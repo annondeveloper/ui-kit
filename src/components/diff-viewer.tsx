@@ -27,8 +27,29 @@ interface DiffLine {
   newLineNo?: number
 }
 
+const MAX_LINES = 2000
+
 /** Simple line-by-line diff using longest common subsequence. */
 function computeDiff(oldLines: string[], newLines: string[]): DiffLine[] {
+  // Fall back to simple line-by-line comparison for large inputs
+  if (oldLines.length > MAX_LINES || newLines.length > MAX_LINES) {
+    const result: DiffLine[] = oldLines.map((l, i) => ({
+      type: (l === (newLines[i] ?? '') ? 'unchanged' : 'removed') as LineType,
+      content: l,
+      oldLineNo: i + 1,
+      newLineNo: i + 1,
+    }))
+    for (let i = oldLines.length; i < newLines.length; i++) {
+      result.push({
+        type: 'added' as LineType,
+        content: newLines[i],
+        oldLineNo: undefined,
+        newLineNo: i + 1,
+      })
+    }
+    return result
+  }
+
   // Build LCS table
   const m = oldLines.length
   const n = newLines.length

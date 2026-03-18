@@ -115,7 +115,8 @@ export function CommandBar({
   const [recentIds, setRecentIds] = useState<string[]>(() => {
     if (typeof window === 'undefined') return []
     try {
-      return JSON.parse(localStorage.getItem(recentKey) ?? '[]') as string[]
+      const raw = JSON.parse(localStorage.getItem(recentKey) ?? '[]')
+      return Array.isArray(raw) ? raw.filter((x: unknown) => typeof x === 'string' && x.length < 256).slice(0, maxRecent) : []
     } catch {
       return []
     }

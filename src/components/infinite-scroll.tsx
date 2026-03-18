@@ -28,6 +28,8 @@ export interface InfiniteScrollProps<T> {
   itemHeight?: number
   /** Content to display when items array is empty. */
   emptyState?: React.ReactNode
+  /** Function to derive a stable key for each item. Falls back to index. */
+  getItemKey?: (item: T, index: number) => string | number
   /** Additional class name for the scroll container. */
   className?: string
 }
@@ -49,6 +51,7 @@ export function InfiniteScroll<T>({
   isLoading = false,
   threshold = 200,
   itemHeight,
+  getItemKey,
   emptyState,
   className,
 }: InfiniteScrollProps<T>): React.JSX.Element {
@@ -57,6 +60,8 @@ export function InfiniteScroll<T>({
   const sentinelRef = useRef<HTMLDivElement>(null)
   const [showScrollTop, setShowScrollTop] = useState(false)
   const loadingRef = useRef(false)
+  const loadMoreRef = useRef(loadMore)
+  useEffect(() => { loadMoreRef.current = loadMore }, [loadMore])
 
   // IntersectionObserver for infinite load trigger
   useEffect(() => {
@@ -68,7 +73,7 @@ export function InfiniteScroll<T>({
         const entry = entries[0]
         if (entry?.isIntersecting && hasMore && !isLoading && !loadingRef.current) {
           loadingRef.current = true
-          const result = loadMore()
+          const result = loadMoreRef.current()
           if (result && typeof result.then === 'function') {
             result.then(() => { loadingRef.current = false }).catch(() => { loadingRef.current = false })
           } else {
@@ -84,7 +89,7 @@ export function InfiniteScroll<T>({
 
     observer.observe(sentinel)
     return () => observer.disconnect()
-  }, [hasMore, isLoading, loadMore, threshold])
+  }, [hasMore, isLoading, threshold])
 
   // Update loadingRef when isLoading changes
   useEffect(() => {
@@ -179,7 +184,7 @@ export function InfiniteScroll<T>({
       ) : (
         /* Non-virtualized rendering */
         items.map((item, index) => (
-          <div key={index}>
+          <div key={getItemKey ? getItemKey(item, index) : index}>
             {renderItem(item, index)}
           </div>
         ))

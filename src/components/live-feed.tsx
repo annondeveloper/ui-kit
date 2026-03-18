@@ -143,6 +143,8 @@ export function LiveFeed({
         ref={scrollRef}
         onScroll={handleScroll}
         className="flex-1 overflow-y-auto"
+        aria-live="polite"
+        aria-atomic="false"
       >
         {visibleItems.length === 0 ? (
           <div className="flex items-center justify-center py-12 text-sm text-[hsl(var(--text-tertiary))]">

@@ -73,6 +73,9 @@ export function StreamingText({
   const containerRef = useRef<HTMLDivElement>(null)
   const prevStreamingRef = useRef(isStreaming)
   const [copied, setCopied] = useState(false)
+  const copyTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  useEffect(() => () => { if (copyTimerRef.current) clearTimeout(copyTimerRef.current) }, [])
 
   useEffect(() => {
     if (prevStreamingRef.current && !isStreaming) {
@@ -91,7 +94,8 @@ export function StreamingText({
   const handleCopy = useCallback(() => {
     void navigator.clipboard.writeText(text).then(() => {
       setCopied(true)
-      setTimeout(() => setCopied(false), 2000)
+      if (copyTimerRef.current) clearTimeout(copyTimerRef.current)
+      copyTimerRef.current = setTimeout(() => setCopied(false), 2000)
     })
   }, [text])
 
@@ -114,6 +118,7 @@ export function StreamingText({
                     animation: `streaming-cursor-blink ${speed}ms step-end infinite`,
                   }
             }
+            aria-hidden="true"
           />
         )}
         <AnimatePresence>
@@ -150,14 +155,6 @@ export function StreamingText({
         )}
       </AnimatePresence>
 
-      {showCursor && isStreaming && !reduced && (
-        <style>{`
-          @keyframes streaming-cursor-blink {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0; }
-          }
-        `}</style>
-      )}
     </div>
   )
 }

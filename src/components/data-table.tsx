@@ -19,6 +19,7 @@ import type { LucideIcon } from 'lucide-react'
 import { TruncatedText } from './truncated-text'
 import { EmptyState } from './empty-state'
 import { Skeleton } from './skeleton'
+import { Select } from './select'
 import { cn } from '../utils'
 
 // ---------------------------------------------------------------------------
@@ -679,18 +680,12 @@ export function DataTable<T>({
           </span>
 
           <div className="flex items-center gap-2">
-            <select
-              value={pageSize}
-              onChange={e => table.setPageSize(Number(e.target.value))}
-              className="rounded-md border border-[hsl(var(--border-subtle))]
-                bg-[hsl(var(--bg-surface))] px-2 py-1 text-[12px]
-                text-[hsl(var(--text-secondary))] outline-none
-                focus:border-[hsl(var(--brand-primary))] transition-colors"
-            >
-              {PAGE_SIZES.map(size => (
-                <option key={size} value={size}>{size} / page</option>
-              ))}
-            </select>
+            <Select
+              value={String(pageSize)}
+              onValueChange={v => table.setPageSize(Number(v))}
+              options={PAGE_SIZES.map(size => ({ value: String(size), label: `${size} / page` }))}
+              className="w-[110px] text-[12px]"
+            />
 
             <div className="flex items-center gap-1">
               <PaginationButton

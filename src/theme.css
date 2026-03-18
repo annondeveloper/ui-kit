@@ -168,6 +168,12 @@ html.light {
   color: hsl(var(--text-primary));
 }
 
+/* ── Streaming cursor ────────────────────────────────────────────────────── */
+@keyframes streaming-cursor-blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
 /* ── Reduced motion ──────────────────────────────────────────────────────── */
 @media (prefers-reduced-motion: reduce) {
   .animate-pulse-ring,

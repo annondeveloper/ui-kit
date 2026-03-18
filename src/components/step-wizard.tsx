@@ -97,6 +97,8 @@ export function StepWizard({
   const [direction, setDirection] = useState(1) // 1=forward, -1=backward
   const [isComplete, setIsComplete] = useState(false)
   const contentRef = useRef<HTMLDivElement>(null)
+  const wizardRef = useRef<HTMLDivElement>(null)
+  const validatingRef = useRef(false)
 
   // Save state to sessionStorage
   useEffect(() => {
@@ -118,20 +120,25 @@ export function StepWizard({
   }, [currentStep, onStepChange])
 
   const handleNext = useCallback(async () => {
+    if (validatingRef.current) return
     const step = steps[currentStep]
     if (step?.validate) {
+      validatingRef.current = true
       setIsValidating(true)
       try {
         const valid = await step.validate()
         if (!valid) {
           setIsValidating(false)
+          validatingRef.current = false
           return
         }
       } catch {
         setIsValidating(false)
+        validatingRef.current = false
         return
       }
       setIsValidating(false)
+      validatingRef.current = false
     }
 
     setCompleted(prev => new Set(prev).add(currentStep))
@@ -165,6 +172,7 @@ export function StepWizard({
   // Keyboard navigation
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
+      if (!wizardRef.current?.contains(e.target as Node)) return
       if (e.key === 'Enter' && !e.shiftKey && !(e.target instanceof HTMLTextAreaElement)) {
         handleNext()
       }
@@ -188,7 +196,7 @@ export function StepWizard({
   const isHorizontal = orientation === 'horizontal'
 
   return (
-    <div className={cn('flex flex-col', className)}>
+    <div ref={wizardRef} className={cn('flex flex-col', className)}>
       {/* Step indicator */}
       <div className={cn(
         'mb-6',

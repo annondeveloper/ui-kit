@@ -47,8 +47,13 @@ function toDateKey(d: Date): string {
 }
 
 function parseDate(s: string): Date {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(s)) {
+    return new Date()
+  }
   const [y, m, d] = s.split('-').map(Number)
-  return new Date(y, m - 1, d)
+  const date = new Date(y, m - 1, d)
+  if (isNaN(date.getTime())) return new Date()
+  return date
 }
 
 /**

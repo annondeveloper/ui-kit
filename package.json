@@ -1,6 +1,6 @@
 {
   "name": "@annondeveloper/ui-kit",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "type": "module",
   "description": "A React component library with dark/light theming, built on Radix UI, Tailwind CSS v4, and Framer Motion.",
   "main": "dist/index.js",

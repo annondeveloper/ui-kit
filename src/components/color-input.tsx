@@ -88,6 +88,12 @@ function formatColor(hex: string, fmt: 'hex' | 'rgb' | 'hsl'): string {
   return `hsl(${Math.round(h * 360)}, ${Math.round(s * 100)}%, ${Math.round(l * 100)}%)`
 }
 
+function isSafeColor(c: string): boolean {
+  return /^#[0-9a-f]{3,8}$/i.test(c) ||
+    /^rgba?\(\s*[\d.]+/.test(c) ||
+    /^hsla?\(\s*[\d.]+/.test(c)
+}
+
 const RECENT_COLORS_KEY = 'ui-kit-recent-colors'
 const MAX_RECENT = 8
 
@@ -110,18 +116,24 @@ export function ColorInput({
   className,
 }: ColorInputProps): React.JSX.Element {
   const prefersReducedMotion = useReducedMotion()
+  const isValidHex = /^#[0-9a-f]{3,8}$/i.test(value)
+  const safeValue = isValidHex ? value : '#000000'
   const [open, setOpen] = useState(false)
   const [copied, setCopied] = useState(false)
   const [textInput, setTextInput] = useState('')
   const [alpha, setAlpha] = useState(1)
   const panelRef = useRef<HTMLDivElement>(null)
   const satAreaRef = useRef<HTMLDivElement>(null)
+  const copyTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  useEffect(() => () => { if (copyTimerRef.current) clearTimeout(copyTimerRef.current) }, [])
 
   // Recent colors
   const [recentColors, setRecentColors] = useState<string[]>(() => {
     if (typeof window === 'undefined') return []
     try {
-      return JSON.parse(localStorage.getItem(RECENT_COLORS_KEY) ?? '[]') as string[]
+      const raw = JSON.parse(localStorage.getItem(RECENT_COLORS_KEY) ?? '[]')
+      return Array.isArray(raw) ? raw.filter((x: unknown) => typeof x === 'string' && x.length < 256).slice(0, MAX_RECENT) : []
     } catch { return [] }
   })
 
@@ -134,13 +146,13 @@ export function ColorInput({
   }, [])
 
   // HSL from current value
-  const { r, g, b } = useMemo(() => hexToRgb(value), [value])
+  const { r, g, b } = useMemo(() => hexToRgb(safeValue), [safeValue])
   const hsl = useMemo(() => rgbToHsl(r, g, b), [r, g, b])
 
   // Sync text input
   useEffect(() => {
-    setTextInput(formatColor(value, format))
-  }, [value, format])
+    setTextInput(formatColor(safeValue, format))
+  }, [safeValue, format])
 
   // Close on click outside
   useEffect(() => {
@@ -220,16 +232,17 @@ export function ColorInput({
       return
     }
     // Revert
-    setTextInput(formatColor(value, format))
-  }, [textInput, value, format, onChange])
+    setTextInput(formatColor(safeValue, format))
+  }, [textInput, safeValue, format, onChange])
 
   const handleCopy = useCallback(async () => {
     try {
-      await navigator.clipboard.writeText(formatColor(value, format))
+      await navigator.clipboard.writeText(formatColor(safeValue, format))
       setCopied(true)
-      setTimeout(() => setCopied(false), 1500)
+      if (copyTimerRef.current) clearTimeout(copyTimerRef.current)
+      copyTimerRef.current = setTimeout(() => setCopied(false), 1500)
     } catch { /* noop */ }
-  }, [value, format])
+  }, [safeValue, format])
 
   // Position for sat/brightness marker
   const markerX = hsl.s * 100
@@ -256,7 +269,7 @@ export function ColorInput({
       >
         <span
           className="h-5 w-5 rounded-md border border-[hsl(var(--border-subtle))]"
-          style={{ backgroundColor: value }}
+          style={{ backgroundColor: isSafeColor(safeValue) ? safeValue : undefined }}
         />
         <span className="font-mono text-xs text-[hsl(var(--text-primary))]">
           {formatColor(value, format)}
@@ -294,7 +307,7 @@ export function ColorInput({
                 style={{
                   left: `${markerX}%`,
                   top: `${Math.max(0, Math.min(100, markerY))}%`,
-                  backgroundColor: value,
+                  backgroundColor: isSafeColor(safeValue) ? safeValue : undefined,
                 }}
               />
             </div>
@@ -325,7 +338,7 @@ export function ColorInput({
                   onChange={e => setAlpha(Number(e.target.value) / 100)}
                   className="w-full h-3 rounded-full appearance-none cursor-pointer"
                   style={{
-                    background: `linear-gradient(to right, transparent, ${value})`,
+                    background: `linear-gradient(to right, transparent, ${isSafeColor(safeValue) ? safeValue : '#000'})`,
                   }}
                 />
               </div>
@@ -376,7 +389,7 @@ export function ColorInput({
                           ? 'border-[hsl(var(--brand-primary))] ring-2 ring-[hsl(var(--brand-primary)/0.3)] scale-110'
                           : 'border-[hsl(var(--border-subtle))] hover:scale-110',
                       )}
-                      style={{ backgroundColor: color }}
+                      style={{ backgroundColor: isSafeColor(color) ? color : undefined }}
                       title={color}
                     />
                   ))}
@@ -399,7 +412,7 @@ export function ColorInput({
                         'h-6 w-6 rounded-md border border-[hsl(var(--border-subtle))]',
                         'hover:scale-110 transition-transform',
                       )}
-                      style={{ backgroundColor: color }}
+                      style={{ backgroundColor: isSafeColor(color) ? color : undefined }}
                       title={color}
                     />
                   ))}

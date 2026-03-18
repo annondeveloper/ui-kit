@@ -53,6 +53,13 @@ const TYPE_ICON_COLOR: Record<Notification['type'], string> = {
   error: 'text-[hsl(var(--status-critical))]',
 }
 
+const TYPE_PROGRESS_BG: Record<Notification['type'], string> = {
+  info: 'bg-[hsl(var(--brand-secondary))]',
+  success: 'bg-[hsl(var(--status-ok))]',
+  warning: 'bg-[hsl(var(--status-warning))]',
+  error: 'bg-[hsl(var(--status-critical))]',
+}
+
 const POSITION_CLASSES: Record<NonNullable<NotificationStackProps['position']>, string> = {
   'top-right': 'top-4 right-4',
   'top-left': 'top-4 left-4',
@@ -216,7 +223,7 @@ function NotificationCard({
       {duration > 0 && (
         <div className="h-0.5 bg-[hsl(var(--bg-overlay))]">
           <div
-            className={cn('h-full transition-[width] duration-100', TYPE_COLOR[type].replace('border-l-', 'bg-'))}
+            className={cn('h-full transition-[width] duration-100', TYPE_PROGRESS_BG[type])}
             style={{ width: `${progress}%` }}
           />
         </div>

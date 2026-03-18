@@ -33,11 +33,15 @@ export function AnimatedCounter({
   const prevRef = useRef(value)
   const rafRef = useRef<number | null>(null)
   const [displayed, setDisplayed] = useState(value)
+  const decimalPlacesRef = useRef(
+    Number.isInteger(value) ? 0 : (value.toString().split('.')[1]?.length ?? 1)
+  )
 
   useEffect(() => {
     const from = prevRef.current
     const to = value
     prevRef.current = value
+    decimalPlacesRef.current = Number.isInteger(to) ? 0 : (to.toString().split('.')[1]?.length ?? 1)
 
     if (reduced || from === to) {
       setDisplayed(to)
@@ -72,11 +76,9 @@ export function AnimatedCounter({
 
   const formatted = format
     ? format(displayed)
-    : Number.isInteger(value)
+    : decimalPlacesRef.current === 0
       ? Math.round(displayed).toString()
-      : displayed.toFixed(
-          value.toString().split('.')[1]?.length ?? 1
-        )
+      : displayed.toFixed(decimalPlacesRef.current)
 
   return (
     <span className={cn('tabular-nums', className)}>

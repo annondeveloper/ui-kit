@@ -48,6 +48,9 @@ export function CopyBlock({
   const [isCollapsed, setIsCollapsed] = useState(true)
   const [needsCollapse, setNeedsCollapse] = useState(false)
   const contentRef = useRef<HTMLPreElement>(null)
+  const copyTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  useEffect(() => () => { if (copyTimerRef.current) clearTimeout(copyTimerRef.current) }, [])
 
   // Check if content exceeds maxHeight
   useEffect(() => {
@@ -61,19 +64,11 @@ export function CopyBlock({
     try {
       await navigator.clipboard.writeText(content)
       setCopied(true)
-      setTimeout(() => setCopied(false), 2000)
+      if (copyTimerRef.current) clearTimeout(copyTimerRef.current)
+      copyTimerRef.current = setTimeout(() => setCopied(false), 2000)
     } catch {
-      // Fallback for older browsers
-      const textarea = document.createElement('textarea')
-      textarea.value = content
-      textarea.style.position = 'fixed'
-      textarea.style.opacity = '0'
-      document.body.appendChild(textarea)
-      textarea.select()
-      document.execCommand('copy')
-      document.body.removeChild(textarea)
-      setCopied(true)
-      setTimeout(() => setCopied(false), 2000)
+      // Clipboard API not available
+      console.warn('Clipboard API not available')
     }
   }, [content])
 

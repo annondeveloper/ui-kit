@@ -151,6 +151,8 @@ export function LogViewer({
         onScroll={checkAtBottom}
         className="overflow-y-auto"
         style={{ maxHeight }}
+        aria-live="polite"
+        aria-atomic="false"
       >
         {filtered.map((entry, i) => (
           <div

@@ -70,6 +70,8 @@ export function SortableList<T extends SortableItem>({
   const containerRef = useRef<HTMLDivElement>(null)
   const startPos = useRef({ x: 0, y: 0 })
   const dragItemId = useRef<string | null>(null)
+  const dragIdxRef = useRef<number | null>(null)
+  const overIdxRef = useRef<number | null>(null)
 
   const handlePointerDown = useCallback(
     (index: number) => (e: React.PointerEvent) => {
@@ -79,6 +81,8 @@ export function SortableList<T extends SortableItem>({
 
       setDragIdx(index)
       setOverIdx(index)
+      dragIdxRef.current = index
+      overIdxRef.current = index
       dragItemId.current = items[index]?.id ?? null
       startPos.current = { x: e.clientX, y: e.clientY }
 
@@ -97,6 +101,7 @@ export function SortableList<T extends SortableItem>({
             : ev.clientX < midX + rect.width / 2 && ev.clientX > midX - rect.width / 2
 
           if (isOver) {
+            overIdxRef.current = i
             setOverIdx(i)
             break
           }
@@ -107,19 +112,18 @@ export function SortableList<T extends SortableItem>({
         document.removeEventListener('pointermove', handlePointerMove)
         document.removeEventListener('pointerup', handlePointerUp)
 
-        setDragIdx(prev => {
-          setOverIdx(over => {
-            if (prev !== null && over !== null && prev !== over) {
-              const newItems = [...items]
-              const [moved] = newItems.splice(prev, 1)
-              if (moved) newItems.splice(over, 0, moved)
-              // Use setTimeout to avoid state update during render
-              setTimeout(() => onReorder(newItems), 0)
-            }
-            return null
-          })
-          return null
-        })
+        const prev = dragIdxRef.current
+        const over = overIdxRef.current
+        if (prev !== null && over !== null && prev !== over) {
+          const newItems = [...items]
+          const [moved] = newItems.splice(prev, 1)
+          if (moved) newItems.splice(over, 0, moved)
+          onReorder(newItems)
+        }
+        dragIdxRef.current = null
+        overIdxRef.current = null
+        setDragIdx(null)
+        setOverIdx(null)
       }
 
       document.addEventListener('pointermove', handlePointerMove)

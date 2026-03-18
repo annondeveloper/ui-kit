@@ -185,7 +185,6 @@ export function RHFToggleSwitch<T extends FieldValues>({
               enabled={!!field.value}
               onChange={field.onChange}
               disabled={disabled}
-              label={label}
             />
             {label && (
               <span className="text-sm text-[hsl(var(--text-primary))]">{label}</span>
