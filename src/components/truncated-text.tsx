@@ -1,5 +1,6 @@
 'use client'
 
+import type React from 'react'
 import { useRef, useState, useEffect } from 'react'
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { Copy, Check } from 'lucide-react'
@@ -16,7 +17,7 @@ export interface TruncatedTextProps {
  * @description A text element that truncates with ellipsis and shows a tooltip with the
  * full text on hover when truncated. Includes a copy-to-clipboard button in the tooltip.
  */
-export function TruncatedText({ text, maxWidth = '100%', className = '' }: TruncatedTextProps) {
+export function TruncatedText({ text, maxWidth = '100%', className = '' }: TruncatedTextProps): React.JSX.Element {
   const ref = useRef<HTMLSpanElement>(null)
   const [isTruncated, setIsTruncated] = useState(false)
   const [copied, setCopied] = useState(false)

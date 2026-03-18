@@ -1,5 +1,6 @@
 'use client'
 
+import type React from 'react'
 import { motion, useReducedMotion } from 'framer-motion'
 import { cn } from '../utils'
 
@@ -37,7 +38,7 @@ export interface StatusPulseProps {
  * @description An animated status indicator dot with optional pulse ring and label.
  * Accepts a configurable map to define custom statuses. Respects prefers-reduced-motion.
  */
-export function StatusPulse({ status, label = true, configMap, className }: StatusPulseProps) {
+export function StatusPulse({ status, label = true, configMap, className }: StatusPulseProps): React.JSX.Element {
   const reduced = useReducedMotion()
   const map = configMap ?? defaultPulseConfigMap
   const cfg = map[status] ?? map['unknown'] ?? defaultPulseConfigMap['unknown']!

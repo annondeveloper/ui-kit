@@ -1,5 +1,6 @@
 'use client'
 
+import type React from 'react'
 import { motion, useReducedMotion } from 'framer-motion'
 import { cn } from '../utils'
 
@@ -59,7 +60,7 @@ export function UptimeTracker({
   label,
   onDayClick,
   className,
-}: UptimeTrackerProps) {
+}: UptimeTrackerProps): React.JSX.Element {
   const reduced = useReducedMotion()
 
   // Calculate overall uptime

@@ -1,5 +1,6 @@
 'use client'
 
+import type React from 'react'
 import { cn } from '../utils'
 
 export interface FilterPillProps {
@@ -18,7 +19,7 @@ export interface FilterPillProps {
  * @description A rounded pill-style filter toggle with active state and optional count.
  * Uses CSS custom property tokens for dark/light mode compatibility.
  */
-export function FilterPill({ label, count, active, onClick, className }: FilterPillProps) {
+export function FilterPill({ label, count, active, onClick, className }: FilterPillProps): React.JSX.Element {
   return (
     <button
       type="button"

@@ -1,5 +1,6 @@
 'use client'
 
+import type React from 'react'
 import { useState, useMemo, useCallback, useRef, useEffect } from 'react'
 import {
   useReactTable, getCoreRowModel, getSortedRowModel,
@@ -365,7 +366,7 @@ export function DataTable<T>({
   exportFilename,
   stickyFirstColumn = false,
   density: densityProp,
-}: DataTableProps<T>) {
+}: DataTableProps<T>): React.JSX.Element {
   const prefersReducedMotion = useReducedMotion()
 
   const [density, setDensity] = useState<Density>(() => {

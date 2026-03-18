@@ -1,5 +1,6 @@
 'use client'
 
+import type React from 'react'
 import { useCallback, useRef, type KeyboardEvent } from 'react'
 import { motion, useReducedMotion } from 'framer-motion'
 import type { LucideIcon } from 'lucide-react'
@@ -49,7 +50,7 @@ export function Tabs({
   variant = 'underline',
   size = 'md',
   className,
-}: TabsProps) {
+}: TabsProps): React.JSX.Element {
   const prefersReducedMotion = useReducedMotion()
   const tabListRef = useRef<HTMLDivElement>(null)
 

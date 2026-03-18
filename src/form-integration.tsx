@@ -1,5 +1,6 @@
 'use client'
 
+import type React from 'react'
 import { Controller, type Control, type FieldValues, type Path, type RegisterOptions } from 'react-hook-form'
 import { FormInput, INPUT_CLS } from './components/form-input'
 import { Select, type SelectOption } from './components/select'
@@ -39,7 +40,7 @@ export interface RHFFormInputProps<T extends FieldValues> {
 export function RHFFormInput<T extends FieldValues>({
   control, name, rules, label, type = 'text',
   placeholder, required, disabled, hint, className, autoComplete,
-}: RHFFormInputProps<T>) {
+}: RHFFormInputProps<T>): React.JSX.Element {
   return (
     <Controller
       control={control}
@@ -84,7 +85,7 @@ export interface RHFSelectProps<T extends FieldValues> {
  */
 export function RHFSelect<T extends FieldValues>({
   control, name, rules, options, placeholder, disabled, className, label,
-}: RHFSelectProps<T>) {
+}: RHFSelectProps<T>): React.JSX.Element {
   return (
     <Controller
       control={control}
@@ -129,7 +130,7 @@ export interface RHFCheckboxProps<T extends FieldValues> {
  */
 export function RHFCheckbox<T extends FieldValues>({
   control, name, rules, label, disabled, className,
-}: RHFCheckboxProps<T>) {
+}: RHFCheckboxProps<T>): React.JSX.Element {
   return (
     <Controller
       control={control}
@@ -171,7 +172,7 @@ export interface RHFToggleSwitchProps<T extends FieldValues> {
  */
 export function RHFToggleSwitch<T extends FieldValues>({
   control, name, rules, label, disabled, className,
-}: RHFToggleSwitchProps<T>) {
+}: RHFToggleSwitchProps<T>): React.JSX.Element {
   return (
     <Controller
       control={control}

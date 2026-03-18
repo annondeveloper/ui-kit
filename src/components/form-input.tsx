@@ -1,11 +1,12 @@
 'use client'
 
+import type React from 'react'
 import { cn } from '../utils'
 
 // ── Shared class constants ──────────────────────────────────────────────────
 // Import these in any page that needs raw class strings (e.g. for <textarea>)
 
-export const INPUT_CLS = cn(
+export const INPUT_CLS: string = cn(
   'w-full rounded-lg border border-[hsl(var(--border-default))]',
   'bg-[hsl(var(--bg-base))] px-3 py-2 text-sm',
   'text-[hsl(var(--text-primary))] placeholder:text-[hsl(var(--text-tertiary))]',
@@ -13,12 +14,12 @@ export const INPUT_CLS = cn(
   'disabled:opacity-50 disabled:cursor-not-allowed',
 )
 
-export const LABEL_CLS = cn(
+export const LABEL_CLS: string = cn(
   'mb-1.5 block text-xs font-medium uppercase tracking-wider',
   'text-[hsl(var(--text-secondary))]',
 )
 
-export const TEXTAREA_CLS = cn(
+export const TEXTAREA_CLS: string = cn(
   INPUT_CLS,
   'resize-none font-mono text-xs leading-relaxed',
 )
@@ -52,7 +53,7 @@ export interface FormInputProps {
 export function FormInput({
   label, value, onChange, type = 'text',
   placeholder, required, disabled, hint, className, autoComplete,
-}: FormInputProps) {
+}: FormInputProps): React.JSX.Element {
   return (
     <div className={cn('space-y-1.5', className)}>
       <label className={LABEL_CLS}>

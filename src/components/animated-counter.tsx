@@ -1,5 +1,6 @@
 'use client'
 
+import type React from 'react'
 import { useEffect, useRef, useState } from 'react'
 import { useReducedMotion } from 'framer-motion'
 import { cn } from '../utils'
@@ -27,7 +28,7 @@ export function AnimatedCounter({
   duration = 400,
   className,
   format,
-}: AnimatedCounterProps) {
+}: AnimatedCounterProps): React.JSX.Element {
   const reduced = useReducedMotion()
   const prevRef = useRef(value)
   const rafRef = useRef<number | null>(null)

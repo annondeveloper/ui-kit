@@ -1,5 +1,6 @@
 'use client'
 
+import type React from 'react'
 import * as RadixSelect from '@radix-ui/react-select'
 import { ChevronDown, Check } from 'lucide-react'
 import { cn } from '../utils'
@@ -29,7 +30,7 @@ export interface SelectProps {
  */
 export function Select({
   value, onValueChange, options, placeholder, className, disabled,
-}: SelectProps) {
+}: SelectProps): React.JSX.Element {
   return (
     <RadixSelect.Root value={value} onValueChange={onValueChange} disabled={disabled}>
       <RadixSelect.Trigger

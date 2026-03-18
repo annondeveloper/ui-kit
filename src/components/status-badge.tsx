@@ -1,5 +1,6 @@
 'use client'
 
+import type React from 'react'
 import { cn } from '../utils'
 
 /** Configuration for a single status entry in a StatusBadge. */
@@ -49,7 +50,7 @@ export interface StatusBadgeProps {
  */
 export function StatusBadge({
   status, label, size = 'md', pulse = false, statusMap, className,
-}: StatusBadgeProps) {
+}: StatusBadgeProps): React.JSX.Element {
   const map = statusMap ?? defaultStatusMap
   const fallback = map['unknown'] ?? defaultStatusMap['unknown']!
   const config = map[status] ?? fallback

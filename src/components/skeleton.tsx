@@ -1,12 +1,13 @@
 'use client'
 
+import type React from 'react'
 import { cn } from '../utils'
 
 /**
  * @description A shimmer skeleton loader block. Requires the `skeleton-shimmer` CSS class
  * from theme.css to animate.
  */
-export function Skeleton({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) {
+export function Skeleton({ className, ...props }: React.HTMLAttributes<HTMLDivElement>): React.JSX.Element {
   return (
     <div
       className={cn('skeleton-shimmer rounded-md', className)}
@@ -25,7 +26,7 @@ export interface SkeletonTextProps {
  * @description A multi-line skeleton text placeholder. The last line renders shorter
  * for a natural paragraph appearance.
  */
-export function SkeletonText({ lines = 1, className }: SkeletonTextProps) {
+export function SkeletonText({ lines = 1, className }: SkeletonTextProps): React.JSX.Element {
   return (
     <div className={cn('space-y-2', className)}>
       {Array.from({ length: lines }).map((_, i) => (
@@ -41,7 +42,7 @@ export function SkeletonText({ lines = 1, className }: SkeletonTextProps) {
 /**
  * @description A card-shaped skeleton placeholder with header area and content bars.
  */
-export function SkeletonCard({ className }: { className?: string }) {
+export function SkeletonCard({ className }: { className?: string }): React.JSX.Element {
   return (
     <div className={cn('rounded-lg border border-[hsl(var(--border-subtle))] bg-[hsl(var(--bg-surface))] p-4 space-y-3', className)}>
       <div className="flex items-center gap-3">

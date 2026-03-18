@@ -1,5 +1,6 @@
 'use client'
 
+import type React from 'react'
 import { forwardRef, type HTMLAttributes, type ReactNode } from 'react'
 import { cn } from '../utils'
 
@@ -37,8 +38,8 @@ export interface CardProps extends HTMLAttributes<HTMLDivElement> {
  * Use with CardHeader, CardTitle, CardDescription, CardContent, and CardFooter
  * subcomponents for semantic structure.
  */
-const Card = forwardRef<HTMLDivElement, CardProps>(
-  ({ variant = 'default', padding = 'md', className, children, ...props }, ref) => (
+const Card: React.ForwardRefExoticComponent<CardProps & React.RefAttributes<HTMLDivElement>> = forwardRef<HTMLDivElement, CardProps>(
+  ({ variant = 'default', padding = 'md', className, children, ...props }, ref): React.JSX.Element => (
     <div
       ref={ref}
       className={cn('rounded-2xl', variantClasses[variant], paddingClasses[padding], className)}
@@ -57,8 +58,8 @@ export interface CardSubProps extends HTMLAttributes<HTMLDivElement> {
 }
 
 /** Header section of a Card (flex row for title + actions). */
-const CardHeader = forwardRef<HTMLDivElement, CardSubProps>(
-  ({ className, children, ...props }, ref) => (
+const CardHeader: React.ForwardRefExoticComponent<CardSubProps & React.RefAttributes<HTMLDivElement>> = forwardRef<HTMLDivElement, CardSubProps>(
+  ({ className, children, ...props }, ref): React.JSX.Element => (
     <div
       ref={ref}
       className={cn('flex items-start justify-between gap-4', className)}
@@ -71,8 +72,8 @@ const CardHeader = forwardRef<HTMLDivElement, CardSubProps>(
 CardHeader.displayName = 'CardHeader'
 
 /** Title within a CardHeader. */
-const CardTitle = forwardRef<HTMLHeadingElement, HTMLAttributes<HTMLHeadingElement> & { children: ReactNode }>(
-  ({ className, children, ...props }, ref) => (
+const CardTitle: React.ForwardRefExoticComponent<HTMLAttributes<HTMLHeadingElement> & { children: ReactNode } & React.RefAttributes<HTMLHeadingElement>> = forwardRef<HTMLHeadingElement, HTMLAttributes<HTMLHeadingElement> & { children: ReactNode }>(
+  ({ className, children, ...props }, ref): React.JSX.Element => (
     <h3
       ref={ref}
       className={cn('text-base font-semibold text-[hsl(var(--text-primary))]', className)}
@@ -85,8 +86,8 @@ const CardTitle = forwardRef<HTMLHeadingElement, HTMLAttributes<HTMLHeadingEleme
 CardTitle.displayName = 'CardTitle'
 
 /** Description text within a CardHeader. */
-const CardDescription = forwardRef<HTMLParagraphElement, HTMLAttributes<HTMLParagraphElement> & { children: ReactNode }>(
-  ({ className, children, ...props }, ref) => (
+const CardDescription: React.ForwardRefExoticComponent<HTMLAttributes<HTMLParagraphElement> & { children: ReactNode } & React.RefAttributes<HTMLParagraphElement>> = forwardRef<HTMLParagraphElement, HTMLAttributes<HTMLParagraphElement> & { children: ReactNode }>(
+  ({ className, children, ...props }, ref): React.JSX.Element => (
     <p
       ref={ref}
       className={cn('text-sm text-[hsl(var(--text-secondary))]', className)}
@@ -99,8 +100,8 @@ const CardDescription = forwardRef<HTMLParagraphElement, HTMLAttributes<HTMLPara
 CardDescription.displayName = 'CardDescription'
 
 /** Main content area of a Card. */
-const CardContent = forwardRef<HTMLDivElement, CardSubProps>(
-  ({ className, children, ...props }, ref) => (
+const CardContent: React.ForwardRefExoticComponent<CardSubProps & React.RefAttributes<HTMLDivElement>> = forwardRef<HTMLDivElement, CardSubProps>(
+  ({ className, children, ...props }, ref): React.JSX.Element => (
     <div ref={ref} className={cn('mt-4', className)} {...props}>
       {children}
     </div>
@@ -109,8 +110,8 @@ const CardContent = forwardRef<HTMLDivElement, CardSubProps>(
 CardContent.displayName = 'CardContent'
 
 /** Footer section of a Card (typically for actions). */
-const CardFooter = forwardRef<HTMLDivElement, CardSubProps>(
-  ({ className, children, ...props }, ref) => (
+const CardFooter: React.ForwardRefExoticComponent<CardSubProps & React.RefAttributes<HTMLDivElement>> = forwardRef<HTMLDivElement, CardSubProps>(
+  ({ className, children, ...props }, ref): React.JSX.Element => (
     <div
       ref={ref}
       className={cn(

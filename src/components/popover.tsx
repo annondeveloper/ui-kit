@@ -1,5 +1,6 @@
 'use client'
 
+import type React from 'react'
 import { type ReactNode } from 'react'
 import * as PopoverPrimitive from '@radix-ui/react-popover'
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion'
@@ -28,7 +29,7 @@ const contentVariants = {
  * @description A popover wrapper built on Radix Popover with Framer Motion entry animation.
  * Closes on outside click. Includes an arrow pointer.
  */
-export function Popover({ trigger, children, side = 'bottom', align = 'center', className }: PopoverProps) {
+export function Popover({ trigger, children, side = 'bottom', align = 'center', className }: PopoverProps): React.JSX.Element {
   const prefersReducedMotion = useReducedMotion()
 
   return (

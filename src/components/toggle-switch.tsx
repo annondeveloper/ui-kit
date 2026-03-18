@@ -1,5 +1,6 @@
 'use client'
 
+import type React from 'react'
 import { ToggleLeft, ToggleRight } from 'lucide-react'
 import { cn } from '../utils'
 
@@ -23,7 +24,7 @@ export interface ToggleSwitchProps {
  */
 export function ToggleSwitch({
   enabled, onChange, size = 'md', disabled, label, className,
-}: ToggleSwitchProps) {
+}: ToggleSwitchProps): React.JSX.Element {
   const iconSize = size === 'sm' ? 'size-5' : 'size-6'
 
   return (

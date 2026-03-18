@@ -1,5 +1,6 @@
 'use client'
 
+import type React from 'react'
 import { type ReactNode } from 'react'
 import * as DropdownMenuPrimitive from '@radix-ui/react-dropdown-menu'
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion'
@@ -42,7 +43,7 @@ const contentVariants = {
  * Features Framer Motion entry/exit animations, keyboard accessibility,
  * and a danger variant for destructive actions.
  */
-export function DropdownMenu({ trigger, items, align = 'end', className }: DropdownMenuProps) {
+export function DropdownMenu({ trigger, items, align = 'end', className }: DropdownMenuProps): React.JSX.Element {
   const prefersReducedMotion = useReducedMotion()
 
   return (

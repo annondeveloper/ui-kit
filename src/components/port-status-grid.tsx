@@ -1,5 +1,6 @@
 'use client'
 
+import type React from 'react'
 import { motion, useReducedMotion } from 'framer-motion'
 import { cn } from '../utils'
 
@@ -58,7 +59,7 @@ export function PortStatusGrid({
   size = 'sm',
   onPortClick,
   className,
-}: PortStatusGridProps) {
+}: PortStatusGridProps): React.JSX.Element {
   const reduced = useReducedMotion()
 
   const gridStyle = columns

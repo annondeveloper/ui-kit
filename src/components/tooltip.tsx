@@ -1,5 +1,6 @@
 'use client'
 
+import type React from 'react'
 import { type ReactNode } from 'react'
 import * as TooltipPrimitive from '@radix-ui/react-tooltip'
 import { cn } from '../utils'
@@ -28,7 +29,7 @@ export function Tooltip({
   side = 'top',
   delay = 200,
   className,
-}: TooltipProps) {
+}: TooltipProps): React.JSX.Element {
   return (
     <TooltipPrimitive.Provider delayDuration={delay}>
       <TooltipPrimitive.Root>

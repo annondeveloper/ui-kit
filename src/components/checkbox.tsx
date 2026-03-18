@@ -1,5 +1,6 @@
 'use client'
 
+import type React from 'react'
 import { forwardRef, type InputHTMLAttributes } from 'react'
 import { Check, Minus } from 'lucide-react'
 import { cn } from '../utils'
@@ -15,8 +16,8 @@ export interface CheckboxProps extends Omit<InputHTMLAttributes<HTMLInputElement
  * @description A themed checkbox with indeterminate state support.
  * Uses CSS custom property tokens for dark/light mode compatibility.
  */
-const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
-  ({ indeterminate, checked, size = 'md', className, ...props }, ref) => {
+const Checkbox: React.ForwardRefExoticComponent<CheckboxProps & React.RefAttributes<HTMLInputElement>> = forwardRef<HTMLInputElement, CheckboxProps>(
+  ({ indeterminate, checked, size = 'md', className, ...props }, ref): React.JSX.Element => {
     const isChecked = checked || indeterminate
     const sizeClass = size === 'sm' ? 'h-3.5 w-3.5' : 'h-4 w-4'
     const iconSize = size === 'sm' ? 'h-2.5 w-2.5' : 'h-3 w-3'

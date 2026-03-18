@@ -1,5 +1,6 @@
 'use client'
 
+import type React from 'react'
 import { useEffect, useCallback, useRef, type ReactNode } from 'react'
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion'
 import { X } from 'lucide-react'
@@ -52,7 +53,7 @@ export function Sheet({
   width = 'max-w-md',
   children,
   className,
-}: SheetProps) {
+}: SheetProps): React.JSX.Element {
   const prefersReducedMotion = useReducedMotion()
   const panelRef = useRef<HTMLDivElement>(null)
 

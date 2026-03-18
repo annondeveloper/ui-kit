@@ -1,5 +1,6 @@
 'use client'
 
+import type React from 'react'
 import { useRef } from 'react'
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion'
 import { cn } from '../utils'
@@ -58,7 +59,7 @@ export function SeverityTimeline({
   maxVisible = 20,
   onEventClick,
   className,
-}: SeverityTimelineProps) {
+}: SeverityTimelineProps): React.JSX.Element | null {
   const reduced = useReducedMotion()
   const scrollRef = useRef<HTMLDivElement>(null)
   const visible = events.slice(0, maxVisible)

@@ -1,5 +1,6 @@
 'use client'
 
+import type React from 'react'
 import { cn } from '../utils'
 import type { LucideIcon } from 'lucide-react'
 
@@ -19,7 +20,7 @@ export interface EmptyStateProps {
  * @description A decorative empty state placeholder with icon, title, description, and optional actions.
  * Features a subtle gradient background and glass-morphism styling.
  */
-export function EmptyState({ icon: Icon, title, description, actions, className }: EmptyStateProps) {
+export function EmptyState({ icon: Icon, title, description, actions, className }: EmptyStateProps): React.JSX.Element {
   return (
     <div
       className={cn(

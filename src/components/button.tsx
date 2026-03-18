@@ -1,5 +1,6 @@
 'use client'
 
+import type React from 'react'
 import { forwardRef, type ButtonHTMLAttributes } from 'react'
 import { Loader2 } from 'lucide-react'
 import { cn } from '../utils'
@@ -40,8 +41,8 @@ export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
  * @description A themed button with variant, size, and loading support.
  * Uses CSS custom property tokens for dark/light mode compatibility.
  */
-const Button = forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ variant = 'primary', size = 'md', loading, disabled, className, children, ...props }, ref) => (
+const Button: React.ForwardRefExoticComponent<ButtonProps & React.RefAttributes<HTMLButtonElement>> = forwardRef<HTMLButtonElement, ButtonProps>(
+  ({ variant = 'primary', size = 'md', loading, disabled, className, children, ...props }, ref): React.JSX.Element => (
     <button
       ref={ref}
       disabled={disabled || loading}

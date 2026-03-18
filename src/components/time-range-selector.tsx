@@ -1,5 +1,6 @@
 'use client'
 
+import type React from 'react'
 import { motion, useReducedMotion } from 'framer-motion'
 import { cn } from '../utils'
 
@@ -40,7 +41,7 @@ export function TimeRangeSelector({
   onChange,
   ranges = defaultRanges,
   className,
-}: TimeRangeSelectorProps) {
+}: TimeRangeSelectorProps): React.JSX.Element {
   const reduced = useReducedMotion()
 
   return (

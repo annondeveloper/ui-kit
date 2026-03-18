@@ -1,5 +1,6 @@
 'use client'
 
+import type React from 'react'
 import { type ElementType } from 'react'
 import { motion, useReducedMotion } from 'framer-motion'
 import { TrendingUp, TrendingDown } from 'lucide-react'
@@ -53,7 +54,7 @@ export function MetricCard({
   status,
   sparklineData,
   className,
-}: MetricCardProps) {
+}: MetricCardProps): React.JSX.Element {
   const reduced = useReducedMotion()
 
   // Trend calculation

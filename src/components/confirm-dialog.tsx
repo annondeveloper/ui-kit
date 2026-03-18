@@ -1,5 +1,6 @@
 'use client'
 
+import type React from 'react'
 import * as AlertDialog from '@radix-ui/react-alert-dialog'
 import { motion, AnimatePresence } from 'framer-motion'
 import { AlertTriangle, Loader2 } from 'lucide-react'
@@ -55,7 +56,7 @@ export function ConfirmDialog({
   variant = 'danger',
   loading = false,
   onConfirm,
-}: ConfirmDialogProps) {
+}: ConfirmDialogProps): React.JSX.Element {
   const styles = variantStyles[variant]
 
   return (

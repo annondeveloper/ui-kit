@@ -1,5 +1,6 @@
 'use client'
 
+import type React from 'react'
 import { motion, useReducedMotion } from 'framer-motion'
 
 export interface SuccessCheckmarkProps {
@@ -12,7 +13,7 @@ export interface SuccessCheckmarkProps {
  * @description An animated success checkmark SVG with circle and path draw animations.
  * Uses Framer Motion spring physics. Respects prefers-reduced-motion.
  */
-export function SuccessCheckmark({ size = 20, className }: SuccessCheckmarkProps) {
+export function SuccessCheckmark({ size = 20, className }: SuccessCheckmarkProps): React.JSX.Element {
   const reduced = useReducedMotion()
 
   return (

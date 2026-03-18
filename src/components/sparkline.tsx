@@ -1,5 +1,6 @@
 'use client'
 
+import type React from 'react'
 import { cn } from '../utils'
 
 export interface SparklineProps {
@@ -45,7 +46,7 @@ export function Sparkline({
   fillOpacity = 0.1,
   showDots = false,
   className,
-}: SparklineProps) {
+}: SparklineProps): React.JSX.Element | null {
   if (data.length < 2) return null
 
   const pad = showDots ? 3 : 1

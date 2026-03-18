@@ -1,5 +1,6 @@
 'use client'
 
+import type React from 'react'
 import { useEffect, useState } from 'react'
 import { useReducedMotion } from 'framer-motion'
 import { cn, clamp } from '../utils'
@@ -53,7 +54,7 @@ export function ThresholdGauge({
   showValue = true,
   format,
   className,
-}: ThresholdGaugeProps) {
+}: ThresholdGaugeProps): React.JSX.Element {
   const reduced = useReducedMotion()
   const value = clamp(rawValue, 0, 100)
   const warning = thresholds?.warning ?? 70

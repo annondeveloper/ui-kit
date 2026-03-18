@@ -1,5 +1,6 @@
 'use client'
 
+import type React from 'react'
 import { motion, useReducedMotion } from 'framer-motion'
 import { cn } from '../utils'
 
@@ -51,7 +52,7 @@ export function Progress({
   animated = true,
   indeterminate = false,
   className,
-}: ProgressProps) {
+}: ProgressProps): React.JSX.Element {
   const prefersReducedMotion = useReducedMotion()
   const pct = Math.min(100, Math.max(0, (value / max) * 100))
 

@@ -1,5 +1,6 @@
 'use client'
 
+import type React from 'react'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion'
 import { ArrowDown, Search } from 'lucide-react'
@@ -78,7 +79,7 @@ export function LogViewer({
   showLevel = true,
   onEntryClick,
   className,
-}: LogViewerProps) {
+}: LogViewerProps): React.JSX.Element {
   const reduced = useReducedMotion()
   const containerRef = useRef<HTMLDivElement>(null)
   const [isAtBottom, setIsAtBottom] = useState(true)

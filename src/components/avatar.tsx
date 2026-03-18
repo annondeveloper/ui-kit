@@ -1,5 +1,6 @@
 'use client'
 
+import type React from 'react'
 import { useState } from 'react'
 import { cn } from '../utils'
 
@@ -55,7 +56,7 @@ export function Avatar({
   size = 'md',
   status,
   className,
-}: AvatarProps) {
+}: AvatarProps): React.JSX.Element {
   const [imgError, setImgError] = useState(false)
   const s = sizeClasses[size]
   const initials = fallback ?? deriveInitials(alt)

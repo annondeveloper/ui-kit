@@ -1,5 +1,6 @@
 'use client'
 
+import type React from 'react'
 import { Toaster as SonnerToaster } from 'sonner'
 
 export interface ToasterProps {
@@ -16,7 +17,7 @@ export interface ToasterProps {
  * instead of reading from a hook, making it portable across applications.
  * Import this Toaster once in your app layout, then use `toast()` from sonner anywhere.
  */
-export function Toaster({ theme = 'dark', position = 'bottom-right', duration = 4000 }: ToasterProps) {
+export function Toaster({ theme = 'dark', position = 'bottom-right', duration = 4000 }: ToasterProps): React.JSX.Element {
   return (
     <SonnerToaster
       theme={theme}

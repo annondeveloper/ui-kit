@@ -1,5 +1,6 @@
 'use client'
 
+import type React from 'react'
 import { type ElementType } from 'react'
 import { motion, useReducedMotion } from 'framer-motion'
 import { ChevronRight } from 'lucide-react'
@@ -54,7 +55,7 @@ export function PipelineStage({
   stages,
   onStageClick,
   className,
-}: PipelineStageProps) {
+}: PipelineStageProps): React.JSX.Element {
   const reduced = useReducedMotion()
 
   return (

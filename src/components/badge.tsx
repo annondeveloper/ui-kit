@@ -1,5 +1,6 @@
 'use client'
 
+import type React from 'react'
 import { cn } from '../utils'
 import type { LucideIcon } from 'lucide-react'
 
@@ -40,7 +41,7 @@ export interface BadgeProps {
  */
 export function Badge({
   children, color = 'gray', icon: Icon, size = 'sm', className,
-}: BadgeProps) {
+}: BadgeProps): React.JSX.Element {
   return (
     <span className={cn(
       'inline-flex items-center gap-1 rounded-full font-medium whitespace-nowrap',
@@ -82,7 +83,7 @@ export interface BadgeVariantConfig<T extends string> {
  * // Usage: <SeverityBadge value="critical" />
  * ```
  */
-export function createBadgeVariant<T extends string>(config: BadgeVariantConfig<T>) {
+export function createBadgeVariant<T extends string>(config: BadgeVariantConfig<T>): (props: { value: T; className?: string }) => React.JSX.Element {
   const { colorMap, labelMap, defaultColor = 'gray', defaultSize = 'xs' } = config
 
   return function VariantBadge({ value, className }: { value: T; className?: string }) {

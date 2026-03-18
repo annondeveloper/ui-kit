@@ -1,5 +1,6 @@
 'use client'
 
+import type React from 'react'
 import { useCallback, useRef, type KeyboardEvent } from 'react'
 import { motion, useReducedMotion } from 'framer-motion'
 import { cn } from '../utils'
@@ -39,7 +40,7 @@ export function RadioGroup({
   onChange,
   orientation = 'vertical',
   className,
-}: RadioGroupProps) {
+}: RadioGroupProps): React.JSX.Element {
   const prefersReducedMotion = useReducedMotion()
   const groupRef = useRef<HTMLDivElement>(null)
 

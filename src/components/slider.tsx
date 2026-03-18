@@ -1,5 +1,6 @@
 'use client'
 
+import type React from 'react'
 import { useCallback, useRef, useState, type KeyboardEvent, type MouseEvent, type TouchEvent } from 'react'
 import { cn } from '../utils'
 
@@ -36,7 +37,7 @@ export function Slider({
   label,
   showValue = false,
   className,
-}: SliderProps) {
+}: SliderProps): React.JSX.Element {
   const trackRef = useRef<HTMLDivElement>(null)
   const [isDragging, setIsDragging] = useState(false)
   const [isHovering, setIsHovering] = useState(false)
