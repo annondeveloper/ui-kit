@@ -15,7 +15,7 @@
     "framer-motion": "npm:framer-motion@^12",
     "lucide-react": "npm:lucide-react@^0.400.0",
     "clsx": "npm:clsx@^2",
-    "tailwind-merge": "npm:tailwind-merge@^2",
+    "tailwind-merge": "npm:tailwind-merge@^3",
     "sonner": "npm:sonner@^2",
     "@radix-ui/react-select": "npm:@radix-ui/react-select@^2",
     "@radix-ui/react-alert-dialog": "npm:@radix-ui/react-alert-dialog@^1",
