@@ -130,3 +130,53 @@ export type { PipelineStageProps, StageInfo } from './components/pipeline-stage'
 
 export { UptimeTracker } from './components/uptime-tracker'
 export type { UptimeTrackerProps, DayStatus } from './components/uptime-tracker'
+
+// ── Real-Time & AI Components ───────────────────────────────────────────────
+export { StreamingText } from './components/streaming-text'
+export type { StreamingTextProps } from './components/streaming-text'
+
+export { TypingIndicator } from './components/typing-indicator'
+export type { TypingIndicatorProps } from './components/typing-indicator'
+
+export { ConfidenceBar } from './components/confidence-bar'
+export type { ConfidenceBarProps } from './components/confidence-bar'
+
+export { LiveFeed } from './components/live-feed'
+export type { LiveFeedProps, FeedItem } from './components/live-feed'
+
+export { DiffViewer } from './components/diff-viewer'
+export type { DiffViewerProps } from './components/diff-viewer'
+
+export { HeatmapCalendar } from './components/heatmap-calendar'
+export type { HeatmapCalendarProps, DayValue } from './components/heatmap-calendar'
+
+export { NotificationStack } from './components/notification-stack'
+export type { NotificationStackProps, Notification } from './components/notification-stack'
+
+export { KanbanColumn } from './components/kanban-column'
+export type { KanbanColumnProps, KanbanItem, KanbanBadgeColor } from './components/kanban-column'
+
+// ── Smart Components ────────────────────────────────────────────────────────
+export { SmartTable } from './components/smart-table'
+export type { SmartTableProps, FilterSuggestion } from './components/smart-table'
+
+export { RealtimeValue } from './components/realtime-value'
+export type { RealtimeValueProps } from './components/realtime-value'
+
+export { CommandBar } from './components/command-bar'
+export type { CommandBarProps, CommandItem } from './components/command-bar'
+
+export { SortableList, DragHandle } from './components/sortable-list'
+export type { SortableListProps, SortableItem, DragHandleProps } from './components/sortable-list'
+
+export { InfiniteScroll } from './components/infinite-scroll'
+export type { InfiniteScrollProps } from './components/infinite-scroll'
+
+export { ColorInput } from './components/color-input'
+export type { ColorInputProps } from './components/color-input'
+
+export { StepWizard } from './components/step-wizard'
+export type { StepWizardProps, WizardStep } from './components/step-wizard'
+
+export { CopyBlock } from './components/copy-block'
+export type { CopyBlockProps } from './components/copy-block'
