@@ -10,9 +10,10 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Smooth theme transition */
+/* Smooth theme transition + scrolling */
 html {
   transition: color-scheme 0.3s ease;
+  scroll-behavior: smooth;
 }
 
 html * {
@@ -42,6 +43,18 @@ code {
   );
   background-size: 300% 300%;
   animation: gradient-shift 12s ease infinite;
+}
+
+/* Section offset for sticky nav */
+section { scroll-margin-top: 4rem; }
+
+/* GPU-accelerated section entry */
+.section-enter {
+  animation: sectionFadeIn 0.3s ease-out;
+}
+@keyframes sectionFadeIn {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 /* Scrollbar styling */
