@@ -4,4 +4,6 @@ dist/
 .DS_Store
 *.log
 storybook-static/
-demo/
+demo/node_modules/
+demo/.next/
+demo/out/
