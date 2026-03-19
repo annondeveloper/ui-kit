@@ -193,3 +193,12 @@ export type { CopyBlockProps } from './components/copy-block'
 
 export { Combobox } from './components/combobox'
 export type { ComboboxProps, ComboboxOption } from './components/combobox'
+
+export { InlineEdit } from './components/inline-edit'
+export type { InlineEditProps } from './components/inline-edit'
+
+export { TreeView } from './components/tree-view'
+export type { TreeViewProps, TreeNode } from './components/tree-view'
+
+export { ScrollReveal } from './components/scroll-reveal'
+export type { ScrollRevealProps } from './components/scroll-reveal'
