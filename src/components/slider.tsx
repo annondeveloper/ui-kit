@@ -162,7 +162,7 @@ export function Slider({
         onMouseEnter={() => setIsHovering(true)}
         onMouseLeave={() => setIsHovering(false)}
         className={cn(
-          'relative h-6 w-full cursor-pointer select-none',
+          'relative h-6 w-full cursor-pointer select-none touch-none',
           'focus-visible:outline-none',
           'group',
         )}

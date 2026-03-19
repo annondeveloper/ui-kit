@@ -157,14 +157,14 @@ export function ColorInput({
   // Close on click outside
   useEffect(() => {
     if (!open) return
-    const handler = (e: MouseEvent) => {
+    const handler = (e: PointerEvent) => {
       if (panelRef.current && !panelRef.current.contains(e.target as Node)) {
         setOpen(false)
         addRecent(value)
       }
     }
-    document.addEventListener('mousedown', handler)
-    return () => document.removeEventListener('mousedown', handler)
+    document.addEventListener('pointerdown', handler)
+    return () => document.removeEventListener('pointerdown', handler)
   }, [open, value, addRecent])
 
   // Saturation/brightness area interaction
@@ -295,7 +295,7 @@ export function ColorInput({
             <div
               ref={satAreaRef}
               onPointerDown={handleSatAreaDown}
-              className="relative h-36 w-full rounded-lg cursor-crosshair overflow-hidden mb-3"
+              className="relative h-36 w-full rounded-lg cursor-crosshair overflow-hidden mb-3 touch-none"
               style={{
                 background: `linear-gradient(to top, #000, transparent),
                              linear-gradient(to right, #fff, hsl(${Math.round(hsl.h * 360)}, 100%, 50%))`,

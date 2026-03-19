@@ -79,6 +79,10 @@ export function SortableList<T extends SortableItem>({
       // Only respond to primary button / touch
       if (e.button !== 0) return
 
+      // Capture pointer so touch drag works without browser scroll hijacking
+      const target = e.currentTarget as HTMLElement
+      target.setPointerCapture(e.pointerId)
+
       setDragIdx(index)
       setOverIdx(index)
       dragIdxRef.current = index
