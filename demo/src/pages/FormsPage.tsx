@@ -149,3 +149,4 @@ export function FormsPage() {
     </div>
   )
 }
+export default FormsPage

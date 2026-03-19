@@ -157,3 +157,4 @@ export function CorePage() {
     </div>
   )
 }
+export default CorePage

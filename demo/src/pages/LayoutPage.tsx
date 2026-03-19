@@ -119,3 +119,4 @@ export function LayoutPage() {
     </div>
   )
 }
+export default LayoutPage

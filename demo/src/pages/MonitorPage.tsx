@@ -148,3 +148,4 @@ export function MonitorPage() {
     </div>
   )
 }
+export default MonitorPage

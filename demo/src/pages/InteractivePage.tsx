@@ -159,3 +159,4 @@ export function InteractivePage() {
     </div>
   )
 }
+export default InteractivePage

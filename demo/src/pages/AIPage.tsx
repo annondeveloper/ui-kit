@@ -140,3 +140,4 @@ export function AIPage() {
     </div>
   )
 }
+export default AIPage
