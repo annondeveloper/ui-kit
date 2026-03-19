@@ -64,14 +64,15 @@ export function InfiniteScroll<T>({
   useEffect(() => { loadMoreRef.current = loadMore }, [loadMore])
 
   // IntersectionObserver for infinite load trigger
+  // Re-create observer when items.length changes so sentinel re-enters viewport detection
   useEffect(() => {
     const sentinel = sentinelRef.current
-    if (!sentinel) return
+    if (!sentinel || !hasMore) return
 
     const observer = new IntersectionObserver(
       (entries) => {
         const entry = entries[0]
-        if (entry?.isIntersecting && hasMore && !isLoading && !loadingRef.current) {
+        if (entry?.isIntersecting && !loadingRef.current) {
           loadingRef.current = true
           const result = loadMoreRef.current()
           if (result && typeof result.then === 'function') {
@@ -89,7 +90,7 @@ export function InfiniteScroll<T>({
 
     observer.observe(sentinel)
     return () => observer.disconnect()
-  }, [hasMore, threshold])
+  }, [hasMore, threshold, items.length])
 
   // Update loadingRef when isLoading changes
   useEffect(() => {

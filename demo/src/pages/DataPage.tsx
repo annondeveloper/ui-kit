@@ -159,7 +159,7 @@ export function DataPage() {
       </div>
       <div className="grid grid-cols-1 gap-6 stagger">
         <Preview label="SmartTable" description="Auto-suggested filters + full DataTable features" glow="realtime" wide code={`<SmartTable columns={columns} data={devices} />`}>
-          <SmartTable columns={columns} data={deviceData} />
+          <SmartTable columns={columns} data={deviceData} exportFilename="devices" />
         </Preview>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -215,7 +215,7 @@ export function DataPage() {
         </div>
 
         <Preview label="DataTable" description="Full-featured data table" wide code={`<DataTable columns={columns} data={data} />`}>
-          <DataTable columns={columns} data={deviceData} />
+          <DataTable columns={columns} data={deviceData} exportFilename="devices-export" searchPlaceholder="Search devices..." />
         </Preview>
       </div>
     </div>
