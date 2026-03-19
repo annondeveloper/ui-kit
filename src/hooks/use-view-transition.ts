@@ -19,7 +19,7 @@ interface ViewTransitionAPI {
  * startTransition(() => setTab('details'))
  * ```
  */
-export function useViewTransition() {
+export function useViewTransition(): { startTransition: (callback: () => void) => void } {
   const startTransition = useCallback((callback: () => void) => {
     if (
       typeof document !== 'undefined' &&
