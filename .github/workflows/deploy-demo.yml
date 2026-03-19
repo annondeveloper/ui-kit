@@ -24,20 +24,19 @@ jobs:
         with:
           node-version: 22
           cache: npm
-          cache-dependency-path: demo/package-lock.json
 
       - name: Build library
-        run: npm ci --legacy-peer-deps && npm run build
+        run: npm ci && npm run build
 
       - name: Build demo
         working-directory: demo
         run: |
-          npm ci --legacy-peer-deps
+          npm ci
           npm run build
 
       - uses: actions/upload-pages-artifact@v3
         with:
-          path: demo/out
+          path: demo/dist
 
   deploy:
     needs: build-demo
