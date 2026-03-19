@@ -6,7 +6,7 @@ import { cn } from '../utils'
 export type Density = 'compact' | 'comfortable' | 'spacious'
 
 const DensityContext = createContext<Density>('comfortable')
-export const useDensity = () => useContext(DensityContext)
+export const useDensity = (): Density => useContext(DensityContext)
 
 export interface DensityProviderProps {
   mode: Density
