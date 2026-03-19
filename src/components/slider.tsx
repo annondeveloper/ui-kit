@@ -168,7 +168,7 @@ export function Slider({
         )}
       >
         {/* Track background */}
-        <div className="absolute top-1/2 -translate-y-1/2 w-full h-2 rounded-full bg-[hsl(var(--bg-overlay))]">
+        <div className="absolute top-1/2 -translate-y-1/2 w-full h-2 rounded-full bg-[hsl(var(--bg-elevated))] ring-1 ring-inset ring-[hsl(var(--border-subtle))]">
           {/* Filled portion */}
           <div
             className="absolute inset-y-0 left-0 rounded-full bg-[hsl(var(--brand-primary))]"

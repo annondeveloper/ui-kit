@@ -69,6 +69,7 @@ export function Avatar({
           s.root,
           'rounded-full overflow-hidden',
           'flex items-center justify-center',
+          'border border-[hsl(var(--border-subtle))]',
           !showImage && 'bg-[hsl(var(--bg-overlay))]',
         )}
       >

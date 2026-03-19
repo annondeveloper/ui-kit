@@ -36,7 +36,7 @@ export function ToggleSwitch({
       disabled={disabled}
       onClick={() => onChange(!enabled)}
       className={cn(
-        'inline-flex items-center transition-colors',
+        'inline-flex items-center gap-2 transition-colors',
         'text-[hsl(var(--text-secondary))] hover:text-[hsl(var(--text-primary))]',
         'disabled:opacity-50 disabled:cursor-not-allowed',
         className,
@@ -47,6 +47,7 @@ export function ToggleSwitch({
       ) : (
         <ToggleLeft className={cn(iconSize, 'text-[hsl(var(--text-tertiary))]')} />
       )}
+      {label && <span className="text-sm text-[hsl(var(--text-secondary))]">{label}</span>}
     </button>
   )
 }

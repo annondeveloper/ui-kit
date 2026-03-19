@@ -70,11 +70,11 @@ export function SeverityTimeline({
     <div
       ref={scrollRef}
       className={cn(
-        'relative overflow-x-auto scrollbar-thin py-2',
+        'relative overflow-x-auto overflow-y-auto scrollbar-thin py-2 max-h-[280px]',
         className,
       )}
     >
-      <div className="flex items-start gap-0 min-w-max">
+      <div className="flex items-start gap-2 min-w-max px-1">
         <AnimatePresence initial={false}>
           {visible.map((ev, i) => (
             <motion.div
@@ -83,14 +83,14 @@ export function SeverityTimeline({
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.8 }}
               transition={{ duration: 0.15, delay: reduced ? 0 : i * 0.03 }}
-              className="flex flex-col items-center relative"
-              style={{ minWidth: 64 }}
+              className="flex flex-col items-center relative px-1"
+              style={{ minWidth: 72 }}
             >
               {/* Connector line */}
               {i < visible.length - 1 && (
                 <div
                   className="absolute top-[11px] left-1/2 h-px bg-[hsl(var(--border-default))]"
-                  style={{ width: 64 }}
+                  style={{ width: 80 }}
                 />
               )}
 
@@ -113,7 +113,7 @@ export function SeverityTimeline({
               </button>
 
               {/* Label */}
-              <span className="mt-1.5 text-[0.6875rem] font-medium text-[hsl(var(--text-primary))] text-center max-w-[56px] truncate">
+              <span className="mt-1.5 text-[0.6875rem] font-medium text-[hsl(var(--text-primary))] text-center max-w-[64px] truncate">
                 {ev.label}
               </span>
 

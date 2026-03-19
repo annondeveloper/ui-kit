@@ -20,8 +20,8 @@ export interface ConfidenceBarProps {
 }
 
 const SIZE_CLASSES = {
-  sm: 'h-1.5',
-  md: 'h-2.5',
+  sm: 'h-2',
+  md: 'h-3',
 } as const
 
 function getBarColor(value: number, thresholds: { low: number; medium: number }): string {
@@ -80,7 +80,7 @@ export function ConfidenceBar({
       {/* Track */}
       <div
         className={cn(
-          'relative w-full overflow-hidden rounded-full bg-[hsl(var(--bg-overlay))]',
+          'relative w-full overflow-hidden rounded-full bg-[hsl(var(--bg-elevated))] ring-1 ring-inset ring-[hsl(var(--border-subtle))]',
           SIZE_CLASSES[size],
         )}
         role="meter"

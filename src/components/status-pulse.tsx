@@ -50,10 +50,11 @@ export function StatusPulse({ status, label = true, configMap, className }: Stat
         {cfg.pulse && !reduced && (
           <span
             className={cn(
-              'absolute inline-flex size-full rounded-full opacity-75 animate-pulse-ring',
+              'absolute inset-0 inline-flex size-full rounded-full opacity-75 animate-pulse-ring',
               cfg.ring,
               cfg.fast && '[animation-duration:1s]',
             )}
+            style={{ transformOrigin: 'center center' }}
           />
         )}
         {/* Solid dot */}

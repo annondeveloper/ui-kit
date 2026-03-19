@@ -61,7 +61,7 @@ function BouncingDots({ size, reduced }: { size: 'sm' | 'md'; reduced: boolean }
   }
 
   return (
-    <span className="inline-flex items-center gap-1">
+    <span className="inline-flex items-end gap-1 h-[1em] pb-[2px]">
       {[0, 1, 2].map((i) => (
         <motion.span
           key={i}
@@ -103,7 +103,7 @@ function AnimatedEllipsis({ reduced }: { reduced: boolean }): React.JSX.Element 
   }
 
   return (
-    <span className="inline-flex w-[1.2em]">
+    <span className="inline-flex items-center w-[1.2em]">
       {[0, 1, 2].map((i) => (
         <motion.span
           key={i}

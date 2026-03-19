@@ -1,7 +1,7 @@
 'use client'
 
 import type React from 'react'
-import { useCallback, useRef, type KeyboardEvent } from 'react'
+import { useCallback, useId, useRef, type KeyboardEvent } from 'react'
 import { motion, useReducedMotion } from 'framer-motion'
 import type { LucideIcon } from 'lucide-react'
 import { cn } from '../utils'
@@ -89,12 +89,13 @@ export function Tabs({
   const listCls = cn(
     'inline-flex items-center overflow-x-auto [scrollbar-width:none]',
     variant === 'underline' && 'border-b border-[hsl(var(--border-subtle))] gap-0',
-    variant === 'pills' && 'gap-1 p-1 rounded-xl bg-[hsl(var(--bg-surface))]',
+    variant === 'pills' && 'gap-1 p-1 rounded-xl bg-[hsl(var(--bg-base))]',
     variant === 'enclosed' && 'gap-0 border-b border-[hsl(var(--border-subtle))]',
     className,
   )
 
-  const layoutId = `tabs-indicator-${variant}`
+  const instanceId = useId()
+  const layoutId = `tabs-indicator-${variant}-${instanceId}`
 
   return (
     <div
@@ -122,7 +123,7 @@ export function Tabs({
           ],
           variant === 'pills' && [
             isActive
-              ? 'text-[hsl(var(--text-primary))]'
+              ? 'text-[hsl(var(--text-primary))] bg-[hsl(var(--bg-overlay))] shadow-sm'
               : 'text-[hsl(var(--text-tertiary))] hover:text-[hsl(var(--text-secondary))] hover:bg-[hsl(var(--bg-elevated)/0.5)]',
             'rounded-lg',
           ],
@@ -156,13 +157,7 @@ export function Tabs({
                 transition={prefersReducedMotion ? { duration: 0 } : { type: 'spring', stiffness: 500, damping: 35 }}
               />
             )}
-            {isActive && variant === 'pills' && (
-              <motion.div
-                layoutId={layoutId}
-                className="absolute inset-0 rounded-lg bg-[hsl(var(--bg-elevated))] -z-10"
-                transition={prefersReducedMotion ? { duration: 0 } : { type: 'spring', stiffness: 500, damping: 35 }}
-              />
-            )}
+            {/* Pills variant uses direct bg class instead of layoutId indicator */}
             {isActive && variant === 'enclosed' && (
               <motion.div
                 layoutId={layoutId}

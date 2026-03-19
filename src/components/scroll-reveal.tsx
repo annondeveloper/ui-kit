@@ -109,7 +109,7 @@ export function ScrollReveal({
   const style: React.CSSProperties = noAnimation
     ? {}
     : {
-        opacity: visible ? undefined : 0,
+        opacity: visible ? 1 : 0,
         animationName: visible ? animName : 'none',
         animationDuration: `${duration}ms`,
         animationDelay: `${totalDelay}ms`,

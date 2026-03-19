@@ -5,6 +5,7 @@ import { type ElementType } from 'react'
 import { motion, useReducedMotion } from 'framer-motion'
 import { TrendingUp, TrendingDown } from 'lucide-react'
 import { cn } from '../utils'
+import { useDensity } from './density-provider'
 import { AnimatedCounter } from './animated-counter'
 import { Sparkline } from './sparkline'
 
@@ -56,6 +57,7 @@ export function MetricCard({
   className,
 }: MetricCardProps): React.JSX.Element {
   const reduced = useReducedMotion()
+  const density = useDensity()
 
   // Trend calculation
   let trendPct: number | null = null
@@ -79,12 +81,14 @@ export function MetricCard({
     <motion.div
       initial={reduced ? false : { opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
+      whileHover={reduced ? undefined : { y: -2, transition: { duration: 0.15 } }}
       transition={{ duration: 0.2, ease: 'easeOut' }}
       style={{ containerType: 'inline-size' }}
       className={cn(
         '@container',
         'relative rounded-2xl border border-[hsl(var(--border-subtle))] bg-[hsl(var(--bg-surface))]',
-        'p-3 @[250px]:p-5 shadow-sm border-l-[3px]',
+        'shadow-sm border-l-[3px] transition-shadow hover:shadow-md hover:border-[hsl(var(--border-default))]',
+        density === 'compact' ? 'p-2 @[250px]:p-3' : density === 'spacious' ? 'p-4 @[250px]:p-6' : 'p-3 @[250px]:p-5',
         status ? statusBorder[status] : 'border-l-[hsl(var(--border-subtle))]',
         className,
       )}
@@ -96,13 +100,19 @@ export function MetricCard({
             {Icon && (
               <Icon className="size-4 shrink-0 text-[hsl(var(--text-tertiary))]" />
             )}
-            <span className="text-[0.6875rem] @[250px]:text-[0.75rem] font-medium text-[hsl(var(--text-secondary))] truncate">
+            <span className={cn(
+              'font-medium text-[hsl(var(--text-secondary))] truncate',
+              density === 'compact' ? 'text-[0.625rem] @[250px]:text-[0.6875rem]' : density === 'spacious' ? 'text-[0.75rem] @[250px]:text-[0.8125rem]' : 'text-[0.6875rem] @[250px]:text-[0.75rem]',
+            )}>
               {label}
             </span>
           </div>
 
           <div className="flex items-baseline gap-2">
-            <span className="text-xl @[250px]:text-2xl @[400px]:text-3xl font-semibold text-[hsl(var(--text-primary))] tabular-nums">
+            <span className={cn(
+              'font-semibold text-[hsl(var(--text-primary))] tabular-nums',
+              density === 'compact' ? 'text-lg @[250px]:text-xl @[400px]:text-2xl' : density === 'spacious' ? 'text-2xl @[250px]:text-3xl @[400px]:text-4xl' : 'text-xl @[250px]:text-2xl @[400px]:text-3xl',
+            )}>
               <AnimatedCounter value={value} format={format} />
             </span>
 

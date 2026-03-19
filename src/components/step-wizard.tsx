@@ -237,9 +237,9 @@ export function StepWizard({
                   )}
                 >
                   {isDone ? (
-                    <Check className="h-4 w-4" />
+                    <Check className="h-5 w-5" />
                   ) : Icon ? (
-                    <Icon className="h-4 w-4" />
+                    <Icon className="h-5 w-5" />
                   ) : (
                     idx + 1
                   )}

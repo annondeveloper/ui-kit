@@ -143,10 +143,10 @@ export function AIPage() {
         </Preview>
 
         <Preview label="TypingIndicator" description="Three animation variants" glow="ai" code={`<TypingIndicator variant="dots" label="AI is thinking" />\n<TypingIndicator variant="pulse" />\n<TypingIndicator variant="text" label="Generating" />`}>
-          <div className="space-y-4">
-            <TypingIndicator variant="dots" label="AI is thinking" />
-            <TypingIndicator variant="pulse" label="Processing query" />
-            <TypingIndicator variant="text" label="Generating response" />
+          <div className="flex flex-col gap-4">
+            <div><TypingIndicator variant="dots" label="AI is thinking" /></div>
+            <div><TypingIndicator variant="pulse" label="Processing query" /></div>
+            <div><TypingIndicator variant="text" label="Generating response" /></div>
           </div>
         </Preview>
 

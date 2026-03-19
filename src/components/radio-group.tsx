@@ -116,9 +116,10 @@ export function RadioGroup({
               className={cn(
                 'relative mt-0.5 h-[18px] w-[18px] shrink-0 rounded-full border-2 transition-colors duration-150',
                 'flex items-center justify-center',
+                'bg-[hsl(var(--bg-base))]',
                 isSelected
                   ? 'border-[hsl(var(--brand-primary))]'
-                  : 'border-[hsl(var(--border-strong))] group-hover:border-[hsl(var(--brand-primary))]',
+                  : 'border-[hsl(var(--border-default))] group-hover:border-[hsl(var(--brand-primary))]',
                 'group-focus-visible:ring-2 group-focus-visible:ring-[hsl(var(--brand-primary))] group-focus-visible:ring-offset-2 group-focus-visible:ring-offset-[hsl(var(--bg-base))]',
               )}
             >

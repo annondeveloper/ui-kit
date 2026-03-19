@@ -89,7 +89,7 @@ export function InfiniteScroll<T>({
 
     observer.observe(sentinel)
     return () => observer.disconnect()
-  }, [hasMore, isLoading, threshold])
+  }, [hasMore, threshold])
 
   // Update loadingRef when isLoading changes
   useEffect(() => {

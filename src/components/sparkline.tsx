@@ -100,6 +100,28 @@ export function Sparkline({
           <circle cx={lastX} cy={lastY} r={2} fill={color} />
         </>
       )}
+      {/* Invisible hover targets at each data point with native tooltip */}
+      {data.map((v, i) => {
+        const x = pad + i * stepX
+        const y = pad + (1 - (v - min) / range) * (height - pad * 2)
+        return (
+          <g key={i}>
+            <circle
+              cx={x}
+              cy={y}
+              r={4}
+              fill="transparent"
+              stroke={color}
+              strokeWidth={1.5}
+              opacity={0}
+              className="hover:opacity-100 transition-opacity"
+              style={{ pointerEvents: 'all' }}
+            >
+              <title>{v}</title>
+            </circle>
+          </g>
+        )
+      })}
     </svg>
   )
 }

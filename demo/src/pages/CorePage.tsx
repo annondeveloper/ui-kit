@@ -13,6 +13,7 @@ export function CorePage() {
   const [encTab, setEncTab] = useState('config')
   const [sheetOpen, setSheetOpen] = useState(false)
   const [dialogOpen, setDialogOpen] = useState(false)
+  const [checkKey, setCheckKey] = useState(0)
 
   return (
     <div className="max-w-5xl mx-auto px-4 sm:px-6 py-8 sm:py-10">
@@ -138,10 +139,13 @@ export function CorePage() {
         </Preview>
 
         <Preview label="SuccessCheckmark" description="Animated check SVG" code={`<SuccessCheckmark size={48} />`}>
-          <div className="flex items-center justify-center gap-6 py-4">
-            <SuccessCheckmark size={32} />
-            <SuccessCheckmark size={48} />
-            <SuccessCheckmark size={64} />
+          <div className="flex flex-col items-center gap-4 py-4">
+            <div className="flex items-center justify-center gap-6">
+              <SuccessCheckmark key={`c32-${checkKey}`} size={32} />
+              <SuccessCheckmark key={`c48-${checkKey}`} size={48} />
+              <SuccessCheckmark key={`c64-${checkKey}`} size={64} />
+            </div>
+            <Button variant="ghost" size="sm" onClick={() => setCheckKey((k) => k + 1)}>Replay</Button>
           </div>
         </Preview>
 

@@ -489,7 +489,7 @@ export function Combobox({
           className={cn(
             'absolute z-50 mt-1 w-full overflow-hidden rounded-lg border',
             'bg-[hsl(var(--bg-surface))] border-[hsl(var(--border-default))]',
-            'shadow-lg shadow-black/20',
+            'shadow-xl shadow-black/30 backdrop-blur-xl',
           )}
         >
           <div
@@ -541,7 +541,7 @@ function OptionRow({ option, selected, active, index, onClick, onMouseEnter }: O
       className={cn(
         'flex cursor-pointer items-center gap-2 px-3 py-2 text-sm transition-colors',
         active && 'bg-[hsl(var(--bg-elevated))]',
-        selected && !active && 'bg-[hsl(var(--bg-elevated)/.5)]',
+        selected && !active && 'bg-[hsl(var(--brand-primary)/.1)]',
         option.disabled && 'cursor-not-allowed opacity-40',
         !option.disabled && !active && 'hover:bg-[hsl(var(--bg-elevated))]',
       )}

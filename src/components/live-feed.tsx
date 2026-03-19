@@ -142,7 +142,7 @@ export function LiveFeed({
       <div
         ref={scrollRef}
         onScroll={handleScroll}
-        className="flex-1 overflow-y-auto"
+        className="h-full flex-1 overflow-y-auto"
         aria-live="polite"
         aria-atomic="false"
       >

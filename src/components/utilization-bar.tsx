@@ -4,6 +4,7 @@ import type React from 'react'
 import { useEffect, useState } from 'react'
 import { useReducedMotion } from 'framer-motion'
 import { cn, clamp } from '../utils'
+import { useDensity } from './density-provider'
 
 export interface UtilizationBarProps {
   /** Utilization value from 0 to 100. */
@@ -53,6 +54,7 @@ export function UtilizationBar({
   className,
 }: UtilizationBarProps): React.JSX.Element {
   const reduced = useReducedMotion()
+  const density = useDensity()
   const value = clamp(rawValue, 0, 100)
   const warning = thresholds?.warning ?? 70
   const critical = thresholds?.critical ?? 90
@@ -73,16 +75,23 @@ export function UtilizationBar({
   const textClass = getTextClass(value, warning, critical)
 
   return (
-    <div className={cn('flex items-center gap-2', className)} title={`${value.toFixed(1)}%`}>
+    <div className={cn(
+      'flex items-center',
+      density === 'compact' ? 'gap-1.5' : density === 'spacious' ? 'gap-3' : 'gap-2',
+      className,
+    )} title={`${value.toFixed(1)}%`}>
       {label && (
-        <span className="text-[0.75rem] font-medium text-[hsl(var(--text-secondary))] shrink-0 min-w-[3rem]">
+        <span className={cn(
+          'font-medium text-[hsl(var(--text-secondary))] shrink-0 min-w-[3rem]',
+          density === 'compact' ? 'text-[0.6875rem]' : density === 'spacious' ? 'text-[0.8125rem]' : 'text-[0.75rem]',
+        )}>
           {label}
         </span>
       )}
       <div
         className={cn(
           'flex-1 rounded-full bg-[hsl(var(--bg-elevated))] overflow-hidden',
-          sizeMap[size],
+          density === 'compact' ? 'h-1.5' : density === 'spacious' ? 'h-3' : sizeMap[size],
         )}
       >
         <div
@@ -95,7 +104,11 @@ export function UtilizationBar({
         />
       </div>
       {showValue && (
-        <span className={cn('text-[0.75rem] font-medium tabular-nums shrink-0 min-w-[2.5rem] text-right', textClass)}>
+        <span className={cn(
+          'font-medium tabular-nums shrink-0 min-w-[2.5rem] text-right',
+          density === 'compact' ? 'text-[0.6875rem]' : density === 'spacious' ? 'text-[0.8125rem]' : 'text-[0.75rem]',
+          textClass,
+        )}>
           {value.toFixed(0)}%
         </span>
       )}

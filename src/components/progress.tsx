@@ -33,8 +33,8 @@ const variantColors: Record<NonNullable<ProgressProps['variant']>, string> = {
 }
 
 const sizeClasses: Record<NonNullable<ProgressProps['size']>, string> = {
-  sm: 'h-1.5',
-  md: 'h-2.5',
+  sm: 'h-2',
+  md: 'h-3',
   lg: 'h-4',
 }
 
@@ -80,7 +80,7 @@ export function Progress({
         aria-valuemax={100}
         aria-label={label}
         className={cn(
-          'w-full overflow-hidden rounded-full bg-[hsl(var(--bg-overlay))]',
+          'w-full overflow-hidden rounded-full bg-[hsl(var(--bg-elevated))] ring-1 ring-inset ring-[hsl(var(--border-subtle))]',
           sizeClasses[size],
         )}
       >

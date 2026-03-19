@@ -38,7 +38,7 @@ export function EmptyState({ icon: Icon, title, description, actions, className 
       </div>
       <h3 className="relative text-heading-3 text-[hsl(var(--text-primary))] mb-1">{title}</h3>
       <p className="relative text-body text-[hsl(var(--text-secondary))] max-w-sm">{description}</p>
-      {actions && <div className="relative mt-6 flex gap-3">{actions}</div>}
+      {actions && <div className="relative z-10 mt-6 flex gap-3">{actions}</div>}
     </div>
   )
 }

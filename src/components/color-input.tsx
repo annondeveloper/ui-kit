@@ -320,8 +320,10 @@ export function ColorInput({
                 max={360}
                 value={Math.round(hsl.h * 360)}
                 onChange={handleHueChange}
-                className="w-full h-3 rounded-full appearance-none cursor-pointer"
+                className="w-full h-3 rounded-full cursor-pointer"
                 style={{
+                  WebkitAppearance: 'none',
+                  appearance: 'none',
                   background: 'linear-gradient(to right, #f00, #ff0, #0f0, #0ff, #00f, #f0f, #f00)',
                 }}
               />
