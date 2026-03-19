@@ -1,10 +1,9 @@
 'use client'
 
-import React, { useState, useEffect, useRef, lazy, Suspense } from 'react'
-import { Sun, Moon, Github, Package } from 'lucide-react'
+import React, { useState, useEffect, useRef, lazy, Suspense, useCallback } from 'react'
+import { Sun, Moon, Github, Package, ExternalLink } from 'lucide-react'
 import { Toaster } from '../../src/index'
 
-// Lazy imports — JS only loads when section enters viewport
 const HeroSection = lazy(() => import('./sections/hero'))
 const AIRealtimeSection = lazy(() => import('./sections/ai-realtime'))
 const SmartDataSection = lazy(() => import('./sections/smart-data'))
@@ -14,131 +13,141 @@ const CoreSection = lazy(() => import('./sections/core'))
 const FormsSection = lazy(() => import('./sections/forms'))
 const LayoutSection = lazy(() => import('./sections/layout'))
 
-// ---------------------------------------------------------------------------
-// Nav config
-// ---------------------------------------------------------------------------
-
 const SECTIONS = [
-  { id: 'ai-realtime', label: 'AI & Real-Time' },
-  { id: 'smart-data', label: 'Smart Data' },
-  { id: 'monitoring', label: 'Monitoring Dashboard' },
-  { id: 'interactive', label: 'Interactive' },
-  { id: 'core', label: 'Core Components' },
-  { id: 'forms', label: 'Forms' },
-  { id: 'layout-feedback', label: 'Layout & Feedback' },
+  { id: 'ai', label: 'AI & Real-Time', emoji: '🧠' },
+  { id: 'data', label: 'Smart Data', emoji: '📊' },
+  { id: 'monitor', label: 'Monitoring', emoji: '📡' },
+  { id: 'interact', label: 'Interactive', emoji: '🎛' },
+  { id: 'core', label: 'Core', emoji: '🧱' },
+  { id: 'forms', label: 'Forms', emoji: '📝' },
+  { id: 'layout', label: 'Layout', emoji: '📐' },
 ]
 
-// ---------------------------------------------------------------------------
-// LazySection — mounts child only when scrolled into view
-// ---------------------------------------------------------------------------
-
-function LazySection({ id, children }: { id: string; children: React.ReactNode }) {
-  const ref = useRef<HTMLDivElement>(null)
-  const [visible, setVisible] = useState(false)
+/* ── Lazy mount wrapper ─────────────────────────────────── */
+function LazyMount({ id, children }: { id: string; children: React.ReactNode }) {
+  const ref = useRef<HTMLElement>(null)
+  const [show, setShow] = useState(false)
 
   useEffect(() => {
     const el = ref.current
     if (!el) return
-    const observer = new IntersectionObserver(
-      ([entry]) => { if (entry.isIntersecting) { setVisible(true); observer.disconnect() } },
-      { rootMargin: '200px' },
+    const io = new IntersectionObserver(
+      ([e]) => { if (e.isIntersecting) { setShow(true); io.disconnect() } },
+      { rootMargin: '300px' },
     )
-    observer.observe(el)
-    return () => observer.disconnect()
+    io.observe(el)
+    return () => io.disconnect()
   }, [])
 
   return (
-    <section id={id} ref={ref} className="scroll-mt-28 min-h-[200px]">
-      {visible ? children : (
-        <div className="h-96 animate-pulse rounded-2xl bg-[hsl(var(--bg-elevated))]" />
+    <section id={id} ref={ref} className="min-h-[120px]">
+      {show ? (
+        <div className="section-loaded">{children}</div>
+      ) : (
+        <div className="space-y-4">
+          <div className="h-6 w-48 rounded bg-[hsl(var(--bg-elevated))] animate-pulse" />
+          <div className="demo-grid">
+            {[1, 2, 3].map(i => (
+              <div key={i} className="h-48 rounded-xl bg-[hsl(var(--bg-elevated))] animate-pulse" />
+            ))}
+          </div>
+        </div>
       )}
     </section>
   )
 }
 
-// ---------------------------------------------------------------------------
-// Section skeleton fallback
-// ---------------------------------------------------------------------------
-
-function SectionSkeleton() {
-  return <div className="h-96 animate-pulse rounded-2xl bg-[hsl(var(--bg-elevated))]" />
+function Fallback() {
+  return (
+    <div className="space-y-4">
+      <div className="h-6 w-48 rounded bg-[hsl(var(--bg-elevated))] animate-pulse" />
+      <div className="demo-grid">
+        {[1, 2, 3].map(i => (
+          <div key={i} className="h-48 rounded-xl bg-[hsl(var(--bg-elevated))] animate-pulse" />
+        ))}
+      </div>
+    </div>
+  )
 }
 
-// ---------------------------------------------------------------------------
-// Main Page — thin shell
-// ---------------------------------------------------------------------------
+export default function DemoPage(): React.JSX.Element {
+  const [dark, setDark] = useState(true)
+  const [active, setActive] = useState('ai')
 
-export default function DemoPage() {
-  const [isDark, setIsDark] = useState(true)
-  const [activeSection, setActiveSection] = useState(SECTIONS[0].id)
-
-  // Theme toggle
   useEffect(() => {
-    document.documentElement.classList.toggle('light', !isDark)
-  }, [isDark])
+    document.documentElement.classList.toggle('light', !dark)
+  }, [dark])
 
-  // Scroll spy via IntersectionObserver
+  // Scroll-spy
   useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        for (const entry of entries) {
-          if (entry.isIntersecting) setActiveSection(entry.target.id)
+    const io = new IntersectionObserver(
+      entries => {
+        for (const e of entries) {
+          if (e.isIntersecting && e.intersectionRatio > 0) {
+            setActive(e.target.id)
+          }
         }
       },
-      { rootMargin: '-30% 0px -60% 0px' },
+      { rootMargin: '-20% 0px -70% 0px' },
     )
     for (const s of SECTIONS) {
       const el = document.getElementById(s.id)
-      if (el) observer.observe(el)
+      if (el) io.observe(el)
     }
-    return () => observer.disconnect()
+    return () => io.disconnect()
   }, [])
 
   return (
     <>
-      <Toaster />
+      <Toaster theme={dark ? 'dark' : 'light'} />
 
-      {/* Sticky header */}
-      <header className="sticky top-0 z-40 backdrop-blur-lg bg-[hsl(var(--bg-base)/0.85)] border-b border-[hsl(var(--border-subtle))]">
-        <div className="max-w-7xl mx-auto flex items-center justify-between px-6 py-3">
-          <span className="text-sm font-semibold text-[hsl(var(--text-primary))]">
-            @annondeveloper/ui-kit
+      {/* ── Sticky nav ───────────────────────────────────── */}
+      <header className="sticky top-0 z-40 backdrop-blur-xl bg-[hsl(var(--bg-base)/0.8)] border-b border-[hsl(var(--border-subtle))]">
+        <div className="max-w-6xl mx-auto flex items-center justify-between px-4 sm:px-6 h-12">
+          <span className="font-mono text-xs font-semibold text-[hsl(var(--text-primary))] tracking-tight">
+            ui-kit
           </span>
-          <div className="flex items-center gap-3">
-            <kbd className="hidden sm:inline-flex items-center gap-1 rounded-md border border-[hsl(var(--border-subtle))] bg-[hsl(var(--bg-surface))] px-2 py-1 text-[10px] text-[hsl(var(--text-tertiary))] font-mono">
-              Cmd+K
-            </kbd>
+          <div className="flex items-center gap-1.5">
+            <a
+              href="https://www.npmjs.com/package/@annondeveloper/ui-kit"
+              target="_blank" rel="noopener noreferrer"
+              className="p-2 rounded-lg text-[hsl(var(--text-tertiary))] hover:text-[hsl(var(--text-primary))] hover:bg-[hsl(var(--bg-elevated))]"
+              aria-label="npm"
+            >
+              <Package className="h-3.5 w-3.5" />
+            </a>
             <a
               href="https://github.com/annondeveloper/ui-kit"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="p-2 rounded-lg text-[hsl(var(--text-secondary))] hover:text-[hsl(var(--text-primary))] hover:bg-[hsl(var(--bg-elevated))] transition-colors"
+              target="_blank" rel="noopener noreferrer"
+              className="p-2 rounded-lg text-[hsl(var(--text-tertiary))] hover:text-[hsl(var(--text-primary))] hover:bg-[hsl(var(--bg-elevated))]"
+              aria-label="GitHub"
             >
-              <Github className="h-4 w-4" />
+              <Github className="h-3.5 w-3.5" />
             </a>
             <button
-              onClick={() => setIsDark(!isDark)}
-              className="p-2 rounded-lg text-[hsl(var(--text-secondary))] hover:text-[hsl(var(--text-primary))] hover:bg-[hsl(var(--bg-elevated))] transition-colors"
+              onClick={() => setDark(!dark)}
+              className="p-2 rounded-lg text-[hsl(var(--text-tertiary))] hover:text-[hsl(var(--text-primary))] hover:bg-[hsl(var(--bg-elevated))] cursor-pointer"
               aria-label="Toggle theme"
             >
-              {isDark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+              {dark ? <Sun className="h-3.5 w-3.5" /> : <Moon className="h-3.5 w-3.5" />}
             </button>
           </div>
         </div>
 
-        {/* Section nav pills */}
-        <div className="max-w-7xl mx-auto px-6 pb-2 overflow-x-auto">
-          <div className="flex gap-1">
-            {SECTIONS.map((s) => (
+        {/* Section pills — touch scroll */}
+        <div className="nav-scroll max-w-6xl mx-auto px-4 sm:px-6 pb-2">
+          <div className="flex gap-1 w-max">
+            {SECTIONS.map(s => (
               <a
                 key={s.id}
                 href={`#${s.id}`}
-                className={`shrink-0 px-3 py-1.5 rounded-full text-xs font-medium transition-colors whitespace-nowrap ${
-                  activeSection === s.id
+                className={`shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-colors ${
+                  active === s.id
                     ? 'bg-[hsl(var(--brand-primary)/0.15)] text-[hsl(var(--brand-primary))]'
-                    : 'text-[hsl(var(--text-tertiary))] hover:text-[hsl(var(--text-primary))] hover:bg-[hsl(var(--bg-elevated))]'
+                    : 'text-[hsl(var(--text-tertiary))] hover:text-[hsl(var(--text-secondary))] hover:bg-[hsl(var(--bg-elevated))]'
                 }`}
               >
+                <span className="hidden sm:inline">{s.emoji}</span>
                 {s.label}
               </a>
             ))}
@@ -146,70 +155,80 @@ export default function DemoPage() {
         </div>
       </header>
 
-      <main className="max-w-7xl mx-auto px-6 pb-32">
-        {/* Hero — always loaded (above the fold) */}
-        <Suspense fallback={<SectionSkeleton />}>
+      {/* ── Main content ─────────────────────────────────── */}
+      <main className="max-w-6xl mx-auto px-4 sm:px-6 pb-24">
+
+        {/* Hero — always loaded */}
+        <Suspense fallback={<Fallback />}>
           <HeroSection />
         </Suspense>
 
-        <div className="space-y-24">
-          <LazySection id="ai-realtime">
-            <Suspense fallback={<SectionSkeleton />}>
+        <div className="space-y-20 sm:space-y-28">
+          <LazyMount id="ai">
+            <Suspense fallback={<Fallback />}>
               <AIRealtimeSection />
             </Suspense>
-          </LazySection>
+          </LazyMount>
 
-          <LazySection id="smart-data">
-            <Suspense fallback={<SectionSkeleton />}>
+          <LazyMount id="data">
+            <Suspense fallback={<Fallback />}>
               <SmartDataSection />
             </Suspense>
-          </LazySection>
+          </LazyMount>
 
-          <LazySection id="monitoring">
-            <Suspense fallback={<SectionSkeleton />}>
+          <LazyMount id="monitor">
+            <Suspense fallback={<Fallback />}>
               <MonitoringSection />
             </Suspense>
-          </LazySection>
+          </LazyMount>
 
-          <LazySection id="interactive">
-            <Suspense fallback={<SectionSkeleton />}>
+          <LazyMount id="interact">
+            <Suspense fallback={<Fallback />}>
               <InteractiveSection />
             </Suspense>
-          </LazySection>
+          </LazyMount>
 
-          <LazySection id="core">
-            <Suspense fallback={<SectionSkeleton />}>
+          <LazyMount id="core">
+            <Suspense fallback={<Fallback />}>
               <CoreSection />
             </Suspense>
-          </LazySection>
+          </LazyMount>
 
-          <LazySection id="forms">
-            <Suspense fallback={<SectionSkeleton />}>
+          <LazyMount id="forms">
+            <Suspense fallback={<Fallback />}>
               <FormsSection />
             </Suspense>
-          </LazySection>
+          </LazyMount>
 
-          <LazySection id="layout-feedback">
-            <Suspense fallback={<SectionSkeleton />}>
+          <LazyMount id="layout">
+            <Suspense fallback={<Fallback />}>
               <LayoutSection />
             </Suspense>
-          </LazySection>
+          </LazyMount>
         </div>
 
         {/* Footer */}
-        <div className="mt-24 pt-8 border-t border-[hsl(var(--border-subtle))] text-center">
-          <p className="text-sm text-[hsl(var(--text-tertiary))]">
-            53 components. Zero compromises. Built for monitoring dashboards, AI interfaces, and professional tools.
-          </p>
-          <div className="flex justify-center gap-4 mt-4">
-            <a href="https://github.com/annondeveloper/ui-kit" target="_blank" rel="noopener noreferrer" className="text-sm text-[hsl(var(--brand-primary))] hover:underline inline-flex items-center gap-1">
-              <Github className="h-3.5 w-3.5" /> GitHub
-            </a>
-            <a href="https://www.npmjs.com/package/@annondeveloper/ui-kit" target="_blank" rel="noopener noreferrer" className="text-sm text-[hsl(var(--brand-primary))] hover:underline inline-flex items-center gap-1">
-              <Package className="h-3.5 w-3.5" /> npm
-            </a>
+        <footer className="mt-24 pt-8 border-t border-[hsl(var(--border-subtle))]">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+            <p className="text-xs text-[hsl(var(--text-tertiary))] text-center sm:text-left">
+              53 components &middot; React 19 &middot; Tailwind v4 &middot; Framer Motion &middot; Radix UI
+            </p>
+            <div className="flex gap-4">
+              <a href="https://github.com/annondeveloper/ui-kit" target="_blank" rel="noopener noreferrer"
+                className="text-xs text-[hsl(var(--brand-primary))] hover:underline inline-flex items-center gap-1">
+                GitHub <ExternalLink className="h-3 w-3" />
+              </a>
+              <a href="https://www.npmjs.com/package/@annondeveloper/ui-kit" target="_blank" rel="noopener noreferrer"
+                className="text-xs text-[hsl(var(--brand-primary))] hover:underline inline-flex items-center gap-1">
+                npm <ExternalLink className="h-3 w-3" />
+              </a>
+              <a href="https://jsr.io/@annondeveloper/ui-kit" target="_blank" rel="noopener noreferrer"
+                className="text-xs text-[hsl(var(--brand-primary))] hover:underline inline-flex items-center gap-1">
+                JSR <ExternalLink className="h-3 w-3" />
+              </a>
+            </div>
           </div>
-        </div>
+        </footer>
       </main>
     </>
   )

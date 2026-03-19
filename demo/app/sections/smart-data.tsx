@@ -1,28 +1,29 @@
 'use client'
 
-import React, { useState, useMemo } from 'react'
+import React, { useMemo } from 'react'
 import {
-  DataTable, SmartTable, DiffViewer, HeatmapCalendar, CopyBlock,
-  StatusBadge,
-  Card, CardHeader, CardTitle, CardDescription, CardContent,
+  DataTable, SmartTable, DiffViewer, HeatmapCalendar, CopyBlock, StatusBadge,
 } from '../../../src/index'
 import type { ColumnDef } from '@tanstack/react-table'
 import type { DayValue } from '../../../src/index'
 
-function rand(min: number, max: number) { return Math.random() * (max - min) + min }
-function randInt(min: number, max: number) { return Math.floor(rand(min, max)) }
-
-function DemoCard({ label, description, children }: { label: string; description?: string; children: React.ReactNode }) {
+function Preview({ label, hint, children, wide }: {
+  label: string; hint: string; children: React.ReactNode; wide?: boolean
+}): React.JSX.Element {
   return (
-    <Card variant="elevated">
-      <CardHeader>
-        <CardTitle className="text-base">{label}</CardTitle>
-        {description && <CardDescription>{description}</CardDescription>}
-      </CardHeader>
-      <CardContent>{children}</CardContent>
-    </Card>
+    <figure className={`preview-card ${wide ? 'col-span-full' : ''}`}>
+      <div className="preview-label">
+        <span>{label}</span>
+        <span className="text-[10px] font-normal normal-case tracking-normal text-[hsl(var(--text-disabled))]">Live</span>
+      </div>
+      <div className="preview-body">{children}</div>
+      <div className="code-snippet font-mono"><code>{hint}</code></div>
+    </figure>
   )
 }
+
+function rand(min: number, max: number) { return Math.random() * (max - min) + min }
+function randInt(min: number, max: number) { return Math.floor(rand(min, max)) }
 
 type ServerRow = {
   id: string; hostname: string; ip: string; cpu: number; memory: number;
@@ -57,47 +58,7 @@ function generateHeatmapData(): DayValue[] {
   return data
 }
 
-function SmartTableDemo() {
-  const data = useMemo(() => generateServerData(10), [])
-  const columns: ColumnDef<ServerRow>[] = useMemo(() => [
-    { accessorKey: 'hostname', header: 'Hostname' },
-    { accessorKey: 'ip', header: 'IP Address' },
-    { accessorKey: 'role', header: 'Role' },
-    { accessorKey: 'cpu', header: 'CPU %' },
-    { accessorKey: 'memory', header: 'Memory %' },
-    { accessorKey: 'status', header: 'Status' },
-    { accessorKey: 'region', header: 'Region' },
-  ], [])
-
-  return (
-    <DemoCard label="SmartTable" description="DataTable with auto-generated filter suggestions: outlier detection, top-N, threshold, pattern analysis">
-      <SmartTable columns={columns} data={data} searchPlaceholder="Search servers..." density="compact" />
-    </DemoCard>
-  )
-}
-
-function DataTableDemo() {
-  const data = useMemo(() => generateServerData(10), [])
-  const columns: ColumnDef<ServerRow>[] = useMemo(() => [
-    { accessorKey: 'id', header: 'ID' },
-    { accessorKey: 'hostname', header: 'Hostname' },
-    { accessorKey: 'ip', header: 'IP Address' },
-    { accessorKey: 'cpu', header: 'CPU %', cell: ({ getValue }) => <span className="tabular-nums">{getValue() as number}%</span> },
-    { accessorKey: 'memory', header: 'Memory %', cell: ({ getValue }) => <span className="tabular-nums">{getValue() as number}%</span> },
-    { accessorKey: 'status', header: 'Status', cell: ({ getValue }) => <StatusBadge status={getValue() as string} /> },
-    { accessorKey: 'region', header: 'Region' },
-    { accessorKey: 'uptime', header: 'Uptime' },
-  ], [])
-
-  return (
-    <DemoCard label="DataTable" description="Full-featured table with sorting, search, pagination, density control, column visibility, and CSV export">
-      <DataTable columns={columns} data={data} searchPlaceholder="Search infrastructure..." defaultPageSize={8} exportFilename="infrastructure" density="comfortable" />
-    </DemoCard>
-  )
-}
-
-function DiffViewerDemo() {
-  const oldConfig = `# router-core01.conf
+const oldConfig = `# router-core01.conf
 hostname router-core01
 interface GigabitEthernet0/0
   ip address 10.0.1.1 255.255.255.0
@@ -109,7 +70,7 @@ router ospf 1
   network 10.0.1.0 0.0.0.255 area 0
   network 10.0.2.0 0.0.0.255 area 0`
 
-  const newConfig = `# router-core01.conf
+const newConfig = `# router-core01.conf
 hostname router-core01
 interface GigabitEthernet0/0
   ip address 10.0.1.1 255.255.255.0
@@ -127,60 +88,65 @@ router ospf 1
   network 10.0.2.0 0.0.0.255 area 0
   network 10.0.3.0 0.0.0.255 area 0`
 
-  return (
-    <DemoCard label="DiffViewer" description="Side-by-side config diff with LCS algorithm, collapsible unchanged sections, and line numbers">
-      <DiffViewer oldValue={oldConfig} newValue={newConfig} mode="side-by-side" language="cisco-ios" />
-    </DemoCard>
-  )
-}
-
-function HeatmapCalendarDemo() {
-  const data = useMemo(() => generateHeatmapData(), [])
-  return <HeatmapCalendar data={data} />
-}
-
 export default function SmartDataSection() {
+  const serverData = useMemo(() => generateServerData(10), [])
+  const heatmapData = useMemo(() => generateHeatmapData(), [])
+
+  const smartCols: ColumnDef<ServerRow>[] = useMemo(() => [
+    { accessorKey: 'hostname', header: 'Hostname' },
+    { accessorKey: 'ip', header: 'IP Address' },
+    { accessorKey: 'role', header: 'Role' },
+    { accessorKey: 'cpu', header: 'CPU %' },
+    { accessorKey: 'memory', header: 'Memory %' },
+    { accessorKey: 'status', header: 'Status' },
+    { accessorKey: 'region', header: 'Region' },
+  ], [])
+
+  const dataCols: ColumnDef<ServerRow>[] = useMemo(() => [
+    { accessorKey: 'id', header: 'ID' },
+    { accessorKey: 'hostname', header: 'Hostname' },
+    { accessorKey: 'ip', header: 'IP Address' },
+    { accessorKey: 'cpu', header: 'CPU %', cell: ({ getValue }) => <span className="tabular-nums">{getValue() as number}%</span> },
+    { accessorKey: 'memory', header: 'Memory %', cell: ({ getValue }) => <span className="tabular-nums">{getValue() as number}%</span> },
+    { accessorKey: 'status', header: 'Status', cell: ({ getValue }) => <StatusBadge status={getValue() as string} /> },
+    { accessorKey: 'region', header: 'Region' },
+    { accessorKey: 'uptime', header: 'Uptime' },
+  ], [])
+
   return (
-    <div className="section-enter">
-      <h2 className="text-2xl font-bold text-[hsl(var(--text-primary))] mb-1">Smart Data</h2>
-      <p className="text-sm text-[hsl(var(--text-secondary))] mb-8">Intelligent data components that analyze, filter, and display structured information with built-in insights.</p>
-      <div className="space-y-8">
-        <SmartTableDemo />
-        <DataTableDemo />
-        <DiffViewerDemo />
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <DemoCard label="HeatmapCalendar" description="GitHub-style 90-day contribution heatmap">
-            <HeatmapCalendarDemo />
-          </DemoCard>
-          <DemoCard label="CopyBlock" description="Code blocks with one-click copy and line numbers">
-            <div className="space-y-4">
-              <CopyBlock
-                language="bash"
-                label="Install"
-                content={`npm install @annondeveloper/ui-kit
-# or
-pnpm add @annondeveloper/ui-kit`}
-              />
-              <CopyBlock
-                language="json"
-                label="Config"
-                showLineNumbers
-                maxHeight={120}
-                content={`{
-  "collector": "snmp-v3",
-  "target": "10.0.1.1",
-  "interval": 60,
-  "credentials": {
-    "username": "netrak",
-    "auth_protocol": "sha256",
-    "priv_protocol": "aes128"
-  }
-}`}
-              />
-            </div>
-          </DemoCard>
-        </div>
+    <>
+      <div className="mb-6">
+        <h2 className="text-xl sm:text-2xl font-bold text-[hsl(var(--text-primary))] tracking-tight">Smart Data</h2>
+        <p className="text-sm text-[hsl(var(--text-secondary))] mt-1">Intelligent data components with built-in analysis and insights.</p>
       </div>
-    </div>
+
+      <div className="demo-grid">
+        <Preview label="SmartTable" hint='<SmartTable columns={cols} data={data} density="compact" />' wide>
+          <SmartTable columns={smartCols} data={serverData} searchPlaceholder="Search servers..." density="compact" />
+        </Preview>
+
+        <Preview label="DataTable" hint='<DataTable columns={cols} data={data} exportFilename="infra" />' wide>
+          <DataTable columns={dataCols} data={serverData} searchPlaceholder="Search infrastructure..." defaultPageSize={8} exportFilename="infrastructure" density="comfortable" />
+        </Preview>
+
+        <Preview label="DiffViewer" hint='<DiffViewer oldValue={old} newValue={new} mode="side-by-side" />' wide>
+          <DiffViewer oldValue={oldConfig} newValue={newConfig} mode="side-by-side" language="cisco-ios" />
+        </Preview>
+
+        <Preview label="HeatmapCalendar" hint='<HeatmapCalendar data={days} />' wide>
+          <HeatmapCalendar data={heatmapData} />
+        </Preview>
+
+        <Preview label="CopyBlock" hint='<CopyBlock language="bash" content={code} />'>
+          <div className="space-y-4">
+            <CopyBlock language="bash" label="Install" content={`npm install @annondeveloper/ui-kit`} />
+            <CopyBlock
+              language="json" label="Config" showLineNumbers maxHeight={120}
+              content={`{\n  "collector": "snmp-v3",\n  "target": "10.0.1.1",\n  "interval": 60\n}`}
+            />
+          </div>
+        </Preview>
+      </div>
+    </>
   )
 }

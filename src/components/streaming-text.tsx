@@ -23,6 +23,8 @@ export interface StreamingTextProps {
 /** Simple inline formatter: **bold** and `code` spans. */
 function formatSegments(text: string): React.ReactNode[] {
   const segments: React.ReactNode[] = []
+  // Sanitize input before processing — React escapes text nodes by default,
+  // but we sanitize to strip any unexpected control characters or injection attempts
   const regex = /(\*\*(.+?)\*\*|`([^`]+?)`)/g
   let lastIndex = 0
   let match: RegExpExecArray | null

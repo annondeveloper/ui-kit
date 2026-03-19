@@ -1,209 +1,152 @@
 'use client'
 
-import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react'
+import React, { useState, useEffect, useRef, useMemo } from 'react'
 import {
-  Search, Globe, AlertTriangle, BarChart3, Settings, Server, Wifi,
-  Download, Sun, Terminal, RefreshCw,
+  Search, Globe, AlertTriangle, BarChart3, Settings,
+  Terminal,
 } from 'lucide-react'
 import {
   StreamingText, TypingIndicator, ConfidenceBar, RealtimeValue,
-  LiveFeed, CommandBar, Button, Toaster, toast,
-  Card, CardHeader, CardTitle, CardDescription, CardContent,
+  LiveFeed, CommandBar,
 } from '../../../src/index'
 import type { FeedItem, CommandItem } from '../../../src/index'
 
+/* ── Preview card with static code hint ─────────────────── */
+function Preview({ label, hint, children, wide }: {
+  label: string; hint: string; children: React.ReactNode; wide?: boolean
+}): React.JSX.Element {
+  return (
+    <figure className={`preview-card ${wide ? 'col-span-full' : ''}`}>
+      <div className="preview-label">
+        <span>{label}</span>
+        <span className="text-[10px] font-normal normal-case tracking-normal text-[hsl(var(--text-disabled))]">Live</span>
+      </div>
+      <div className="preview-body">{children}</div>
+      <div className="code-snippet font-mono">
+        <code>{hint}</code>
+      </div>
+    </figure>
+  )
+}
+
 function rand(min: number, max: number) { return Math.random() * (max - min) + min }
-function randInt(min: number, max: number) { return Math.floor(rand(min, max)) }
 
-function DemoCard({ label, description, children }: { label: string; description?: string; children: React.ReactNode }) {
-  return (
-    <Card variant="elevated">
-      <CardHeader>
-        <CardTitle className="text-base">{label}</CardTitle>
-        {description && <CardDescription>{description}</CardDescription>}
-      </CardHeader>
-      <CardContent>{children}</CardContent>
-    </Card>
-  )
-}
-
-function SectionHeader() {
-  return (
-    <>
-      <h2 className="text-2xl font-bold text-[hsl(var(--text-primary))] mb-1">AI & Real-Time</h2>
-      <p className="text-sm text-[hsl(var(--text-secondary))] mb-8">Components purpose-built for AI interfaces, live data, and command-line workflows. No other library has these.</p>
-    </>
-  )
-}
-
-function StreamingTextDemo() {
-  const fullText = `Analyzing network topology for **datacenter-west**...
-
-Found **247 entities** across 12 racks. Detecting LLDP neighbors and building adjacency graph.
-
-Identified 3 potential issues:
-- Switch \`sw-rack07\` has asymmetric LLDP: sees \`fw-core01\` but not vice versa
-- Host \`esxi-14\` reports 2 NICs down on \`vmnic3\` and \`vmnic4\`
-- BGP session between \`core-rtr01\` and \`edge-rtr03\` is in **Idle** state
-
-Recommendations:
-1. Check cable between sw-rack07 port Gi0/24 and fw-core01 port eth1/3
-2. Verify NIC firmware on esxi-14 (current: 20.5.13, available: 21.1.2)
-3. Review BGP config for neighbor \`203.0.113.5\` on core-rtr01`
-
-  const [displayed, setDisplayed] = useState('')
-  const [isStreaming, setIsStreaming] = useState(true)
-  const indexRef = useRef(0)
+export default function AIRealtimeSection(): React.JSX.Element {
+  const fullText = `Analyzing **datacenter-west** topology...\n\nFound **247 entities** across 12 racks. Detecting LLDP neighbors.\n\nIssues found:\n- Switch \`sw-rack07\` has asymmetric LLDP\n- Host \`esxi-14\` has 2 NICs down\n- BGP session \`core-rtr01\` → \`edge-rtr03\` is **Idle**`
+  const [streamText, setStreamText] = useState('')
+  const [streaming, setStreaming] = useState(true)
+  const streamIdx = useRef(0)
 
   useEffect(() => {
-    if (!isStreaming) return
-    const interval = setInterval(() => {
-      if (indexRef.current < fullText.length) {
-        const chunkSize = randInt(2, 8)
-        indexRef.current = Math.min(indexRef.current + chunkSize, fullText.length)
-        setDisplayed(fullText.slice(0, indexRef.current))
+    if (!streaming) return
+    const t = setInterval(() => {
+      streamIdx.current += 3
+      if (streamIdx.current >= fullText.length) {
+        setStreamText(fullText)
+        setStreaming(false)
+        clearInterval(t)
       } else {
-        setIsStreaming(false)
-        clearInterval(interval)
+        setStreamText(fullText.slice(0, streamIdx.current))
       }
     }, 30)
-    return () => clearInterval(interval)
-  }, [isStreaming, fullText])
+    return () => clearInterval(t)
+  }, [streaming, fullText])
 
-  const handleRestart = useCallback(() => {
-    indexRef.current = 0
-    setDisplayed('')
-    setIsStreaming(true)
-  }, [])
-
-  return (
-    <DemoCard label="StreamingText" description="AI response streaming with markdown formatting, blinking cursor, and copy-on-complete">
-      <div className="rounded-xl bg-[hsl(var(--bg-base))] border border-[hsl(var(--border-subtle))] p-4 max-h-[300px] overflow-y-auto">
-        <StreamingText text={displayed} isStreaming={isStreaming} />
-      </div>
-      {!isStreaming && (
-        <Button size="sm" variant="outline" onClick={handleRestart} className="mt-3">
-          <RefreshCw className="h-3.5 w-3.5" /> Restart
-        </Button>
-      )}
-    </DemoCard>
-  )
-}
-
-function RealtimeValueDemo() {
-  const [val, setVal] = useState(1247)
-  const [prev, setPrev] = useState(1230)
-
+  const [rtValue, setRtValue] = useState(1247.3)
+  const [rtPrev, setRtPrev] = useState(1189.0)
+  const [rtUpdated, setRtUpdated] = useState(new Date().toISOString())
   useEffect(() => {
-    const id = setInterval(() => {
-      setPrev(val)
-      setVal((v) => Math.max(0, v + randInt(-50, 60)))
-    }, 2000)
-    return () => clearInterval(id)
-  })
+    const t = setInterval(() => {
+      setRtPrev(rtValue)
+      setRtValue(v => +(v + rand(-80, 120)).toFixed(1))
+      setRtUpdated(new Date().toISOString())
+    }, 3000)
+    return () => clearInterval(t)
+  }, [rtValue])
 
-  return (
-    <DemoCard label="RealtimeValue" description="Live metric with animated transitions, freshness tracking, and delta display">
-      <div className="space-y-6">
-        <RealtimeValue value={val} previousValue={prev} label="Requests/sec" lastUpdated={new Date().toISOString()} connectionState="connected" size="lg" />
-        <RealtimeValue value={42.8} label="Avg Latency (ms)" connectionState="reconnecting" size="md" />
-        <RealtimeValue value="N/A" label="Throughput" connectionState="disconnected" size="sm" />
-      </div>
-    </DemoCard>
-  )
-}
-
-function LiveFeedDemo() {
-  const [items, setItems] = useState<FeedItem[]>(() => {
-    const now = Date.now()
-    return [
-      { id: '1', content: 'SNMP collector completed walk for switch-core01 (1,247 OIDs)', timestamp: new Date(now - 3000), type: 'info' },
-      { id: '2', content: 'Alert fired: CPU > 90% on host web-07.prod', timestamp: new Date(now - 8000), type: 'error' },
-      { id: '3', content: 'Discovery scan found 2 new candidates in 10.0.5.0/24', timestamp: new Date(now - 15000), type: 'success' },
-      { id: '4', content: 'BGP session flap detected on edge-rtr-03 (peer: 203.0.113.5)', timestamp: new Date(now - 22000), type: 'warning' },
-      { id: '5', content: 'Syslog: interface GigabitEthernet0/12 changed state to up', timestamp: new Date(now - 30000), type: 'info' },
-      { id: '6', content: 'Certificate renewal completed for api-server.internal', timestamp: new Date(now - 45000), type: 'success' },
+  const [feedItems, setFeedItems] = useState<FeedItem[]>([
+    { id: '1', content: 'BGP session established with 198.51.100.1', timestamp: new Date(Date.now() - 60000), type: 'success' },
+    { id: '2', content: 'Interface Gi0/24 flap detected on sw-rack07', timestamp: new Date(Date.now() - 30000), type: 'warning' },
+    { id: '3', content: 'SNMP poll completed: 247 entities', timestamp: new Date(Date.now() - 10000), type: 'info' },
+  ])
+  useEffect(() => {
+    const msgs = [
+      { content: 'CPU threshold exceeded on esxi-14 (94.2%)', type: 'error' as const },
+      { content: 'New entity discovered: 10.0.3.47 (Cisco Nexus)', type: 'info' as const },
+      { content: 'Alert resolved: Memory normalized on db-01', type: 'success' as const },
     ]
-  })
-  const counterRef = useRef(7)
-
-  useEffect(() => {
-    const id = setInterval(() => {
-      const messages = [
-        { content: `SNMP trap received from switch-rack${randInt(1, 20)}`, type: 'info' as const },
-        { content: `Metric batch written: ${randInt(800, 1500)} observations`, type: 'success' as const },
-        { content: `High memory usage on worker-${String(randInt(1, 12)).padStart(2, '0')} (${randInt(85, 98)}%)`, type: 'warning' as const },
-        { content: `New entity approved: host ${randInt(1, 254)}.${randInt(1, 254)}.${randInt(1, 254)}.${randInt(1, 254)}`, type: 'info' as const },
-      ]
-      const msg = messages[randInt(0, messages.length)]!
-      setItems((prev) => [{
-        id: String(counterRef.current++),
-        content: msg.content,
-        timestamp: new Date(),
-        type: msg.type,
-      }, ...prev].slice(0, 30))
-    }, 4000)
-    return () => clearInterval(id)
+    let idx = 0
+    const t = setInterval(() => {
+      const msg = msgs[idx % msgs.length]!
+      setFeedItems(prev => [{ id: `f-${Date.now()}`, content: msg.content, timestamp: new Date(), type: msg.type }, ...prev].slice(0, 15))
+      idx++
+    }, 5000)
+    return () => clearInterval(t)
   }, [])
 
-  return (
-    <DemoCard label="LiveFeed" description="Real-time event feed with auto-scroll, pause/resume, and type-colored borders. New events arrive every 4 seconds.">
-      <div className="h-[280px]">
-        <LiveFeed items={items} maxVisible={20} />
-      </div>
-    </DemoCard>
-  )
-}
-
-function CommandBarDemo() {
-  const commands: CommandItem[] = useMemo(() => [
-    { id: 'search-entities', label: 'Search Entities', description: 'Find devices, hosts, and services', icon: Search, group: 'Navigation', shortcut: 'Cmd+E', onSelect: () => toast.info('Navigate: Entities'), keywords: ['device', 'host', 'find'] },
-    { id: 'topology', label: 'Open Topology Map', icon: Globe, group: 'Navigation', onSelect: () => toast.info('Navigate: Topology') },
-    { id: 'alerts', label: 'View Active Alerts', icon: AlertTriangle, group: 'Navigation', shortcut: 'Cmd+A', onSelect: () => toast.info('Navigate: Alerts'), keywords: ['warning', 'critical'] },
-    { id: 'dashboard', label: 'Go to Dashboard', icon: BarChart3, group: 'Navigation', onSelect: () => toast.info('Navigate: Dashboard') },
-    { id: 'settings', label: 'Open Settings', icon: Settings, group: 'Navigation', shortcut: 'Cmd+,', onSelect: () => toast.info('Navigate: Settings') },
-    { id: 'add-device', label: 'Add New Device', description: 'Register a device for monitoring', icon: Server, group: 'Actions', onSelect: () => toast.success('Add device wizard opened') },
-    { id: 'run-discovery', label: 'Run Network Discovery', icon: Wifi, group: 'Actions', onSelect: () => toast.success('Discovery scan started') },
-    { id: 'export-data', label: 'Export Dashboard Data', icon: Download, group: 'Actions', onSelect: () => toast.info('Exporting...') },
-    { id: 'toggle-theme', label: 'Toggle Dark/Light Mode', icon: Sun, group: 'Preferences', onSelect: () => document.documentElement.classList.toggle('light'), keywords: ['dark', 'light', 'theme'] },
-    { id: 'help', label: 'Keyboard Shortcuts', icon: Terminal, group: 'Help', shortcut: 'Cmd+/', onSelect: () => toast.info('Shortcuts panel opened') },
+  const commandItems = useMemo<CommandItem[]>(() => [
+    { id: '1', label: 'Go to Dashboard', icon: BarChart3, shortcut: 'G D', group: 'Navigation', onSelect: () => {} },
+    { id: '2', label: 'View Topology', icon: Globe, shortcut: 'G T', group: 'Navigation', onSelect: () => {} },
+    { id: '3', label: 'Search Entities', icon: Search, group: 'Actions', onSelect: () => {}, keywords: ['find'] },
+    { id: '4', label: 'Open Settings', icon: Settings, shortcut: '⌘ ,', group: 'Actions', onSelect: () => {} },
+    { id: '5', label: 'View Alerts', icon: AlertTriangle, group: 'Navigation', onSelect: () => {} },
+    { id: '6', label: 'Deploy Agent', icon: Terminal, group: 'Actions', onSelect: () => {} },
   ], [])
 
-  return <CommandBar items={commands} />
-}
-
-export default function AIRealtimeSection() {
   return (
-    <div className="section-enter">
-      <SectionHeader />
-      <div className="space-y-8">
-        <CommandBarDemo />
-        <StreamingTextDemo />
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <DemoCard label="TypingIndicator" description="Three animation variants">
-            <div className="space-y-4">
-              <div className="flex items-center gap-3"><TypingIndicator variant="dots" label="AI is thinking" /></div>
-              <div className="flex items-center gap-3"><TypingIndicator variant="pulse" label="Processing query" /></div>
-              <div className="flex items-center gap-3"><TypingIndicator variant="text" label="Generating response" /></div>
-            </div>
-          </DemoCard>
-          <DemoCard label="ConfidenceBar" description="Probability display with threshold zones">
-            <div className="space-y-5">
-              <ConfidenceBar value={0.92} label="Entity match" />
-              <ConfidenceBar value={0.65} label="Anomaly score" />
-              <ConfidenceBar value={0.23} label="False positive" />
-            </div>
-          </DemoCard>
-          <RealtimeValueDemo />
-        </div>
-        <LiveFeedDemo />
-        <DemoCard label="CommandBar" description="Press Cmd+K (or Ctrl+K) to open the universal command palette. 10 sample commands registered.">
-          <p className="text-sm text-[hsl(var(--text-secondary))]">
-            Try pressing <kbd className="rounded border border-[hsl(var(--border-subtle))] bg-[hsl(var(--bg-surface))] px-1.5 py-0.5 text-[10px] font-mono">Cmd+K</kbd> now.
-            The command bar supports fuzzy search, keyboard navigation, grouped items, and recent selections.
-          </p>
-        </DemoCard>
+    <>
+      <div className="mb-6">
+        <h2 className="text-xl sm:text-2xl font-bold text-[hsl(var(--text-primary))] tracking-tight">AI & Real-Time</h2>
+        <p className="text-sm text-[hsl(var(--text-secondary))] mt-1">Components no other library has — for LLM interfaces and live operational data.</p>
       </div>
-    </div>
+
+      <div className="demo-grid">
+        <Preview label="StreamingText" hint='<StreamingText text={response} isStreaming={true} />'>
+          <div className="text-sm max-h-48 overflow-y-auto">
+            <StreamingText text={streamText} isStreaming={streaming} />
+          </div>
+        </Preview>
+
+        <Preview label="TypingIndicator" hint='<TypingIndicator variant="dots" label="AI thinking" />'>
+          <div className="space-y-4">
+            <TypingIndicator variant="dots" label="AI is thinking" />
+            <TypingIndicator variant="pulse" label="Processing" />
+            <TypingIndicator variant="text" label="Analyzing" />
+          </div>
+        </Preview>
+
+        <Preview label="ConfidenceBar" hint='<ConfidenceBar value={0.87} label="Match" />'>
+          <div className="space-y-3">
+            <ConfidenceBar value={0.92} label="Entity match" />
+            <ConfidenceBar value={0.64} label="Anomaly score" />
+            <ConfidenceBar value={0.18} label="False positive" />
+          </div>
+        </Preview>
+
+        <Preview label="RealtimeValue" hint='<RealtimeValue value={n} connectionState="connected" />'>
+          <RealtimeValue
+            value={rtValue} label="Throughput"
+            format={(v) => `${v.toFixed(0)} req/s`}
+            previousValue={rtPrev} lastUpdated={rtUpdated}
+            connectionState="connected" size="lg"
+          />
+        </Preview>
+
+        <Preview label="LiveFeed" hint='<LiveFeed items={events} autoScroll maxVisible={15} />' wide>
+          <div className="max-h-52 overflow-hidden">
+            <LiveFeed items={feedItems} maxVisible={10} showTimestamps autoScroll />
+          </div>
+        </Preview>
+
+        <Preview label="CommandBar" hint='<CommandBar items={commands} hotkey="k" />' wide>
+          <div className="text-center py-4">
+            <p className="text-sm text-[hsl(var(--text-secondary))] mb-2">
+              Press <kbd className="px-2 py-0.5 rounded border border-[hsl(var(--border-default))] bg-[hsl(var(--bg-elevated))] text-[11px] font-mono">⌘K</kbd> to open
+            </p>
+            <CommandBar items={commandItems} />
+          </div>
+        </Preview>
+      </div>
+    </>
   )
 }

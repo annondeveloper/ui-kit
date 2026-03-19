@@ -121,3 +121,36 @@ export function utilColor(pct: number, colorMap: UtilColorMap = defaultUtilColor
   if (pct >= colorMap.medium.threshold) return colorMap.medium.className
   return colorMap.low.className
 }
+
+/**
+ * Sanitize a string for safe rendering. Uses DOMPurify when available,
+ * falls back to basic HTML entity escaping.
+ * Import `isomorphic-dompurify` as an optional peer dependency for full sanitization.
+ */
+export function sanitize(input: string): string {
+  try {
+    // Dynamic import to keep DOMPurify optional
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const DOMPurify = require('isomorphic-dompurify')
+    return DOMPurify.sanitize(input, { ALLOWED_TAGS: [], ALLOWED_ATTR: [] }) as string
+  } catch {
+    // Fallback: strip all HTML tags and escape entities
+    return input
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#039;')
+  }
+}
+
+/**
+ * Validate that a string is a safe CSS color value (hex, rgb, hsl).
+ * Rejects CSS injection attempts like `expression()` or `url()`.
+ */
+export function isSafeColor(c: string): boolean {
+  return /^#[0-9a-f]{3,8}$/i.test(c) ||
+    /^rgba?\(\s*[\d.]+/.test(c) ||
+    /^hsla?\(\s*[\d.]+/.test(c) ||
+    /^hsl\(var\(--[a-z-]+\)\)$/.test(c)
+}

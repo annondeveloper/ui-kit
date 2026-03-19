@@ -1,6 +1,8 @@
 // ── Utils ────────────────────────────────────────────────────────────────────
 export {
   cn,
+  sanitize,
+  isSafeColor,
   fmtBps,
   fmtSpeed,
   fmtUtil,
