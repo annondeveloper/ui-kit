@@ -187,14 +187,18 @@ export function ColorInput({
   const handleSatAreaDown = useCallback(
     (e: React.PointerEvent) => {
       e.preventDefault()
+      const el = e.currentTarget as HTMLElement
+      el.setPointerCapture(e.pointerId)
       handleSatAreaPointer(e)
       const move = (ev: PointerEvent) => handleSatAreaPointer(ev)
       const up = () => {
-        document.removeEventListener('pointermove', move)
-        document.removeEventListener('pointerup', up)
+        el.removeEventListener('pointermove', move)
+        el.removeEventListener('pointerup', up)
+        el.removeEventListener('lostpointercapture', up)
       }
-      document.addEventListener('pointermove', move)
-      document.addEventListener('pointerup', up)
+      el.addEventListener('pointermove', move)
+      el.addEventListener('pointerup', up)
+      el.addEventListener('lostpointercapture', up)
     },
     [handleSatAreaPointer],
   )

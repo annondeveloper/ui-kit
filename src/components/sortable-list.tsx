@@ -79,10 +79,6 @@ export function SortableList<T extends SortableItem>({
       // Only respond to primary button / touch
       if (e.button !== 0) return
 
-      // Capture pointer so touch drag works without browser scroll hijacking
-      const target = e.currentTarget as HTMLElement
-      target.setPointerCapture(e.pointerId)
-
       setDragIdx(index)
       setOverIdx(index)
       dragIdxRef.current = index
@@ -90,9 +86,16 @@ export function SortableList<T extends SortableItem>({
       dragItemId.current = items[index]?.id ?? null
       startPos.current = { x: e.clientX, y: e.clientY }
 
+      // Use pointer capture on the container for reliable touch tracking.
+      // Captured pointer events fire on the capturing element, so we listen
+      // on the container (not document) for move/up events.
+      const container = containerRef.current
+      if (container) {
+        container.setPointerCapture(e.pointerId)
+      }
+
       const handlePointerMove = (ev: PointerEvent) => {
-        if (!containerRef.current) return
-        const container = containerRef.current
+        if (!container) return
         const children = Array.from(container.children) as HTMLElement[]
 
         // Find which item we're over
@@ -113,8 +116,11 @@ export function SortableList<T extends SortableItem>({
       }
 
       const handlePointerUp = () => {
-        document.removeEventListener('pointermove', handlePointerMove)
-        document.removeEventListener('pointerup', handlePointerUp)
+        if (container) {
+          container.removeEventListener('pointermove', handlePointerMove)
+          container.removeEventListener('pointerup', handlePointerUp)
+          container.removeEventListener('lostpointercapture', handlePointerUp)
+        }
 
         const prev = dragIdxRef.current
         const over = overIdxRef.current
@@ -130,8 +136,11 @@ export function SortableList<T extends SortableItem>({
         setOverIdx(null)
       }
 
-      document.addEventListener('pointermove', handlePointerMove)
-      document.addEventListener('pointerup', handlePointerUp)
+      if (container) {
+        container.addEventListener('pointermove', handlePointerMove)
+        container.addEventListener('pointerup', handlePointerUp)
+        container.addEventListener('lostpointercapture', handlePointerUp)
+      }
     },
     [items, onReorder, direction],
   )
@@ -197,7 +206,7 @@ export function SortableList<T extends SortableItem>({
     <div
       ref={containerRef}
       className={cn(
-        'flex',
+        'flex touch-none',
         direction === 'vertical' ? 'flex-col' : 'flex-row flex-wrap',
         className,
       )}
