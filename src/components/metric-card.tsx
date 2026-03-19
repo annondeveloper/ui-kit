@@ -80,26 +80,29 @@ export function MetricCard({
       initial={reduced ? false : { opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.2, ease: 'easeOut' }}
+      style={{ containerType: 'inline-size' }}
       className={cn(
+        '@container',
         'relative rounded-2xl border border-[hsl(var(--border-subtle))] bg-[hsl(var(--bg-surface))]',
-        'p-5 shadow-sm border-l-[3px]',
+        'p-3 @[250px]:p-5 shadow-sm border-l-[3px]',
         status ? statusBorder[status] : 'border-l-[hsl(var(--border-subtle))]',
         className,
       )}
     >
-      <div className="flex items-start justify-between gap-3">
+      {/* Narrow (<250px): stacked vertical. Default (250-400px): current. Wide (>400px): horizontal with sparkline on right. */}
+      <div className="flex flex-col @[250px]:flex-row @[250px]:items-start @[250px]:justify-between gap-3">
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-2 mb-1">
             {Icon && (
               <Icon className="size-4 shrink-0 text-[hsl(var(--text-tertiary))]" />
             )}
-            <span className="text-[0.75rem] font-medium text-[hsl(var(--text-secondary))] truncate">
+            <span className="text-[0.6875rem] @[250px]:text-[0.75rem] font-medium text-[hsl(var(--text-secondary))] truncate">
               {label}
             </span>
           </div>
 
           <div className="flex items-baseline gap-2">
-            <span className="text-2xl font-semibold text-[hsl(var(--text-primary))] tabular-nums">
+            <span className="text-xl @[250px]:text-2xl @[400px]:text-3xl font-semibold text-[hsl(var(--text-primary))] tabular-nums">
               <AnimatedCounter value={value} format={format} />
             </span>
 
@@ -121,20 +124,23 @@ export function MetricCard({
           </div>
         </div>
 
+        {/* Sparkline: hidden in narrow containers, shown at 250px+, larger at 400px+ */}
         {sparklineData && sparklineData.length >= 2 && (
-          <Sparkline
-            data={sparklineData}
-            width={60}
-            height={28}
-            color={
-              status === 'critical'
-                ? 'hsl(var(--status-critical))'
-                : status === 'warning'
-                  ? 'hsl(var(--status-warning))'
-                  : 'hsl(var(--brand-primary))'
-            }
-            fillOpacity={0.15}
-          />
+          <div className="hidden @[250px]:block">
+            <Sparkline
+              data={sparklineData}
+              width={60}
+              height={28}
+              color={
+                status === 'critical'
+                  ? 'hsl(var(--status-critical))'
+                  : status === 'warning'
+                    ? 'hsl(var(--status-warning))'
+                    : 'hsl(var(--brand-primary))'
+              }
+              fillOpacity={0.15}
+            />
+          </div>
         )}
       </div>
     </motion.div>

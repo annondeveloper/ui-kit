@@ -202,3 +202,21 @@ export type { TreeViewProps, TreeNode } from './components/tree-view'
 
 export { ScrollReveal } from './components/scroll-reveal'
 export type { ScrollRevealProps } from './components/scroll-reveal'
+
+// ── Container Query Components ─────────────────────────────────────────────
+export { ResponsiveCard, ResponsiveGrid } from './components/responsive-card'
+export type { ResponsiveCardProps, ResponsiveGridProps } from './components/responsive-card'
+
+// ── File Upload ────────────────────────────────────────────────────────────
+export { FileUpload } from './components/file-upload'
+export type { FileUploadProps } from './components/file-upload'
+
+// ── Native Tooltip ─────────────────────────────────────────────────────────
+export { NativeTooltip } from './components/native-tooltip'
+export type { NativeTooltipProps } from './components/native-tooltip'
+
+// ── View Transitions ───────────────────────────────────────────────────────
+export { useViewTransition } from './hooks/use-view-transition'
+
+export { ViewTransitionLink } from './components/view-transition-link'
+export type { ViewTransitionLinkProps } from './components/view-transition-link'
