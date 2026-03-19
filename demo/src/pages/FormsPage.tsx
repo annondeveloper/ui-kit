@@ -1,9 +1,24 @@
-import { useState, type ChangeEvent } from 'react'
+import { useState, useCallback, type ChangeEvent } from 'react'
 import { Preview } from '../components/Preview.tsx'
 import {
   FormInput, Select, Checkbox, ToggleSwitch,
   RadioGroup, Slider, FilterPill, ColorInput,
+  Combobox,
+  type ComboboxOption,
 } from '@ui/index'
+
+const vendorOptions: ComboboxOption[] = [
+  { value: 'cisco', label: 'Cisco', description: 'IOS-XE, NX-OS, ASA', group: 'Network' },
+  { value: 'juniper', label: 'Juniper', description: 'Junos OS', group: 'Network' },
+  { value: 'arista', label: 'Arista', description: 'EOS', group: 'Network' },
+  { value: 'nokia', label: 'Nokia', description: 'SR OS', group: 'Network' },
+  { value: 'fortinet', label: 'Fortinet', description: 'FortiOS', group: 'Security' },
+  { value: 'paloalto', label: 'Palo Alto', description: 'PAN-OS', group: 'Security' },
+  { value: 'dell', label: 'Dell', description: 'PowerEdge, iDRAC', group: 'Compute' },
+  { value: 'hpe', label: 'HPE', description: 'ProLiant, Comware', group: 'Compute' },
+  { value: 'vmware', label: 'VMware', description: 'vSphere, ESXi', group: 'Virtualization' },
+  { value: 'proxmox', label: 'Proxmox', description: 'VE Hypervisor', group: 'Virtualization' },
+]
 
 export function FormsPage() {
   const [text, setText] = useState('core-sw-01')
@@ -19,6 +34,7 @@ export function FormsPage() {
   const [slider, setSlider] = useState(60)
   const [filters, setFilters] = useState<Record<string, boolean>>({ All: true, Active: false, Warning: false, Critical: false, Stale: false })
   const [color, setColor] = useState('#8b5cf6')
+  const [comboVendors, setComboVendors] = useState<string | string[]>([])
 
   const toggleFilter = (key: string) => {
     if (key === 'All') {
@@ -32,11 +48,20 @@ export function FormsPage() {
     }
   }
 
+  // Simulated async search
+  const searchVendors = useCallback(async (query: string): Promise<ComboboxOption[]> => {
+    await new Promise(r => setTimeout(r, 400))
+    return vendorOptions.filter(o =>
+      o.label.toLowerCase().includes(query.toLowerCase()) ||
+      (o.description?.toLowerCase().includes(query.toLowerCase()) ?? false)
+    )
+  }, [])
+
   return (
-    <div className="max-w-5xl mx-auto px-6 py-10">
+    <div className="max-w-5xl mx-auto px-4 sm:px-6 py-8 sm:py-10">
       <div className="mb-8">
         <h1 className="text-2xl font-bold text-[hsl(var(--text-primary))] mb-1">Forms</h1>
-        <p className="text-sm text-[hsl(var(--text-secondary))]">8 form components for data entry and configuration</p>
+        <p className="text-sm text-[hsl(var(--text-secondary))]">9 form components for data entry and configuration</p>
       </div>
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 stagger">
         <Preview label="FormInput" description="Text input with label, hint, validation" code={`<FormInput label="Hostname" value={val} onChange={setVal} required />\n<FormInput label="Password" type="password" />`}>
@@ -73,6 +98,23 @@ export function FormsPage() {
               onValueChange={() => {}}
               placeholder="Select vendor..."
             />
+          </div>
+        </Preview>
+
+        <Preview label="Combobox" description="Searchable multi-select with async" code={`<Combobox\n  options={vendors}\n  value={selected}\n  onChange={setSelected}\n  multiple\n  onSearch={asyncFetch}\n/>`}>
+          <div className="space-y-4">
+            <Combobox
+              options={vendorOptions}
+              value={comboVendors}
+              onChange={setComboVendors}
+              multiple
+              onSearch={searchVendors}
+              placeholder="Search vendors..."
+              label="Supported Vendors"
+            />
+            <p className="text-xs text-[hsl(var(--text-tertiary))]">
+              Selected: {Array.isArray(comboVendors) && comboVendors.length > 0 ? comboVendors.join(', ') : 'none'}
+            </p>
           </div>
         </Preview>
 

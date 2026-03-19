@@ -2,8 +2,8 @@ import { useState, useEffect, useCallback, useRef } from 'react'
 import { Preview, useInViewTimer } from '../components/Preview.tsx'
 import {
   StreamingText, TypingIndicator, ConfidenceBar,
-  RealtimeValue, LiveFeed, CommandBar,
-  type FeedItem, type CommandItem,
+  RealtimeValue, LiveFeed, CommandBar, Combobox, InlineEdit,
+  type FeedItem, type CommandItem, type ComboboxOption,
 } from '@ui/index'
 import { Search, Zap, Settings, HelpCircle } from 'lucide-react'
 
@@ -43,6 +43,17 @@ const commands: CommandItem[] = [
   { id: '4', label: 'Help & Support', icon: HelpCircle, group: 'Config', onSelect: () => {} },
 ]
 
+const deviceOptions: ComboboxOption[] = [
+  { value: 'core-sw-01', label: 'core-sw-01', description: '10.0.0.1 - Cisco Catalyst 9300', group: 'Core' },
+  { value: 'core-sw-02', label: 'core-sw-02', description: '10.0.0.2 - Cisco Catalyst 9500', group: 'Core' },
+  { value: 'dist-sw-01', label: 'dist-sw-01', description: '10.0.1.1 - Juniper EX4300', group: 'Distribution' },
+  { value: 'dist-sw-02', label: 'dist-sw-02', description: '10.0.1.2 - Juniper EX4400', group: 'Distribution' },
+  { value: 'edge-fw-01', label: 'edge-fw-01', description: '10.0.2.1 - FortiGate 600E', group: 'Edge' },
+  { value: 'edge-fw-02', label: 'edge-fw-02', description: '10.0.2.2 - Palo Alto PA-850', group: 'Edge' },
+  { value: 'access-sw-01', label: 'access-sw-01', description: '10.0.3.1 - Arista 7050X3', group: 'Access' },
+  { value: 'access-sw-02', label: 'access-sw-02', description: '10.0.3.2 - Arista 7050CX3', group: 'Access' },
+]
+
 export function AIPage() {
   const { text, streaming } = useStreamingDemo()
   const [rtValue, setRtValue] = useState(1247)
@@ -52,13 +63,40 @@ export function AIPage() {
     { id: '2', content: 'BGP session with 198.51.100.1 established', timestamp: new Date(Date.now() - 60000), type: 'success' },
     { id: '3', content: 'SNMP collection completed for 47 devices', timestamp: new Date(Date.now() - 120000), type: 'info' },
   ])
+  const [confidenceValues, setConfidenceValues] = useState([0, 0, 0])
+  const confidenceAnimated = useRef(false)
+
+  // Combobox state
+  const [comboSingle, setComboSingle] = useState<string | string[]>('')
+  const [comboMulti, setComboMulti] = useState<string | string[]>([])
+  const [asyncResults, setAsyncResults] = useState<ComboboxOption[]>([])
+
+  // InlineEdit state
+  const [hostname, setHostname] = useState('core-sw-01')
+  const [description, setDescription] = useState('Primary core switch - Building A')
+  const [interval, setInterval_] = useState('60')
 
   const updateRt = useCallback(() => {
     setRtPrev(rtValue)
     setRtValue(p => p + Math.floor(Math.random() * 100 - 30))
   }, [rtValue])
 
-  const rtRef = useInViewTimer(2000, updateRt)
+  const rtRef = useInViewTimer(2500, updateRt)
+
+  // Animate confidence bars on viewport enter
+  const confRef = useRef<HTMLDivElement>(null)
+  useEffect(() => {
+    const el = confRef.current
+    if (!el) return
+    const obs = new IntersectionObserver(([entry]) => {
+      if (entry.isIntersecting && !confidenceAnimated.current) {
+        confidenceAnimated.current = true
+        setTimeout(() => setConfidenceValues([0.92, 0.65, 0.23]), 200)
+      }
+    }, { threshold: 0.3 })
+    obs.observe(el)
+    return () => obs.disconnect()
+  }, [])
 
   const feedEvents = [
     { content: 'CPU threshold exceeded on edge-fw-02 (92%)', type: 'error' as const },
@@ -82,11 +120,20 @@ export function AIPage() {
 
   const feedRef = useInViewTimer(4000, addFeedItem)
 
+  // Simulated async search for combobox
+  const asyncSearch = useCallback(async (query: string): Promise<ComboboxOption[]> => {
+    await new Promise(r => setTimeout(r, 600))
+    return deviceOptions.filter(o =>
+      o.label.toLowerCase().includes(query.toLowerCase()) ||
+      (o.description?.toLowerCase().includes(query.toLowerCase()) ?? false)
+    )
+  }, [])
+
   return (
-    <div className="max-w-5xl mx-auto px-6 py-10">
+    <div className="max-w-5xl mx-auto px-4 sm:px-6 py-8 sm:py-10">
       <div className="mb-8">
         <h1 className="text-2xl font-bold text-[hsl(var(--text-primary))] mb-1">AI & Realtime</h1>
-        <p className="text-sm text-[hsl(var(--text-secondary))]">6 components for streaming, live data, and AI-powered interfaces</p>
+        <p className="text-sm text-[hsl(var(--text-secondary))]">8 components for streaming, live data, search, and inline editing</p>
       </div>
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 stagger">
         <Preview label="StreamingText" description="AI-style text streaming with cursor" glow="ai" code={`<StreamingText\n  text={response}\n  isStreaming={true}\n  showCursor\n/>`}>
@@ -103,15 +150,15 @@ export function AIPage() {
           </div>
         </Preview>
 
-        <Preview label="ConfidenceBar" description="Threshold-colored probability bars" glow="ai" code={`<ConfidenceBar value={0.92} label="Entity Match" />\n<ConfidenceBar value={0.65} label="Vendor ID" />\n<ConfidenceBar value={0.23} label="Location" />`}>
-          <div className="space-y-3">
-            <ConfidenceBar value={0.92} label="Entity Match" />
-            <ConfidenceBar value={0.65} label="Vendor Classification" />
-            <ConfidenceBar value={0.23} label="Location Inference" />
+        <Preview label="ConfidenceBar" description="Animated fill on viewport enter" glow="ai" code={`<ConfidenceBar value={0.92} label="Entity Match" />\n<ConfidenceBar value={0.65} label="Vendor ID" />`}>
+          <div ref={confRef} className="space-y-3">
+            <ConfidenceBar value={confidenceValues[0]} label="Entity Match" />
+            <ConfidenceBar value={confidenceValues[1]} label="Vendor Classification" />
+            <ConfidenceBar value={confidenceValues[2]} label="Location Inference" />
           </div>
         </Preview>
 
-        <Preview label="RealtimeValue" description="Live value with freshness tracking" glow="realtime" code={`<RealtimeValue\n  value={1247}\n  label="Events/sec"\n  previousValue={1200}\n  connectionState="connected"\n  lastUpdated={new Date()}\n/>`}>
+        <Preview label="RealtimeValue" description="Live value with freshness tracking" glow="realtime" code={`<RealtimeValue\n  value={1247}\n  label="Events/sec"\n  previousValue={1200}\n  connectionState="connected"\n/>`}>
           <div ref={rtRef}>
             <RealtimeValue
               value={rtValue}
@@ -124,7 +171,49 @@ export function AIPage() {
           </div>
         </Preview>
 
-        <Preview label="LiveFeed" description="Real-time event stream" glow="realtime" wide code={`<LiveFeed\n  items={events}\n  showTimestamps\n  autoScroll\n/>`}>
+        <Preview label="Combobox" description="Async search with multi-select tags" glow="ai" wide code={`<Combobox\n  options={devices}\n  onSearch={asyncFetch}\n  multiple\n  placeholder="Search devices..."\n/>`}>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <p className="text-xs text-[hsl(var(--text-tertiary))] mb-2">Single select with async search</p>
+              <Combobox
+                options={deviceOptions}
+                value={comboSingle}
+                onChange={setComboSingle}
+                onSearch={asyncSearch}
+                placeholder="Search devices..."
+              />
+            </div>
+            <div>
+              <p className="text-xs text-[hsl(var(--text-tertiary))] mb-2">Multi-select with tags</p>
+              <Combobox
+                options={deviceOptions}
+                value={comboMulti}
+                onChange={setComboMulti}
+                multiple
+                placeholder="Select multiple..."
+              />
+            </div>
+          </div>
+        </Preview>
+
+        <Preview label="InlineEdit" description="Click text to edit, save on Enter/blur" glow="ai" code={`<InlineEdit\n  value={hostname}\n  onSave={async (v) => setHostname(v)}\n  aria-label="Hostname"\n/>`}>
+          <div className="space-y-2">
+            <div className="flex items-center gap-3">
+              <span className="text-xs text-[hsl(var(--text-tertiary))] w-24 shrink-0">Hostname:</span>
+              <InlineEdit value={hostname} onSave={async (v) => { await new Promise(r => setTimeout(r, 400)); setHostname(v) }} aria-label="Hostname" />
+            </div>
+            <div className="flex items-center gap-3">
+              <span className="text-xs text-[hsl(var(--text-tertiary))] w-24 shrink-0">Description:</span>
+              <InlineEdit value={description} onSave={async (v) => setDescription(v)} aria-label="Description" />
+            </div>
+            <div className="flex items-center gap-3">
+              <span className="text-xs text-[hsl(var(--text-tertiary))] w-24 shrink-0">Interval (s):</span>
+              <InlineEdit value={interval} type="number" onSave={async (v) => setInterval_(v)} aria-label="Interval" />
+            </div>
+          </div>
+        </Preview>
+
+        <Preview label="LiveFeed" description="Real-time event stream (new events every 4s)" glow="realtime" wide code={`<LiveFeed\n  items={events}\n  showTimestamps\n  autoScroll\n/>`}>
           <div ref={feedRef} className="h-[220px]">
             <LiveFeed items={feedItems} showTimestamps autoScroll maxVisible={10} />
           </div>

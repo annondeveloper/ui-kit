@@ -32,6 +32,17 @@ html { scroll-behavior: smooth; }
   animation: cardReveal 0.5s ease-out both;
 }
 
+/* Viewport highlight: subtle glow when entering view, then fade */
+.preview-card.viewport-highlight {
+  animation: cardReveal 0.5s ease-out both, viewportGlow 1.2s ease-out both;
+}
+
+@keyframes viewportGlow {
+  0% { box-shadow: 0 0 0 0 hsl(var(--brand-primary) / 0); }
+  20% { box-shadow: 0 0 20px 2px hsl(var(--brand-primary) / 0.15); }
+  100% { box-shadow: 0 0 0 0 hsl(var(--brand-primary) / 0); }
+}
+
 @keyframes cardReveal {
   from { opacity: 0; transform: translateY(20px) scale(0.98); }
   to { opacity: 1; transform: translateY(0) scale(1); }
@@ -52,6 +63,46 @@ html { scroll-behavior: smooth; }
   to { opacity: 1; transform: translateY(0); }
 }
 
+/* ScrollReveal CSS animations */
+@keyframes ui-fade-up {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes ui-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes ui-slide-left {
+  from { opacity: 0; transform: translateX(-30px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+@keyframes ui-slide-right {
+  from { opacity: 0; transform: translateX(30px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+@keyframes ui-scale {
+  from { opacity: 0; transform: scale(0.92); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+/* Demo grid utility */
+.demo-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+}
+@media (min-width: 640px) {
+  .demo-grid { grid-template-columns: repeat(2, 1fr); }
+}
+@media (min-width: 1024px) {
+  .demo-grid { grid-template-columns: repeat(3, 1fr); }
+}
+
 ::-webkit-scrollbar { width: 5px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: hsl(var(--border-default)); border-radius: 3px; }
+
+/* Theme preview panel */
+.theme-preview-panel {
+  transition: background-color 0.3s, color 0.3s, border-color 0.3s;
+}

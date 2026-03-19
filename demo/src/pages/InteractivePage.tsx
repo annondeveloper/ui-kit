@@ -3,8 +3,9 @@ import { Preview } from '../components/Preview.tsx'
 import {
   SortableList, DragHandle, StepWizard, ColorInput,
   InfiniteScroll, KanbanColumn, NotificationStack,
-  FormInput, Button,
-  type SortableItem, type WizardStep, type KanbanItem, type Notification,
+  FormInput, Button, DensityProvider, MetricCard, UtilizationBar,
+  ScrollReveal, Badge,
+  type SortableItem, type WizardStep, type KanbanItem, type Notification, type Density,
 } from '@ui/index'
 
 interface TaskItem extends SortableItem {
@@ -54,6 +55,7 @@ export function InteractivePage() {
     Array.from({ length: 5 }, (_, i) => ({ id: `s${i}`, text: `Log entry ${i + 1}: SNMP walk completed for 10.0.${i}.1` }))
   )
   const [notifications, setNotifications] = useState<Notification[]>([])
+  const [density, setDensity] = useState<Density>('comfortable')
 
   const loadMore = useCallback(async () => {
     await new Promise(r => setTimeout(r, 500))
@@ -88,10 +90,10 @@ export function InteractivePage() {
   const priorityColor: Record<string, string> = { high: 'text-[hsl(var(--status-critical))]', medium: 'text-[hsl(var(--status-warning))]', low: 'text-[hsl(var(--text-tertiary))]' }
 
   return (
-    <div className="max-w-5xl mx-auto px-6 py-10">
+    <div className="max-w-5xl mx-auto px-4 sm:px-6 py-8 sm:py-10">
       <div className="mb-8">
         <h1 className="text-2xl font-bold text-[hsl(var(--text-primary))] mb-1">Interactive</h1>
-        <p className="text-sm text-[hsl(var(--text-secondary))]">6 components for drag-and-drop, wizards, and rich interactions</p>
+        <p className="text-sm text-[hsl(var(--text-secondary))]">9 components for drag-and-drop, wizards, density control, and rich interactions</p>
       </div>
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 stagger">
         <Preview label="SortableList" description="Drag-and-drop reorderable list" glow="interactive" code={`<SortableList\n  items={tasks}\n  onReorder={setTasks}\n  renderItem={(item, i, handle) => <div {...handle}>...</div>}\n/>`}>
@@ -108,8 +110,61 @@ export function InteractivePage() {
           />
         </Preview>
 
-        <Preview label="StepWizard" description="Multi-step wizard with validation" glow="interactive" code={`<StepWizard\n  steps={steps}\n  onComplete={handleDone}\n/>`}>
+        <Preview label="StepWizard" description="Multi-step wizard with navigation" glow="interactive" code={`<StepWizard\n  steps={steps}\n  onComplete={handleDone}\n/>`}>
           <StepWizard steps={wizardSteps} onComplete={() => {}} />
+        </Preview>
+
+        <Preview label="DensityProvider" description="Toggle compact/comfortable/spacious" glow="interactive" wide code={`<DensityProvider mode="compact">\n  <MetricCard ... />\n  <UtilizationBar ... />\n</DensityProvider>`}>
+          <div className="space-y-4">
+            <div className="flex items-center gap-2 mb-2">
+              <span className="text-xs text-[hsl(var(--text-tertiary))]">Density:</span>
+              {(['compact', 'comfortable', 'spacious'] as Density[]).map(d => (
+                <button
+                  key={d}
+                  onClick={() => setDensity(d)}
+                  className={`text-xs px-2.5 py-1 rounded-lg transition-colors cursor-pointer ${
+                    density === d
+                      ? 'bg-[hsl(var(--brand-primary))]/15 text-[hsl(var(--brand-primary))] font-medium'
+                      : 'text-[hsl(var(--text-tertiary))] hover:text-[hsl(var(--text-secondary))] hover:bg-[hsl(var(--bg-elevated))]'
+                  }`}
+                >
+                  {d}
+                </button>
+              ))}
+              <Badge color="purple" size="xs" className="ml-2">{density}</Badge>
+            </div>
+            <DensityProvider mode={density}>
+              <div className="grid grid-cols-2 gap-3">
+                <MetricCard label="CPU" value={72} format={n => `${n}%`} status="warning" />
+                <MetricCard label="Memory" value={4.2} format={n => `${n.toFixed(1)} GB`} status="ok" />
+              </div>
+              <div className="space-y-2 mt-3">
+                <UtilizationBar value={72} label="CPU Usage" />
+                <UtilizationBar value={45} label="Disk I/O" />
+              </div>
+            </DensityProvider>
+          </div>
+        </Preview>
+
+        <Preview label="ScrollReveal" description="Elements animate in on scroll" glow="interactive" wide code={`<ScrollReveal animation="fade-up" delay={100}>\n  <Card>Content</Card>\n</ScrollReveal>`}>
+          <div className="space-y-3 max-h-[300px] overflow-y-auto px-1 py-2">
+            <p className="text-xs text-[hsl(var(--text-tertiary))] mb-2">Scroll down to reveal items with different animations:</p>
+            {[
+              { anim: 'fade-up' as const, label: 'Fade Up', desc: 'Default entry animation for cards' },
+              { anim: 'fade-in' as const, label: 'Fade In', desc: 'Subtle opacity transition' },
+              { anim: 'slide-left' as const, label: 'Slide Left', desc: 'Enter from the left side' },
+              { anim: 'slide-right' as const, label: 'Slide Right', desc: 'Enter from the right side' },
+              { anim: 'scale' as const, label: 'Scale Up', desc: 'Grow from smaller to full size' },
+            ].map((item, i) => (
+              <ScrollReveal key={item.anim} animation={item.anim} staggerIndex={i} once={false}>
+                <div className="flex items-center gap-3 p-3 rounded-xl bg-[hsl(var(--bg-base))] border border-[hsl(var(--border-subtle))]">
+                  <span className="text-sm font-medium text-[hsl(var(--text-primary))]">{item.label}</span>
+                  <span className="text-xs text-[hsl(var(--text-tertiary))]">{item.desc}</span>
+                  <Badge color="blue" size="xs" className="ml-auto">{item.anim}</Badge>
+                </div>
+              </ScrollReveal>
+            ))}
+          </div>
         </Preview>
 
         <Preview label="ColorInput" description="Color picker with presets" glow="interactive" code={`<ColorInput value={color} onChange={setColor} label="Brand Color" />`}>
@@ -137,7 +192,7 @@ export function InteractivePage() {
         </Preview>
 
         <Preview label="KanbanColumn" description="Kanban board columns" glow="interactive" wide code={`<KanbanColumn title="To Do" items={items} color="hsl(var(--brand-primary))" />`}>
-          <div className="grid grid-cols-3 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             <KanbanColumn title="To Do" items={kanbanTodo} color="hsl(var(--brand-primary))" />
             <KanbanColumn title="In Progress" items={kanbanProgress} color="hsl(var(--status-warning))" />
             <KanbanColumn title="Done" items={kanbanDone} color="hsl(var(--status-ok))" />

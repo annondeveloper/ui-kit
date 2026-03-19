@@ -4,12 +4,12 @@ import { Sun, Moon, Menu, X, Copy, Check, Package } from 'lucide-react'
 
 const categories = [
   { path: '/',            label: 'Home',        emoji: '\u{1F3E0}', count: 0 },
-  { path: '/ai',          label: 'AI & Realtime', emoji: '\u{1F916}', count: 6 },
-  { path: '/monitor',     label: 'Monitoring',  emoji: '\u{1F4CA}', count: 12 },
-  { path: '/data',        label: 'Smart Data',  emoji: '\u{1F9E0}', count: 7 },
-  { path: '/interactive', label: 'Interactive',  emoji: '\u{1F579}', count: 6 },
+  { path: '/ai',          label: 'AI & Realtime', emoji: '\u{1F916}', count: 8 },
+  { path: '/monitor',     label: 'Monitoring',  emoji: '\u{1F4CA}', count: 13 },
+  { path: '/data',        label: 'Smart Data',  emoji: '\u{1F9E0}', count: 8 },
+  { path: '/interactive', label: 'Interactive',  emoji: '\u{1F579}', count: 9 },
   { path: '/core',        label: 'Core',        emoji: '\u{1F9F1}', count: 11 },
-  { path: '/forms',       label: 'Forms',       emoji: '\u{270D}',  count: 8 },
+  { path: '/forms',       label: 'Forms',       emoji: '\u{270D}',  count: 9 },
   { path: '/layout',      label: 'Layout',      emoji: '\u{1F4D0}', count: 6 },
 ]
 

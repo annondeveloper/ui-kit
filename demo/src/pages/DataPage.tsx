@@ -3,9 +3,11 @@ import { Preview } from '../components/Preview.tsx'
 import {
   SmartTable, DataTable, DiffViewer, HeatmapCalendar,
   CopyBlock, AnimatedCounter, TruncatedText, Button,
-  type DayValue,
+  TreeView,
+  type DayValue, type TreeNode,
 } from '@ui/index'
 import type { ColumnDef } from '@tanstack/react-table'
+import { Folder, FileText, FileCode, FileJson, Image, Settings } from 'lucide-react'
 
 interface DeviceRow {
   name: string
@@ -90,16 +92,70 @@ const jsonCode = `{
   }
 }`
 
+const treeData: TreeNode[] = [
+  {
+    id: 'project',
+    label: 'netrak/',
+    icon: Folder,
+    children: [
+      {
+        id: 'backend',
+        label: 'backend/',
+        icon: Folder,
+        children: [
+          { id: 'cargo', label: 'Cargo.toml', icon: Settings },
+          {
+            id: 'crates',
+            label: 'crates/',
+            icon: Folder,
+            children: [
+              { id: 'server', label: 'server/', icon: Folder, children: [
+                { id: 'main-rs', label: 'main.rs', icon: FileCode },
+                { id: 'routes', label: 'routes/', icon: Folder, children: [
+                  { id: 'mod-rs', label: 'mod.rs', icon: FileCode },
+                  { id: 'entities-rs', label: 'entities.rs', icon: FileCode },
+                  { id: 'metrics-rs', label: 'metrics.rs', icon: FileCode },
+                ]},
+              ]},
+              { id: 'common', label: 'common/', icon: Folder, children: [
+                { id: 'lib-rs', label: 'lib.rs', icon: FileCode },
+              ]},
+              { id: 'snmp-engine', label: 'snmp-engine/', icon: Folder },
+            ],
+          },
+        ],
+      },
+      {
+        id: 'frontend',
+        label: 'frontend/',
+        icon: Folder,
+        children: [
+          { id: 'package-json', label: 'package.json', icon: FileJson },
+          { id: 'tsconfig', label: 'tsconfig.json', icon: FileJson },
+          { id: 'app', label: 'app/', icon: Folder, children: [
+            { id: 'layout', label: 'layout.tsx', icon: FileCode },
+            { id: 'page', label: 'page.tsx', icon: FileCode },
+          ]},
+          { id: 'components', label: 'components/', icon: Folder },
+        ],
+      },
+      { id: 'readme', label: 'README.md', icon: FileText },
+      { id: 'screenshot', label: 'screenshot.png', icon: Image, disabled: true },
+    ],
+  },
+]
+
 export function DataPage() {
   const [counter, setCounter] = useState(1000)
+  const [selectedNode, setSelectedNode] = useState<string>('main-rs')
 
   const increment = useCallback(() => setCounter(p => p + Math.floor(Math.random() * 500)), [])
 
   return (
-    <div className="max-w-5xl mx-auto px-6 py-10">
+    <div className="max-w-5xl mx-auto px-4 sm:px-6 py-8 sm:py-10">
       <div className="mb-8">
         <h1 className="text-2xl font-bold text-[hsl(var(--text-primary))] mb-1">Smart Data</h1>
-        <p className="text-sm text-[hsl(var(--text-secondary))]">7 components for data display, analysis, and interaction</p>
+        <p className="text-sm text-[hsl(var(--text-secondary))]">8 components for data display, analysis, and interaction</p>
       </div>
       <div className="grid grid-cols-1 gap-6 stagger">
         <Preview label="SmartTable" description="Auto-suggested filters + full DataTable features" glow="realtime" wide code={`<SmartTable columns={columns} data={devices} />`}>
@@ -113,19 +169,33 @@ export function DataPage() {
             </div>
           </Preview>
 
-          <Preview label="HeatmapCalendar" description="90-day activity heatmap" code={`<HeatmapCalendar data={days} showMonthLabels />`}>
-            <HeatmapCalendar data={heatmapData} showMonthLabels showDayLabels />
+          <Preview label="TreeView" description="File browser tree with expand/collapse" code={`<TreeView\n  data={treeData}\n  selected={selectedNode}\n  onSelect={setSelected}\n  showLines\n  defaultExpanded={['project', 'backend']}\n/>`}>
+            <div className="max-h-[260px] overflow-y-auto">
+              <TreeView
+                data={treeData}
+                selected={selectedNode}
+                onSelect={setSelectedNode}
+                showLines
+                defaultExpanded={['project', 'backend', 'crates', 'server', 'frontend']}
+              />
+            </div>
           </Preview>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <Preview label="HeatmapCalendar" description="90-day activity heatmap" code={`<HeatmapCalendar data={days} showMonthLabels />`}>
+            <HeatmapCalendar data={heatmapData} showMonthLabels showDayLabels />
+          </Preview>
+
           <Preview label="CopyBlock" description="Code blocks with copy button" code={`<CopyBlock content={code} language="bash" showLineNumbers />`}>
             <div className="space-y-3">
               <CopyBlock content={bashCode} language="bash" showLineNumbers label="Install Agent" />
               <CopyBlock content={jsonCode} language="json" maxHeight={120} label="Entity Payload" />
             </div>
           </Preview>
+        </div>
 
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <Preview label="AnimatedCounter" description="Spring-animated number transitions" code={`<AnimatedCounter value={count} />\n<Button onClick={increment}>Add</Button>`}>
             <div className="text-center py-4">
               <div className="text-4xl font-bold text-[hsl(var(--text-primary))] tabular-nums mb-4">
@@ -134,9 +204,7 @@ export function DataPage() {
               <Button variant="primary" onClick={increment}>Add random amount</Button>
             </div>
           </Preview>
-        </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <Preview label="TruncatedText" description="Truncated text with tooltip" code={`<TruncatedText text={longText} maxWidth={200} />`}>
             <div className="space-y-3">
               <TruncatedText text="This is a very long hostname that will be truncated: dc01-rack14-sw-access-port-bundle-aggr-01.datacenter.example.com" maxWidth={280} />
@@ -144,11 +212,11 @@ export function DataPage() {
               <TruncatedText text="Another long string: enterprise-monitoring-platform-core-service-mesh-gateway-primary.internal.corp.netrak.io" maxWidth={280} />
             </div>
           </Preview>
-
-          <Preview label="DataTable" description="Full-featured data table" code={`<DataTable columns={columns} data={data} />`}>
-            <DataTable columns={columns.slice(0, 4)} data={deviceData.slice(0, 5)} />
-          </Preview>
         </div>
+
+        <Preview label="DataTable" description="Full-featured data table" wide code={`<DataTable columns={columns} data={data} />`}>
+          <DataTable columns={columns} data={deviceData} />
+        </Preview>
       </div>
     </div>
   )

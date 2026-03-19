@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useEffect, useRef } from 'react'
 import { Preview, useInViewTimer } from '../components/Preview.tsx'
 import {
   MetricCard, ThresholdGauge, UtilizationBar, Sparkline,
@@ -6,6 +6,7 @@ import {
   TimeRangeSelector, StatusBadge, StatusPulse, LogViewer,
   type DayStatus, type PortStatus, type StageInfo, type TimelineEvent, type LogEntry,
 } from '@ui/index'
+import { generateTheme, themeToCSS } from '@ui/index'
 import { Server, Cpu, HardDrive, Wifi } from 'lucide-react'
 
 function genSparkline(base: number, variance: number, len = 12): number[] {
@@ -51,6 +52,46 @@ export function MonitorPage() {
   const [sparkData, setSparkData] = useState(genSparkline(65, 15))
   const [timeRange, setTimeRange] = useState('24h')
 
+  // Gauge animation on viewport enter
+  const [gaugeValues, setGaugeValues] = useState([0, 0, 0, 0])
+  const gaugeAnimated = useRef(false)
+  const gaugeRef = useRef<HTMLDivElement>(null)
+  useEffect(() => {
+    const el = gaugeRef.current
+    if (!el) return
+    const obs = new IntersectionObserver(([entry]) => {
+      if (entry.isIntersecting && !gaugeAnimated.current) {
+        gaugeAnimated.current = true
+        setTimeout(() => setGaugeValues([67, 78, 45, 92]), 200)
+      }
+    }, { threshold: 0.3 })
+    obs.observe(el)
+    return () => obs.disconnect()
+  }, [])
+
+  // Util bar animation
+  const [utilValues, setUtilValues] = useState([0, 0, 0, 0])
+  const utilAnimated = useRef(false)
+  const utilRef = useRef<HTMLDivElement>(null)
+  useEffect(() => {
+    const el = utilRef.current
+    if (!el) return
+    const obs = new IntersectionObserver(([entry]) => {
+      if (entry.isIntersecting && !utilAnimated.current) {
+        utilAnimated.current = true
+        setTimeout(() => setUtilValues([67, 78, 45, 92]), 200)
+      }
+    }, { threshold: 0.3 })
+    obs.observe(el)
+    return () => obs.disconnect()
+  }, [])
+
+  // Theme generator demo
+  const [brandColor, setBrandColor] = useState('#6366f1')
+  const [themeMode, setThemeMode] = useState<'dark' | 'light'>('dark')
+  const generatedTheme = generateTheme(brandColor, themeMode)
+  const themeCSS = themeToCSS(generatedTheme, '.theme-demo')
+
   const tick = useCallback(() => {
     setMetrics(p => ({
       rps: p.rps + Math.floor(Math.random() * 200 - 80),
@@ -64,13 +105,13 @@ export function MonitorPage() {
   const tickRef = useInViewTimer(2000, tick)
 
   return (
-    <div className="max-w-5xl mx-auto px-6 py-10">
+    <div className="max-w-5xl mx-auto px-4 sm:px-6 py-8 sm:py-10">
       <div className="mb-8">
         <h1 className="text-2xl font-bold text-[hsl(var(--text-primary))] mb-1">Monitoring</h1>
-        <p className="text-sm text-[hsl(var(--text-secondary))]">12 components for dashboards, metrics, and infrastructure visualization</p>
+        <p className="text-sm text-[hsl(var(--text-secondary))]">13 components for dashboards, metrics, and infrastructure visualization</p>
       </div>
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 stagger" ref={tickRef}>
-        <Preview label="MetricCard" description="Dashboard stat tiles with sparklines" glow="monitor" wide code={`<MetricCard label="Requests/sec" value={12847} sparklineData={data} status="ok" />`}>
+        <Preview label="MetricCard" description="Live updating dashboard stat tiles" glow="monitor" wide code={`<MetricCard label="Requests/sec" value={12847} sparklineData={data} status="ok" />`}>
           <div className="grid grid-cols-2 gap-3">
             <MetricCard label="Requests/sec" value={metrics.rps} previousValue={12600} trendDirection="up-good" status="ok" sparklineData={sparkData} icon={Server} />
             <MetricCard label="CPU Usage" value={metrics.cpu} format={n => `${n.toFixed(0)}%`} previousValue={62} trendDirection="up-bad" status={metrics.cpu > 80 ? 'critical' : metrics.cpu > 60 ? 'warning' : 'ok'} icon={Cpu} />
@@ -79,21 +120,21 @@ export function MonitorPage() {
           </div>
         </Preview>
 
-        <Preview label="ThresholdGauge" description="SVG gauges with threshold zones" glow="monitor" code={`<ThresholdGauge value={72} label="CPU" />`}>
-          <div className="flex justify-around">
-            <ThresholdGauge value={metrics.cpu} label="CPU" size={100} />
-            <ThresholdGauge value={78} label="Memory" size={100} />
-            <ThresholdGauge value={45} label="Disk" size={100} />
-            <ThresholdGauge value={92} label="Network" size={100} />
+        <Preview label="ThresholdGauge" description="Animate to target on viewport enter" glow="monitor" code={`<ThresholdGauge value={72} label="CPU" />`}>
+          <div ref={gaugeRef} className="flex flex-wrap justify-around gap-2">
+            <ThresholdGauge value={gaugeValues[0]} label="CPU" size={100} />
+            <ThresholdGauge value={gaugeValues[1]} label="Memory" size={100} />
+            <ThresholdGauge value={gaugeValues[2]} label="Disk" size={100} />
+            <ThresholdGauge value={gaugeValues[3]} label="Network" size={100} />
           </div>
         </Preview>
 
-        <Preview label="UtilizationBar" description="Resource utilization with thresholds" glow="monitor" code={`<UtilizationBar value={72} label="CPU" />`}>
-          <div className="space-y-3">
-            <UtilizationBar value={metrics.cpu} label="CPU" />
-            <UtilizationBar value={78} label="Memory" />
-            <UtilizationBar value={45} label="Disk I/O" />
-            <UtilizationBar value={92} label="Network" thresholds={{ warning: 60, critical: 85 }} />
+        <Preview label="UtilizationBar" description="Animated resource utilization fills" glow="monitor" code={`<UtilizationBar value={72} label="CPU" />`}>
+          <div ref={utilRef} className="space-y-3">
+            <UtilizationBar value={utilValues[0]} label="CPU" />
+            <UtilizationBar value={utilValues[1]} label="Memory" />
+            <UtilizationBar value={utilValues[2]} label="Disk I/O" />
+            <UtilizationBar value={utilValues[3]} label="Network" thresholds={{ warning: 60, critical: 85 }} />
           </div>
         </Preview>
 
@@ -134,10 +175,70 @@ export function MonitorPage() {
         </Preview>
 
         <Preview label="StatusPulse" description="Animated status dots" glow="monitor" code={`<StatusPulse status="online" showLabel />`}>
-          <div className="flex gap-6">
+          <div className="flex flex-wrap gap-6">
             {['online', 'degraded', 'offline', 'unknown'].map(s => (
               <StatusPulse key={s} status={s} label />
             ))}
+          </div>
+        </Preview>
+
+        <Preview label="generateTheme" description="Generate a full theme from one color" glow="monitor" wide code={`import { generateTheme, themeToCSS } from '@ui/index'\nconst theme = generateTheme('#6366f1', 'dark')\nconst css = themeToCSS(theme, ':root')`}>
+          <div className="space-y-4">
+            <div className="flex flex-wrap items-center gap-4">
+              <div>
+                <label className="text-xs text-[hsl(var(--text-tertiary))] block mb-1">Brand Color</label>
+                <div className="flex items-center gap-2">
+                  <input
+                    type="color"
+                    value={brandColor}
+                    onChange={e => setBrandColor(e.target.value)}
+                    className="w-10 h-8 rounded border border-[hsl(var(--border-default))] cursor-pointer"
+                  />
+                  <span className="text-xs font-mono text-[hsl(var(--text-secondary))]">{brandColor}</span>
+                </div>
+              </div>
+              <div>
+                <label className="text-xs text-[hsl(var(--text-tertiary))] block mb-1">Mode</label>
+                <div className="flex gap-1">
+                  {(['dark', 'light'] as const).map(m => (
+                    <button
+                      key={m}
+                      onClick={() => setThemeMode(m)}
+                      className={`text-xs px-3 py-1.5 rounded-lg cursor-pointer transition-colors ${
+                        themeMode === m ? 'bg-[hsl(var(--brand-primary))]/15 text-[hsl(var(--brand-primary))] font-medium' : 'text-[hsl(var(--text-tertiary))] hover:bg-[hsl(var(--bg-elevated))]'
+                      }`}
+                    >
+                      {m}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+            {/* Live preview swatch */}
+            <style>{themeCSS}</style>
+            <div className="theme-demo theme-preview-panel rounded-xl border border-current/10 p-4" style={{
+              background: `hsl(${generatedTheme['bg-surface']})`,
+              color: `hsl(${generatedTheme['text-primary']})`,
+              borderColor: `hsl(${generatedTheme['border-default']})`,
+            }}>
+              <div className="flex items-center gap-3 mb-3">
+                <div className="w-3 h-3 rounded-full" style={{ background: `hsl(${generatedTheme['brand-primary']})` }} />
+                <span className="text-sm font-semibold">Preview Panel</span>
+                <span className="text-xs ml-auto" style={{ color: `hsl(${generatedTheme['text-tertiary']})` }}>Generated theme</span>
+              </div>
+              <div className="grid grid-cols-4 gap-2 mb-3">
+                {(['bg-base', 'bg-surface', 'bg-elevated', 'bg-overlay'] as const).map(k => (
+                  <div key={k} className="rounded-lg p-2 text-center" style={{ background: `hsl(${generatedTheme[k]})`, border: `1px solid hsl(${generatedTheme['border-subtle']})` }}>
+                    <span className="text-[9px] font-mono" style={{ color: `hsl(${generatedTheme['text-tertiary']})` }}>{k.replace('bg-', '')}</span>
+                  </div>
+                ))}
+              </div>
+              <div className="flex gap-2">
+                {(['status-ok', 'status-warning', 'status-critical', 'brand-primary'] as const).map(k => (
+                  <div key={k} className="h-2 flex-1 rounded-full" style={{ background: `hsl(${generatedTheme[k]})` }} />
+                ))}
+              </div>
+            </div>
           </div>
         </Preview>
 

@@ -52,17 +52,34 @@ function highlightCode(code: string): ReactNode[] {
 export function Preview({ label, description, code, glow, wide, children }: PreviewProps) {
   const ref = useRef<HTMLDivElement>(null)
   const [copied, setCopied] = useState(false)
+  const [inView, setInView] = useState(false)
 
   useEffect(() => {
     const el = ref.current
     if (!el) return
     const obs = new IntersectionObserver(
-      ([entry]) => { if (entry.isIntersecting) { el.classList.add('in-view'); obs.disconnect() } },
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          el.classList.add('in-view')
+          setInView(true)
+        } else {
+          setInView(false)
+        }
+      },
       { threshold: 0.15 },
     )
     obs.observe(el)
     return () => obs.disconnect()
   }, [])
+
+  // Subtle glow pulse when entering viewport
+  useEffect(() => {
+    const el = ref.current
+    if (!el || !inView) return
+    el.classList.add('viewport-highlight')
+    const t = setTimeout(() => el.classList.remove('viewport-highlight'), 1200)
+    return () => clearTimeout(t)
+  }, [inView])
 
   const handleCopy = useCallback(() => {
     void navigator.clipboard.writeText(code).then(() => {
@@ -77,7 +94,7 @@ export function Preview({ label, description, code, glow, wide, children }: Prev
       className={`preview-card ${glow ? glowClass[glow] : ''} ${wide ? 'col-span-full' : ''}`}
     >
       {/* Header */}
-      <div className="px-5 pt-4 pb-3 border-b border-[hsl(var(--border-subtle))]">
+      <div className="px-4 sm:px-5 pt-4 pb-3 border-b border-[hsl(var(--border-subtle))]">
         <h3 className="text-sm font-semibold text-[hsl(var(--text-primary))]">{label}</h3>
         {description && (
           <p className="text-xs text-[hsl(var(--text-secondary))] mt-0.5">{description}</p>
@@ -85,13 +102,13 @@ export function Preview({ label, description, code, glow, wide, children }: Prev
       </div>
 
       {/* Live demo */}
-      <div className="p-5 min-h-[80px]">
+      <div className="p-4 sm:p-5 min-h-[80px]">
         {children}
       </div>
 
       {/* Code */}
       <div className="relative border-t border-[hsl(var(--border-subtle))] bg-[hsl(var(--bg-base))]">
-        <pre className="p-4 text-xs leading-relaxed overflow-x-auto font-mono text-[hsl(var(--text-secondary))]">
+        <pre className="p-3 sm:p-4 text-xs leading-relaxed overflow-x-auto font-mono text-[hsl(var(--text-secondary))]">
           <code>{highlightCode(code.trim())}</code>
         </pre>
         <button
@@ -136,4 +153,23 @@ export function useInViewTimer(intervalMs: number, callback: () => void) {
   }, [intervalMs, callback])
 
   return ref
+}
+
+/** Hook: returns [ref, isInView] based on IntersectionObserver */
+export function useInView(threshold = 0.1): [React.RefObject<HTMLDivElement | null>, boolean] {
+  const ref = useRef<HTMLDivElement>(null)
+  const [inView, setInView] = useState(false)
+
+  useEffect(() => {
+    const el = ref.current
+    if (!el) return
+    const obs = new IntersectionObserver(
+      ([entry]) => setInView(entry.isIntersecting),
+      { threshold },
+    )
+    obs.observe(el)
+    return () => obs.disconnect()
+  }, [threshold])
+
+  return [ref, inView]
 }

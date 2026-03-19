@@ -15,7 +15,7 @@ export function CorePage() {
   const [dialogOpen, setDialogOpen] = useState(false)
 
   return (
-    <div className="max-w-5xl mx-auto px-6 py-10">
+    <div className="max-w-5xl mx-auto px-4 sm:px-6 py-8 sm:py-10">
       <div className="mb-8">
         <h1 className="text-2xl font-bold text-[hsl(var(--text-primary))] mb-1">Core</h1>
         <p className="text-sm text-[hsl(var(--text-secondary))]">11 foundational components for building interfaces</p>
@@ -87,7 +87,7 @@ export function CorePage() {
           </div>
         </Preview>
 
-        <Preview label="ConfirmDialog" description="Confirmation modal with variants" code={`<ConfirmDialog\n  open={open}\n  onOpenChange={setOpen}\n  title="Delete device?"\n  description="This cannot be undone."\n  variant="danger"\n  onConfirm={handleDelete}\n/>`}>
+        <Preview label="ConfirmDialog" description="Confirmation modal with variants" code={`<ConfirmDialog\n  open={open}\n  onOpenChange={setOpen}\n  title="Delete device?"\n  variant="danger"\n  onConfirm={handleDelete}\n/>`}>
           <div className="text-center py-4">
             <Button variant="danger" onClick={() => setDialogOpen(true)}>Delete Device</Button>
             <ConfirmDialog
@@ -103,7 +103,7 @@ export function CorePage() {
         </Preview>
 
         <Preview label="Tooltip" description="Contextual hints on hover" code={`<Tooltip content="More info"><Button>Hover me</Button></Tooltip>`}>
-          <div className="flex gap-3 justify-center py-4">
+          <div className="flex flex-wrap gap-3 justify-center py-4">
             <Tooltip content="View device details"><Button variant="outline" size="icon"><Info className="size-4" /></Button></Tooltip>
             <Tooltip content="Configure alerts" side="bottom"><Button variant="outline" size="icon"><Bell className="size-4" /></Button></Tooltip>
             <Tooltip content="Open settings" side="right"><Button variant="outline" size="icon"><Settings className="size-4" /></Button></Tooltip>

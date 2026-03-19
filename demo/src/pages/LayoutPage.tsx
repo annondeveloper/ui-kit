@@ -30,7 +30,7 @@ export function LayoutPage() {
   }, [])
 
   return (
-    <div className="max-w-5xl mx-auto px-6 py-10">
+    <div className="max-w-5xl mx-auto px-4 sm:px-6 py-8 sm:py-10">
       <div className="mb-8">
         <h1 className="text-2xl font-bold text-[hsl(var(--text-primary))] mb-1">Layout & Feedback</h1>
         <p className="text-sm text-[hsl(var(--text-secondary))]">6 components for loading states, empty states, and layout patterns</p>
@@ -42,7 +42,7 @@ export function LayoutPage() {
             title="No devices found"
             description="Add your first network device to start collecting metrics and monitoring health."
             actions={
-              <div className="flex gap-2">
+              <div className="flex flex-wrap gap-2">
                 <Button size="sm"><Plus className="size-3.5" /> Add Device</Button>
                 <Button variant="outline" size="sm"><Search className="size-3.5" /> Run Discovery</Button>
               </div>
@@ -83,7 +83,7 @@ export function LayoutPage() {
 
         <Preview label="Avatar" description="Image, initials, status dot" code={`<Avatar alt="Alice" size="md" status="online" />\n<Avatar alt="Bob" size="lg" status="busy" />`}>
           <div className="space-y-4">
-            <div className="flex items-end gap-3">
+            <div className="flex items-end gap-3 flex-wrap">
               <Avatar alt="A" size="xs" />
               <Avatar alt="Bob Chen" size="sm" status="online" />
               <Avatar alt="Carol Davis" size="md" status="online" />
