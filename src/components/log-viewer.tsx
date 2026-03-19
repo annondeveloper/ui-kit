@@ -176,7 +176,7 @@ export function LogViewer({
               </span>
             )}
             {entry.source && (
-              <span className="text-[hsl(var(--text-secondary))] shrink-0">
+              <span className="text-[hsl(var(--text-secondary))] shrink-0 max-w-[6rem] truncate">
                 [{entry.source}]
               </span>
             )}

@@ -297,7 +297,7 @@ function SideBySide({
       )}
       data-language={language}
     >
-      <div className="grid grid-cols-2 divide-x divide-[hsl(var(--border-subtle))]">
+      <div className="grid grid-cols-1 sm:grid-cols-2 divide-y sm:divide-y-0 sm:divide-x divide-[hsl(var(--border-subtle))]">
         {/* Left: old */}
         <div>
           {pairs.map((pair, idx) => (

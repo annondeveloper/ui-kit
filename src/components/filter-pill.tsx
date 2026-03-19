@@ -25,7 +25,7 @@ export function FilterPill({ label, count, active, onClick, className }: FilterP
       type="button"
       onClick={onClick}
       className={cn(
-        'rounded-full px-3 py-1 text-xs transition-colors whitespace-nowrap',
+        'rounded-full px-3 py-1.5 text-xs transition-colors whitespace-nowrap',
         active
           ? 'bg-[hsl(var(--brand-primary))]/10 text-[hsl(var(--brand-primary))] font-medium'
           : 'bg-[hsl(var(--bg-elevated))] text-[hsl(var(--text-secondary))] hover:bg-[hsl(var(--bg-overlay))]',

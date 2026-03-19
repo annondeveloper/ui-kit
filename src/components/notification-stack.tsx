@@ -208,7 +208,7 @@ function NotificationCard({
             type="button"
             onClick={handleDismiss}
             className={cn(
-              'shrink-0 p-0.5 rounded cursor-pointer',
+              'shrink-0 p-2 sm:p-1 rounded cursor-pointer',
               'text-[hsl(var(--text-tertiary))] hover:text-[hsl(var(--text-primary))]',
               'hover:bg-[hsl(var(--bg-overlay))] transition-colors duration-100',
             )}

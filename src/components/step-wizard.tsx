@@ -331,7 +331,7 @@ export function StepWizard({
             onClick={handleBack}
             disabled={currentStep === 0}
             className={cn(
-              'inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium transition-colors',
+              'inline-flex items-center gap-1.5 px-4 py-2.5 rounded-lg text-sm font-medium transition-colors',
               'border border-[hsl(var(--border-default))]',
               'text-[hsl(var(--text-primary))]',
               'hover:bg-[hsl(var(--bg-overlay))]',
@@ -350,7 +350,7 @@ export function StepWizard({
             onClick={handleNext}
             disabled={isValidating}
             className={cn(
-              'inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium transition-colors',
+              'inline-flex items-center gap-1.5 px-4 py-2.5 rounded-lg text-sm font-medium transition-colors',
               'bg-[hsl(var(--brand-primary))] text-[hsl(var(--text-on-brand))]',
               'hover:bg-[hsl(var(--brand-primary))]/90',
               'disabled:opacity-70 disabled:cursor-not-allowed',

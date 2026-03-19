@@ -87,7 +87,7 @@ export function Tabs({
   )
 
   const listCls = cn(
-    'inline-flex items-center',
+    'inline-flex items-center overflow-x-auto [scrollbar-width:none]',
     variant === 'underline' && 'border-b border-[hsl(var(--border-subtle))] gap-0',
     variant === 'pills' && 'gap-1 p-1 rounded-xl bg-[hsl(var(--bg-surface))]',
     variant === 'enclosed' && 'gap-0 border-b border-[hsl(var(--border-subtle))]',

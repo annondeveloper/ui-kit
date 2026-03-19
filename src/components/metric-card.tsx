@@ -124,7 +124,7 @@ export function MetricCard({
         {sparklineData && sparklineData.length >= 2 && (
           <Sparkline
             data={sparklineData}
-            width={72}
+            width={60}
             height={28}
             color={
               status === 'critical'

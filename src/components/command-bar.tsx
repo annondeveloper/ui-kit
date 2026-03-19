@@ -291,7 +291,7 @@ export function CommandBar({
             transition={prefersReducedMotion ? { duration: 0 } : { duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
             className={cn(
               'absolute left-1/2 top-[15%] -translate-x-1/2',
-              'w-full max-w-lg rounded-2xl overflow-hidden',
+              'w-[calc(100%-2rem)] max-w-lg rounded-2xl overflow-hidden',
               'border border-[hsl(var(--border-default))]',
               'bg-[hsl(var(--bg-elevated))] shadow-2xl',
               'flex flex-col max-h-[70vh]',
@@ -404,7 +404,7 @@ export function CommandBar({
             </div>
 
             {/* Footer */}
-            <div className="flex items-center gap-4 px-4 py-2 border-t border-[hsl(var(--border-subtle)/0.5)] text-[10px] text-[hsl(var(--text-tertiary))]">
+            <div className="hidden sm:flex items-center gap-4 px-4 py-2 border-t border-[hsl(var(--border-subtle)/0.5)] text-[10px] text-[hsl(var(--text-tertiary))]">
               <span className="inline-flex items-center gap-1">
                 <kbd className="rounded border border-[hsl(var(--border-subtle))] bg-[hsl(var(--bg-surface))] px-1 py-0.5 font-mono">&uarr;&darr;</kbd>
                 Navigate

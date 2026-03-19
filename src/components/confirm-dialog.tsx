@@ -81,7 +81,7 @@ export function ConfirmDialog({
                 transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
                 className={cn(
                   'fixed left-1/2 top-1/2 z-50 -translate-x-1/2 -translate-y-1/2',
-                  'w-full max-w-md p-6 rounded-2xl',
+                  'w-[calc(100%-2rem)] max-w-md p-5 sm:p-6 rounded-2xl',
                   'border border-[hsl(var(--border-default))]',
                   'bg-[hsl(var(--bg-elevated))] shadow-2xl',
                   'focus:outline-none',

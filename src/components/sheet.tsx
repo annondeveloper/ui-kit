@@ -144,7 +144,7 @@ export function Sheet({
                 <button
                   onClick={onClose}
                   className={cn(
-                    'shrink-0 p-1.5 rounded-lg transition-colors',
+                    'shrink-0 p-2.5 rounded-lg transition-colors',
                     'text-[hsl(var(--text-tertiary))] hover:text-[hsl(var(--text-primary))]',
                     'hover:bg-[hsl(var(--bg-elevated))]',
                     'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[hsl(var(--brand-primary))]',

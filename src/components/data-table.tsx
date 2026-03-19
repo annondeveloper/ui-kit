@@ -436,7 +436,7 @@ export function DataTable<T>({
       <div className="rounded-xl border border-[hsl(var(--border-subtle)/0.5)]
         bg-[hsl(var(--bg-surface)/0.6)] backdrop-blur-xl overflow-hidden">
         <div className="flex items-center gap-3 p-4 border-b border-[hsl(var(--border-subtle)/0.3)]">
-          <Skeleton className="h-9 w-64 rounded-lg" />
+          <Skeleton className="h-9 w-48 sm:w-64 rounded-lg" />
           <div className="flex-1" />
           <Skeleton className="h-8 w-24 rounded-lg" />
         </div>
@@ -463,7 +463,7 @@ export function DataTable<T>({
         border-b border-[hsl(var(--border-subtle)/0.3)]">
 
         {/* Search */}
-        <div className="relative flex-1 min-w-[200px] max-w-sm">
+        <div className="relative flex-1 min-w-0 max-w-sm">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4
             text-[hsl(var(--text-tertiary))]" />
           <input

@@ -99,14 +99,18 @@ export function SeverityTimeline({
                 type="button"
                 onClick={() => onEventClick?.(ev)}
                 className={cn(
-                  'relative z-10 size-[10px] rounded-full ring-4 shrink-0',
+                  'relative z-10 min-w-[44px] min-h-[44px] flex items-center justify-center',
                   'transition-transform hover:scale-125 cursor-pointer',
-                  severityDot[ev.severity] ?? severityDot.info,
-                  severityRing[ev.severity] ?? severityRing.info,
                 )}
                 title={ev.detail ?? ev.label}
                 aria-label={`${ev.label} — ${ev.severity}`}
-              />
+              >
+                <span className={cn(
+                  'size-[10px] rounded-full ring-4 shrink-0',
+                  severityDot[ev.severity] ?? severityDot.info,
+                  severityRing[ev.severity] ?? severityRing.info,
+                )} />
+              </button>
 
               {/* Label */}
               <span className="mt-1.5 text-[0.6875rem] font-medium text-[hsl(var(--text-primary))] text-center max-w-[56px] truncate">

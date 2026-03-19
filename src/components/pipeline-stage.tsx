@@ -59,7 +59,7 @@ export function PipelineStage({
   const reduced = useReducedMotion()
 
   return (
-    <div className={cn('flex items-center gap-0 overflow-x-auto', className)}>
+    <div className={cn('flex items-center gap-0 overflow-x-auto pb-1', className)}>
       {stages.map((stage, i) => {
         const Icon = stage.icon
         const isDisabled = stage.status === 'disabled'

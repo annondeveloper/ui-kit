@@ -333,7 +333,7 @@ export function SmartTable<T>({
                     tabIndex={0}
                     onClick={(e) => { e.stopPropagation(); handleDismiss(suggestion.label) }}
                     onKeyDown={(e) => { if (e.key === 'Enter') { e.stopPropagation(); handleDismiss(suggestion.label) } }}
-                    className="ml-0.5 opacity-0 group-hover:opacity-100 transition-opacity rounded-full p-0.5 hover:bg-[hsl(var(--bg-overlay)/0.3)]"
+                    className="ml-0.5 opacity-0 group-hover:opacity-100 [@media(pointer:coarse)]:opacity-60 transition-opacity rounded-full p-0.5 hover:bg-[hsl(var(--bg-overlay)/0.3)]"
                   >
                     <X className="h-2.5 w-2.5" />
                   </span>

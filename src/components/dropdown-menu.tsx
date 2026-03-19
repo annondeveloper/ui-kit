@@ -55,6 +55,7 @@ export function DropdownMenu({ trigger, items, align = 'end', className }: Dropd
           <DropdownMenuPrimitive.Content
             align={align}
             sideOffset={6}
+            collisionPadding={16}
             asChild
           >
             <motion.div

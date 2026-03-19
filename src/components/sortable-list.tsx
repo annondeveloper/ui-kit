@@ -260,7 +260,7 @@ export function DragHandle(props: DragHandleProps): React.JSX.Element {
       role={props.role}
       aria-roledescription={props['aria-roledescription']}
       className={cn(
-        'inline-flex items-center justify-center p-1 rounded cursor-grab touch-none select-none',
+        'inline-flex items-center justify-center p-2.5 rounded cursor-grab touch-none select-none',
         'text-[hsl(var(--text-disabled))] hover:text-[hsl(var(--text-secondary))] transition-colors',
         'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[hsl(var(--brand-primary))]',
         props.isDragging && 'cursor-grabbing text-[hsl(var(--brand-primary))]',

@@ -65,7 +65,7 @@ export function KanbanColumn({
   return (
     <div
       className={cn(
-        'flex flex-col w-72 min-w-[18rem] rounded-2xl',
+        'flex flex-col w-full sm:w-72 sm:min-w-[18rem] rounded-2xl',
         'bg-[hsl(var(--bg-surface))] border border-[hsl(var(--border-subtle))]',
         className,
       )}

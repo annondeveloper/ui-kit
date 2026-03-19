@@ -42,6 +42,7 @@ export function Popover({ trigger, children, side = 'bottom', align = 'center', 
             side={side}
             align={align}
             sideOffset={8}
+            collisionPadding={16}
             asChild
           >
             <motion.div

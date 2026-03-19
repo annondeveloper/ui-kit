@@ -208,7 +208,7 @@ export function LiveFeed({
             className={cn(
               'absolute top-12 left-1/2 -translate-x-1/2 z-10',
               'inline-flex items-center gap-1 px-3 py-1.5 rounded-full',
-              'bg-[hsl(var(--brand-primary))] text-white text-xs font-medium',
+              'bg-[hsl(var(--brand-primary))] text-[hsl(var(--text-on-brand))] text-xs font-medium',
               'shadow-lg cursor-pointer hover:brightness-110 transition-[filter] duration-100',
             )}
           >

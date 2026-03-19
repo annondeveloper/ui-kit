@@ -285,7 +285,7 @@ export function ColorInput({
             exit={prefersReducedMotion ? undefined : { opacity: 0, scale: 0.96, y: -4 }}
             transition={prefersReducedMotion ? { duration: 0 } : { duration: 0.15 }}
             className={cn(
-              'absolute z-50 mt-2 w-64 rounded-xl overflow-hidden',
+              'absolute z-50 mt-2 w-64 max-w-[calc(100vw-1rem)] rounded-xl overflow-hidden',
               'border border-[hsl(var(--border-default))]',
               'bg-[hsl(var(--bg-elevated))] shadow-xl',
               'p-3',
@@ -384,7 +384,7 @@ export function ColorInput({
                       key={color}
                       onClick={() => { onChange(color); addRecent(color) }}
                       className={cn(
-                        'h-6 w-6 rounded-md border transition-all',
+                        'h-7 w-7 rounded-md border transition-all',
                         value === color
                           ? 'border-[hsl(var(--brand-primary))] ring-2 ring-[hsl(var(--brand-primary)/0.3)] scale-110'
                           : 'border-[hsl(var(--border-subtle))] hover:scale-110',
@@ -409,7 +409,7 @@ export function ColorInput({
                       key={color}
                       onClick={() => onChange(color)}
                       className={cn(
-                        'h-6 w-6 rounded-md border border-[hsl(var(--border-subtle))]',
+                        'h-7 w-7 rounded-md border border-[hsl(var(--border-subtle))]',
                         'hover:scale-110 transition-transform',
                       )}
                       style={{ backgroundColor: isSafeColor(color) ? color : undefined }}

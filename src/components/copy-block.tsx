@@ -146,7 +146,7 @@ export function CopyBlock({
           onClick={handleCopy}
           className={cn(
             'absolute top-2 right-2 z-10 rounded-md p-1.5 transition-all',
-            'opacity-0 group-hover:opacity-100',
+            'opacity-0 group-hover:opacity-100 [@media(pointer:coarse)]:opacity-100',
             copied
               ? 'text-[hsl(var(--status-ok))] bg-[hsl(var(--status-ok)/0.1)]'
               : 'text-[hsl(var(--text-tertiary))] hover:text-[hsl(var(--text-primary))] bg-[hsl(var(--bg-elevated)/0.8)] hover:bg-[hsl(var(--bg-elevated))]',
