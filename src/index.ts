@@ -20,6 +20,14 @@ export {
 
 export type { UtilColorMap } from './utils'
 
+// ── Theme Generator ──────────────────────────────────────────────────────────
+export { generateTheme, themeToCSS, validateTheme } from './theme-generator'
+export type { ThemeTokens } from './theme-generator'
+
+// ── Density ──────────────────────────────────────────────────────────────────
+export { DensityProvider, useDensity } from './components/density-provider'
+export type { DensityProviderProps } from './components/density-provider'
+
 // ── Components ───────────────────────────────────────────────────────────────
 export { Button } from './components/button'
 export type { ButtonProps, ButtonVariant, ButtonSize } from './components/button'
@@ -182,3 +190,6 @@ export type { StepWizardProps, WizardStep } from './components/step-wizard'
 
 export { CopyBlock } from './components/copy-block'
 export type { CopyBlockProps } from './components/copy-block'
+
+export { Combobox } from './components/combobox'
+export type { ComboboxProps, ComboboxOption } from './components/combobox'

@@ -1,6 +1,6 @@
 {
   "name": "@annondeveloper/ui-kit",
-  "version": "0.2.4",
+  "version": "0.3.0",
   "exports": {
     ".": "./src/index.ts",
     "./form": "./src/form.ts"
