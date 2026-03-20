@@ -48,6 +48,9 @@ Every component implementation MUST include:
 10. **Bundle size** — Check gzip size after implementation against budget (primitives <2KB, medium <5KB, complex <8KB)
 11. **Documentation** — Update README.md with component API after each component completion
 12. **Memory update** — Update progress memory file after each task
+13. **Visual inspection** — After each component, visually inspect it in the demo site or Storybook. Verify it looks correct in dark/light mode, responds to motion levels, and works on different viewport sizes.
+14. **Demo pages** — Build demo pages in `demo/src/pages/` as components are completed. Each page showcases the components built in that phase with interactive examples.
+15. **Hero stories** — Write Storybook stories (`.stories.tsx`) for each component showcasing all variants, states, and interactions. These serve as both documentation and visual regression baselines.
 
 ---
 
@@ -1346,10 +1349,22 @@ Each task:
 4. Update barrel + docs
 5. Commit with descriptive message
 
-- [ ] **Phase 2 Checkpoint: All 14 primitives built, tested, documented**
+- [ ] **Phase 2 Demo: Build demo page for primitives**
+
+Create `demo/src/pages/v2/PrimitivesPage.tsx` showcasing all 14 primitives with interactive examples in Aurora Fluid theme. Include dark/light toggle, motion level control.
+
+- [ ] **Phase 2 Stories: Write Storybook stories for all 14 primitives**
+
+Each component gets a `.stories.tsx` file with: Default, AllVariants, AllSizes, DarkMode, LightMode, WithMotion stories.
+
+- [ ] **Phase 2 Visual: Inspect all components in browser**
+
+Run demo site, visually verify each component looks correct in dark/light mode, responds to motion levels, and works on mobile viewport.
+
+- [ ] **Phase 2 Checkpoint: All 14 primitives built, tested, documented, demoed**
 
 ```bash
-git commit -m "milestone(v2): Phase 2 complete — 14 primitive components"
+git commit -m "milestone(v2): Phase 2 complete — 14 primitive components with demo + stories"
 ```
 
 - [ ] **Update memory file with Phase 2 progress**
@@ -1395,10 +1410,12 @@ git commit -m "milestone(v2): Phase 2 complete — 14 primitive components"
 
 Each task follows the same TDD pattern. Select and Combobox are the most complex — they use `popover` API, anchor positioning with JS fallback, roving tabindex, and virtual scroll.
 
+- [ ] **Phase 3 Demo + Stories: Build FormsPage demo and stories for all 7 form components**
+- [ ] **Phase 3 Visual: Inspect form components in browser, verify form engine integration**
 - [ ] **Phase 3 Checkpoint**
 
 ```bash
-git commit -m "milestone(v2): Phase 3 complete — 7 form components"
+git commit -m "milestone(v2): Phase 3 complete — 7 form components with demo + stories"
 ```
 
 - [ ] **Update memory file**
@@ -1457,10 +1474,12 @@ git commit -m "milestone(v2): Phase 3 complete — 7 form components"
 - [ ] Implement with stagger animation, useGesture swipe, update barrel + docs
 - [ ] Commit: `feat(v2): NotificationStack — stacked, swipe, group, mark-all-read`
 
+- [ ] **Phase 4 Demo + Stories: Build OverlaysPage demo and stories for all 10 overlay components**
+- [ ] **Phase 4 Visual: Inspect overlays in browser — test open/close, positioning, keyboard, touch dismiss**
 - [ ] **Phase 4 Checkpoint**
 
 ```bash
-git commit -m "milestone(v2): Phase 4 complete — 10 overlay components (zero Radix)"
+git commit -m "milestone(v2): Phase 4 complete — 10 overlay components with demo + stories"
 ```
 
 - [ ] **Update memory file**
@@ -1499,10 +1518,12 @@ git commit -m "milestone(v2): Phase 4 complete — 10 overlay components (zero R
 - [ ] Implement with container-type: inline-size, update barrel + docs
 - [ ] Commit: `feat(v2): ResponsiveCard — container-query self-adapting`
 
+- [ ] **Phase 5 Demo + Stories: Build LayoutPage demo and stories for all 6 layout components**
+- [ ] **Phase 5 Visual: Inspect layouts in browser — test scroll animations, tab navigation, responsive behavior**
 - [ ] **Phase 5 Checkpoint**
 
 ```bash
-git commit -m "milestone(v2): Phase 5 complete — 6 layout & navigation components"
+git commit -m "milestone(v2): Phase 5 complete — 6 layout components with demo + stories"
 ```
 
 - [ ] **Update memory file**
@@ -1557,10 +1578,12 @@ git commit -m "milestone(v2): Phase 5 complete — 6 layout & navigation compone
 - [ ] Implement with Aurora Fluid styled placeholder, update barrel + docs
 - [ ] Commit: `feat(v2): EmptyState — illustrated placeholder, action button`
 
+- [ ] **Phase 6 Demo + Stories: Build DataPage demo and stories for all 9 data components**
+- [ ] **Phase 6 Visual: Inspect data components — test virtual scroll, drag, keyboard grid navigation**
 - [ ] **Phase 6 Checkpoint**
 
 ```bash
-git commit -m "milestone(v2): Phase 6 complete — 9 data components"
+git commit -m "milestone(v2): Phase 6 complete — 9 data components with demo + stories"
 ```
 
 - [ ] **Update memory file**
@@ -1624,10 +1647,12 @@ git commit -m "milestone(v2): Phase 6 complete — 9 data components"
 - [ ] Implement with CSS grid, OKLCH intensity mapping, update barrel + docs
 - [ ] Commit: `feat(v2): HeatmapCalendar — OKLCH intensity, tooltip, responsive`
 
+- [ ] **Phase 7 Demo + Stories: Build MonitorPage demo and stories — full monitoring dashboard showcase**
+- [ ] **Phase 7 Visual: Inspect monitoring dashboard — test real-time updates, threshold animations, responsive**
 - [ ] **Phase 7 Checkpoint**
 
 ```bash
-git commit -m "milestone(v2): Phase 7 complete — 11 monitoring & metrics components"
+git commit -m "milestone(v2): Phase 7 complete — 11 monitoring components with demo + stories"
 ```
 
 - [ ] **Update memory file**
@@ -1661,10 +1686,12 @@ git commit -m "milestone(v2): Phase 7 complete — 11 monitoring & metrics compo
 - [ ] Implement with spring solver for value morphing, update barrel + docs
 - [ ] Commit: `feat(v2): RealtimeValue — spring number changes, delta indicator`
 
+- [ ] **Phase 8 Demo + Stories: Build AIPage demo and stories — streaming, typing, live feed showcase**
+- [ ] **Phase 8 Visual: Inspect AI components — test streaming, reconnection, real-time value transitions**
 - [ ] **Phase 8 Checkpoint**
 
 ```bash
-git commit -m "milestone(v2): Phase 8 complete — 5 AI & real-time components"
+git commit -m "milestone(v2): Phase 8 complete — 5 AI & real-time components with demo + stories"
 ```
 
 - [ ] **Update memory file**
