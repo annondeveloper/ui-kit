@@ -27,12 +27,12 @@
     "src/components/"
   ],
   "scripts": {
-    "build": "tsup && tsup --config tsup.cli.config.ts && node --input-type=commonjs -e \"const f='dist/cli/index.js',c=require('fs');c.writeFileSync(f,'#!/usr/bin/env node\\n'+c.readFileSync(f,'utf8'))\"",
+    "build": "tsup && tsup --config tsup.cli.config.ts && node scripts/add-shebang.js",
     "test": "vitest run",
     "test:watch": "vitest",
     "typecheck": "tsc --noEmit -p tsconfig.build.json",
     "prepublishOnly": "npm run typecheck && npm run build && npm test",
-    "release": "npm version patch && git push --follow-tags",
+    "release": "node scripts/sync-version.js && npm version patch && git push --follow-tags",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build --output-dir storybook-static"
   },
