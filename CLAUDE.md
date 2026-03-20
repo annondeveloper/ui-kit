@@ -8,6 +8,19 @@
 **Current stable:** v0.4.1 on `main` branch
 **Next-gen rebuild:** v2.0.0 on `v2` branch
 
+## Development Philosophy
+
+**Quality over speed. Always.** Take as many turns, tokens, and time as needed to implement things properly. Never rush. This is a revolutionary library — every component must be built with care:
+
+- Full TDD: write failing tests first, verify they fail, then implement
+- Run spec compliance review AND code quality review after each task
+- One task at a time — don't combine phases to save time
+- Verify thoroughly: tests, build, typecheck, visual inspection
+- Fix issues before moving on — never leave known problems for later
+- Write comprehensive tests including edge cases, not just happy-path
+- Build demo pages and Storybook stories alongside components, not deferred
+- Visually inspect every component in browser after implementation
+
 ## Key Architecture Decisions (v2)
 
 - **Zero external dependencies** — only peer deps are `react` ^19 and `react-dom` ^19
