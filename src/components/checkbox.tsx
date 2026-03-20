@@ -162,10 +162,9 @@ const checkboxStyles = css`
         padding-block-start: 1px;
       }
 
-      /* Touch targets */
+      /* Touch targets — parent scope is the tap target, not the box visual */
       @media (pointer: coarse) {
-        .ui-checkbox__box {
-          min-inline-size: 44px;
+        :scope {
           min-block-size: 44px;
         }
       }

@@ -206,13 +206,13 @@ export default function CorePage() {
         <Preview label="ToggleSwitch" description="On/off with labels, different sizes">
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
             <div style={row}>
-              <ToggleSwitch checked={toggle1} onChange={() => setToggle1(t => !t)} size="sm" />
+              <ToggleSwitch checked={toggle1} onChange={(e) => setToggle1(e.target.checked)} size="sm" />
               <span style={{ fontSize: 'var(--text-sm)', color: 'var(--text-secondary)' }}>
                 Notifications {toggle1 ? 'On' : 'Off'}
               </span>
             </div>
             <div style={row}>
-              <ToggleSwitch checked={toggle2} onChange={() => setToggle2(t => !t)} size="md" />
+              <ToggleSwitch checked={toggle2} onChange={(e) => setToggle2(e.target.checked)} size="md" />
               <span style={{ fontSize: 'var(--text-sm)', color: 'var(--text-secondary)' }}>
                 Dark mode {toggle2 ? 'On' : 'Off'}
               </span>

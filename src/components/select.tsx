@@ -33,9 +33,9 @@ export interface SelectProps
   extends Omit<HTMLAttributes<HTMLDivElement>, 'onChange' | 'defaultValue'> {
   name: string
   options: SelectOption[]
-  value?: string
-  defaultValue?: string
-  onChange?: (value: string) => void
+  value?: string | string[]
+  defaultValue?: string | string[]
+  onChange?: (value: string | string[]) => void
   placeholder?: string
   label?: ReactNode
   error?: string
@@ -43,6 +43,7 @@ export interface SelectProps
   size?: 'sm' | 'md' | 'lg'
   searchable?: boolean
   clearable?: boolean
+  multiple?: boolean
   motion?: 0 | 1 | 2 | 3
 }
 
@@ -277,6 +278,35 @@ const selectStyles = css`
         color: var(--brand, oklch(65% 0.2 270));
       }
 
+      /* Multi-select tag display */
+      .ui-select__multi-value {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 0.25rem;
+        flex: 1;
+        min-inline-size: 0;
+        text-align: start;
+      }
+
+      .ui-select__tag {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.25rem;
+        padding-block: 0.0625rem;
+        padding-inline: 0.375rem;
+        background: oklch(100% 0 0 / 0.08);
+        border-radius: var(--radius-sm, 0.25rem);
+        font-size: var(--text-xs, 0.75rem);
+        line-height: 1.5;
+        white-space: nowrap;
+      }
+
+      .ui-select__multi-count {
+        font-size: var(--text-xs, 0.75rem);
+        color: var(--text-tertiary, oklch(60% 0 0));
+      }
+
       /* Empty state */
       .ui-select__empty {
         padding-block: 0.75rem;
@@ -399,6 +429,7 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(
       size = 'md',
       searchable,
       clearable,
+      multiple,
       motion: motionProp,
       className,
       ...rest
@@ -418,7 +449,9 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(
 
     // ── State ─────────────────────────────────────────────────────────
     const [isOpen, setIsOpen] = useState(false)
-    const [internalValue, setInternalValue] = useState(defaultValue ?? '')
+    const [internalValue, setInternalValue] = useState<string | string[]>(
+      defaultValue ?? (multiple ? [] : '')
+    )
     const [activeIndex, setActiveIndex] = useState(-1)
     const [searchQuery, setSearchQuery] = useState('')
 
@@ -427,8 +460,16 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(
       controlledValue !== undefined
         ? controlledValue
         : fieldProps
-          ? (fieldProps.value as string) ?? ''
+          ? (fieldProps.value as string | string[]) ?? (multiple ? [] : '')
           : internalValue
+
+    // Helper: is a given option value currently selected?
+    const isValueSelected = (optionValue: string): boolean => {
+      if (multiple) {
+        return Array.isArray(resolvedValue) && resolvedValue.includes(optionValue)
+      }
+      return resolvedValue === optionValue
+    }
 
     const touched = fieldProps?.touched ?? false
     const contextError = fieldProps && touched ? fieldProps.error : undefined
@@ -473,9 +514,11 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(
       setIsOpen(true)
       setSearchQuery('')
       // Set active index to currently selected value, or 0
-      const selectedIdx = enabledOptions.findIndex(
-        (o) => o.value === resolvedValue
-      )
+      const selectedIdx = multiple
+        ? 0
+        : enabledOptions.findIndex(
+            (o) => o.value === resolvedValue
+          )
       setActiveIndex(selectedIdx >= 0 ? selectedIdx : 0)
     }, [disabled, enabledOptions, resolvedValue])
 
@@ -490,28 +533,44 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(
     const selectOption = useCallback(
       (option: SelectOption) => {
         if (option.disabled) return
-        const newValue = option.value
-        setInternalValue(newValue)
-        onChange?.(newValue)
-        if (fieldProps) {
-          fieldProps.onChange(newValue)
+
+        if (multiple) {
+          // Toggle the option in the array
+          const currentArr = Array.isArray(resolvedValue) ? resolvedValue : []
+          const newValue = currentArr.includes(option.value)
+            ? currentArr.filter((v) => v !== option.value)
+            : [...currentArr, option.value]
+          setInternalValue(newValue)
+          onChange?.(newValue)
+          if (fieldProps) {
+            fieldProps.onChange(newValue)
+          }
+          // Don't close — stay open for multi-picking
+        } else {
+          const newValue = option.value
+          setInternalValue(newValue)
+          onChange?.(newValue)
+          if (fieldProps) {
+            fieldProps.onChange(newValue)
+          }
+          close()
         }
-        close()
       },
-      [onChange, fieldProps, close]
+      [onChange, fieldProps, close, multiple, resolvedValue]
     )
 
     // ── Clear ─────────────────────────────────────────────────────────
     const handleClear = useCallback(
       (e: React.MouseEvent) => {
         e.stopPropagation()
-        setInternalValue('')
-        onChange?.('')
+        const emptyValue = multiple ? [] : ''
+        setInternalValue(emptyValue)
+        onChange?.(emptyValue)
         if (fieldProps) {
-          fieldProps.onChange('')
+          fieldProps.onChange(emptyValue)
         }
       },
-      [onChange, fieldProps]
+      [onChange, fieldProps, multiple]
     )
 
     // ── Click outside ─────────────────────────────────────────────────
@@ -614,7 +673,13 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(
     }, [isOpen, searchable])
 
     // ── Derived ───────────────────────────────────────────────────────
-    const selectedOption = options.find((o) => o.value === resolvedValue)
+    const selectedOption = multiple ? undefined : options.find((o) => o.value === resolvedValue)
+    const selectedOptions = multiple
+      ? options.filter((o) => Array.isArray(resolvedValue) && resolvedValue.includes(o.value))
+      : []
+    const hasValue = multiple
+      ? Array.isArray(resolvedValue) && resolvedValue.length > 0
+      : !!resolvedValue
 
     return (
       <div
@@ -625,6 +690,7 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(
         {...(isOpen ? { 'data-open': '' } : {})}
         {...(resolvedError ? { 'data-invalid': '' } : {})}
         {...(disabled ? { 'data-disabled': '' } : {})}
+        {...(multiple ? { 'data-multiple': '' } : {})}
         {...rest}
       >
         {label && (
@@ -633,8 +699,14 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(
           </label>
         )}
 
-        {/* Hidden input for native form submission */}
-        <input type="hidden" name={name} value={resolvedValue} />
+        {/* Hidden input(s) for native form submission */}
+        {multiple && Array.isArray(resolvedValue) ? (
+          resolvedValue.map((v) => (
+            <input key={v} type="hidden" name={name} value={v} />
+          ))
+        ) : (
+          <input type="hidden" name={name} value={resolvedValue as string} />
+        )}
 
         {/* Trigger */}
         <button
@@ -665,14 +737,36 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(
           }}
         >
           <span className="ui-select__value">
-            {selectedOption?.icon}
-            {selectedOption ? (
-              selectedOption.label
+            {multiple ? (
+              selectedOptions.length > 0 ? (
+                <span className="ui-select__multi-value">
+                  {selectedOptions.length <= 3 ? (
+                    selectedOptions.map((o) => (
+                      <span key={o.value} className="ui-select__tag">{o.label}</span>
+                    ))
+                  ) : (
+                    <>
+                      <span className="ui-select__tag">{selectedOptions[0].label}</span>
+                      <span className="ui-select__tag">{selectedOptions[1].label}</span>
+                      <span className="ui-select__multi-count">+{selectedOptions.length - 2} more</span>
+                    </>
+                  )}
+                </span>
+              ) : (
+                <span className="ui-select__placeholder">{placeholder}</span>
+              )
             ) : (
-              <span className="ui-select__placeholder">{placeholder}</span>
+              <>
+                {selectedOption?.icon}
+                {selectedOption ? (
+                  selectedOption.label
+                ) : (
+                  <span className="ui-select__placeholder">{placeholder}</span>
+                )}
+              </>
             )}
           </span>
-          {clearable && resolvedValue && (
+          {clearable && hasValue && (
             <span
               className="ui-select__clear"
               role="button"
@@ -694,6 +788,7 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(
             role="listbox"
             id={listboxId}
             aria-labelledby={label ? labelId : undefined}
+            aria-multiselectable={multiple || undefined}
             tabIndex={-1}
             onKeyDown={handleListboxKeyDown}
             style={{
@@ -718,7 +813,7 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(
               {filteredOptions.map((option) => {
                 const enabledIdx = enabledOptions.indexOf(option)
                 const isActive = enabledIdx === activeIndex
-                const isSelected = option.value === resolvedValue
+                const isSelected = isValueSelected(option.value)
                 return (
                   <div
                     key={option.value}

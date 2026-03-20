@@ -1,6 +1,6 @@
 'use client'
 
-import { forwardRef, useState, useEffect, useRef, type HTMLAttributes } from 'react'
+import { forwardRef, useState, useEffect, useRef, useCallback, type HTMLAttributes } from 'react'
 import { css } from '../core/styles/css-tag'
 import { useStyles } from '../core/styles/use-styles'
 import { useMotionLevel } from '../core/motion/use-motion-level'
@@ -68,6 +68,20 @@ export const AnimatedCounter = forwardRef<HTMLSpanElement, AnimatedCounterProps>
     const [displayValue, setDisplayValue] = useState(value)
     const rafIdRef = useRef<number>(0)
     const startTimeRef = useRef<number | null>(null)
+    const spanRef = useRef<HTMLSpanElement | null>(null)
+
+    // Merge forwarded ref with internal ref
+    const setRefs = useCallback(
+      (el: HTMLSpanElement | null) => {
+        spanRef.current = el
+        if (typeof ref === 'function') {
+          ref(el)
+        } else if (ref) {
+          (ref as React.MutableRefObject<HTMLSpanElement | null>).current = el
+        }
+      },
+      [ref]
+    )
 
     // Pre-compute spring curve for level 2+
     const springCurveRef = useRef<number[] | null>(null)
@@ -80,6 +94,8 @@ export const AnimatedCounter = forwardRef<HTMLSpanElement, AnimatedCounterProps>
     motionLevelRef.current = motionLevel
     const durationRef = useRef(duration)
     durationRef.current = duration
+    const formatterRef = useRef(formatter)
+    formatterRef.current = formatter
 
     useEffect(() => {
       if (prevValueRef.current === value) return
@@ -118,11 +134,15 @@ export const AnimatedCounter = forwardRef<HTMLSpanElement, AnimatedCounterProps>
           interpolated = from + (value - from) * easeOut(progress)
         }
 
-        setDisplayValue(interpolated)
+        // Update DOM directly — avoids 60 React re-renders per second
+        if (spanRef.current) {
+          spanRef.current.textContent = formatterRef.current(interpolated)
+        }
 
         if (progress < 1) {
           rafIdRef.current = requestAnimationFrame(tick)
         } else {
+          // Final React state update for consistency
           setDisplayValue(value)
         }
       }
@@ -147,7 +167,7 @@ export const AnimatedCounter = forwardRef<HTMLSpanElement, AnimatedCounterProps>
 
     return (
       <span
-        ref={ref}
+        ref={setRefs}
         className={cn(cls('root'), className)}
         role="status"
         aria-live="polite"

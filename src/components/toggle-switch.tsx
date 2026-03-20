@@ -178,11 +178,13 @@ const toggleSwitchStyles = css`
         user-select: none;
       }
 
-      /* Touch targets */
+      /* Touch targets — expanded invisible hit area, NOT enlarged visual */
       @media (pointer: coarse) {
-        .ui-toggle-switch__track {
-          min-inline-size: 44px;
-          min-block-size: 44px;
+        .ui-toggle-switch__track::before {
+          content: '';
+          position: absolute;
+          inset: -12px;
+          /* Ensures minimum 44px tap area without changing visual size */
         }
       }
 

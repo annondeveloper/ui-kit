@@ -84,14 +84,14 @@ const radioGroupStyles = css`
         pointer-events: none;
       }
 
-      /* Hidden native radio */
+      /* Hidden native radio — overlays the entire option for click forwarding */
       .ui-radio-group__input {
         position: absolute;
         opacity: 0;
-        inline-size: 0;
-        block-size: 0;
+        inset: 0;
         margin: 0;
-        padding: 0;
+        cursor: pointer;
+        /* Don't set width/height to 0 — it prevents click forwarding */
       }
 
       /* Custom radio circle */
@@ -173,10 +173,9 @@ const radioGroupStyles = css`
         margin-block-start: var(--space-xs, 0.25rem);
       }
 
-      /* Touch targets */
+      /* Touch targets — entire option row is the tap target, not just the circle */
       @media (pointer: coarse) {
-        .ui-radio-group__circle {
-          min-inline-size: 44px;
+        .ui-radio-group__option {
           min-block-size: 44px;
         }
       }
