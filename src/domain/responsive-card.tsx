@@ -11,7 +11,7 @@ import { cn } from '../core/utils/cn'
 
 // ─── Types ──────────────────────────────────────────────────────────────────
 
-export interface ResponsiveCardProps extends HTMLAttributes<HTMLDivElement> {
+export interface ResponsiveCardProps extends Omit<HTMLAttributes<HTMLDivElement>, 'title'> {
   image?: ReactNode
   title: ReactNode
   description?: ReactNode

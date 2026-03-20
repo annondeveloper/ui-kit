@@ -22,7 +22,7 @@ export interface Step {
   validate?: () => boolean | Promise<boolean>
 }
 
-export interface StepWizardProps extends HTMLAttributes<HTMLDivElement> {
+export interface StepWizardProps extends Omit<HTMLAttributes<HTMLDivElement>, 'onChange'> {
   steps: Step[]
   activeStep?: number
   defaultStep?: number
