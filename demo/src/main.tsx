@@ -13,6 +13,8 @@ const DataPage = lazy(() => import('./pages/DataPage'))
 const MonitorPage = lazy(() => import('./pages/MonitorPage'))
 const AIPage = lazy(() => import('./pages/AIPage'))
 const DocsPage = lazy(() => import('./pages/DocsPage'))
+const AnimationsPage = lazy(() => import('./pages/AnimationsPage'))
+const IconsPage = lazy(() => import('./pages/IconsPage'))
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
@@ -27,6 +29,8 @@ createRoot(document.getElementById('root')!).render(
             <Route path="data" element={<Suspense><DataPage /></Suspense>} />
             <Route path="monitor" element={<Suspense><MonitorPage /></Suspense>} />
             <Route path="ai" element={<Suspense><AIPage /></Suspense>} />
+            <Route path="animations" element={<Suspense><AnimationsPage /></Suspense>} />
+            <Route path="icons" element={<Suspense><IconsPage /></Suspense>} />
             <Route path="docs" element={<Suspense><DocsPage /></Suspense>} />
           </Route>
         </Routes>
