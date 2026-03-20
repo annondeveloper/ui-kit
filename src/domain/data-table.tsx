@@ -519,7 +519,7 @@ function DataTableInner<T extends object>(
       const th = (e.target as HTMLElement).parentElement!
       const startWidth = columnWidths[colId] ?? th.getBoundingClientRect().width
       resizeRef.current = { colId, startX: e.clientX, startWidth }
-      ;(e.target as HTMLElement).setPointerCapture(e.pointerId)
+      ;(e.target as HTMLElement).setPointerCapture?.(e.pointerId)
       ;(e.target as HTMLElement).setAttribute('data-resizing', '')
     },
     [columnWidths]

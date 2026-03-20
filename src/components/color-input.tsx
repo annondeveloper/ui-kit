@@ -511,7 +511,7 @@ export const ColorInput = forwardRef<HTMLDivElement, ColorInputProps>(
         if (disabled) return
         const area = slAreaRef.current
         if (!area) return
-        area.setPointerCapture(e.pointerId)
+        area.setPointerCapture?.(e.pointerId)
 
         const updateSL = (clientX: number, clientY: number) => {
           const rect = area.getBoundingClientRect()
