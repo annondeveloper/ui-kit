@@ -18,7 +18,7 @@
     "dist"
   ],
   "scripts": {
-    "build": "tsup && node scripts/extract-css.js",
+    "build": "tsup && tsup --config tsup.cli.config.ts && node scripts/extract-css.js",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
@@ -67,5 +67,8 @@
     "typescript",
     "zero-dependency"
   ],
-  "sideEffects": false
+  "sideEffects": false,
+  "bin": {
+    "ui-kit": "dist/cli/index.js"
+  }
 }
