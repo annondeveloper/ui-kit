@@ -1,68 +1,40 @@
 import { useState, useCallback } from 'react'
 import { Preview } from '../components/Preview.tsx'
 import {
-  EmptyState, Skeleton, SkeletonText, SkeletonCard,
-  Progress, Avatar, InfiniteScroll, HeatmapCalendar,
-  Button, type DayValue,
+  Skeleton, Progress, Avatar, InfiniteScroll,
+  HeatmapCalendar, FileUpload, Button,
+  type HeatmapData,
 } from '@ui/index'
 import { Inbox, Plus, Search } from 'lucide-react'
 
-const heatmapData: DayValue[] = Array.from({ length: 90 }, (_, i) => {
+const heatmapData: HeatmapData[] = Array.from({ length: 90 }, (_, i) => {
   const d = new Date(); d.setDate(d.getDate() - 89 + i)
   return { date: d.toISOString().slice(0, 10), value: Math.floor(Math.random() * 100) }
 })
 
 export function LayoutPage() {
-  const [scrollItems, setScrollItems] = useState(
-    Array.from({ length: 5 }, (_, i) => ({ id: `l${i}`, text: `Event ${i + 1}: System health check passed` }))
-  )
   const [progVal, setProgVal] = useState(65)
-
-  const loadMore = useCallback(async () => {
-    await new Promise(r => setTimeout(r, 600))
-    setScrollItems(prev => {
-      const next = Array.from({ length: 5 }, (_, i) => ({
-        id: `l${prev.length + i}`,
-        text: `Event ${prev.length + i + 1}: Metric collection cycle completed`,
-      }))
-      return [...prev, ...next]
-    })
-  }, [])
 
   return (
     <div className="max-w-5xl mx-auto px-4 sm:px-6 py-8 sm:py-10">
       <div className="mb-8">
         <h1 className="text-2xl font-bold text-[hsl(var(--text-primary))] mb-1">Layout & Feedback</h1>
-        <p className="text-sm text-[hsl(var(--text-secondary))]">6 components for loading states, empty states, and layout patterns</p>
+        <p className="text-sm text-[hsl(var(--text-secondary))]">6 components for loading states, feedback, and layout patterns</p>
       </div>
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 stagger">
-        <Preview label="EmptyState" description="Purposeful empty state with CTA" code={`<EmptyState\n  icon={Inbox}\n  title="No devices found"\n  description="Add your first device to start monitoring."\n  actions={<Button>Add Device</Button>}\n/>`}>
-          <EmptyState
-            icon={Inbox}
-            title="No devices found"
-            description="Add your first network device to start collecting metrics and monitoring health."
-            actions={
-              <div className="flex flex-wrap gap-2">
-                <Button size="sm"><Plus className="size-3.5" /> Add Device</Button>
-                <Button variant="outline" size="sm"><Search className="size-3.5" /> Run Discovery</Button>
-              </div>
-            }
-          />
-        </Preview>
-
-        <Preview label="Skeleton" description="Loading shimmer placeholders" code={`<Skeleton className="h-8 w-full" />\n<SkeletonText lines={3} />\n<SkeletonCard />`}>
+        <Preview label="Skeleton" description="Loading shimmer placeholders" code={`<Skeleton width="100%" height={32} />\n<Skeleton lines={3} />`}>
           <div className="space-y-4">
             <div className="flex items-center gap-3">
-              <Skeleton className="size-10 rounded-full" />
+              <Skeleton variant="circular" width={40} height={40} />
               <div className="flex-1 space-y-2">
-                <Skeleton className="h-4 w-3/4 rounded" />
-                <Skeleton className="h-3 w-1/2 rounded" />
+                <Skeleton width="75%" height={16} />
+                <Skeleton width="50%" height={12} />
               </div>
             </div>
-            <SkeletonText lines={3} />
+            <Skeleton lines={3} />
             <div className="grid grid-cols-2 gap-3">
-              <SkeletonCard />
-              <SkeletonCard />
+              <Skeleton height={80} />
+              <Skeleton height={80} />
             </div>
           </div>
         </Preview>
@@ -81,39 +53,40 @@ export function LayoutPage() {
           </div>
         </Preview>
 
-        <Preview label="Avatar" description="Image, initials, status dot" code={`<Avatar alt="Alice" size="md" status="online" />\n<Avatar alt="Bob" size="lg" status="busy" />`}>
+        <Preview label="Avatar" description="Image, initials, status dot, sizes" code={`<Avatar alt="Alice" size="md" />`}>
           <div className="space-y-4">
             <div className="flex items-end gap-3 flex-wrap">
               <Avatar alt="A" size="xs" />
-              <Avatar alt="Bob Chen" size="sm" status="online" />
-              <Avatar alt="Carol Davis" size="md" status="online" />
-              <Avatar alt="Dave Evans" size="lg" status="busy" />
-              <Avatar alt="Eve Foster" size="xl" status="away" />
-            </div>
-            <div className="flex items-end gap-3">
-              <Avatar alt="Offline" size="md" status="offline" />
-              <Avatar alt="No status" size="md" />
+              <Avatar alt="Bob Chen" size="sm" />
+              <Avatar alt="Carol Davis" size="md" />
+              <Avatar alt="Dave Evans" size="lg" />
+              <Avatar alt="Eve Foster" size="xl" />
             </div>
           </div>
         </Preview>
 
-        <Preview label="InfiniteScroll" description="Load-more virtual list" code={`<InfiniteScroll\n  items={items}\n  renderItem={renderFn}\n  loadMore={loadMore}\n  hasMore={true}\n/>`}>
-          <div className="h-[180px]">
-            <InfiniteScroll
-              items={scrollItems}
-              renderItem={item => (
-                <div className="px-3 py-2 text-sm text-[hsl(var(--text-secondary))] border-b border-[hsl(var(--border-subtle))]">
-                  {item.text}
+        <Preview label="FileUpload" description="Drag and drop file upload" code={`<FileUpload\n  accept=".json,.csv"\n  maxSize={5 * 1024 * 1024}\n  onChange={handleFiles}\n/>`}>
+          <FileUpload
+            accept=".json,.csv,.txt"
+            maxSize={5 * 1024 * 1024}
+            onChange={() => {}}
+          />
+        </Preview>
+
+        <Preview label="InfiniteScroll" description="Content that loads on scroll" code={`<InfiniteScroll onLoadMore={loadMore} hasMore={true}>\n  {items}\n</InfiniteScroll>`}>
+          <div className="h-[180px] overflow-auto">
+            <InfiniteScroll onLoadMore={async () => {}} hasMore={false}>
+              {Array.from({ length: 8 }, (_, i) => (
+                <div key={i} className="px-3 py-2 text-sm text-[hsl(var(--text-secondary))] border-b border-[hsl(var(--border-subtle))]">
+                  Event {i + 1}: System health check passed
                 </div>
-              )}
-              loadMore={loadMore}
-              hasMore={scrollItems.length < 30}
-            />
+              ))}
+            </InfiniteScroll>
           </div>
         </Preview>
 
-        <Preview label="HeatmapCalendar" description="Activity heatmap grid" code={`<HeatmapCalendar data={dayValues} showMonthLabels showDayLabels />`}>
-          <HeatmapCalendar data={heatmapData} showMonthLabels showDayLabels />
+        <Preview label="HeatmapCalendar" description="Activity heatmap grid" code={`<HeatmapCalendar data={dayValues} />`}>
+          <HeatmapCalendar data={heatmapData} />
         </Preview>
       </div>
     </div>

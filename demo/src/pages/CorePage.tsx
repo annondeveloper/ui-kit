@@ -1,25 +1,31 @@
-import { useState } from 'react'
+import { useState, type ChangeEvent } from 'react'
 import { Preview } from '../components/Preview.tsx'
 import {
-  Button, Badge, Card, CardHeader, CardTitle, CardContent,
-  Tabs, Sheet, ConfirmDialog, Tooltip, Popover, DropdownMenu,
-  SuccessCheckmark, toast,
+  Button, Badge, Card, Avatar, AvatarGroup,
+  Skeleton, Progress, Checkbox, RadioGroup,
+  ToggleSwitch, Slider, StatusBadge, StatusPulse,
+  SuccessCheckmark, AnimatedCounter, Tabs,
 } from '@ui/index'
-import { Star, Trash2, Edit, MoreVertical, Bell, Settings, Info, Zap, Copy, Download, Share2 } from 'lucide-react'
 
 export function CorePage() {
   const [activeTab, setActiveTab] = useState('overview')
   const [pillTab, setPillTab] = useState('all')
   const [encTab, setEncTab] = useState('config')
-  const [sheetOpen, setSheetOpen] = useState(false)
-  const [dialogOpen, setDialogOpen] = useState(false)
   const [checkKey, setCheckKey] = useState(0)
+  const [counter, setCounter] = useState(1000)
+  const [checked1, setChecked1] = useState(true)
+  const [checked2, setChecked2] = useState(false)
+  const [toggle1, setToggle1] = useState(true)
+  const [toggle2, setToggle2] = useState(false)
+  const [radio, setRadio] = useState('sha256')
+  const [slider, setSlider] = useState(60)
+  const [progVal, setProgVal] = useState(65)
 
   return (
     <div className="max-w-5xl mx-auto px-4 sm:px-6 py-8 sm:py-10">
       <div className="mb-8">
         <h1 className="text-2xl font-bold text-[hsl(var(--text-primary))] mb-1">Core</h1>
-        <p className="text-sm text-[hsl(var(--text-secondary))]">11 foundational components for building interfaces</p>
+        <p className="text-sm text-[hsl(var(--text-secondary))]">14 foundational components for building interfaces</p>
       </div>
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 stagger">
         <Preview label="Button" description="5 variants, 4 sizes, loading state" code={`<Button variant="primary">Save</Button>\n<Button variant="danger" loading>Deleting</Button>`}>
@@ -35,14 +41,14 @@ export function CorePage() {
               <Button size="sm">Small</Button>
               <Button size="md">Medium</Button>
               <Button size="lg">Large</Button>
-              <Button size="icon"><Star className="size-4" /></Button>
+              <Button size="icon"><span>+</span></Button>
               <Button loading>Loading</Button>
               <Button disabled>Disabled</Button>
             </div>
           </div>
         </Preview>
 
-        <Preview label="Badge" description="10 colors + factory variant" code={`<Badge color="green">Active</Badge>\n<Badge color="red" icon={Zap}>Alert</Badge>`}>
+        <Preview label="Badge" description="10 colors with size variants" code={`<Badge color="green">Active</Badge>\n<Badge color="red">Alert</Badge>`}>
           <div className="space-y-3">
             <div className="flex flex-wrap gap-2">
               {(['brand', 'blue', 'green', 'yellow', 'red', 'orange', 'purple', 'pink', 'teal', 'gray'] as const).map(c => (
@@ -50,19 +56,60 @@ export function CorePage() {
               ))}
             </div>
             <div className="flex flex-wrap gap-2">
-              <Badge color="green" icon={Zap} size="md">With icon</Badge>
-              <Badge color="red" size="xs">Tiny</Badge>
+              <Badge color="green" size="xs">Tiny</Badge>
               <Badge color="purple" size="md">Medium</Badge>
             </div>
           </div>
         </Preview>
 
-        <Preview label="Card" description="4 variants with header/content/footer" code={`<Card variant="elevated">\n  <CardHeader><CardTitle>Title</CardTitle></CardHeader>\n  <CardContent>Content</CardContent>\n</Card>`}>
+        <Preview label="Card" description="4 variants with interactive hover" code={`<Card variant="elevated">\n  <div>Content here</div>\n</Card>`}>
           <div className="grid grid-cols-2 gap-3">
-            <Card variant="default" padding="sm"><CardHeader><CardTitle>Default</CardTitle></CardHeader><CardContent><p className="text-xs text-[hsl(var(--text-secondary))]">Standard card with subtle border</p></CardContent></Card>
-            <Card variant="elevated" padding="sm"><CardHeader><CardTitle>Elevated</CardTitle></CardHeader><CardContent><p className="text-xs text-[hsl(var(--text-secondary))]">Stronger shadow and border</p></CardContent></Card>
-            <Card variant="outlined" padding="sm"><CardHeader><CardTitle>Outlined</CardTitle></CardHeader><CardContent><p className="text-xs text-[hsl(var(--text-secondary))]">Transparent with border</p></CardContent></Card>
-            <Card variant="interactive" padding="sm"><CardHeader><CardTitle>Interactive</CardTitle></CardHeader><CardContent><p className="text-xs text-[hsl(var(--text-secondary))]">Hover for effect</p></CardContent></Card>
+            <Card variant="default" padding="sm">
+              <div className="p-3">
+                <h4 className="text-sm font-semibold text-[hsl(var(--text-primary))]">Default</h4>
+                <p className="text-xs text-[hsl(var(--text-secondary))]">Standard card with subtle border</p>
+              </div>
+            </Card>
+            <Card variant="elevated" padding="sm">
+              <div className="p-3">
+                <h4 className="text-sm font-semibold text-[hsl(var(--text-primary))]">Elevated</h4>
+                <p className="text-xs text-[hsl(var(--text-secondary))]">Stronger shadow and border</p>
+              </div>
+            </Card>
+            <Card variant="outlined" padding="sm">
+              <div className="p-3">
+                <h4 className="text-sm font-semibold text-[hsl(var(--text-primary))]">Outlined</h4>
+                <p className="text-xs text-[hsl(var(--text-secondary))]">Transparent with border</p>
+              </div>
+            </Card>
+            <Card interactive padding="sm">
+              <div className="p-3">
+                <h4 className="text-sm font-semibold text-[hsl(var(--text-primary))]">Interactive</h4>
+                <p className="text-xs text-[hsl(var(--text-secondary))]">Hover for effect</p>
+              </div>
+            </Card>
+          </div>
+        </Preview>
+
+        <Preview label="Avatar" description="Image, initials, status dot" code={`<Avatar alt="Alice" size="md" />\n<AvatarGroup max={3}>...</AvatarGroup>`}>
+          <div className="space-y-4">
+            <div className="flex items-end gap-3 flex-wrap">
+              <Avatar alt="A" size="xs" />
+              <Avatar alt="Bob Chen" size="sm" />
+              <Avatar alt="Carol Davis" size="md" />
+              <Avatar alt="Dave Evans" size="lg" />
+              <Avatar alt="Eve Foster" size="xl" />
+            </div>
+            <div>
+              <span className="text-[10px] text-[hsl(var(--text-tertiary))] uppercase tracking-wider mb-2 block">Group</span>
+              <AvatarGroup max={3}>
+                <Avatar alt="Alice" size="md" />
+                <Avatar alt="Bob" size="md" />
+                <Avatar alt="Carol" size="md" />
+                <Avatar alt="Dave" size="md" />
+                <Avatar alt="Eve" size="md" />
+              </AvatarGroup>
+            </div>
           </div>
         </Preview>
 
@@ -74,67 +121,84 @@ export function CorePage() {
           </div>
         </Preview>
 
-        <Preview label="Sheet" description="Slide-over panel from edge" code={`<Sheet open={open} onClose={close} title="Details" side="right">\n  Content\n</Sheet>`}>
-          <div className="text-center py-4">
-            <Button onClick={() => setSheetOpen(true)}>Open Sheet</Button>
-            <Sheet open={sheetOpen} onClose={() => setSheetOpen(false)} title="Device Details" description="Configuration and status" side="right" width="w-96">
-              <div className="p-4 space-y-3 text-sm text-[hsl(var(--text-secondary))]">
-                <p><strong className="text-[hsl(var(--text-primary))]">Hostname:</strong> core-sw-01</p>
-                <p><strong className="text-[hsl(var(--text-primary))]">IP:</strong> 10.0.0.1</p>
-                <p><strong className="text-[hsl(var(--text-primary))]">Vendor:</strong> Cisco IOS-XE</p>
-                <p><strong className="text-[hsl(var(--text-primary))]">Uptime:</strong> 142 days</p>
+        <Preview label="Skeleton" description="Loading shimmer placeholders" code={`<Skeleton width="100%" height={32} />`}>
+          <div className="space-y-4">
+            <div className="flex items-center gap-3">
+              <Skeleton variant="circular" width={40} height={40} />
+              <div className="flex-1 space-y-2">
+                <Skeleton width="75%" height={16} />
+                <Skeleton width="50%" height={12} />
               </div>
-            </Sheet>
+            </div>
+            <Skeleton lines={3} />
+            <div className="grid grid-cols-2 gap-3">
+              <Skeleton height={80} />
+              <Skeleton height={80} />
+            </div>
           </div>
         </Preview>
 
-        <Preview label="ConfirmDialog" description="Confirmation modal with variants" code={`<ConfirmDialog\n  open={open}\n  onOpenChange={setOpen}\n  title="Delete device?"\n  variant="danger"\n  onConfirm={handleDelete}\n/>`}>
-          <div className="text-center py-4">
-            <Button variant="danger" onClick={() => setDialogOpen(true)}>Delete Device</Button>
-            <ConfirmDialog
-              open={dialogOpen}
-              onOpenChange={setDialogOpen}
-              title="Delete device?"
-              description="This will remove core-sw-01 and all associated metrics. This action cannot be undone."
-              variant="danger"
-              confirmLabel="Delete"
-              onConfirm={() => { setDialogOpen(false); toast.success('Device deleted') }}
-            />
+        <Preview label="Progress" description="All variants + indeterminate" code={`<Progress value={65} label="Upload" showValue variant="success" />\n<Progress indeterminate label="Processing..." />`}>
+          <div className="space-y-4">
+            <Progress value={progVal} label="Migration Progress" showValue variant="default" />
+            <Progress value={85} label="Disk Usage" showValue variant="warning" size="md" />
+            <Progress value={95} label="CPU Critical" showValue variant="danger" size="lg" />
+            <Progress value={100} label="Complete" showValue variant="success" />
+            <Progress value={0} indeterminate label="Discovering devices..." />
+            <div className="flex gap-2 mt-2">
+              <Button size="sm" variant="outline" onClick={() => setProgVal(p => Math.max(0, p - 10))}>-10</Button>
+              <Button size="sm" variant="outline" onClick={() => setProgVal(p => Math.min(100, p + 10))}>+10</Button>
+            </div>
           </div>
         </Preview>
 
-        <Preview label="Tooltip" description="Contextual hints on hover" code={`<Tooltip content="More info"><Button>Hover me</Button></Tooltip>`}>
-          <div className="flex flex-wrap gap-3 justify-center py-4">
-            <Tooltip content="View device details"><Button variant="outline" size="icon"><Info className="size-4" /></Button></Tooltip>
-            <Tooltip content="Configure alerts" side="bottom"><Button variant="outline" size="icon"><Bell className="size-4" /></Button></Tooltip>
-            <Tooltip content="Open settings" side="right"><Button variant="outline" size="icon"><Settings className="size-4" /></Button></Tooltip>
+        <Preview label="Checkbox" description="Checkbox with label states" code={`<Checkbox checked={val} onChange={handler} />`}>
+          <div className="space-y-3">
+            <label className="flex items-center gap-2 cursor-pointer"><Checkbox checked={checked1} onChange={(e: ChangeEvent<HTMLInputElement>) => setChecked1(e.target.checked)} /><span className="text-sm text-[hsl(var(--text-primary))]">Enable SNMP polling</span></label>
+            <label className="flex items-center gap-2 cursor-pointer"><Checkbox checked={checked2} onChange={(e: ChangeEvent<HTMLInputElement>) => setChecked2(e.target.checked)} /><span className="text-sm text-[hsl(var(--text-primary))]">Enable syslog collection</span></label>
           </div>
         </Preview>
 
-        <Preview label="Popover" description="Click-triggered floating content" code={`<Popover trigger={<Button>Open</Button>}>\n  Popover content\n</Popover>`}>
-          <div className="text-center py-4">
-            <Popover trigger={<Button variant="secondary">Show details</Button>}>
-              <div className="p-3 space-y-2 text-sm">
-                <p className="font-medium text-[hsl(var(--text-primary))]">Quick Stats</p>
-                <p className="text-[hsl(var(--text-secondary))]">CPU: 67% | Mem: 4.2 GB</p>
-                <p className="text-[hsl(var(--text-secondary))]">Uptime: 142 days</p>
-              </div>
-            </Popover>
+        <Preview label="RadioGroup" description="Vertical and horizontal" code={`<RadioGroup options={opts} value={val} onChange={setVal} />`}>
+          <RadioGroup
+            options={[
+              { value: 'md5', label: 'MD5', description: 'Legacy' },
+              { value: 'sha1', label: 'SHA-1' },
+              { value: 'sha256', label: 'SHA-256', description: 'Recommended' },
+            ]}
+            value={radio}
+            onChange={setRadio}
+            orientation="vertical"
+          />
+        </Preview>
+
+        <Preview label="ToggleSwitch" description="On/off toggle with label" code={`<ToggleSwitch label="Auto-refresh" enabled={val} onChange={setVal} />`}>
+          <div className="space-y-4">
+            <ToggleSwitch label="Auto-refresh dashboard" enabled={toggle1} onChange={setToggle1} />
+            <ToggleSwitch label="Dark mode" enabled={toggle2} onChange={setToggle2} />
           </div>
         </Preview>
 
-        <Preview label="DropdownMenu" description="Context menu with actions" code={`<DropdownMenu\n  trigger={<Button size="icon"><MoreVertical /></Button>}\n  items={menuItems}\n/>`}>
-          <div className="text-center py-4">
-            <DropdownMenu
-              trigger={<Button variant="secondary" size="icon"><MoreVertical className="size-4" /></Button>}
-              items={[
-                { label: 'Edit', icon: Edit, onClick: () => toast.info('Edit clicked') },
-                { label: 'Copy', icon: Copy, onClick: () => toast.info('Copy clicked') },
-                { label: 'Export', icon: Download, onClick: () => toast.info('Export clicked') },
-                { label: 'Share', icon: Share2, onClick: () => toast.info('Share clicked') },
-                { label: 'Delete', icon: Trash2, onClick: () => toast.error('Delete clicked'), variant: 'danger' },
-              ]}
-            />
+        <Preview label="Slider" description="Range slider with value display" code={`<Slider value={val} onChange={setVal} min={10} max={300} label="Interval" showValue />`}>
+          <div className="space-y-4 py-2">
+            <Slider value={slider} onChange={setSlider} min={10} max={300} step={5} label="Collection Interval (sec)" showValue />
+            <Slider value={75} onChange={() => {}} min={0} max={100} label="Alert Threshold (%)" showValue />
+          </div>
+        </Preview>
+
+        <Preview label="StatusBadge" description="All status variants" code={`<StatusBadge status="active" />\n<StatusBadge status="critical" pulse />`}>
+          <div className="flex flex-wrap gap-2">
+            {['ok', 'active', 'warning', 'critical', 'unknown', 'maintenance', 'stale', 'inactive', 'decommissioned', 'pending'].map(s => (
+              <StatusBadge key={s} status={s} pulse={s === 'critical'} />
+            ))}
+          </div>
+        </Preview>
+
+        <Preview label="StatusPulse" description="Animated status dots" code={`<StatusPulse status="ok" label="Healthy" />`}>
+          <div className="flex flex-wrap gap-6">
+            {(['ok', 'warning', 'critical', 'info'] as const).map(s => (
+              <StatusPulse key={s} status={s} label={s} />
+            ))}
           </div>
         </Preview>
 
@@ -145,16 +209,16 @@ export function CorePage() {
               <SuccessCheckmark key={`c48-${checkKey}`} size={48} />
               <SuccessCheckmark key={`c64-${checkKey}`} size={64} />
             </div>
-            <Button variant="ghost" size="sm" onClick={() => setCheckKey((k) => k + 1)}>Replay</Button>
+            <Button variant="ghost" size="sm" onClick={() => setCheckKey(k => k + 1)}>Replay</Button>
           </div>
         </Preview>
 
-        <Preview label="Toast" description="Sonner-powered notifications" code={`toast.success('Device saved')\ntoast.error('Connection failed')`}>
-          <div className="flex flex-wrap gap-2 justify-center py-4">
-            <Button variant="secondary" size="sm" onClick={() => toast.success('Configuration saved successfully')}>Success</Button>
-            <Button variant="secondary" size="sm" onClick={() => toast.error('Failed to connect to 10.0.5.42')}>Error</Button>
-            <Button variant="secondary" size="sm" onClick={() => toast.warning('CPU usage above 90% threshold')}>Warning</Button>
-            <Button variant="secondary" size="sm" onClick={() => toast.info('SNMP collection cycle started')}>Info</Button>
+        <Preview label="AnimatedCounter" description="Spring-animated number transitions" code={`<AnimatedCounter value={count} />`}>
+          <div className="text-center py-4">
+            <div className="text-4xl font-bold text-[hsl(var(--text-primary))] tabular-nums mb-4">
+              <AnimatedCounter value={counter} />
+            </div>
+            <Button variant="primary" onClick={() => setCounter(p => p + Math.floor(Math.random() * 500))}>Add random amount</Button>
           </div>
         </Preview>
       </div>

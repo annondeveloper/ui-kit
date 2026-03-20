@@ -1,5 +1,5 @@
 @import "tailwindcss";
-@import "../../src/theme.css";
+@import "../../src/core/tokens/theme.css";
 @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Outfit:wght@300;400;500;600;700;800&display=swap');
 
 body {

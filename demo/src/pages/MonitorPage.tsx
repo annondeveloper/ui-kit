@@ -3,54 +3,55 @@ import { Preview, useInViewTimer } from '../components/Preview.tsx'
 import {
   MetricCard, ThresholdGauge, UtilizationBar, Sparkline,
   UptimeTracker, PortStatusGrid, PipelineStage, SeverityTimeline,
-  TimeRangeSelector, StatusBadge, StatusPulse, LogViewer,
-  type DayStatus, type PortStatus, type StageInfo, type TimelineEvent, type LogEntry,
+  TimeRangeSelector, LogViewer,
+  type UptimeDay, type PortStatus, type Stage, type TimelineEvent, type LogLine,
 } from '@ui/index'
 import { generateTheme, themeToCSS } from '@ui/index'
-import { Server, Cpu, HardDrive, Wifi } from 'lucide-react'
 
 function genSparkline(base: number, variance: number, len = 12): number[] {
   return Array.from({ length: len }, () => base + (Math.random() - 0.5) * variance * 2)
 }
 
-const uptimeDays: DayStatus[] = Array.from({ length: 90 }, (_, i) => {
+const uptimeDays: UptimeDay[] = Array.from({ length: 90 }, (_, i) => {
   const d = new Date(); d.setDate(d.getDate() - 89 + i)
   const r = Math.random()
-  return { date: d.toISOString().slice(0, 10), status: r > 0.97 ? 'outage' : r > 0.92 ? 'degraded' : 'ok', uptime: r > 0.97 ? 85 : r > 0.92 ? 95 : 99.9 }
+  return { date: d.toISOString().slice(0, 10), status: r > 0.97 ? 'down' as const : r > 0.92 ? 'degraded' as const : 'up' as const, uptime: r > 0.97 ? 0.85 : r > 0.92 ? 0.95 : 0.999 }
 })
 
 const ports: PortStatus[] = Array.from({ length: 48 }, (_, i) => ({
-  id: `p${i}`, label: `Gi1/0/${i + 1}`,
-  status: Math.random() > 0.85 ? 'down' : Math.random() > 0.95 ? 'error' : 'up',
-  speed: Math.random() > 0.5 ? '10G' : '1G',
-  utilization: Math.floor(Math.random() * 100),
+  port: i + 1,
+  label: `Gi1/0/${i + 1}`,
+  status: (Math.random() > 0.85 ? 'critical' : Math.random() > 0.95 ? 'warning' : 'ok') as PortStatus['status'],
 }))
 
-const stages: StageInfo[] = [
-  { name: 'Collect', status: 'active', metric: { label: 'rate', value: '1.2k/s' }, icon: Wifi },
-  { name: 'Normalize', status: 'active', metric: { label: 'lag', value: '12ms' } },
-  { name: 'Correlate', status: 'active', metric: { label: 'queue', value: '847' } },
-  { name: 'Evaluate', status: 'idle', metric: { label: 'rules', value: '24' } },
-  { name: 'Store', status: 'active', metric: { label: 'write', value: '980/s' } },
+const stages: Stage[] = [
+  { id: 'collect', label: 'Collect', status: 'active' },
+  { id: 'normalize', label: 'Normalize', status: 'active' },
+  { id: 'correlate', label: 'Correlate', status: 'active' },
+  { id: 'evaluate', label: 'Evaluate', status: 'idle' },
+  { id: 'store', label: 'Store', status: 'active' },
 ]
 
 const events: TimelineEvent[] = Array.from({ length: 10 }, (_, i) => {
   const d = new Date(); d.setMinutes(d.getMinutes() - i * 15)
   const severities: TimelineEvent['severity'][] = ['critical', 'warning', 'info', 'ok']
-  return { time: d.toISOString(), label: `Event ${10 - i}: ${['Link down', 'High CPU', 'Config change', 'Recovery'][i % 4]}`, severity: severities[i % 4] }
+  return {
+    id: `evt-${i}`,
+    timestamp: d,
+    title: `Event ${10 - i}: ${['Link down', 'High CPU', 'Config change', 'Recovery'][i % 4]}`,
+    severity: severities[i % 4],
+  }
 })
 
-const logs: LogEntry[] = Array.from({ length: 15 }, (_, i) => {
+const logs: LogLine[] = Array.from({ length: 15 }, (_, i) => {
   const d = new Date(); d.setSeconds(d.getSeconds() - i * 30)
-  const levels: LogEntry['level'][] = ['error', 'warn', 'info', 'debug', 'info']
+  const levels: LogLine['level'][] = ['error', 'warn', 'info', 'debug', 'info']
   const msgs = ['Connection timeout to 10.0.1.5:161', 'SNMP walk completed in 2.3s', 'Rate calc delta: ifHCInOctets +847293', 'Entity correlated: uuid=a8f3...', 'Alert rule "CPU > 90%" matched on core-sw-01']
-  return { time: d.toISOString(), level: levels[i % 5], message: msgs[i % 5], source: ['snmp-collector', 'normalizer', 'correlator'][i % 3] }
+  return { id: i, timestamp: d, level: levels[i % 5], message: msgs[i % 5] }
 })
 
 export function MonitorPage() {
-  const [metrics, setMetrics] = useState({ rps: 12847, cpu: 67, mem: 4.2, err: 23 })
   const [sparkData, setSparkData] = useState(genSparkline(65, 15))
-  const [timeRange, setTimeRange] = useState('24h')
 
   // Gauge animation on viewport enter
   const [gaugeValues, setGaugeValues] = useState([0, 0, 0, 0])
@@ -93,12 +94,6 @@ export function MonitorPage() {
   const themeCSS = themeToCSS(generatedTheme, '.theme-demo')
 
   const tick = useCallback(() => {
-    setMetrics(p => ({
-      rps: p.rps + Math.floor(Math.random() * 200 - 80),
-      cpu: Math.min(100, Math.max(10, p.cpu + (Math.random() - 0.5) * 8)),
-      mem: Math.max(0.5, p.mem + (Math.random() - 0.5) * 0.3),
-      err: Math.max(0, p.err + Math.floor(Math.random() * 6 - 3)),
-    }))
     setSparkData(p => [...p.slice(1), p[p.length - 1] + Math.floor(Math.random() * 10 - 4)])
   }, [])
 
@@ -111,12 +106,12 @@ export function MonitorPage() {
         <p className="text-sm text-[hsl(var(--text-secondary))]">13 components for dashboards, metrics, and infrastructure visualization</p>
       </div>
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 stagger" ref={tickRef}>
-        <Preview label="MetricCard" description="Live updating dashboard stat tiles" glow="monitor" wide code={`<MetricCard label="Requests/sec" value={12847} sparklineData={data} status="ok" />`}>
+        <Preview label="MetricCard" description="Dashboard stat tiles" glow="monitor" wide code={`<MetricCard title="CPU" value="67%" status="warning" />`}>
           <div className="grid grid-cols-2 gap-3">
-            <MetricCard label="Requests/sec" value={metrics.rps} previousValue={12600} trendDirection="up-good" status="ok" sparklineData={sparkData} icon={Server} />
-            <MetricCard label="CPU Usage" value={metrics.cpu} format={n => `${n.toFixed(0)}%`} previousValue={62} trendDirection="up-bad" status={metrics.cpu > 80 ? 'critical' : metrics.cpu > 60 ? 'warning' : 'ok'} icon={Cpu} />
-            <MetricCard label="Memory" value={metrics.mem} format={n => `${n.toFixed(1)} GB`} previousValue={4.0} trendDirection="up-bad" status="ok" icon={HardDrive} />
-            <MetricCard label="Errors" value={metrics.err} previousValue={28} trendDirection="down-good" status={metrics.err > 20 ? 'warning' : 'ok'} />
+            <MetricCard title="Requests/sec" value="12,847" change={{ value: 2.4, period: '1h' }} trend="up" status="ok" sparkline={sparkData} />
+            <MetricCard title="CPU Usage" value="67%" change={{ value: -1.2 }} trend="up" status="warning" />
+            <MetricCard title="Memory" value="4.2 GB" change={{ value: 0.3 }} trend="up" status="ok" />
+            <MetricCard title="Errors" value="23" change={{ value: -5 }} trend="down" status="ok" />
           </div>
         </Preview>
 
@@ -134,20 +129,20 @@ export function MonitorPage() {
             <UtilizationBar value={utilValues[0]} label="CPU" />
             <UtilizationBar value={utilValues[1]} label="Memory" />
             <UtilizationBar value={utilValues[2]} label="Disk I/O" />
-            <UtilizationBar value={utilValues[3]} label="Network" thresholds={{ warning: 60, critical: 85 }} />
+            <UtilizationBar value={utilValues[3]} label="Network" />
           </div>
         </Preview>
 
         <Preview label="Sparkline" description="Inline SVG micro-charts" glow="monitor" code={`<Sparkline data={[40, 42, 38, 45, 50]} width={120} height={28} />`}>
           <div className="space-y-4">
-            <div className="flex items-center gap-3"><span className="text-xs text-[hsl(var(--text-secondary))] w-20">Trending up</span><Sparkline data={genSparkline(40, 5).map((v, i) => v + i * 2)} width={200} height={32} color="hsl(var(--status-ok))" fillOpacity={0.15} showDots /></div>
-            <div className="flex items-center gap-3"><span className="text-xs text-[hsl(var(--text-secondary))] w-20">Volatile</span><Sparkline data={genSparkline(50, 25)} width={200} height={32} color="hsl(var(--status-warning))" fillOpacity={0.15} showDots /></div>
-            <div className="flex items-center gap-3"><span className="text-xs text-[hsl(var(--text-secondary))] w-20">Stable</span><Sparkline data={genSparkline(60, 3)} width={200} height={32} color="hsl(var(--brand-primary))" fillOpacity={0.15} showDots /></div>
+            <div className="flex items-center gap-3"><span className="text-xs text-[hsl(var(--text-secondary))] w-20">Trending up</span><Sparkline data={genSparkline(40, 5).map((v, i) => v + i * 2)} width={200} height={32} color="hsl(var(--status-ok))" /></div>
+            <div className="flex items-center gap-3"><span className="text-xs text-[hsl(var(--text-secondary))] w-20">Volatile</span><Sparkline data={genSparkline(50, 25)} width={200} height={32} color="hsl(var(--status-warning))" /></div>
+            <div className="flex items-center gap-3"><span className="text-xs text-[hsl(var(--text-secondary))] w-20">Stable</span><Sparkline data={genSparkline(60, 3)} width={200} height={32} color="hsl(var(--brand-primary))" /></div>
           </div>
         </Preview>
 
-        <Preview label="UptimeTracker" description="90-day uptime strip" glow="monitor" code={`<UptimeTracker days={days} showPercentage label="API Gateway" />`}>
-          <UptimeTracker days={uptimeDays} showPercentage label="API Gateway" />
+        <Preview label="UptimeTracker" description="90-day uptime strip" glow="monitor" code={`<UptimeTracker days={days} />`}>
+          <UptimeTracker days={uptimeDays} />
         </Preview>
 
         <Preview label="PortStatusGrid" description="48-port switch visualization" glow="monitor" code={`<PortStatusGrid ports={ports} columns={12} />`}>
@@ -162,24 +157,8 @@ export function MonitorPage() {
           <SeverityTimeline events={events} maxVisible={6} />
         </Preview>
 
-        <Preview label="TimeRangeSelector" description="Time range picker" glow="monitor" code={`<TimeRangeSelector value="24h" onChange={setValue} />`}>
-          <TimeRangeSelector value={timeRange} onChange={v => setTimeRange(v)} />
-        </Preview>
-
-        <Preview label="StatusBadge" description="All 10 status variants" glow="monitor" code={`<StatusBadge status="active" />\n<StatusBadge status="critical" pulse />`}>
-          <div className="flex flex-wrap gap-2">
-            {['ok', 'active', 'warning', 'critical', 'unknown', 'maintenance', 'stale', 'inactive', 'decommissioned', 'pending'].map(s => (
-              <StatusBadge key={s} status={s} pulse={s === 'critical'} />
-            ))}
-          </div>
-        </Preview>
-
-        <Preview label="StatusPulse" description="Animated status dots" glow="monitor" code={`<StatusPulse status="online" showLabel />`}>
-          <div className="flex flex-wrap gap-6">
-            {['online', 'degraded', 'offline', 'unknown'].map(s => (
-              <StatusPulse key={s} status={s} label />
-            ))}
-          </div>
+        <Preview label="TimeRangeSelector" description="Time range picker with presets" glow="monitor" code={`<TimeRangeSelector onChange={setRange} />`}>
+          <TimeRangeSelector onChange={() => {}} />
         </Preview>
 
         <Preview label="generateTheme" description="Generate a full theme from one color" glow="monitor" wide code={`import { generateTheme, themeToCSS } from '@ui/index'\nconst theme = generateTheme('#6366f1', 'dark')\nconst css = themeToCSS(theme, ':root')`}>
@@ -242,8 +221,8 @@ export function MonitorPage() {
           </div>
         </Preview>
 
-        <Preview label="LogViewer" description="Structured log viewer with search" glow="monitor" wide code={`<LogViewer entries={logs} maxHeight={200} autoScroll />`}>
-          <LogViewer entries={logs} maxHeight={200} autoScroll showTimestamps showLevel />
+        <Preview label="LogViewer" description="Structured log viewer" glow="monitor" wide code={`<LogViewer lines={logs} maxLines={200} autoTail />`}>
+          <LogViewer lines={logs} maxLines={200} autoTail />
         </Preview>
       </div>
     </div>

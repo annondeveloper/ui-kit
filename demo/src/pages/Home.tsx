@@ -11,13 +11,14 @@ import {
 const sparkBase = [40, 42, 38, 45, 50, 48, 52, 55, 53, 58, 60, 62]
 
 const categories = [
-  { path: '/ai',          label: 'AI & Realtime', icon: Activity,           count: 8,  desc: 'Streaming, typing, confidence, combobox, inline edit', preview: 'ai' },
-  { path: '/monitor',     label: 'Monitoring',    icon: Gauge,              count: 13, desc: 'Gauges, sparklines, grids, theme generator', preview: 'monitor' },
-  { path: '/data',        label: 'Smart Data',    icon: Database,           count: 8,  desc: 'Tables, diffs, heatmaps, tree view', preview: 'data' },
-  { path: '/interactive', label: 'Interactive',    icon: MousePointerClick,  count: 9,  desc: 'Drag, sort, kanban, density, scroll reveal', preview: 'interactive' },
-  { path: '/core',        label: 'Core',           icon: Layers,            count: 11, desc: 'Buttons, badges, cards, dialogs', preview: 'core' },
-  { path: '/forms',       label: 'Forms',          icon: PenLine,           count: 9,  desc: 'Inputs, selects, sliders, combobox', preview: 'forms' },
-  { path: '/layout',      label: 'Layout',         icon: Layout,            count: 6,  desc: 'Empty states, skeletons, progress', preview: 'layout' },
+  { path: '/core',        label: 'Core',            icon: Layers,            count: 14, desc: 'Buttons, badges, cards, tabs, avatars, progress', preview: 'core' },
+  { path: '/forms',       label: 'Forms',           icon: PenLine,           count: 9,  desc: 'Inputs, selects, sliders, combobox', preview: 'forms' },
+  { path: '/overlays',    label: 'Overlays',        icon: Layout,            count: 9,  desc: 'Dialogs, sheets, tooltips, toasts, menus', preview: 'core' },
+  { path: '/data',        label: 'Data',            icon: Database,          count: 9,  desc: 'Tables, diffs, heatmaps, tree view', preview: 'data' },
+  { path: '/monitor',     label: 'Monitoring',      icon: Gauge,             count: 13, desc: 'Gauges, sparklines, grids, theme generator', preview: 'monitor' },
+  { path: '/ai',          label: 'AI & Realtime',   icon: Activity,          count: 5,  desc: 'Streaming, typing, confidence, live feed', preview: 'ai' },
+  { path: '/interactive', label: 'Interactive',      icon: MousePointerClick, count: 9,  desc: 'Drag, sort, kanban, density, scroll reveal', preview: 'interactive' },
+  { path: '/layout',      label: 'Layout',          icon: Layout,            count: 6,  desc: 'Skeletons, file upload, infinite scroll', preview: 'layout' },
 ]
 
 function MiniPreview({ type }: { type: string }) {
@@ -27,7 +28,7 @@ function MiniPreview({ type }: { type: string }) {
     case 'monitor':
       return (
         <div className="flex items-center gap-2">
-          <StatusPulse status="online" />
+          <StatusPulse status="ok" />
           <Sparkline data={[30, 35, 32, 40, 42, 38, 45]} width={60} height={16} color="hsl(var(--status-ok))" />
         </div>
       )
@@ -125,7 +126,7 @@ export function Home() {
       <div className="text-center mb-8 sm:mb-12 stagger">
         <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[hsl(var(--brand-primary))]/10 text-[hsl(var(--brand-primary))] text-xs font-medium mb-6">
           <span className="size-1.5 rounded-full bg-[hsl(var(--brand-primary))] animate-pulse" />
-          56+ components, dark + light, fully typed
+          v2 — 62 components, zero deps, Aurora Fluid design
         </div>
         <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-[hsl(var(--text-primary))] tracking-tight mb-4">
           Build dashboards<br className="hidden sm:block" /> that <span className="text-[hsl(var(--brand-primary))]">operate.</span>
@@ -150,7 +151,7 @@ export function Home() {
           <span className="text-xs font-medium text-[hsl(var(--text-secondary))]">Live dashboard preview</span>
           <div className="ml-auto flex gap-1.5 items-center">
             <StatusBadge status="active" size="sm" />
-            <Badge color="purple" size="xs">v0.3</Badge>
+            <Badge color="purple" size="xs">v2</Badge>
           </div>
         </div>
 
@@ -172,18 +173,18 @@ export function Home() {
           ))}
         </div>
 
-        <DensityProvider mode={density}>
+        <DensityProvider density={density}>
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-4">
-            <MetricCard label="Requests/sec" value={rps} previousValue={12600} trendDirection="up-good" status="ok" sparklineData={sparkData} />
-            <MetricCard label="Avg Latency" value={latency} format={n => `${n.toFixed(1)}ms`} previousValue={2.6} trendDirection="down-good" status="ok" />
-            <MetricCard label="Uptime" value={uptime} format={n => `${n.toFixed(2)}%`} previousValue={99.95} trendDirection="up-good" status="ok" />
-            <MetricCard label="Errors" value={errors} previousValue={8} trendDirection="down-good" status={errors > 10 ? 'warning' : 'ok'} />
+            <MetricCard title="Requests/sec" value={rps.toLocaleString()} change={{ value: 2.4, period: '1h' }} trend="up" status="ok" sparkline={sparkData} />
+            <MetricCard title="Avg Latency" value={`${latency.toFixed(1)}ms`} change={{ value: -0.2 }} trend="down" status="ok" />
+            <MetricCard title="Uptime" value={`${uptime.toFixed(2)}%`} change={{ value: 0.02 }} trend="up" status="ok" />
+            <MetricCard title="Errors" value={String(errors)} change={{ value: -3 }} trend="down" status={errors > 10 ? 'warning' : 'ok'} />
           </div>
         </DensityProvider>
 
         <div className="flex flex-wrap items-center gap-4 sm:gap-6 text-xs text-[hsl(var(--text-tertiary))]">
           <span className="tabular-nums"><AnimatedCounter value={rps} /> events processed</span>
-          <Sparkline data={sparkData} width={120} height={20} color="hsl(var(--brand-primary))" fillOpacity={0.1} />
+          <Sparkline data={sparkData} width={120} height={20} color="hsl(var(--brand-primary))" />
         </div>
       </div>
 

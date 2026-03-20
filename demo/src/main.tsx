@@ -3,7 +3,7 @@ import { createRoot } from 'react-dom/client'
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import './index.css'
 import App from './App.tsx'
-import { Toaster } from '@ui/index'
+import { ToastProvider } from '@ui/index'
 
 // Code-split: each page loads only when navigated to
 const Home = lazy(() => import('./pages/Home.tsx'))
@@ -14,6 +14,7 @@ const InteractivePage = lazy(() => import('./pages/InteractivePage.tsx'))
 const CorePage = lazy(() => import('./pages/CorePage.tsx'))
 const FormsPage = lazy(() => import('./pages/FormsPage.tsx'))
 const LayoutPage = lazy(() => import('./pages/LayoutPage.tsx'))
+const OverlaysPage = lazy(() => import('./pages/OverlaysPage.tsx'))
 
 function PageFallback() {
   return (
@@ -31,19 +32,21 @@ function PageFallback() {
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <BrowserRouter basename="/ui-kit">
-      <Routes>
-        <Route element={<App />}>
-          <Route index element={<Suspense fallback={<PageFallback />}><Home /></Suspense>} />
-          <Route path="ai" element={<Suspense fallback={<PageFallback />}><AIPage /></Suspense>} />
-          <Route path="monitor" element={<Suspense fallback={<PageFallback />}><MonitorPage /></Suspense>} />
-          <Route path="data" element={<Suspense fallback={<PageFallback />}><DataPage /></Suspense>} />
-          <Route path="interactive" element={<Suspense fallback={<PageFallback />}><InteractivePage /></Suspense>} />
-          <Route path="core" element={<Suspense fallback={<PageFallback />}><CorePage /></Suspense>} />
-          <Route path="forms" element={<Suspense fallback={<PageFallback />}><FormsPage /></Suspense>} />
-          <Route path="layout" element={<Suspense fallback={<PageFallback />}><LayoutPage /></Suspense>} />
-        </Route>
-      </Routes>
-      <Toaster position="bottom-right" />
+      <ToastProvider position="bottom-right">
+        <Routes>
+          <Route element={<App />}>
+            <Route index element={<Suspense fallback={<PageFallback />}><Home /></Suspense>} />
+            <Route path="ai" element={<Suspense fallback={<PageFallback />}><AIPage /></Suspense>} />
+            <Route path="monitor" element={<Suspense fallback={<PageFallback />}><MonitorPage /></Suspense>} />
+            <Route path="data" element={<Suspense fallback={<PageFallback />}><DataPage /></Suspense>} />
+            <Route path="interactive" element={<Suspense fallback={<PageFallback />}><InteractivePage /></Suspense>} />
+            <Route path="core" element={<Suspense fallback={<PageFallback />}><CorePage /></Suspense>} />
+            <Route path="forms" element={<Suspense fallback={<PageFallback />}><FormsPage /></Suspense>} />
+            <Route path="layout" element={<Suspense fallback={<PageFallback />}><LayoutPage /></Suspense>} />
+            <Route path="overlays" element={<Suspense fallback={<PageFallback />}><OverlaysPage /></Suspense>} />
+          </Route>
+        </Routes>
+      </ToastProvider>
     </BrowserRouter>
   </StrictMode>,
 )
