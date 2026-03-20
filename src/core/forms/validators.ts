@@ -51,7 +51,7 @@ export const v = {
    */
   email(message = 'Invalid email address'): ValidatorFn {
     return (value) => {
-      if (!value || typeof value !== 'string') return undefined
+      if (!value || typeof value !== 'string' || value.trim() === '') return undefined
       const emailRegex =
         /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*\.[a-zA-Z]{2,}$/
       if (!emailRegex.test(value)) return message
@@ -81,7 +81,7 @@ export const v = {
    */
   minLength(min: number, message?: string): ValidatorFn {
     return (value) => {
-      if (!value || typeof value !== 'string') return undefined
+      if (!value || typeof value !== 'string' || value.trim() === '') return undefined
       if (value.length < min) return message ?? `Must be at least ${min} characters`
       return undefined
     }
@@ -93,7 +93,7 @@ export const v = {
    */
   maxLength(max: number, message?: string): ValidatorFn {
     return (value) => {
-      if (!value || typeof value !== 'string') return undefined
+      if (!value || typeof value !== 'string' || value.trim() === '') return undefined
       if (value.length > max) return message ?? `Must be at most ${max} characters`
       return undefined
     }
@@ -133,7 +133,7 @@ export const v = {
    */
   pattern(regex: RegExp, message = 'Invalid format'): ValidatorFn {
     return (value) => {
-      if (!value || typeof value !== 'string') return undefined
+      if (!value || typeof value !== 'string' || value.trim() === '') return undefined
       if (!regex.test(value)) return message
       return undefined
     }
@@ -188,14 +188,19 @@ export const v = {
   ): AsyncValidatorFn {
     const { debounce: debounceMs = 300 } = options
     let timer: ReturnType<typeof setTimeout> | null = null
+    let resolvePending: ((v: string | undefined) => void) | null = null
 
     return (value) => {
+      if (timer) clearTimeout(timer)
+      // Settle the superseded promise so callers don't hang
+      resolvePending?.(undefined)
+
       return new Promise((resolve) => {
-        if (timer) clearTimeout(timer)
+        resolvePending = resolve
         timer = setTimeout(async () => {
+          resolvePending = null
           try {
-            const result = await fn(value)
-            resolve(result)
+            resolve(await fn(value))
           } catch {
             resolve('Validation failed')
           }

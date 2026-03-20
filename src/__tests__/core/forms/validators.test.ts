@@ -119,6 +119,10 @@ describe('v.email', () => {
     expect(validate(true)).toBeUndefined()
   })
 
+  it('skips validation for whitespace-only string', () => {
+    expect(validate('   ')).toBeUndefined()
+  })
+
   it('uses custom error message', () => {
     const custom = v.email('Please enter a valid email')
     expect(custom('bad')).toBe('Please enter a valid email')
@@ -204,6 +208,10 @@ describe('v.minLength', () => {
     expect(validate(true)).toBeUndefined()
   })
 
+  it('skips validation for whitespace-only string', () => {
+    expect(validate('   ')).toBeUndefined()
+  })
+
   it('uses custom message', () => {
     const custom = v.minLength(5, 'Too short!')
     expect(custom('ab')).toBe('Too short!')
@@ -239,6 +247,10 @@ describe('v.maxLength', () => {
 
   it('skips for null', () => {
     expect(validate(null)).toBeUndefined()
+  })
+
+  it('skips validation for whitespace-only string', () => {
+    expect(validate('   ')).toBeUndefined()
   })
 
   it('uses custom message', () => {
@@ -388,6 +400,10 @@ describe('v.pattern', () => {
 
   it('skips for non-string values', () => {
     expect(validate(123)).toBeUndefined()
+  })
+
+  it('skips validation for whitespace-only string', () => {
+    expect(validate('   ')).toBeUndefined()
   })
 
   it('uses custom message', () => {
@@ -590,6 +606,22 @@ describe('v.async', () => {
     await new Promise((r) => setTimeout(r, 100))
     expect(fn).toHaveBeenCalledTimes(1)
     expect(fn).toHaveBeenCalledWith('abc')
+  })
+
+  it('settles earlier debounced promises (does not hang)', async () => {
+    const validate = v.async(async (value) => {
+      return value === 'taken' ? 'Already taken' : undefined
+    }, { debounce: 50 })
+
+    const p1 = validate('a')
+    const p2 = validate('ab')
+    const p3 = validate('abc')
+
+    // All promises should settle — p1 and p2 resolve with undefined (cancelled)
+    const results = await Promise.all([p1, p2, p3])
+    expect(results[0]).toBeUndefined() // settled by cancellation
+    expect(results[1]).toBeUndefined() // settled by cancellation
+    expect(results[2]).toBeUndefined() // actual validation result
   })
 
   it('handles thrown errors gracefully', async () => {
