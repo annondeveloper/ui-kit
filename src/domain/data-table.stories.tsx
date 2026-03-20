@@ -39,21 +39,21 @@ const data: Server[] = [
 ]
 
 export const Default: Story = {
-  args: { data, columns },
+  args: { data, columns: columns as any },
 }
 
 export const Striped: Story = {
-  args: { data, columns, striped: true },
+  args: { data, columns: columns as any, striped: true },
 }
 
 export const Selectable: Story = {
-  args: { data, columns, selectable: true },
+  args: { data, columns: columns as any, selectable: true },
 }
 
 export const Loading: Story = {
-  args: { data: [], columns, loading: true },
+  args: { data: [], columns: columns as any, loading: true },
 }
 
 export const Empty: Story = {
-  args: { data: [], columns, empty: 'No servers found' },
+  args: { data: [], columns: columns as any, empty: 'No servers found' },
 }

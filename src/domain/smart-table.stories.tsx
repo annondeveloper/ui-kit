@@ -36,5 +36,5 @@ const data: User[] = [
 ]
 
 export const Default: Story = {
-  args: { data, columns, searchable: true, paginated: true, pageSize: 3 },
+  args: { data, columns: columns as any, searchable: true, paginated: true, pageSize: 3 },
 }

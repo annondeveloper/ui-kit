@@ -15,7 +15,7 @@ type Story = StoryObj<typeof Tooltip>
 
 export const Default: Story = {
   render: (args) => (
-    <Tooltip content="Helpful tooltip text" {...args}>
+    <Tooltip {...args} content="Helpful tooltip text">
       <Button variant="secondary">Hover me</Button>
     </Tooltip>
   ),

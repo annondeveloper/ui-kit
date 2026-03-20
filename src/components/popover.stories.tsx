@@ -16,8 +16,8 @@ type Story = StoryObj<typeof Popover>
 export const Default: Story = {
   render: (args) => (
     <Popover
-      content={<div style={{ padding: '0.5rem' }}>Popover content here</div>}
       {...args}
+      content={<div style={{ padding: '0.5rem' }}>Popover content here</div>}
     >
       <Button variant="secondary">Open Popover</Button>
     </Popover>
