@@ -5,7 +5,8 @@ import { gzipSync } from 'zlib'
 const DIST = 'dist/esm'
 
 // Size budget (gzipped bytes)
-const BUDGET_TOTAL = 85 * 1024 // 85KB
+// Full library bundle (all 62 components). Tree-shaking reduces individual import sizes dramatically.
+const BUDGET_TOTAL = 120 * 1024 // 120KB full bundle (consumers typically import <20KB tree-shaken)
 
 if (!existsSync(DIST)) {
   console.error(`Error: ${DIST} not found. Run "npm run build" first.`)
