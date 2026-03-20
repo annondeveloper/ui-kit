@@ -22,3 +22,6 @@ export { FilterPill, FilterPillGroup, type FilterPillProps, type FilterPillGroup
 export { Tooltip, type TooltipProps } from './tooltip'
 export { NativeTooltip, type NativeTooltipProps } from './native-tooltip'
 export { Popover, type PopoverProps } from './popover'
+export { Dialog, type DialogProps } from './dialog'
+export { ConfirmDialog, type ConfirmDialogProps } from './confirm-dialog'
+export { Sheet, type SheetProps } from './sheet'
