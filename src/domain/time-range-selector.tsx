@@ -53,7 +53,7 @@ const selectorStyles = css`
       .ui-time-range-selector__presets {
         display: flex;
         gap: 2px;
-        background: var(--bg-muted, oklch(100% 0 0 / 0.04));
+        background: var(--bg-elevated, oklch(16% 0.02 275));
         border-radius: var(--radius-md, 0.5rem);
         padding: 2px;
       }
@@ -75,13 +75,13 @@ const selectorStyles = css`
       }
 
       .ui-time-range-selector__preset:hover {
-        background: oklch(100% 0 0 / 0.06);
+        background: var(--brand-glow, oklch(65% 0.2 270 / 0.15));
         color: var(--text-primary, oklch(90% 0 0));
       }
 
       .ui-time-range-selector__preset[data-active="true"] {
-        background: oklch(65% 0.2 270 / 0.15);
-        color: oklch(75% 0.2 270);
+        background: var(--brand-subtle, oklch(65% 0.2 270 / 0.08));
+        color: var(--brand-light, oklch(75% 0.18 270));
         font-weight: 600;
       }
 
@@ -103,7 +103,7 @@ const selectorStyles = css`
         padding: var(--space-xs, 0.25rem) var(--space-sm, 0.5rem);
         font-size: var(--text-sm, 0.875rem);
         font-family: inherit;
-        background: var(--bg-input, oklch(100% 0 0 / 0.04));
+        background: var(--bg-surface, oklch(12% 0.015 270));
         border: 1px solid var(--border-subtle, oklch(100% 0 0 / 0.1));
         border-radius: var(--radius-sm, 0.375rem);
         color: var(--text-primary, oklch(90% 0 0));

@@ -8,6 +8,7 @@ import { SmartTable } from '@ui/domain/smart-table'
 import { TreeView } from '@ui/domain/tree-view'
 import { SortableList } from '@ui/domain/sortable-list'
 import { CopyBlock } from '@ui/domain/copy-block'
+import { InfiniteScroll } from '@ui/domain/infinite-scroll'
 import { DiffViewer } from '@ui/domain/diff-viewer'
 import { EmptyState } from '@ui/domain/empty-state'
 import type { ColumnDef } from '@ui/domain/data-table'
@@ -130,6 +131,24 @@ const grid: React.CSSProperties = {
 
 export default function DataPage() {
   const [activeTab, setActiveTab] = useState('overview')
+  const [feedItems, setFeedItems] = useState(Array.from({ length: 20 }, (_, i) => `Item ${i + 1}`))
+  const [hasMore, setHasMore] = useState(true)
+  const [loadingMore, setLoadingMore] = useState(false)
+
+  const loadMore = async () => {
+    setLoadingMore(true)
+    await new Promise(r => setTimeout(r, 500))
+    setFeedItems(prev => {
+      const next = [
+        ...prev,
+        ...Array.from({ length: 10 }, (_, i) => `Item ${prev.length + i + 1}`),
+      ]
+      if (next.length >= 50) setHasMore(false)
+      return next
+    })
+    setLoadingMore(false)
+  }
+
   const [sortItems, setSortItems] = useState<SortableItem[]>([
     { id: '1', content: 'Deploy to production' },
     { id: '2', content: 'Run integration tests' },
@@ -196,12 +215,14 @@ export default function DataPage() {
         </Preview>
 
         {/* SmartTable */}
-        <Preview label="SmartTable" description="Built-in search and pagination" wide>
+        <Preview label="SmartTable" description="Search, column toggle, and pagination" wide>
           <SmartTable
             data={serverData}
             columns={columns}
             searchable
             searchPlaceholder="Search servers..."
+            columnToggle
+            selectable
             paginated
             pageSize={4}
           />
@@ -236,6 +257,27 @@ export default function DataPage() {
             mode="unified"
             showLineNumbers
           />
+        </Preview>
+
+        {/* InfiniteScroll */}
+        <Preview label="InfiniteScroll" description="Load more items on scroll" wide>
+          <InfiniteScroll
+            onLoadMore={loadMore}
+            hasMore={hasMore}
+            loading={loadingMore}
+            style={{ height: '300px', overflow: 'auto' }}
+          >
+            {feedItems.map((item, i) => (
+              <div key={i} style={{
+                padding: '0.75rem 1rem',
+                borderBottom: '1px solid var(--border-subtle)',
+                fontSize: 'var(--text-sm)',
+                color: 'var(--text-primary)',
+              }}>
+                {item}
+              </div>
+            ))}
+          </InfiniteScroll>
         </Preview>
 
         {/* EmptyState */}

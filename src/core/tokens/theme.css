@@ -1,3 +1,7 @@
+*, *::before, *::after {
+  -webkit-tap-highlight-color: transparent;
+}
+
 :root {
   color-scheme: dark;
 

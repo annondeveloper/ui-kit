@@ -59,6 +59,7 @@ const sortableListStyles = css`
         font-size: var(--text-sm, 0.875rem);
         cursor: grab;
         user-select: none;
+        touch-action: none;
         min-block-size: 2.25rem;
         outline: none;
         position: relative;

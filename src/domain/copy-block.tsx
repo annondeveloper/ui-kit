@@ -530,11 +530,37 @@ export function CopyBlock({
 
   const handleCopy = useCallback(async () => {
     try {
-      await navigator.clipboard.writeText(code)
+      if (navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(code)
+      } else {
+        // Fallback for non-secure contexts or missing clipboard API
+        const textarea = document.createElement('textarea')
+        textarea.value = code
+        textarea.style.position = 'fixed'
+        textarea.style.left = '-9999px'
+        document.body.appendChild(textarea)
+        textarea.select()
+        document.execCommand('copy')
+        document.body.removeChild(textarea)
+      }
       setCopied(true)
       setTimeout(() => setCopied(false), 2000)
     } catch {
-      // Silently fail if clipboard not available
+      // Fallback when clipboard API rejects (e.g. non-secure context)
+      try {
+        const textarea = document.createElement('textarea')
+        textarea.value = code
+        textarea.style.position = 'fixed'
+        textarea.style.left = '-9999px'
+        document.body.appendChild(textarea)
+        textarea.select()
+        document.execCommand('copy')
+        document.body.removeChild(textarea)
+        setCopied(true)
+        setTimeout(() => setCopied(false), 2000)
+      } catch {
+        setCopied(false)
+      }
     }
   }, [code])
 

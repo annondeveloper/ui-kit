@@ -258,7 +258,7 @@ export const ToggleSwitch = forwardRef<HTMLInputElement, ToggleSwitchProps>(
         {...(disabled ? { 'data-disabled': '' } : {})}
         {...(error ? { 'data-error': '' } : {})}
       >
-        <div className="ui-toggle-switch__row">
+        <label htmlFor={inputId} className="ui-toggle-switch__row">
           <input
             ref={ref}
             type="checkbox"
@@ -277,11 +277,11 @@ export const ToggleSwitch = forwardRef<HTMLInputElement, ToggleSwitchProps>(
             <span className="ui-toggle-switch__thumb" />
           </span>
           {label && (
-            <label htmlFor={inputId} className="ui-toggle-switch__label">
+            <span className="ui-toggle-switch__label">
               {label}
-            </label>
+            </span>
           )}
-        </div>
+        </label>
         {error && (
           <span id={errorId} className="ui-toggle-switch__error" role="alert">
             {error}

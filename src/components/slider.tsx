@@ -38,6 +38,7 @@ const sliderStyles = css`
         position: relative;
         font-family: inherit;
         inline-size: 100%;
+        -webkit-tap-highlight-color: transparent;
       }
 
       :scope[data-disabled] {
