@@ -18,13 +18,13 @@
     "dist"
   ],
   "scripts": {
-    "build": "tsup && node scripts/extract-css.ts || true",
-"typecheck": "tsc --noEmit",
+    "build": "tsup && node scripts/extract-css.js",
+    "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:a11y": "vitest run --grep a11y",
-    "test:bundle-size": "node scripts/check-bundle-size.ts || true",
-    "preversion": "node scripts/sync-versions.ts",
+    "test:bundle-size": "node scripts/check-bundle-size.js",
+    "preversion": "node scripts/sync-versions.js",
     "postversion": "git push && git push --tags"
   },
   "peerDependencies": {
