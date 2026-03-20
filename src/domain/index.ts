@@ -13,3 +13,4 @@ export { SortableList, type SortableListProps, type SortableItem } from './sorta
 export { KanbanColumn, type KanbanColumnProps, type KanbanCard } from './kanban-column'
 export { TruncatedText, type TruncatedTextProps } from './truncated-text'
 export { CopyBlock, type CopyBlockProps, type CopyBlockLanguage } from './copy-block'
+export { DiffViewer, type DiffViewerProps } from './diff-viewer'
