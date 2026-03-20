@@ -3,9 +3,15 @@
 import { useState, useCallback } from 'react'
 import { NavLink, Outlet, useLocation } from 'react-router-dom'
 import { UIProvider } from '@ui/components/ui-provider'
+import { AppShell } from '@ui/components/app-shell'
+import { Sidebar, SidebarHeader, SidebarContent, SidebarFooter, SidebarItem } from '@ui/components/sidebar'
+import { Navbar } from '@ui/components/navbar'
+import { Drawer } from '@ui/components/drawer'
 import { Icon } from '@ui/core/icons/icon'
 import { css } from '@ui/core/styles/css-tag'
 import { useStyles } from '@ui/core/styles/use-styles'
+
+// ─── Navigation categories ───────────────────────────────────────────────────
 
 const categories = [
   { path: '/', label: 'Home', icon: 'zap' as const },
@@ -18,106 +24,12 @@ const categories = [
   { path: '/docs', label: 'Docs', icon: 'file' as const },
 ]
 
+// ─── Minimal demo-specific styles (layout is handled by components) ──────────
+
 const appStyles = css`
   @layer demo {
-    .demo-layout {
-      display: flex;
-      min-height: 100dvh;
-    }
-
-    /* Desktop sidebar */
-    .demo-sidebar {
-      width: 240px;
-      flex-shrink: 0;
-      border-inline-end: 1px solid var(--border-subtle);
-      background: var(--bg-surface);
-      position: sticky;
-      top: 0;
-      height: 100dvh;
-      display: flex;
-      flex-direction: column;
-      overflow-y: auto;
-      z-index: 30;
-    }
-
-    @media (max-width: 768px) {
-      .demo-sidebar {
-        display: none;
-      }
-    }
-
-    /* Mobile header bar */
-    .demo-mobile-header {
-      display: none;
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      z-index: 40;
-      align-items: center;
-      gap: 0.75rem;
-      padding: 0.75rem 1rem;
-      background: var(--bg-surface);
-      border-bottom: 1px solid var(--border-subtle);
-      backdrop-filter: blur(12px);
-    }
-
-    @media (max-width: 768px) {
-      .demo-mobile-header {
-        display: flex;
-      }
-    }
-
-    /* Mobile sidebar overlay */
-    .demo-mobile-overlay {
-      position: fixed;
-      inset: 0;
-      z-index: 50;
-    }
-
-    .demo-mobile-backdrop {
-      position: absolute;
-      inset: 0;
-      background: oklch(0% 0 0 / 0.6);
-      backdrop-filter: blur(4px);
-    }
-
-    .demo-mobile-drawer {
-      position: absolute;
-      left: 0;
-      top: 0;
-      bottom: 0;
-      width: 280px;
-      background: var(--bg-surface);
-      box-shadow: var(--shadow-lg);
-      display: flex;
-      flex-direction: column;
-      overflow-y: auto;
-      animation: demo-slide-in 0.2s ease-out;
-    }
-
-    @keyframes demo-slide-in {
-      from { transform: translateX(-100%); }
-      to { transform: translateX(0); }
-    }
-
-    /* Main content */
-    .demo-main {
-      flex: 1;
-      min-width: 0;
-      padding: 2rem;
-    }
-
-    @media (max-width: 768px) {
-      .demo-main {
-        padding: 1rem;
-        padding-top: calc(56px + 1rem);
-      }
-    }
-
-    /* Sidebar logo */
+    /* Logo block */
     .demo-logo {
-      padding: 1.25rem;
       display: flex;
       align-items: center;
       gap: 0.75rem;
@@ -130,6 +42,7 @@ const appStyles = css`
       background: var(--brand);
       display: grid;
       place-items: center;
+      flex-shrink: 0;
     }
 
     .demo-logo-text {
@@ -143,45 +56,8 @@ const appStyles = css`
       color: var(--text-tertiary);
     }
 
-    /* Nav links */
-    .demo-nav {
-      flex: 1;
-      padding: 0 0.75rem;
-    }
-
-    .demo-nav-link {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      padding: 0.5rem 0.75rem;
-      border-radius: var(--radius-md);
-      font-size: var(--text-sm);
-      color: var(--text-secondary);
-      margin-bottom: 0.125rem;
-      transition: all 0.15s;
-      text-decoration: none;
-    }
-
-    .demo-nav-link:hover {
-      background: oklch(100% 0 0 / 0.04);
-      color: var(--text-primary);
-    }
-
-    .demo-nav-link--active {
-      color: var(--brand);
-      background: var(--brand-subtle);
-      font-weight: 600;
-    }
-
-    .demo-nav-link--active:hover {
-      background: var(--brand-subtle);
-      color: var(--brand);
-    }
-
-    /* Controls footer */
+    /* Controls */
     .demo-controls {
-      padding: 0.75rem;
-      border-block-start: 1px solid var(--border-subtle);
       display: flex;
       flex-direction: column;
       gap: 0.5rem;
@@ -199,7 +75,6 @@ const appStyles = css`
       min-width: 3rem;
     }
 
-    /* Motion level buttons */
     .demo-motion-btn {
       width: 28px;
       height: 28px;
@@ -231,7 +106,6 @@ const appStyles = css`
       border-color: var(--brand);
     }
 
-    /* Theme toggle button */
     .demo-theme-toggle {
       display: flex;
       align-items: center;
@@ -254,29 +128,11 @@ const appStyles = css`
       border-color: var(--border-strong);
     }
 
-    /* Close button for mobile drawer */
-    .demo-close-btn {
-      position: absolute;
-      top: 0.75rem;
-      right: 0.75rem;
-      width: 32px;
-      height: 32px;
-      border-radius: var(--radius-sm);
-      border: none;
-      background: transparent;
-      color: var(--text-secondary);
-      cursor: pointer;
-      display: grid;
-      place-items: center;
-      z-index: 1;
-    }
-
-    .demo-close-btn:hover {
-      background: oklch(100% 0 0 / 0.06);
-    }
-
-    /* Hamburger button */
-    .demo-hamburger {
+    /* Icon button (navbar actions) */
+    .demo-icon-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
       padding: 0.375rem;
       border-radius: var(--radius-md);
       border: none;
@@ -285,46 +141,71 @@ const appStyles = css`
       cursor: pointer;
     }
 
-    .demo-hamburger:hover {
+    .demo-icon-btn:hover {
       background: oklch(100% 0 0 / 0.06);
+    }
+
+    /* Main content area */
+    .demo-main {
+      padding: 2rem;
+    }
+
+    @media (max-width: 768px) {
+      .demo-main {
+        padding: 1rem;
+      }
+    }
+
+    /* Drawer nav links */
+    .demo-drawer-nav {
+      display: flex;
+      flex-direction: column;
+      gap: 0.125rem;
+      padding: 0.75rem 0;
+    }
+
+    .demo-drawer-link {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.5rem 0.75rem;
+      border-radius: var(--radius-md);
+      font-size: var(--text-sm);
+      color: var(--text-secondary);
+      text-decoration: none;
+      transition: all 0.15s;
+    }
+
+    .demo-drawer-link:hover {
+      background: oklch(100% 0 0 / 0.04);
+      color: var(--text-primary);
+    }
+
+    .demo-drawer-link--active {
+      color: var(--brand);
+      background: var(--brand-subtle);
+      font-weight: 600;
     }
   }
 `
 
-function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
-  return (
-    <>
-      <div className="demo-logo">
-        <div className="demo-logo-icon">
-          <Icon name="zap" size="sm" style={{ color: 'white' }} />
-        </div>
-        <div>
-          <div className="demo-logo-text">ui-kit v2</div>
-          <div className="demo-logo-sub">Aurora Fluid</div>
-        </div>
-      </div>
+// ─── Shared sub-components ───────────────────────────────────────────────────
 
-      <nav className="demo-nav">
-        {categories.map(c => (
-          <NavLink
-            key={c.path}
-            to={c.path}
-            end={c.path === '/'}
-            onClick={onNavigate}
-            className={({ isActive }) =>
-              `demo-nav-link${isActive ? ' demo-nav-link--active' : ''}`
-            }
-          >
-            <Icon name={c.icon} size="sm" />
-            {c.label}
-          </NavLink>
-        ))}
-      </nav>
-    </>
+function Logo() {
+  return (
+    <div className="demo-logo">
+      <div className="demo-logo-icon">
+        <Icon name="zap" size="sm" style={{ color: 'white' }} />
+      </div>
+      <div>
+        <div className="demo-logo-text">ui-kit v2</div>
+        <div className="demo-logo-sub">Aurora Fluid</div>
+      </div>
+    </div>
   )
 }
 
-function SidebarControls({
+function DemoControls({
   motion,
   setMotion,
   light,
@@ -357,70 +238,123 @@ function SidebarControls({
   )
 }
 
+// ─── App ─────────────────────────────────────────────────────────────────────
+
 export default function App() {
   const [light, setLight] = useState(false)
   const [motion, setMotion] = useState(3)
-  const [mobileOpen, setMobileOpen] = useState(false)
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
+  const [drawerOpen, setDrawerOpen] = useState(false)
   const location = useLocation()
 
   useStyles('demo-app', appStyles)
 
-  const closeMobile = useCallback(() => setMobileOpen(false), [])
   const toggleTheme = useCallback(() => setLight(l => !l), [])
+  const closeDrawer = useCallback(() => setDrawerOpen(false), [])
+
+  // ── Sidebar (desktop — hidden at <=768px by AppShell) ──
+  const sidebar = (
+    <Sidebar
+      collapsed={sidebarCollapsed}
+      onCollapse={setSidebarCollapsed}
+    >
+      <SidebarHeader>
+        <Logo />
+      </SidebarHeader>
+
+      <SidebarContent>
+        {categories.map(c => (
+          <NavLink key={c.path} to={c.path} end={c.path === '/'} style={{ textDecoration: 'none' }}>
+            {({ isActive }) => (
+              <SidebarItem
+                icon={<Icon name={c.icon} size="sm" />}
+                label={c.label}
+                active={isActive}
+              />
+            )}
+          </NavLink>
+        ))}
+      </SidebarContent>
+
+      <SidebarFooter>
+        <DemoControls
+          motion={motion}
+          setMotion={setMotion}
+          light={light}
+          onToggleTheme={toggleTheme}
+        />
+      </SidebarFooter>
+    </Sidebar>
+  )
+
+  // ── Navbar (visible at all sizes; hamburger opens Drawer on mobile) ──
+  const navbar = (
+    <Navbar
+      bordered
+      sticky
+      logo={<Logo />}
+      actions={
+        <>
+          <button
+            className="demo-icon-btn"
+            onClick={toggleTheme}
+            aria-label="Toggle theme"
+          >
+            <Icon name={light ? 'eye-off' : 'eye'} size="sm" />
+          </button>
+          <button
+            className="demo-icon-btn"
+            onClick={() => setDrawerOpen(true)}
+            aria-label="Open navigation"
+          >
+            <Icon name="menu" size="md" />
+          </button>
+        </>
+      }
+    />
+  )
 
   return (
     <UIProvider motion={motion as 0 | 1 | 2 | 3} mode={light ? 'light' : 'dark'}>
-      <div className="demo-layout">
-        {/* Desktop sidebar */}
-        <aside className="demo-sidebar">
-          <SidebarContent />
-          <SidebarControls
-            motion={motion}
-            setMotion={setMotion}
-            light={light}
-            onToggleTheme={toggleTheme}
-          />
-        </aside>
-
-        {/* Mobile header */}
-        <div className="demo-mobile-header">
-          <button className="demo-hamburger" onClick={() => setMobileOpen(true)}>
-            <Icon name="menu" size="md" />
-          </button>
-          <span style={{ fontSize: 'var(--text-sm)', fontWeight: 600, color: 'var(--text-primary)' }}>
-            ui-kit v2
-          </span>
-          <div style={{ marginInlineStart: 'auto' }}>
-            <button className="demo-hamburger" onClick={toggleTheme}>
-              <Icon name={light ? 'eye-off' : 'eye'} size="sm" />
-            </button>
+      <AppShell
+        navbar={navbar}
+        sidebar={sidebar}
+        sidebarCollapsed={sidebarCollapsed}
+      >
+        {/* Mobile drawer — sidebar content as overlay */}
+        <Drawer open={drawerOpen} onClose={closeDrawer} side="left" size="sm">
+          <Logo />
+          <nav className="demo-drawer-nav">
+            {categories.map(c => (
+              <NavLink
+                key={c.path}
+                to={c.path}
+                end={c.path === '/'}
+                onClick={closeDrawer}
+                className={({ isActive }) =>
+                  `demo-drawer-link${isActive ? ' demo-drawer-link--active' : ''}`
+                }
+              >
+                <Icon name={c.icon} size="sm" />
+                {c.label}
+              </NavLink>
+            ))}
+          </nav>
+          <div style={{ marginBlockStart: 'auto', paddingBlockStart: '1rem' }}>
+            <DemoControls
+              motion={motion}
+              setMotion={setMotion}
+              light={light}
+              onToggleTheme={() => { toggleTheme(); closeDrawer() }}
+            />
           </div>
-        </div>
-
-        {/* Mobile sidebar overlay */}
-        {mobileOpen && (
-          <div className="demo-mobile-overlay">
-            <div className="demo-mobile-backdrop" onClick={closeMobile} />
-            <div className="demo-mobile-drawer">
-              <button className="demo-close-btn" onClick={closeMobile}>
-                <Icon name="x" size="sm" />
-              </button>
-              <SidebarContent onNavigate={closeMobile} />
-              <SidebarControls
-                motion={motion}
-                setMotion={setMotion}
-                light={light}
-                onToggleTheme={() => { toggleTheme(); closeMobile() }}
-              />
-            </div>
-          </div>
-        )}
+        </Drawer>
 
         {/* Main content */}
         <main className="demo-main" key={location.pathname}>
           <Outlet />
         </main>
-      </div>
+      </AppShell>
     </UIProvider>
   )
 }
