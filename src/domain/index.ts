@@ -14,3 +14,4 @@ export { KanbanColumn, type KanbanColumnProps, type KanbanCard } from './kanban-
 export { TruncatedText, type TruncatedTextProps } from './truncated-text'
 export { CopyBlock, type CopyBlockProps, type CopyBlockLanguage } from './copy-block'
 export { DiffViewer, type DiffViewerProps } from './diff-viewer'
+export { EmptyState, type EmptyStateProps } from './empty-state'
