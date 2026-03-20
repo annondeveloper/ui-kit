@@ -13,6 +13,7 @@ const categories = [
   { path: '/data', label: 'Data', icon: 'bar-chart' as const },
   { path: '/monitor', label: 'Monitoring', icon: 'activity' as const },
   { path: '/ai', label: 'AI & Realtime', icon: 'terminal' as const },
+  { path: '/docs', label: 'Docs', icon: 'file' as const },
 ]
 
 export default function App() {
