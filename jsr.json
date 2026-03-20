@@ -1,14 +1,23 @@
 {
   "name": "@annondeveloper/ui-kit",
-  "version": "2.0.0-alpha.0",
+  "version": "2.0.0",
   "exports": {
     ".": "./src/index.ts",
     "./form": "./src/form.ts",
     "./theme": "./src/theme.ts"
   },
   "publish": {
-    "include": ["src/", "LICENSE", "README.md"],
-    "exclude": ["src/__tests__/", "src/cli/", "**/*.stories.tsx", "**/*.test.tsx"]
+    "include": [
+      "src/",
+      "LICENSE",
+      "README.md"
+    ],
+    "exclude": [
+      "src/__tests__/",
+      "src/cli/",
+      "**/*.stories.tsx",
+      "**/*.test.tsx"
+    ]
   },
   "imports": {
     "react": "npm:react@^19",
