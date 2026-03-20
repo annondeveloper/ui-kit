@@ -7,3 +7,4 @@ storybook-static/
 demo/node_modules/
 demo/.next/
 demo/out/
+.superpowers/
