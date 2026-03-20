@@ -23,3 +23,4 @@ export { SeverityTimeline, type SeverityTimelineProps, type TimelineEvent } from
 export { LogViewer, type LogViewerProps, type LogLine } from './log-viewer'
 export { PortStatusGrid, type PortStatusGridProps, type PortStatus } from './port-status-grid'
 export { PipelineStage, type PipelineStageProps, type Stage } from './pipeline-stage'
+export { UptimeTracker, type UptimeTrackerProps, type UptimeDay } from './uptime-tracker'
