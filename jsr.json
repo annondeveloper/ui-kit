@@ -1,28 +1,17 @@
 {
   "name": "@annondeveloper/ui-kit",
-  "version": "0.4.0",
+  "version": "2.0.0-alpha.0",
   "exports": {
     ".": "./src/index.ts",
-    "./form": "./src/form.ts"
+    "./form": "./src/form.ts",
+    "./theme": "./src/theme.ts"
   },
   "publish": {
     "include": ["src/", "LICENSE", "README.md"],
-    "exclude": ["src/__tests__/", "src/cli/", "**/*.stories.tsx", "**/*.css"]
+    "exclude": ["src/__tests__/", "src/cli/", "**/*.stories.tsx", "**/*.test.tsx"]
   },
   "imports": {
     "react": "npm:react@^19",
-    "react-dom": "npm:react-dom@^19",
-    "framer-motion": "npm:framer-motion@^12",
-    "lucide-react": "npm:lucide-react@^0.577.0",
-    "clsx": "npm:clsx@^2",
-    "tailwind-merge": "npm:tailwind-merge@^3",
-    "sonner": "npm:sonner@^2",
-    "@radix-ui/react-select": "npm:@radix-ui/react-select@^2",
-    "@radix-ui/react-alert-dialog": "npm:@radix-ui/react-alert-dialog@^1",
-    "@radix-ui/react-tooltip": "npm:@radix-ui/react-tooltip@^1",
-    "@radix-ui/react-dropdown-menu": "npm:@radix-ui/react-dropdown-menu@^2",
-    "@radix-ui/react-popover": "npm:@radix-ui/react-popover@^1",
-    "@tanstack/react-table": "npm:@tanstack/react-table@^8",
-    "react-hook-form": "npm:react-hook-form@^7"
+    "react-dom": "npm:react-dom@^19"
   }
 }
