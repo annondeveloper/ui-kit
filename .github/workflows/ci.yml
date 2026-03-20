@@ -2,12 +2,12 @@ name: CI
 
 on:
   push:
-    branches: [main]
+    branches: [main, v2]
   pull_request:
-    branches: [main]
+    branches: [main, v2]
 
 jobs:
-  build:
+  build-test:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -19,3 +19,4 @@ jobs:
       - run: npm run typecheck
       - run: npm run build
       - run: npm test
+      - run: npm run test:bundle-size
