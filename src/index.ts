@@ -10,3 +10,6 @@ export * from './core/forms'
 
 // Components
 export * from './components'
+
+// Domain
+export * from './domain'
