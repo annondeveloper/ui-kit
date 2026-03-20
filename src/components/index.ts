@@ -9,3 +9,4 @@ export { RadioGroup, type RadioGroupProps, type RadioOption } from './radio-grou
 export { ToggleSwitch, type ToggleSwitchProps } from './toggle-switch'
 export { Slider, type SliderProps } from './slider'
 export { StatusBadge, type StatusBadgeProps } from './status-badge'
+export { StatusPulse, type StatusPulseProps } from './status-pulse'
