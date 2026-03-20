@@ -16,3 +16,4 @@ export { CopyBlock, type CopyBlockProps, type CopyBlockLanguage } from './copy-b
 export { DiffViewer, type DiffViewerProps } from './diff-viewer'
 export { EmptyState, type EmptyStateProps } from './empty-state'
 export { MetricCard, type MetricCardProps } from './metric-card'
+export { Sparkline, type SparklineProps } from './sparkline'
