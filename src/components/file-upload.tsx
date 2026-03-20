@@ -20,7 +20,7 @@ import { Icon } from '../core/icons'
 
 // ─── Types ──────────────────────────────────────────────────────────────────
 
-export interface FileUploadProps extends Omit<HTMLAttributes<HTMLDivElement>, 'onChange'> {
+export interface FileUploadProps extends Omit<HTMLAttributes<HTMLDivElement>, 'onChange' | 'onError'> {
   name: string
   accept?: string
   multiple?: boolean
