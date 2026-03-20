@@ -14,3 +14,4 @@ export { SuccessCheckmark, type SuccessCheckmarkProps } from './success-checkmar
 export { AnimatedCounter, type AnimatedCounterProps } from './animated-counter'
 export { FormInput, type FormInputProps } from './form-input'
 export { Select, type SelectProps, type SelectOption } from './select'
+export { Combobox, type ComboboxProps, type ComboboxOption } from './combobox'
