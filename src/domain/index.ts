@@ -25,3 +25,4 @@ export { PortStatusGrid, type PortStatusGridProps, type PortStatus } from './por
 export { PipelineStage, type PipelineStageProps, type Stage } from './pipeline-stage'
 export { UptimeTracker, type UptimeTrackerProps, type UptimeDay } from './uptime-tracker'
 export { TimeRangeSelector, type TimeRangeSelectorProps, type TimeRangePreset } from './time-range-selector'
+export { HeatmapCalendar, type HeatmapCalendarProps, type HeatmapData } from './heatmap-calendar'
