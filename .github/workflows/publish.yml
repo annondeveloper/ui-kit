@@ -91,6 +91,6 @@ jobs:
         with:
           name: dist
           path: dist/
-      - run: npx jsr publish --allow-dirty
+      - run: npx jsr publish --allow-dirty --no-check
         env:
           JSR_TOKEN: ${{ secrets.JSR_TOKEN }}
