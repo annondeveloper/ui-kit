@@ -105,9 +105,9 @@ export default function AIPage() {
         {/* TypingIndicator */}
         <Preview label="TypingIndicator" description="Chat-style typing animation">
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-            <TypingIndicator label="Claude is thinking..." />
+            <TypingIndicator label="AI is thinking..." />
             <TypingIndicator
-              avatar={<Avatar name="Claude" size="sm" />}
+              avatar={<Avatar name="Assistant" size="sm" />}
               label="Generating response..."
               size="md"
             />

@@ -12,7 +12,7 @@ export default meta
 type Story = StoryObj<typeof TypingIndicator>
 
 export const Default: Story = {
-  args: { label: 'Claude is typing' },
+  args: { label: 'AI is typing' },
 }
 
 export const WithAvatar: Story = {
