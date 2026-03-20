@@ -22,3 +22,4 @@ export { UtilizationBar, type UtilizationBarProps, type UtilizationSegment } fro
 export { SeverityTimeline, type SeverityTimelineProps, type TimelineEvent } from './severity-timeline'
 export { LogViewer, type LogViewerProps, type LogLine } from './log-viewer'
 export { PortStatusGrid, type PortStatusGridProps, type PortStatus } from './port-status-grid'
+export { PipelineStage, type PipelineStageProps, type Stage } from './pipeline-stage'
