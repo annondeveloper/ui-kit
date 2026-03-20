@@ -34,6 +34,102 @@ function App() {
 - **Responsive** — container queries, fluid typography, touch/mouse/gamepad support
 - **Theme generator** — generate complete theme from single brand color
 
+## Documentation
+
+- [Migration Guide](docs/migration-v2.md) -- Upgrading from v1 to v2
+- [Theming](docs/theming.md) -- OKLCH colors, theme generation, customization
+- [Form Engine](docs/forms.md) -- Built-in form state, validators, auto-wiring
+- [Animation](docs/animation.md) -- Physics springs, timeline, stagger, scroll
+- [Design Spec](docs/superpowers/specs/2026-03-20-ui-kit-v2-design.md) -- Full architecture document
+
+## Component List
+
+### Core Components (31)
+
+| Component | Description |
+|-----------|-------------|
+| `AnimatedCounter` | Smooth number animation with easing |
+| `Avatar` | Image/initials avatar with status dot |
+| `Badge` | Pill-shaped label with color presets |
+| `Button` | Primary action with variants and loading |
+| `Card` | Styled container with subcomponents |
+| `Checkbox` | Themed checkbox with indeterminate state |
+| `ColorInput` | Color picker with hue/saturation panel |
+| `Combobox` | Searchable select with async loading |
+| `ConfirmDialog` | Confirmation modal with danger variant |
+| `Dialog` | Native dialog with animated entry/exit |
+| `DropdownMenu` | Action menu with submenus and shortcuts |
+| `FileUpload` | Drag-and-drop file upload with preview |
+| `FilterPill` | Rounded filter toggle with count |
+| `FormInput` | Themed input with label and validation |
+| `InlineEdit` | Click-to-edit text field |
+| `NativeTooltip` | Lightweight tooltip using title attribute |
+| `Popover` | Anchored popover with arrow and focus management |
+| `Progress` | Progress bar with indeterminate mode |
+| `RadioGroup` | Radio button group with descriptions |
+| `ScrollReveal` | Scroll-triggered reveal animation |
+| `Select` | Themed dropdown select |
+| `Sheet` | Slide-over drawer with swipe dismiss |
+| `Skeleton` | Shimmer loading placeholder |
+| `Slider` | Range slider with keyboard support |
+| `StatusBadge` | Status indicator with colored dot |
+| `StatusPulse` | Animated status dot with pulse ring |
+| `SuccessCheckmark` | Animated SVG checkmark |
+| `Tabs` | Tabbed interface with animated indicator |
+| `ToggleSwitch` | Boolean toggle switch |
+| `Tooltip` | Popover-based tooltip with positioning |
+| `UIProvider` | Theme, motion, and density provider |
+
+### Domain Components (34)
+
+| Component | Description |
+|-----------|-------------|
+| `CommandBar` | Universal command palette (Cmd+K) |
+| `ConfidenceBar` | Probability bar with threshold zones |
+| `CopyBlock` | Code display with one-click copy |
+| `DataTable` | Full-featured data grid with search, sort, filter |
+| `DiffViewer` | Side-by-side/inline diff viewer |
+| `EmptyState` | Decorative placeholder with icon and actions |
+| `HeatmapCalendar` | GitHub-style contribution heatmap |
+| `InfiniteScroll` | Virtualized infinite-scroll list |
+| `KanbanColumn` | Kanban board column with cards |
+| `LiveFeed` | Real-time event feed with auto-scroll |
+| `LogViewer` | Log stream viewer with severity colors |
+| `MetricCard` | Dashboard stat tile with sparkline |
+| `NotificationStack` | Toast notification cards with auto-dismiss |
+| `PipelineStage` | Horizontal pipeline visualization |
+| `PortStatusGrid` | Network port status indicator grid |
+| `RealtimeValue` | Live data display with freshness tracking |
+| `ResponsiveCard` | Container-query adaptive card |
+| `SeverityTimeline` | Event timeline with severity dots |
+| `SmartTable` | DataTable with auto-generated filter suggestions |
+| `SortableList` | Drag-and-drop reorderable list |
+| `Sparkline` | Inline SVG sparkline chart |
+| `StepWizard` | Multi-step form wizard |
+| `StreamingText` | AI/LLM streaming text with cursor |
+| `ThresholdGauge` | Semicircular gauge with threshold zones |
+| `TimeRangeSelector` | Compact time range pill selector |
+| `Toast` | Pre-themed toast notifications |
+| `TreeView` | Hierarchical tree with expand/collapse |
+| `TruncatedText` | Auto-truncating text with tooltip |
+| `TypingIndicator` | "Someone is typing" animation |
+| `UptimeTracker` | Daily uptime bar strip |
+| `UtilizationBar` | Horizontal bar with threshold colors |
+| `ViewTransitionLink` | View Transitions API integration |
+
+### Core Engine Modules
+
+| Module | Size | Description |
+|--------|------|-------------|
+| `core/styles` | ~1KB | useStyles(), css tag, adoptedStyleSheets, SSR |
+| `core/motion` | ~3.5KB | Spring solver, WAAPI, timeline, stagger, scroll, FLIP |
+| `core/input` | ~2.4KB | Unified pointer, gestures, focus, gamepad, multitouch |
+| `core/tokens` | ~1.5KB | OKLCH theme, generateTheme(), applyTheme() |
+| `core/a11y` | ~1KB | Focus trap, roving tabindex, live region, stable ID |
+| `core/icons` | ~2KB | 50+ built-in SVG icons, all overridable |
+| `core/forms` | ~2KB | createForm, useForm, validators, Form, FieldArray |
+| `core/utils` | ~0.5KB | cn(), formatting, sanitize, clamp |
+
 ## Entry Points
 
 ```typescript
