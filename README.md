@@ -1,4 +1,57 @@
-# @annondeveloper/ui-kit
+# @annondeveloper/ui-kit v2
+
+> Zero-dependency React component library with 62 components, physics-based animations, OKLCH color system, and Aurora Fluid design.
+
+## Quick Start
+
+```bash
+npm install @annondeveloper/ui-kit
+```
+
+```tsx
+import { UIProvider, Button, Card, MetricCard } from '@annondeveloper/ui-kit'
+
+function App() {
+  return (
+    <UIProvider>
+      <Card>
+        <Button variant="primary">Deploy</Button>
+        <MetricCard title="CPU" value="87.4%" trend="up" />
+      </Card>
+    </UIProvider>
+  )
+}
+```
+
+## Features
+
+- **Zero dependencies** — only `react` and `react-dom` peer deps
+- **62 components** — primitives, forms, overlays, data, monitoring, AI/real-time
+- **Aurora Fluid design** — deep atmospheric surfaces, ambient glows, OKLCH colors
+- **Physics animations** — real spring solver, configurable motion levels (0-3)
+- **Built-in form engine** — `createForm`, `useForm`, validators, zero external deps
+- **Accessibility** — WAI-ARIA patterns, keyboard navigation, screen reader support
+- **Responsive** — container queries, fluid typography, touch/mouse/gamepad support
+- **Theme generator** — generate complete theme from single brand color
+
+## Entry Points
+
+```typescript
+import { Button, Dialog, DataTable } from '@annondeveloper/ui-kit'
+import { createForm, useForm, v } from '@annondeveloper/ui-kit/form'
+import { generateTheme, themeToCSS } from '@annondeveloper/ui-kit/theme'
+import '@annondeveloper/ui-kit/css/theme.css'  // Standalone CSS (optional)
+```
+
+## Motion Levels
+
+```tsx
+<UIProvider motion={2}>  {/* 0=none, 1=subtle, 2=expressive, 3=cinematic */}
+```
+
+---
+
+## v1 Documentation
 
 > The React component library for monitoring dashboards, infrastructure tools, and professional applications.
 
