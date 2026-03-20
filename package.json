@@ -19,8 +19,7 @@
   ],
   "scripts": {
     "build": "tsup && node scripts/extract-css.ts || true",
-    "build:cli": "tsup --config tsup.cli.config.ts",
-    "typecheck": "tsc --noEmit",
+"typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:a11y": "vitest run --grep a11y",

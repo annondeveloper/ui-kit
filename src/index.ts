@@ -6,6 +6,7 @@ export * from './core/icons'
 export * from './core/a11y'
 export * from './core/input'
 export * from './core/utils'
+export * from './core/forms'
 
 // Components (to be added as they're built)
 // export * from './components/button'
