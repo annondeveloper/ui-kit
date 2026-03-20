@@ -4,3 +4,4 @@ export { NotificationStack, type NotificationStackProps, type Notification } fro
 export { StepWizard, type StepWizardProps, type Step } from './step-wizard'
 export { ScrollReveal, type ScrollRevealProps } from './scroll-reveal'
 export { InfiniteScroll, type InfiniteScrollProps } from './infinite-scroll'
+export { ViewTransitionLink, type ViewTransitionLinkProps } from './view-transition-link'
