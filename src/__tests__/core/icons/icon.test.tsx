@@ -78,8 +78,7 @@ describe('Icon', () => {
   })
 
   it('returns null for unknown icon name', () => {
-    // @ts-expect-error — intentionally testing unknown name
-    const { container } = render(<Icon name="nonexistent-icon" />)
+    const { container } = render(<Icon name={"nonexistent-icon" as any} />)
     expect(container.querySelector('svg')).toBeNull()
   })
 

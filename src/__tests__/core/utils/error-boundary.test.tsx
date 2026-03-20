@@ -157,7 +157,7 @@ describe('ComponentErrorBoundary', () => {
 
   describe('edge cases', () => {
     it('handles error with no message', () => {
-      function ThrowNoMessage() {
+      function ThrowNoMessage(): React.JSX.Element {
         throw new Error()
       }
       render(
