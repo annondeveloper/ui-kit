@@ -3,3 +3,4 @@ export { CommandBar, type CommandBarProps, type CommandItem } from './command-ba
 export { NotificationStack, type NotificationStackProps, type Notification } from './notification-stack'
 export { StepWizard, type StepWizardProps, type Step } from './step-wizard'
 export { ScrollReveal, type ScrollRevealProps } from './scroll-reveal'
+export { InfiniteScroll, type InfiniteScrollProps } from './infinite-scroll'
