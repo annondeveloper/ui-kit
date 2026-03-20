@@ -123,29 +123,27 @@ const buttonStyles = css`
       :scope[data-loading="true"]::after {
         content: '';
         position: absolute;
-        inset: 0;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        /* Spinner */
-        border: 2px solid oklch(100% 0 0 / 0.3);
-        border-inline-start-color: oklch(100% 0 0);
-        border-radius: var(--radius-full);
         inline-size: 1em;
         block-size: 1em;
-        margin: auto;
+        inset-block-start: 50%;
+        inset-inline-start: 50%;
+        translate: -50% -50%;
+        border: 2px solid currentColor;
+        border-inline-start-color: transparent;
+        border-radius: var(--radius-full);
+        opacity: 0.8;
         animation: ui-button-spin 0.6s linear infinite;
       }
 
       /* Active press — motion level 1+ */
-      :scope:active:not(:disabled) {
+      :scope:active:not(:disabled):not([data-motion="0"]) {
         transform: scale(0.97);
         transition-duration: 0.05s;
       }
 
       /* Hover lift — motion level 1+ */
       @media (hover: hover) {
-        :scope:hover:not(:disabled):not(:active) {
+        :scope:hover:not(:disabled):not(:active):not([data-motion="0"]) {
           transform: translateY(-1px);
         }
       }

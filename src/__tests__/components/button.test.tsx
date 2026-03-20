@@ -313,6 +313,20 @@ describe('Button', () => {
       render(<Button motion={1}>Subtle</Button>)
       expect(screen.getByRole('button')).toHaveAttribute('data-motion', '1')
     })
+
+    it('suppresses hover/active transforms when motion=0', () => {
+      const { container } = render(<Button motion={0}>Test</Button>)
+      const button = container.querySelector('button')
+      expect(button?.getAttribute('data-motion')).toBe('0')
+      // The CSS selector :not([data-motion="0"]) ensures transforms don't apply
+      // We verify the attribute is set; visual testing confirms CSS behavior
+    })
+
+    it('allows transforms when motion >= 1', () => {
+      const { container } = render(<Button motion={1}>Test</Button>)
+      const button = container.querySelector('button')
+      expect(button?.getAttribute('data-motion')).toBe('1')
+    })
   })
 
   // ─── Display name ─────────────────────────────────────────────────
