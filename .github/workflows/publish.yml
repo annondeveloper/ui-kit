@@ -4,6 +4,10 @@ on:
   release:
     types: [published]
 
+concurrency:
+  group: publish
+  cancel-in-progress: false
+
 jobs:
   # Build and test once, then publish to all registries
   build:
@@ -40,7 +44,8 @@ jobs:
         with:
           node-version: 22
           registry-url: https://npm.pkg.github.com
-      - run: npm publish
+      # Skip prepublishOnly — build job already validated
+      - run: npm publish --ignore-scripts
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -61,7 +66,11 @@ jobs:
         with:
           node-version: 22
           registry-url: https://registry.npmjs.org
-      - run: npm publish --access public --provenance
+      # Override project .npmrc so scoped package goes to npmjs, not GitHub Packages
+      - name: Configure npm for public registry
+        run: echo "//registry.npmjs.org/:_authToken=\${NODE_AUTH_TOKEN}" > .npmrc
+      # Skip prepublishOnly — build job already validated
+      - run: npm publish --access public --provenance --ignore-scripts
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
