@@ -1,1 +1,6 @@
-export {}
+export { usePointer, type PointerContext, type DragContext, type PointerHandlers } from './pointer'
+export { useGesture, type GestureHandlers } from './gestures'
+export { useFocusMethod, type FocusMethod } from './focus'
+export { useGamepadNavigation, type GamepadConfig } from './gamepad'
+export { haptic, type HapticType } from './haptics'
+export { useMultiTouch, type TouchZone } from './multitouch'
