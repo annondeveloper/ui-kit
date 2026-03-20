@@ -51,6 +51,8 @@ jobs:
         with:
           name: dist
           path: dist/
+      - name: Remove .npmrc scope override for public npm
+        run: rm -f .npmrc
       - run: npm publish --access public --provenance
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
@@ -75,12 +77,20 @@ jobs:
   publish-jsr:
     needs: build
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
       - uses: actions/download-artifact@v4
         with:
           name: dist
           path: dist/
-      - run: npx jsr publish
+      - run: npx jsr publish --allow-dirty
         env:
           JSR_TOKEN: ${{ secrets.JSR_TOKEN }}
