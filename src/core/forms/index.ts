@@ -9,3 +9,9 @@ export type { FormState, FieldProps } from './use-form'
 
 export { FormContextProvider, useFormContext, useFormContextOptional } from './form-context'
 export type { FormContextProviderProps } from './form-context'
+
+export { Form } from './form-component'
+export type { FormProps } from './form-component'
+
+export { FieldArray } from './field-array'
+export type { FieldArrayProps, FieldArrayRenderProps, FieldArrayItem } from './field-array'
