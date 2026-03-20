@@ -1,145 +1,163 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
-import { Preview, useInViewTimer } from '../components/Preview.tsx'
-import {
-  StreamingText, TypingIndicator, ConfidenceBar,
-  RealtimeValue, LiveFeed,
-  type FeedItem,
-} from '@ui/index'
+import { Preview } from '../components/Preview'
+import { StreamingText } from '@ui/domain/streaming-text'
+import { TypingIndicator } from '@ui/domain/typing-indicator'
+import { ConfidenceBar } from '@ui/domain/confidence-bar'
+import { LiveFeed } from '@ui/domain/live-feed'
+import { RealtimeValue } from '@ui/domain/realtime-value'
+import { Button } from '@ui/components/button'
+import { Card } from '@ui/components/card'
+import { Avatar } from '@ui/components/avatar'
+import type { FeedItem } from '@ui/domain/live-feed'
 
-const AI_TEXT = `Analyzing **network topology** for anomalies...
+const streamingParagraph = `The Aurora Fluid design system represents a new paradigm in component library design. By combining perceptually uniform OKLCH colors with physics-based spring animations, we achieve a level of visual fidelity that was previously only possible with hand-crafted animations. Every transition is governed by real differential equations, not bezier approximations. The result is interfaces that feel alive — responsive, natural, and deeply satisfying to interact with.`
 
-Found \`3 degraded links\` across the backbone. The primary issue appears to be on the **core-sw-01 -> dist-sw-03** segment where packet loss exceeds 2.1%.
-
-Recommendation: Check the fiber patch panel in **Rack A-14** and run \`show interfaces counters errors\` on both endpoints.`
-
-function useStreamingDemo() {
-  const [text, setText] = useState('')
-  const [streaming, setStreaming] = useState(true)
-  const idx = useRef(0)
-
-  useEffect(() => {
-    const id = setInterval(() => {
-      if (idx.current < AI_TEXT.length) {
-        const chunk = Math.min(3, AI_TEXT.length - idx.current)
-        setText(AI_TEXT.slice(0, idx.current + chunk))
-        idx.current += chunk
-      } else {
-        setStreaming(false)
-        clearInterval(id)
-        setTimeout(() => { idx.current = 0; setText(''); setStreaming(true) }, 5000)
-      }
-    }, 30)
-    return () => clearInterval(id)
-  }, [streaming])
-
-  return { text, streaming }
+const grid: React.CSSProperties = {
+  display: 'grid',
+  gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))',
+  gap: '1rem',
 }
 
-export function AIPage() {
-  const { text, streaming } = useStreamingDemo()
-  const [rtValue, setRtValue] = useState(1247)
-  const [rtPrev, setRtPrev] = useState(1200)
-  const [feedItems, setFeedItems] = useState<FeedItem[]>([
-    { id: '1', content: 'Interface Gi0/0/1 on core-sw-01 flapped', timestamp: new Date(Date.now() - 30000), type: 'warning' },
-    { id: '2', content: 'BGP session with 198.51.100.1 established', timestamp: new Date(Date.now() - 60000), type: 'success' },
-    { id: '3', content: 'SNMP collection completed for 47 devices', timestamp: new Date(Date.now() - 120000), type: 'info' },
-  ])
-  const [confidenceValues, setConfidenceValues] = useState([0, 0, 0])
-  const confidenceAnimated = useRef(false)
+export default function AIPage() {
+  const [streamKey, setStreamKey] = useState(0)
+  const [streamText, setStreamText] = useState('')
+  const [streaming, setStreaming] = useState(true)
+  const charIndex = useRef(0)
 
-  const updateRt = useCallback(() => {
-    setRtPrev(rtValue)
-    setRtValue(p => p + Math.floor(Math.random() * 100 - 30))
-  }, [rtValue])
-
-  const rtRef = useInViewTimer(2500, updateRt)
-
-  // Animate confidence bars on viewport enter
-  const confRef = useRef<HTMLDivElement>(null)
+  // Simulate streaming text character by character
   useEffect(() => {
-    const el = confRef.current
-    if (!el) return
-    const obs = new IntersectionObserver(([entry]) => {
-      if (entry.isIntersecting && !confidenceAnimated.current) {
-        confidenceAnimated.current = true
-        setTimeout(() => setConfidenceValues([0.92, 0.65, 0.23]), 200)
+    charIndex.current = 0
+    setStreamText('')
+    setStreaming(true)
+    const interval = setInterval(() => {
+      if (charIndex.current < streamingParagraph.length) {
+        setStreamText(streamingParagraph.slice(0, charIndex.current + 1))
+        charIndex.current++
+      } else {
+        setStreaming(false)
+        clearInterval(interval)
       }
-    }, { threshold: 0.3 })
-    obs.observe(el)
-    return () => obs.disconnect()
-  }, [])
+    }, 20)
+    return () => clearInterval(interval)
+  }, [streamKey])
 
-  const feedEvents = [
-    { content: 'CPU threshold exceeded on edge-fw-02 (92%)', type: 'error' as const },
-    { content: 'New device discovered: 10.0.5.42 (Cisco IOS-XE)', type: 'info' as const },
-    { content: 'Alert resolved: Memory utilization on db-srv-01', type: 'success' as const },
-    { content: 'OSPF neighbor 10.0.0.3 changed state to DOWN', type: 'warning' as const },
-    { content: 'Backup completed for running-config on 12 devices', type: 'success' as const },
-  ]
-  const feedIdx = useRef(0)
+  // LiveFeed items
+  const [feedItems, setFeedItems] = useState<FeedItem[]>(() => [
+    { id: '1', content: 'User authenticated: alice@example.com', timestamp: Date.now() - 5000, type: 'info' },
+    { id: '2', content: 'API request: GET /api/v2/metrics', timestamp: Date.now() - 3000, type: 'info' },
+    { id: '3', content: 'Cache miss: key=user:1234:profile', timestamp: Date.now() - 1000, type: 'warning' },
+  ])
+  const feedCounter = useRef(4)
 
   const addFeedItem = useCallback(() => {
-    const ev = feedEvents[feedIdx.current % feedEvents.length]
-    feedIdx.current++
-    setFeedItems(prev => [{
-      id: crypto.randomUUID(),
-      content: ev.content,
-      timestamp: new Date(),
-      type: ev.type,
-    }, ...prev].slice(0, 20))
+    const messages = [
+      'WebSocket connection established',
+      'Model inference completed: 142ms',
+      'Rate limit warning: 450/500 requests',
+      'New deployment detected: v2.4.2',
+      'Database query: 12ms (3 rows)',
+      'Background job completed: email-digest',
+      'Error: upstream timeout after 5000ms',
+      'Token refresh: session extended 30min',
+    ]
+    const types = ['info', 'info', 'warning', 'info', 'info', 'info', 'error', 'info']
+    const i = Math.floor(Math.random() * messages.length)
+    const id = String(feedCounter.current++)
+    setFeedItems(prev => [...prev, {
+      id,
+      content: messages[i],
+      timestamp: Date.now(),
+      type: types[i],
+    }])
   }, [])
 
-  const feedRef = useInViewTimer(4000, addFeedItem)
+  // RealtimeValue
+  const [rtValue, setRtValue] = useState(1247)
+  const [rtPrev, setRtPrev] = useState(1200)
+
+  const changeRtValue = useCallback(() => {
+    setRtPrev(rtValue)
+    setRtValue(prev => prev + Math.floor(Math.random() * 200) - 50)
+  }, [rtValue])
 
   return (
-    <div className="max-w-5xl mx-auto px-4 sm:px-6 py-8 sm:py-10">
-      <div className="mb-8">
-        <h1 className="text-2xl font-bold text-[hsl(var(--text-primary))] mb-1">AI & Realtime</h1>
-        <p className="text-sm text-[hsl(var(--text-secondary))]">5 components for streaming, live data, and AI interactions</p>
+    <div style={{ maxWidth: 1100, margin: '0 auto' }}>
+      <div style={{ marginBottom: '2rem' }}>
+        <h1 style={{ fontSize: 'var(--text-2xl)', fontWeight: 800, letterSpacing: '-0.02em', marginBottom: '0.25rem' }}>AI & Realtime</h1>
+        <p style={{ fontSize: 'var(--text-sm)', color: 'var(--text-secondary)' }}>Components designed for AI interfaces and real-time data streams</p>
       </div>
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 stagger">
-        <Preview label="StreamingText" description="AI-style text streaming with cursor" glow="ai" code={`<StreamingText\n  text={response}\n  isStreaming={true}\n  showCursor\n/>`}>
-          <div className="h-[160px] overflow-y-auto">
-            <StreamingText text={text} isStreaming={streaming} showCursor />
+
+      <div style={grid}>
+        {/* StreamingText */}
+        <Preview label="StreamingText" description="Simulated character-by-character streaming" wide>
+          <div style={{ marginBottom: '0.75rem' }}>
+            <StreamingText
+              text={streamText}
+              streaming={streaming}
+              showCursor={streaming}
+            />
           </div>
+          <Button size="sm" variant="secondary" onClick={() => setStreamKey(k => k + 1)}>
+            Restart Stream
+          </Button>
         </Preview>
 
-        <Preview label="TypingIndicator" description="Three animation variants" glow="ai" code={`<TypingIndicator variant="dots" label="AI is thinking" />\n<TypingIndicator variant="pulse" />\n<TypingIndicator variant="text" label="Generating" />`}>
-          <div className="flex flex-col gap-4">
-            <div><TypingIndicator variant="dots" label="AI is thinking" /></div>
-            <div><TypingIndicator variant="pulse" label="Processing query" /></div>
-            <div><TypingIndicator variant="text" label="Generating response" /></div>
-          </div>
-        </Preview>
-
-        <Preview label="ConfidenceBar" description="Animated fill on viewport enter" glow="ai" code={`<ConfidenceBar value={0.92} label="Entity Match" />\n<ConfidenceBar value={0.65} label="Vendor ID" />`}>
-          <div ref={confRef} className="space-y-3">
-            <ConfidenceBar value={confidenceValues[0]} label="Entity Match" />
-            <ConfidenceBar value={confidenceValues[1]} label="Vendor Classification" />
-            <ConfidenceBar value={confidenceValues[2]} label="Location Inference" />
-          </div>
-        </Preview>
-
-        <Preview label="RealtimeValue" description="Live value with freshness tracking" glow="realtime" code={`<RealtimeValue\n  value={1247}\n  label="Events/sec"\n  previousValue={1200}\n  connectionState="connected"\n/>`}>
-          <div ref={rtRef}>
-            <RealtimeValue
-              value={rtValue}
-              label="Events/sec"
-              previousValue={rtPrev}
-              connectionState="connected"
-              lastUpdated={new Date()}
-              size="lg"
+        {/* TypingIndicator */}
+        <Preview label="TypingIndicator" description="Chat-style typing animation">
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+            <TypingIndicator label="Claude is thinking..." />
+            <TypingIndicator
+              avatar={<Avatar name="Claude" size="sm" />}
+              label="Generating response..."
+              size="md"
             />
           </div>
         </Preview>
 
-        <Preview label="LiveFeed" description="Real-time event stream (new events every 4s)" glow="realtime" wide code={`<LiveFeed\n  items={events}\n  showTimestamps\n  autoScroll\n/>`}>
-          <div ref={feedRef} className="h-[220px]">
-            <LiveFeed items={feedItems} showTimestamps autoScroll maxVisible={10} />
+        {/* ConfidenceBar */}
+        <Preview label="ConfidenceBar" description="Model confidence visualization">
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+            <ConfidenceBar value={0.95} label="Intent: book_flight" showValue size="md" />
+            <ConfidenceBar value={0.72} label="Intent: check_status" showValue size="md" />
+            <ConfidenceBar value={0.31} label="Intent: cancel_order" showValue size="md" />
           </div>
+        </Preview>
+
+        {/* LiveFeed */}
+        <Preview label="LiveFeed" description="Real-time event stream" wide>
+          <div style={{ marginBottom: '0.75rem', display: 'flex', gap: '0.75rem' }}>
+            <Button size="sm" variant="primary" onClick={addFeedItem}>Add Event</Button>
+            <Button size="sm" variant="ghost" onClick={() => setFeedItems([])}>Clear</Button>
+          </div>
+          <LiveFeed
+            items={feedItems}
+            maxItems={10}
+            autoScroll
+            connectionStatus="connected"
+          />
+        </Preview>
+
+        {/* RealtimeValue */}
+        <Preview label="RealtimeValue" description="Animated value with delta indicator">
+          <Card variant="outlined" padding="md">
+            <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
+              <div>
+                <div style={{ fontSize: 'var(--text-xs)', color: 'var(--text-tertiary)', marginBottom: '0.25rem' }}>Requests/s</div>
+                <RealtimeValue
+                  value={rtValue}
+                  previousValue={rtPrev}
+                  showDelta
+                  flashOnChange
+                  style={{ fontSize: 'var(--text-xl)', fontWeight: 700 }}
+                />
+              </div>
+              <Button size="sm" variant="secondary" onClick={changeRtValue}>
+                Update Value
+              </Button>
+            </div>
+          </Card>
         </Preview>
       </div>
     </div>
   )
 }
-export default AIPage

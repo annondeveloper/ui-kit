@@ -1,139 +1,191 @@
-import { useState, useCallback } from 'react'
-import { Outlet, NavLink, useLocation } from 'react-router-dom'
-import { Sun, Moon, Menu, X, Copy, Check, Package } from 'lucide-react'
+import { useState } from 'react'
+import { NavLink, Outlet } from 'react-router-dom'
+import { UIProvider } from '@ui/components/ui-provider'
+import { Icon } from '@ui/core/icons/icon'
+import { Slider } from '@ui/components/slider'
+import { ToggleSwitch } from '@ui/components/toggle-switch'
 
 const categories = [
-  { path: '/',            label: 'Home',         emoji: '\u{1F3E0}', count: 0 },
-  { path: '/core',        label: 'Core',         emoji: '\u{1F9F1}', count: 14 },
-  { path: '/forms',       label: 'Forms',        emoji: '\u{270D}',  count: 9 },
-  { path: '/overlays',    label: 'Overlays',     emoji: '\u{1F4AC}', count: 9 },
-  { path: '/data',        label: 'Data',         emoji: '\u{1F9E0}', count: 9 },
-  { path: '/monitor',     label: 'Monitoring',   emoji: '\u{1F4CA}', count: 13 },
-  { path: '/ai',          label: 'AI & Realtime',emoji: '\u{1F916}', count: 5 },
-  { path: '/interactive', label: 'Interactive',   emoji: '\u{1F579}', count: 9 },
-  { path: '/layout',      label: 'Layout',       emoji: '\u{1F4D0}', count: 6 },
+  { path: '/', label: 'Home', icon: 'zap' as const },
+  { path: '/core', label: 'Core', icon: 'code' as const },
+  { path: '/forms', label: 'Forms', icon: 'edit' as const },
+  { path: '/overlays', label: 'Overlays', icon: 'menu' as const },
+  { path: '/data', label: 'Data', icon: 'bar-chart' as const },
+  { path: '/monitor', label: 'Monitoring', icon: 'activity' as const },
+  { path: '/ai', label: 'AI & Realtime', icon: 'terminal' as const },
 ]
 
-function Sidebar({ onClose }: { onClose?: () => void }) {
-  const [light, setLight] = useState(false)
-  const [copied, setCopied] = useState(false)
-
-  const toggleTheme = useCallback(() => {
-    setLight(p => {
-      document.documentElement.classList.toggle('light', !p)
-      return !p
-    })
-  }, [])
-
-  const handleCopy = useCallback(() => {
-    void navigator.clipboard.writeText('npm install @annondeveloper/ui-kit').then(() => {
-      setCopied(true)
-      setTimeout(() => setCopied(false), 2000)
-    })
-  }, [])
-
-  return (
-    <div className="flex flex-col h-full">
-      {/* Logo */}
-      <div className="p-5 flex items-center gap-2.5">
-        <div className="size-8 rounded-xl bg-[hsl(var(--brand-primary))] flex items-center justify-center">
-          <Package className="size-4 text-white" />
-        </div>
-        <div>
-          <div className="text-sm font-semibold text-[hsl(var(--text-primary))]">ui-kit</div>
-          <div className="text-[10px] text-[hsl(var(--text-tertiary))]">@annondeveloper</div>
-        </div>
-        {onClose && (
-          <button onClick={onClose} className="ml-auto p-1 rounded-lg hover:bg-[hsl(var(--bg-elevated))] cursor-pointer">
-            <X className="size-4 text-[hsl(var(--text-secondary))]" />
-          </button>
-        )}
-      </div>
-
-      {/* Nav links */}
-      <nav className="flex-1 px-3 space-y-0.5 overflow-y-auto">
-        {categories.map(c => (
-          <NavLink
-            key={c.path}
-            to={c.path}
-            end={c.path === '/'}
-            onClick={onClose}
-            className={({ isActive }) =>
-              `flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm transition-colors ${
-                isActive
-                  ? 'bg-[hsl(var(--brand-primary))]/10 text-[hsl(var(--brand-primary))] font-medium'
-                  : 'text-[hsl(var(--text-secondary))] hover:bg-[hsl(var(--bg-elevated))] hover:text-[hsl(var(--text-primary))]'
-              }`
-            }
-          >
-            <span className="text-base">{c.emoji}</span>
-            <span className="flex-1">{c.label}</span>
-            {c.count > 0 && (
-              <span className="text-[10px] tabular-nums px-1.5 py-0.5 rounded-full bg-[hsl(var(--bg-overlay))] text-[hsl(var(--text-tertiary))]">
-                {c.count}
-              </span>
-            )}
-          </NavLink>
-        ))}
-      </nav>
-
-      {/* Bottom controls */}
-      <div className="p-3 border-t border-[hsl(var(--border-subtle))] space-y-2">
-        <button
-          onClick={handleCopy}
-          className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-mono bg-[hsl(var(--bg-base))] border border-[hsl(var(--border-subtle))] text-[hsl(var(--text-secondary))] hover:border-[hsl(var(--border-default))] transition-colors cursor-pointer"
-        >
-          <span className="flex-1 text-left truncate">npm i @annondeveloper/ui-kit</span>
-          {copied ? <Check className="size-3 text-[hsl(var(--status-ok))]" /> : <Copy className="size-3" />}
-        </button>
-        <button
-          onClick={toggleTheme}
-          className="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-lg text-xs font-medium text-[hsl(var(--text-secondary))] hover:bg-[hsl(var(--bg-elevated))] transition-colors cursor-pointer"
-        >
-          {light ? <Moon className="size-3.5" /> : <Sun className="size-3.5" />}
-          {light ? 'Dark mode' : 'Light mode'}
-        </button>
-      </div>
-    </div>
-  )
-}
-
 export default function App() {
+  const [light, setLight] = useState(false)
+  const [motion, setMotion] = useState(3)
   const [mobileOpen, setMobileOpen] = useState(false)
-  const location = useLocation()
 
   return (
-    <div className="flex min-h-screen">
-      {/* Desktop sidebar */}
-      <aside className="hidden md:block w-[220px] shrink-0 border-r border-[hsl(var(--border-subtle))] bg-[hsl(var(--bg-surface))] sticky top-0 h-screen overflow-y-auto">
-        <Sidebar />
-      </aside>
-
-      {/* Mobile header */}
-      <div className="md:hidden fixed top-0 left-0 right-0 z-40 flex items-center gap-3 px-4 py-3 bg-[hsl(var(--bg-surface))]/80 backdrop-blur-lg border-b border-[hsl(var(--border-subtle))]">
-        <button
-          onClick={() => setMobileOpen(true)}
-          className="p-1.5 rounded-lg hover:bg-[hsl(var(--bg-elevated))] cursor-pointer"
-        >
-          <Menu className="size-5 text-[hsl(var(--text-primary))]" />
-        </button>
-        <span className="text-sm font-semibold text-[hsl(var(--text-primary))]">ui-kit</span>
-      </div>
-
-      {/* Mobile sidebar overlay */}
-      {mobileOpen && (
-        <div className="md:hidden fixed inset-0 z-50">
-          <div className="absolute inset-0 bg-black/50" onClick={() => setMobileOpen(false)} />
-          <div className="absolute left-0 top-0 bottom-0 w-[260px] bg-[hsl(var(--bg-surface))] shadow-2xl">
-            <Sidebar onClose={() => setMobileOpen(false)} />
+    <UIProvider motion={motion as 0 | 1 | 2 | 3} mode={light ? 'light' : 'dark'}>
+      <div style={{ display: 'flex', minHeight: '100dvh' }}>
+        {/* Desktop Sidebar */}
+        <aside style={{
+          width: 240,
+          flexShrink: 0,
+          borderInlineEnd: '1px solid var(--border-subtle)',
+          background: 'var(--bg-surface)',
+          position: 'sticky',
+          top: 0,
+          height: '100dvh',
+          display: 'flex',
+          flexDirection: 'column',
+          overflow: 'auto',
+        }}>
+          {/* Logo */}
+          <div style={{ padding: '1.25rem', display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+            <div style={{
+              width: 32, height: 32, borderRadius: 'var(--radius-md)',
+              background: 'var(--brand)', display: 'grid', placeItems: 'center',
+            }}>
+              <Icon name="zap" size="sm" style={{ color: 'white' }} />
+            </div>
+            <div>
+              <div style={{ fontSize: 'var(--text-sm)', fontWeight: 700, color: 'var(--text-primary)' }}>ui-kit v2</div>
+              <div style={{ fontSize: '0.625rem', color: 'var(--text-tertiary)' }}>Aurora Fluid</div>
+            </div>
           </div>
-        </div>
-      )}
 
-      {/* Main content */}
-      <main className="flex-1 min-w-0 md:pb-0 pb-4 pt-14 md:pt-0" key={location.pathname}>
-        <Outlet />
-      </main>
-    </div>
+          {/* Navigation */}
+          <nav style={{ flex: 1, padding: '0 0.75rem' }}>
+            {categories.map(c => (
+              <NavLink
+                key={c.path}
+                to={c.path}
+                end={c.path === '/'}
+                style={({ isActive }) => ({
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.5rem',
+                  padding: '0.5rem 0.75rem',
+                  borderRadius: 'var(--radius-md)',
+                  fontSize: 'var(--text-sm)',
+                  color: isActive ? 'var(--brand)' : 'var(--text-secondary)',
+                  background: isActive ? 'var(--brand-subtle)' : 'transparent',
+                  fontWeight: isActive ? 600 : 400,
+                  marginBottom: '0.125rem',
+                  transition: 'all 0.15s',
+                })}
+              >
+                <Icon name={c.icon} size="sm" />
+                {c.label}
+              </NavLink>
+            ))}
+          </nav>
+
+          {/* Controls */}
+          <div style={{ padding: '0.75rem', borderBlockStart: '1px solid var(--border-subtle)' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.75rem' }}>
+              <span style={{ fontSize: 'var(--text-xs)', color: 'var(--text-secondary)' }}>Light mode</span>
+              <ToggleSwitch
+                checked={light}
+                onChange={() => setLight(l => !l)}
+                size="sm"
+              />
+            </div>
+            <div style={{ marginBottom: '0.5rem' }}>
+              <span style={{ fontSize: 'var(--text-xs)', color: 'var(--text-secondary)' }}>Motion: {motion}</span>
+              <Slider
+                min={0}
+                max={3}
+                step={1}
+                value={motion}
+                onChange={setMotion}
+                size="sm"
+              />
+            </div>
+          </div>
+        </aside>
+
+        {/* Mobile header */}
+        <div style={{
+          display: 'none',
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          zIndex: 40,
+          alignItems: 'center',
+          gap: '0.75rem',
+          padding: '0.75rem 1rem',
+          background: 'var(--bg-surface)',
+          borderBottom: '1px solid var(--border-subtle)',
+        }}>
+          <button
+            onClick={() => setMobileOpen(true)}
+            style={{
+              padding: '0.375rem',
+              borderRadius: 'var(--radius-md)',
+              border: 'none',
+              background: 'transparent',
+              color: 'var(--text-primary)',
+              cursor: 'pointer',
+            }}
+          >
+            <Icon name="menu" size="md" />
+          </button>
+          <span style={{ fontSize: 'var(--text-sm)', fontWeight: 600 }}>ui-kit v2</span>
+        </div>
+
+        {/* Mobile overlay */}
+        {mobileOpen && (
+          <div style={{
+            position: 'fixed',
+            inset: 0,
+            zIndex: 50,
+          }}>
+            <div
+              style={{ position: 'absolute', inset: 0, background: 'oklch(0% 0 0 / 0.5)' }}
+              onClick={() => setMobileOpen(false)}
+            />
+            <div style={{
+              position: 'absolute',
+              left: 0,
+              top: 0,
+              bottom: 0,
+              width: 260,
+              background: 'var(--bg-surface)',
+              boxShadow: 'var(--shadow-lg)',
+              padding: '1rem',
+            }}>
+              <nav>
+                {categories.map(c => (
+                  <NavLink
+                    key={c.path}
+                    to={c.path}
+                    end={c.path === '/'}
+                    onClick={() => setMobileOpen(false)}
+                    style={({ isActive }) => ({
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '0.5rem',
+                      padding: '0.5rem 0.75rem',
+                      borderRadius: 'var(--radius-md)',
+                      fontSize: 'var(--text-sm)',
+                      color: isActive ? 'var(--brand)' : 'var(--text-secondary)',
+                      background: isActive ? 'var(--brand-subtle)' : 'transparent',
+                      fontWeight: isActive ? 600 : 400,
+                      marginBottom: '0.125rem',
+                    })}
+                  >
+                    <Icon name={c.icon} size="sm" />
+                    {c.label}
+                  </NavLink>
+                ))}
+              </nav>
+            </div>
+          </div>
+        )}
+
+        {/* Main content */}
+        <main style={{ flex: 1, minWidth: 0, padding: '2rem' }}>
+          <Outlet />
+        </main>
+      </div>
+    </UIProvider>
   )
 }

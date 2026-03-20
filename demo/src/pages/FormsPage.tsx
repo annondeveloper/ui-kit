@@ -1,194 +1,228 @@
-import { useState, useCallback, type ChangeEvent } from 'react'
-import { Preview } from '../components/Preview.tsx'
-import {
-  FormInput, Select, Checkbox, ToggleSwitch,
-  RadioGroup, Slider, FilterPill, ColorInput,
-  Combobox,
-  type ComboboxOption,
-} from '@ui/index'
+import { useState } from 'react'
+import { Preview } from '../components/Preview'
+import { FormInput } from '@ui/components/form-input'
+import { Select } from '@ui/components/select'
+import { Combobox } from '@ui/components/combobox'
+import { ColorInput } from '@ui/components/color-input'
+import { FileUpload } from '@ui/components/file-upload'
+import { InlineEdit } from '@ui/components/inline-edit'
+import { FilterPill, FilterPillGroup } from '@ui/components/filter-pill'
+import { Checkbox } from '@ui/components/checkbox'
+import { Button } from '@ui/components/button'
+import { Card } from '@ui/components/card'
+import { createForm } from '@ui/core/forms/create-form'
+import { useForm } from '@ui/core/forms/use-form'
+import { Form } from '@ui/core/forms/form-component'
+import { v } from '@ui/core/forms/validators'
+import { Icon } from '@ui/core/icons/icon'
 
-const vendorOptions: ComboboxOption[] = [
-  { value: 'cisco', label: 'Cisco', description: 'IOS-XE, NX-OS, ASA', group: 'Network' },
-  { value: 'juniper', label: 'Juniper', description: 'Junos OS', group: 'Network' },
-  { value: 'arista', label: 'Arista', description: 'EOS', group: 'Network' },
-  { value: 'nokia', label: 'Nokia', description: 'SR OS', group: 'Network' },
-  { value: 'fortinet', label: 'Fortinet', description: 'FortiOS', group: 'Security' },
-  { value: 'paloalto', label: 'Palo Alto', description: 'PAN-OS', group: 'Security' },
-  { value: 'dell', label: 'Dell', description: 'PowerEdge, iDRAC', group: 'Compute' },
-  { value: 'hpe', label: 'HPE', description: 'ProLiant, Comware', group: 'Compute' },
-  { value: 'vmware', label: 'VMware', description: 'vSphere, ESXi', group: 'Virtualization' },
-  { value: 'proxmox', label: 'Proxmox', description: 'VE Hypervisor', group: 'Virtualization' },
+/* Registration form definition using createForm */
+const registrationForm = createForm({
+  fields: {
+    email: { initial: '', validate: v.pipe(v.required(), v.email()) },
+    password: { initial: '', validate: v.pipe(v.required(), v.minLength(8, 'At least 8 characters')) },
+    confirmPassword: {
+      initial: '',
+      validate: (value, allValues) => {
+        if (!value || (typeof value === 'string' && value.trim() === '')) return 'Required'
+        if (value !== allValues?.password) return 'Passwords must match'
+        return undefined
+      },
+    },
+    terms: { initial: false, validate: v.required('You must accept the terms') },
+  },
+  onSubmit: (values) => {
+    alert(`Registered: ${JSON.stringify(values, null, 2)}`)
+  },
+})
+
+const grid: React.CSSProperties = {
+  display: 'grid',
+  gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))',
+  gap: '1rem',
+}
+
+const roleOptions = [
+  { value: 'admin', label: 'Administrator' },
+  { value: 'editor', label: 'Editor' },
+  { value: 'viewer', label: 'Viewer' },
+  { value: 'developer', label: 'Developer' },
+  { value: 'designer', label: 'Designer' },
+  { value: 'pm', label: 'Project Manager' },
 ]
 
-export function FormsPage() {
-  const [text, setText] = useState('core-sw-01')
-  const [password, setPassword] = useState('secret123')
-  const [selectVal, setSelectVal] = useState('snmpv3')
-  const [checked1, setChecked1] = useState(true)
-  const [checked2, setChecked2] = useState(false)
-  const [checked3, setChecked3] = useState(false)
-  const [toggle1, setToggle1] = useState(true)
-  const [toggle2, setToggle2] = useState(false)
-  const [radio, setRadio] = useState('sha256')
-  const [radioH, setRadioH] = useState('compact')
-  const [slider, setSlider] = useState(60)
-  const [filters, setFilters] = useState<Record<string, boolean>>({ All: true, Active: false, Warning: false, Critical: false, Stale: false })
-  const [color, setColor] = useState('#8b5cf6')
-  const [comboVendors, setComboVendors] = useState<string | string[]>([])
+const countryOptions = [
+  { value: 'us', label: 'United States', description: 'North America' },
+  { value: 'uk', label: 'United Kingdom', description: 'Europe' },
+  { value: 'de', label: 'Germany', description: 'Europe' },
+  { value: 'jp', label: 'Japan', description: 'Asia' },
+  { value: 'au', label: 'Australia', description: 'Oceania' },
+  { value: 'br', label: 'Brazil', description: 'South America' },
+  { value: 'ca', label: 'Canada', description: 'North America' },
+  { value: 'fr', label: 'France', description: 'Europe' },
+]
+
+export default function FormsPage() {
+  const form = useForm(registrationForm)
+
+  const [role, setRole] = useState('')
+  const [country, setCountry] = useState('')
+  const [color, setColor] = useState('#6366f1')
+  const [inlineVal, setInlineVal] = useState('Click to edit this text')
+  const [inlineTitle, setInlineTitle] = useState('Project Alpha')
+  const [filters, setFilters] = useState<Record<string, boolean>>({
+    status: true,
+    priority: true,
+    assignee: false,
+    label: false,
+    date: true,
+  })
 
   const toggleFilter = (key: string) => {
-    if (key === 'All') {
-      setFilters({ All: true, Active: false, Warning: false, Critical: false, Stale: false })
-    } else {
-      setFilters(prev => {
-        const next = { ...prev, [key]: !prev[key], All: false }
-        if (!Object.entries(next).some(([k, v]) => k !== 'All' && v)) next.All = true
-        return next
-      })
-    }
+    setFilters(f => ({ ...f, [key]: !f[key] }))
   }
 
-  // Simulated async search
-  const searchVendors = useCallback(async (query: string): Promise<ComboboxOption[]> => {
-    await new Promise(r => setTimeout(r, 400))
-    return vendorOptions.filter(o =>
-      o.label.toLowerCase().includes(query.toLowerCase()) ||
-      (o.description?.toLowerCase().includes(query.toLowerCase()) ?? false)
-    )
-  }, [])
-
   return (
-    <div className="max-w-5xl mx-auto px-4 sm:px-6 py-8 sm:py-10">
-      <div className="mb-8">
-        <h1 className="text-2xl font-bold text-[hsl(var(--text-primary))] mb-1">Forms</h1>
-        <p className="text-sm text-[hsl(var(--text-secondary))]">9 form components for data entry and configuration</p>
+    <div style={{ maxWidth: 1100, margin: '0 auto' }}>
+      <div style={{ marginBottom: '2rem' }}>
+        <h1 style={{ fontSize: 'var(--text-2xl)', fontWeight: 800, letterSpacing: '-0.02em', marginBottom: '0.25rem' }}>Forms</h1>
+        <p style={{ fontSize: 'var(--text-sm)', color: 'var(--text-secondary)' }}>Form components and the built-in form engine</p>
       </div>
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 stagger">
-        <Preview label="FormInput" description="Text input with label, hint, validation" code={`<FormInput label="Hostname" value={val} onChange={setVal} required />\n<FormInput label="Password" type="password" />`}>
-          <div className="space-y-3">
-            <FormInput label="Hostname" value={text} onChange={setText} required hint="FQDN or short hostname" />
-            <FormInput label="API Key" type="password" value={password} onChange={setPassword} />
-            <FormInput label="Description" value="" onChange={() => {}} hint="Optional device description" />
-            <FormInput label="Disabled" value="Cannot edit" onChange={() => {}} disabled />
-          </div>
-        </Preview>
 
-        <Preview label="Select" description="Themed dropdown" code={`<Select\n  options={options}\n  value={val}\n  onValueChange={setVal}\n/>`}>
-          <div className="space-y-3">
-            <label className="mb-1.5 block text-xs font-medium uppercase tracking-wider text-[hsl(var(--text-secondary))]">SNMP Version</label>
-            <Select
-              options={[
-                { value: 'snmpv1', label: 'SNMP v1' },
-                { value: 'snmpv2c', label: 'SNMP v2c' },
-                { value: 'snmpv3', label: 'SNMP v3 (USM)' },
-              ]}
-              value={selectVal}
-              onValueChange={setSelectVal}
-            />
-            <label className="mb-1.5 block text-xs font-medium uppercase tracking-wider text-[hsl(var(--text-secondary))]">Vendor</label>
-            <Select
-              options={[
-                { value: 'cisco', label: 'Cisco' },
-                { value: 'juniper', label: 'Juniper' },
-                { value: 'arista', label: 'Arista' },
-                { value: 'nokia', label: 'Nokia' },
-                { value: 'fortinet', label: 'Fortinet' },
-              ]}
-              value=""
-              onValueChange={() => {}}
-              placeholder="Select vendor..."
-            />
-          </div>
-        </Preview>
-
-        <Preview label="Combobox" description="Searchable multi-select with async" code={`<Combobox\n  options={vendors}\n  value={selected}\n  onChange={setSelected}\n  multiple\n  onSearch={asyncFetch}\n/>`}>
-          <div className="space-y-4">
-            <Combobox
-              options={vendorOptions}
-              value={comboVendors}
-              onChange={setComboVendors}
-              multiple
-              onSearch={searchVendors}
-              placeholder="Search vendors..."
-              label="Supported Vendors"
-            />
-            <p className="text-xs text-[hsl(var(--text-tertiary))]">
-              Selected: {Array.isArray(comboVendors) && comboVendors.length > 0 ? comboVendors.join(', ') : 'none'}
-            </p>
-          </div>
-        </Preview>
-
-        <Preview label="Checkbox" description="Checkbox with label states" code={`<Checkbox checked={val} onChange={handler} />`}>
-          <div className="space-y-3">
-            <label className="flex items-center gap-2 cursor-pointer"><Checkbox checked={checked1} onChange={(e: ChangeEvent<HTMLInputElement>) => setChecked1(e.target.checked)} /><span className="text-sm text-[hsl(var(--text-primary))]">Enable SNMP polling</span></label>
-            <label className="flex items-center gap-2 cursor-pointer"><Checkbox checked={checked2} onChange={(e: ChangeEvent<HTMLInputElement>) => setChecked2(e.target.checked)} /><span className="text-sm text-[hsl(var(--text-primary))]">Enable syslog collection</span></label>
-            <label className="flex items-center gap-2 cursor-pointer"><Checkbox checked={checked3} onChange={(e: ChangeEvent<HTMLInputElement>) => setChecked3(e.target.checked)} /><span className="text-sm text-[hsl(var(--text-primary))]">Auto-approve discovered devices</span></label>
-          </div>
-        </Preview>
-
-        <Preview label="ToggleSwitch" description="On/off toggle with label" code={`<ToggleSwitch label="Auto-refresh" enabled={val} onChange={setVal} />`}>
-          <div className="space-y-4">
-            <ToggleSwitch label="Auto-refresh dashboard" enabled={toggle1} onChange={setToggle1} />
-            <ToggleSwitch label="Dark mode" enabled={toggle2} onChange={setToggle2} />
-          </div>
-        </Preview>
-
-        <Preview label="RadioGroup" description="Vertical and horizontal layouts" code={`<RadioGroup\n  options={options}\n  value={val}\n  onChange={setVal}\n  orientation="vertical"\n/>`}>
-          <div className="space-y-4">
-            <div>
-              <span className="text-[10px] text-[hsl(var(--text-tertiary))] uppercase tracking-wider mb-2 block">Auth Protocol</span>
-              <RadioGroup
-                options={[
-                  { value: 'md5', label: 'MD5', description: 'Legacy, not recommended' },
-                  { value: 'sha1', label: 'SHA-1' },
-                  { value: 'sha256', label: 'SHA-256', description: 'Recommended' },
-                ]}
-                value={radio}
-                onChange={setRadio}
-                orientation="vertical"
+      <div style={grid}>
+        {/* Registration Form */}
+        <Preview label="Registration Form" description="Built with createForm + useForm + validators" wide>
+          <Card variant="outlined" padding="md">
+            <Form form={form} style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', maxWidth: 400 }}>
+              <FormInput
+                name="email"
+                label="Email"
+                type="email"
+                placeholder="you@example.com"
+                icon={<Icon name="edit" size="sm" />}
+                value={form.values.email as string}
+                onChange={(e) => form.setValue('email', (e.target as HTMLInputElement).value)}
+                onBlur={() => form.setTouched('email')}
+                error={form.touched.email ? form.errors.email : undefined}
               />
-            </div>
-            <div>
-              <span className="text-[10px] text-[hsl(var(--text-tertiary))] uppercase tracking-wider mb-2 block">Table density</span>
-              <RadioGroup
-                options={[
-                  { value: 'compact', label: 'Compact' },
-                  { value: 'comfortable', label: 'Comfortable' },
-                  { value: 'spacious', label: 'Spacious' },
-                ]}
-                value={radioH}
-                onChange={setRadioH}
-                orientation="horizontal"
+              <FormInput
+                name="password"
+                label="Password"
+                type="password"
+                placeholder="At least 8 characters"
+                value={form.values.password as string}
+                onChange={(e) => form.setValue('password', (e.target as HTMLInputElement).value)}
+                onBlur={() => form.setTouched('password')}
+                error={form.touched.password ? form.errors.password : undefined}
               />
-            </div>
-          </div>
+              <FormInput
+                name="confirmPassword"
+                label="Confirm Password"
+                type="password"
+                placeholder="Re-enter password"
+                value={form.values.confirmPassword as string}
+                onChange={(e) => form.setValue('confirmPassword', (e.target as HTMLInputElement).value)}
+                onBlur={() => form.setTouched('confirmPassword')}
+                error={form.touched.confirmPassword ? form.errors.confirmPassword : undefined}
+              />
+              <Checkbox
+                label="I accept the terms and conditions"
+                checked={form.values.terms as boolean}
+                onChange={() => form.setValue('terms', !(form.values.terms as boolean))}
+              />
+              {form.touched.terms && form.errors.terms && (
+                <div style={{ fontSize: 'var(--text-xs)', color: 'var(--status-critical)' }}>
+                  {form.errors.terms}
+                </div>
+              )}
+              <Button type="submit" variant="primary" loading={form.submitting}>
+                Create Account
+              </Button>
+            </Form>
+          </Card>
         </Preview>
 
-        <Preview label="Slider" description="Range slider with value display" code={`<Slider\n  value={val}\n  onChange={setVal}\n  min={10} max={300}\n  label="Interval (sec)"\n  showValue\n/>`}>
-          <div className="space-y-4 py-2">
-            <Slider value={slider} onChange={setSlider} min={10} max={300} step={5} label="Collection Interval (sec)" showValue />
-            <Slider value={75} onChange={() => {}} min={0} max={100} label="Alert Threshold (%)" showValue />
-          </div>
+        {/* Select */}
+        <Preview label="Select" description="Dropdown with 6 role options">
+          <Select
+            name="role"
+            label="Role"
+            placeholder="Choose a role..."
+            options={roleOptions}
+            value={role}
+            onChange={setRole}
+          />
         </Preview>
 
-        <Preview label="FilterPill" description="Toggle filter pills" code={`<FilterPill label="Active" active={isActive} onClick={toggle} count={42} />`}>
-          <div className="flex flex-wrap gap-2">
-            {Object.entries(filters).map(([label, active]) => (
-              <FilterPill key={label} label={label} active={active} onClick={() => toggleFilter(label)} count={label === 'All' ? 156 : label === 'Active' ? 120 : label === 'Warning' ? 23 : label === 'Critical' ? 5 : 8} />
-            ))}
-          </div>
+        {/* Combobox */}
+        <Preview label="Combobox" description="Searchable country selector">
+          <Combobox
+            name="country"
+            label="Country"
+            placeholder="Search countries..."
+            options={countryOptions}
+            value={country}
+            onChange={setCountry}
+          />
         </Preview>
 
-        <Preview label="ColorInput" description="Color picker with presets" code={`<ColorInput value={color} onChange={setColor} label="Theme Color" />`}>
+        {/* ColorInput */}
+        <Preview label="ColorInput" description="Color picker with swatches">
           <ColorInput
+            name="brand-color"
+            label="Brand Color"
             value={color}
             onChange={setColor}
-            label="Alert Color"
-            presets={['#ef4444', '#f59e0b', '#10b981', '#3b82f6', '#8b5cf6', '#ec4899']}
+            swatches={['#6366f1', '#8b5cf6', '#ec4899', '#f43f5e', '#f97316', '#22c55e', '#06b6d4', '#3b82f6']}
+            showInput
           />
+        </Preview>
+
+        {/* FileUpload */}
+        <Preview label="FileUpload" description="Drag and drop zone">
+          <FileUpload
+            name="avatar"
+            label="Upload Avatar"
+            description="PNG, JPG, or GIF up to 5MB"
+            accept="image/*"
+            maxSize={5 * 1024 * 1024}
+            onChange={(files) => console.log('Files:', files)}
+          />
+        </Preview>
+
+        {/* InlineEdit */}
+        <Preview label="InlineEdit" description="Click to edit in place">
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+            <InlineEdit
+              value={inlineTitle}
+              onChange={setInlineTitle}
+              size="lg"
+            />
+            <InlineEdit
+              value={inlineVal}
+              onChange={setInlineVal}
+              size="md"
+              placeholder="Click to add text..."
+            />
+          </div>
+        </Preview>
+
+        {/* FilterPill */}
+        <Preview label="FilterPill" description="Active/inactive pill group" wide>
+          <FilterPillGroup onClearAll={() => setFilters(Object.fromEntries(Object.keys(filters).map(k => [k, false])))}>
+            {Object.entries(filters).map(([key, active]) => (
+              <FilterPill
+                key={key}
+                label={key.charAt(0).toUpperCase() + key.slice(1)}
+                active={active}
+                onClick={() => toggleFilter(key)}
+                onRemove={active ? () => toggleFilter(key) : undefined}
+                count={active ? Math.floor(Math.random() * 20) + 1 : undefined}
+              />
+            ))}
+          </FilterPillGroup>
         </Preview>
       </div>
     </div>
   )
 }
-export default FormsPage

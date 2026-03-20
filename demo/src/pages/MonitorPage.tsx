@@ -1,231 +1,211 @@
-import { useState, useCallback, useEffect, useRef } from 'react'
-import { Preview, useInViewTimer } from '../components/Preview.tsx'
-import {
-  MetricCard, ThresholdGauge, UtilizationBar, Sparkline,
-  UptimeTracker, PortStatusGrid, PipelineStage, SeverityTimeline,
-  TimeRangeSelector, LogViewer,
-  type UptimeDay, type PortStatus, type Stage, type TimelineEvent, type LogLine,
-} from '@ui/index'
-import { generateTheme, themeToCSS } from '@ui/index'
+import { useState } from 'react'
+import { Preview } from '../components/Preview'
+import { MetricCard } from '@ui/domain/metric-card'
+import { ThresholdGauge } from '@ui/domain/threshold-gauge'
+import { UtilizationBar } from '@ui/domain/utilization-bar'
+import { Sparkline } from '@ui/domain/sparkline'
+import { LogViewer } from '@ui/domain/log-viewer'
+import { PipelineStage } from '@ui/domain/pipeline-stage'
+import { UptimeTracker } from '@ui/domain/uptime-tracker'
+import { HeatmapCalendar } from '@ui/domain/heatmap-calendar'
+import { SeverityTimeline } from '@ui/domain/severity-timeline'
+import { PortStatusGrid } from '@ui/domain/port-status-grid'
+import { TimeRangeSelector } from '@ui/domain/time-range-selector'
+import type { LogLine } from '@ui/domain/log-viewer'
+import type { Stage } from '@ui/domain/pipeline-stage'
+import type { UptimeDay } from '@ui/domain/uptime-tracker'
+import type { HeatmapData } from '@ui/domain/heatmap-calendar'
+import type { TimelineEvent } from '@ui/domain/severity-timeline'
+import type { PortStatus } from '@ui/domain/port-status-grid'
 
-function genSparkline(base: number, variance: number, len = 12): number[] {
-  return Array.from({ length: len }, () => base + (Math.random() - 0.5) * variance * 2)
-}
-
-const uptimeDays: UptimeDay[] = Array.from({ length: 90 }, (_, i) => {
-  const d = new Date(); d.setDate(d.getDate() - 89 + i)
-  const r = Math.random()
-  return { date: d.toISOString().slice(0, 10), status: r > 0.97 ? 'down' as const : r > 0.92 ? 'degraded' as const : 'up' as const, uptime: r > 0.97 ? 0.85 : r > 0.92 ? 0.95 : 0.999 }
-})
-
-const ports: PortStatus[] = Array.from({ length: 48 }, (_, i) => ({
-  port: i + 1,
-  label: `Gi1/0/${i + 1}`,
-  status: (Math.random() > 0.85 ? 'critical' : Math.random() > 0.95 ? 'warning' : 'ok') as PortStatus['status'],
-}))
-
-const stages: Stage[] = [
-  { id: 'collect', label: 'Collect', status: 'active' },
-  { id: 'normalize', label: 'Normalize', status: 'active' },
-  { id: 'correlate', label: 'Correlate', status: 'active' },
-  { id: 'evaluate', label: 'Evaluate', status: 'idle' },
-  { id: 'store', label: 'Store', status: 'active' },
+const logLines: LogLine[] = [
+  { id: 1, timestamp: Date.now() - 60000, level: 'info', message: 'Server started on port 3000' },
+  { id: 2, timestamp: Date.now() - 55000, level: 'info', message: 'Connected to database cluster' },
+  { id: 3, timestamp: Date.now() - 45000, level: 'debug', message: 'Cache warmed: 1,247 entries loaded' },
+  { id: 4, timestamp: Date.now() - 30000, level: 'warn', message: 'Connection pool nearing limit: 45/50' },
+  { id: 5, timestamp: Date.now() - 20000, level: 'error', message: 'Failed to reach upstream: timeout after 5s' },
+  { id: 6, timestamp: Date.now() - 15000, level: 'info', message: 'Retry succeeded on attempt 2' },
+  { id: 7, timestamp: Date.now() - 10000, level: 'info', message: 'Health check passed: all services nominal' },
+  { id: 8, timestamp: Date.now() - 5000, level: 'warn', message: 'SSL certificate expires in 14 days' },
+  { id: 9, timestamp: Date.now() - 2000, level: 'info', message: 'Metrics exported to Prometheus' },
+  { id: 10, timestamp: Date.now(), level: 'debug', message: 'GC completed: freed 128MB in 12ms' },
 ]
 
-const events: TimelineEvent[] = Array.from({ length: 10 }, (_, i) => {
-  const d = new Date(); d.setMinutes(d.getMinutes() - i * 15)
-  const severities: TimelineEvent['severity'][] = ['critical', 'warning', 'info', 'ok']
-  return {
-    id: `evt-${i}`,
-    timestamp: d,
-    title: `Event ${10 - i}: ${['Link down', 'High CPU', 'Config change', 'Recovery'][i % 4]}`,
-    severity: severities[i % 4],
+const pipelineStages: Stage[] = [
+  { id: 'build', label: 'Build', status: 'success', duration: 45 },
+  { id: 'test', label: 'Test', status: 'success', duration: 120 },
+  { id: 'deploy', label: 'Deploy', status: 'running', duration: 30 },
+  { id: 'release', label: 'Release', status: 'pending' },
+]
+
+function generateUptimeDays(count: number): UptimeDay[] {
+  const days: UptimeDay[] = []
+  const statuses: UptimeDay['status'][] = ['up', 'up', 'up', 'up', 'up', 'degraded', 'up', 'up', 'up', 'down']
+  for (let i = count - 1; i >= 0; i--) {
+    const date = new Date()
+    date.setDate(date.getDate() - i)
+    const status = statuses[Math.floor(Math.random() * statuses.length)]
+    days.push({
+      date: date.toISOString().slice(0, 10),
+      status,
+      uptime: status === 'up' ? 0.999 : status === 'degraded' ? 0.95 : 0.0,
+    })
   }
-})
+  return days
+}
 
-const logs: LogLine[] = Array.from({ length: 15 }, (_, i) => {
-  const d = new Date(); d.setSeconds(d.getSeconds() - i * 30)
-  const levels: LogLine['level'][] = ['error', 'warn', 'info', 'debug', 'info']
-  const msgs = ['Connection timeout to 10.0.1.5:161', 'SNMP walk completed in 2.3s', 'Rate calc delta: ifHCInOctets +847293', 'Entity correlated: uuid=a8f3...', 'Alert rule "CPU > 90%" matched on core-sw-01']
-  return { id: i, timestamp: d, level: levels[i % 5], message: msgs[i % 5] }
-})
+function generateHeatmapData(): HeatmapData[] {
+  const data: HeatmapData[] = []
+  for (let i = 90; i >= 0; i--) {
+    const date = new Date()
+    date.setDate(date.getDate() - i)
+    data.push({
+      date: date.toISOString().slice(0, 10),
+      value: Math.floor(Math.random() * 100),
+    })
+  }
+  return data
+}
 
-export function MonitorPage() {
-  const [sparkData, setSparkData] = useState(genSparkline(65, 15))
+const timelineEvents: TimelineEvent[] = [
+  { id: '1', timestamp: Date.now() - 3600000, severity: 'critical', title: 'Database failover triggered', description: 'Primary node unresponsive, promoted replica' },
+  { id: '2', timestamp: Date.now() - 2400000, severity: 'warning', title: 'High memory usage on cache-01', description: 'Memory at 92%, approaching threshold' },
+  { id: '3', timestamp: Date.now() - 1200000, severity: 'ok', title: 'Failover recovery complete', description: 'All services restored to normal operation' },
+  { id: '4', timestamp: Date.now() - 600000, severity: 'info', title: 'Scheduled maintenance window', description: 'SSL cert renewal for *.api.example.com' },
+]
 
-  // Gauge animation on viewport enter
-  const [gaugeValues, setGaugeValues] = useState([0, 0, 0, 0])
-  const gaugeAnimated = useRef(false)
-  const gaugeRef = useRef<HTMLDivElement>(null)
-  useEffect(() => {
-    const el = gaugeRef.current
-    if (!el) return
-    const obs = new IntersectionObserver(([entry]) => {
-      if (entry.isIntersecting && !gaugeAnimated.current) {
-        gaugeAnimated.current = true
-        setTimeout(() => setGaugeValues([67, 78, 45, 92]), 200)
-      }
-    }, { threshold: 0.3 })
-    obs.observe(el)
-    return () => obs.disconnect()
-  }, [])
+const ports: PortStatus[] = [
+  { port: 22, status: 'ok', label: 'SSH' },
+  { port: 80, status: 'ok', label: 'HTTP' },
+  { port: 443, status: 'ok', label: 'HTTPS' },
+  { port: 3000, status: 'ok', label: 'API' },
+  { port: 3306, status: 'warning', label: 'MySQL' },
+  { port: 5432, status: 'ok', label: 'Postgres' },
+  { port: 6379, status: 'ok', label: 'Redis' },
+  { port: 8080, status: 'critical', label: 'Proxy' },
+  { port: 9090, status: 'ok', label: 'Prometheus' },
+  { port: 9200, status: 'unknown', label: 'Elastic' },
+  { port: 27017, status: 'ok', label: 'MongoDB' },
+  { port: 5672, status: 'ok', label: 'RabbitMQ' },
+]
 
-  // Util bar animation
-  const [utilValues, setUtilValues] = useState([0, 0, 0, 0])
-  const utilAnimated = useRef(false)
-  const utilRef = useRef<HTMLDivElement>(null)
-  useEffect(() => {
-    const el = utilRef.current
-    if (!el) return
-    const obs = new IntersectionObserver(([entry]) => {
-      if (entry.isIntersecting && !utilAnimated.current) {
-        utilAnimated.current = true
-        setTimeout(() => setUtilValues([67, 78, 45, 92]), 200)
-      }
-    }, { threshold: 0.3 })
-    obs.observe(el)
-    return () => obs.disconnect()
-  }, [])
+const grid: React.CSSProperties = {
+  display: 'grid',
+  gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))',
+  gap: '1rem',
+}
 
-  // Theme generator demo
-  const [brandColor, setBrandColor] = useState('#6366f1')
-  const [themeMode, setThemeMode] = useState<'dark' | 'light'>('dark')
-  const generatedTheme = generateTheme(brandColor, themeMode)
-  const themeCSS = themeToCSS(generatedTheme, '.theme-demo')
-
-  const tick = useCallback(() => {
-    setSparkData(p => [...p.slice(1), p[p.length - 1] + Math.floor(Math.random() * 10 - 4)])
-  }, [])
-
-  const tickRef = useInViewTimer(2000, tick)
+export default function MonitorPage() {
+  const [uptimeDays] = useState(() => generateUptimeDays(30))
+  const [heatmapData] = useState(() => generateHeatmapData())
 
   return (
-    <div className="max-w-5xl mx-auto px-4 sm:px-6 py-8 sm:py-10">
-      <div className="mb-8">
-        <h1 className="text-2xl font-bold text-[hsl(var(--text-primary))] mb-1">Monitoring</h1>
-        <p className="text-sm text-[hsl(var(--text-secondary))]">13 components for dashboards, metrics, and infrastructure visualization</p>
+    <div style={{ maxWidth: 1200, margin: '0 auto' }}>
+      <div style={{ marginBottom: '2rem' }}>
+        <h1 style={{ fontSize: 'var(--text-2xl)', fontWeight: 800, letterSpacing: '-0.02em', marginBottom: '0.25rem' }}>Monitoring</h1>
+        <p style={{ fontSize: 'var(--text-sm)', color: 'var(--text-secondary)' }}>Real-time dashboards, gauges, logs, and infrastructure monitoring</p>
       </div>
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 stagger" ref={tickRef}>
-        <Preview label="MetricCard" description="Dashboard stat tiles" glow="monitor" wide code={`<MetricCard title="CPU" value="67%" status="warning" />`}>
-          <div className="grid grid-cols-2 gap-3">
-            <MetricCard title="Requests/sec" value="12,847" change={{ value: 2.4, period: '1h' }} trend="up" status="ok" sparkline={sparkData} />
-            <MetricCard title="CPU Usage" value="67%" change={{ value: -1.2 }} trend="up" status="warning" />
-            <MetricCard title="Memory" value="4.2 GB" change={{ value: 0.3 }} trend="up" status="ok" />
-            <MetricCard title="Errors" value="23" change={{ value: -5 }} trend="down" status="ok" />
+
+      {/* Top row: 4 MetricCards */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem', marginBottom: '1.5rem' }}>
+        <MetricCard title="CPU Usage" value="87.4%" trend="up" status="warning" sparkline={[45, 52, 49, 63, 72, 68, 75, 82, 87]} />
+        <MetricCard title="Memory" value="62.1%" trend="flat" status="ok" sparkline={[58, 60, 59, 61, 62, 61, 63, 62, 62]} />
+        <MetricCard title="Network I/O" value="2.4 Gb/s" trend="up" status="ok" sparkline={[1.2, 1.5, 1.8, 2.0, 2.1, 2.3, 2.4]} />
+        <MetricCard title="Disk" value="78.3%" trend="up" status="warning" sparkline={[70, 72, 73, 74, 75, 76, 77, 78]} />
+      </div>
+
+      <div style={grid}>
+        {/* ThresholdGauge */}
+        <Preview label="ThresholdGauge" description="Gauge with warning/critical thresholds">
+          <div style={{ display: 'flex', gap: '2rem', justifyContent: 'center', flexWrap: 'wrap' }}>
+            <ThresholdGauge value={42} label="Healthy" showValue size="md" />
+            <ThresholdGauge value={72} label="Warning" showValue size="md" thresholds={{ warning: 60, critical: 85 }} />
+            <ThresholdGauge value={93} label="Critical" showValue size="md" thresholds={{ warning: 60, critical: 85 }} />
           </div>
         </Preview>
 
-        <Preview label="ThresholdGauge" description="Animate to target on viewport enter" glow="monitor" code={`<ThresholdGauge value={72} label="CPU" />`}>
-          <div ref={gaugeRef} className="flex flex-wrap justify-around gap-2">
-            <ThresholdGauge value={gaugeValues[0]} label="CPU" size={100} />
-            <ThresholdGauge value={gaugeValues[1]} label="Memory" size={100} />
-            <ThresholdGauge value={gaugeValues[2]} label="Disk" size={100} />
-            <ThresholdGauge value={gaugeValues[3]} label="Network" size={100} />
+        {/* UtilizationBar */}
+        <Preview label="UtilizationBar" description="Segmented resource utilization">
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+            <UtilizationBar
+              segments={[
+                { value: 45, label: 'System', color: 'var(--status-info)' },
+                { value: 25, label: 'User', color: 'var(--brand)' },
+                { value: 10, label: 'Cache', color: 'var(--status-warning)' },
+              ]}
+              showLabels
+              size="md"
+            />
+            <UtilizationBar
+              segments={[
+                { value: 78, label: 'Used', color: 'var(--status-critical)' },
+              ]}
+              max={100}
+              thresholds={{ warning: 60, critical: 80 }}
+              showLabels
+              size="lg"
+            />
           </div>
         </Preview>
 
-        <Preview label="UtilizationBar" description="Animated resource utilization fills" glow="monitor" code={`<UtilizationBar value={72} label="CPU" />`}>
-          <div ref={utilRef} className="space-y-3">
-            <UtilizationBar value={utilValues[0]} label="CPU" />
-            <UtilizationBar value={utilValues[1]} label="Memory" />
-            <UtilizationBar value={utilValues[2]} label="Disk I/O" />
-            <UtilizationBar value={utilValues[3]} label="Network" />
-          </div>
-        </Preview>
-
-        <Preview label="Sparkline" description="Inline SVG micro-charts" glow="monitor" code={`<Sparkline data={[40, 42, 38, 45, 50]} width={120} height={28} />`}>
-          <div className="space-y-4">
-            <div className="flex items-center gap-3"><span className="text-xs text-[hsl(var(--text-secondary))] w-20">Trending up</span><Sparkline data={genSparkline(40, 5).map((v, i) => v + i * 2)} width={200} height={32} color="hsl(var(--status-ok))" /></div>
-            <div className="flex items-center gap-3"><span className="text-xs text-[hsl(var(--text-secondary))] w-20">Volatile</span><Sparkline data={genSparkline(50, 25)} width={200} height={32} color="hsl(var(--status-warning))" /></div>
-            <div className="flex items-center gap-3"><span className="text-xs text-[hsl(var(--text-secondary))] w-20">Stable</span><Sparkline data={genSparkline(60, 3)} width={200} height={32} color="hsl(var(--brand-primary))" /></div>
-          </div>
-        </Preview>
-
-        <Preview label="UptimeTracker" description="90-day uptime strip" glow="monitor" code={`<UptimeTracker days={days} />`}>
-          <UptimeTracker days={uptimeDays} />
-        </Preview>
-
-        <Preview label="PortStatusGrid" description="48-port switch visualization" glow="monitor" code={`<PortStatusGrid ports={ports} columns={12} />`}>
-          <PortStatusGrid ports={ports} columns={12} size="sm" />
-        </Preview>
-
-        <Preview label="PipelineStage" description="Data processing pipeline" glow="monitor" wide code={`<PipelineStage stages={stages} />`}>
-          <PipelineStage stages={stages} />
-        </Preview>
-
-        <Preview label="SeverityTimeline" description="Event timeline with severity dots" glow="monitor" code={`<SeverityTimeline events={events} />`}>
-          <SeverityTimeline events={events} maxVisible={6} />
-        </Preview>
-
-        <Preview label="TimeRangeSelector" description="Time range picker with presets" glow="monitor" code={`<TimeRangeSelector onChange={setRange} />`}>
-          <TimeRangeSelector onChange={() => {}} />
-        </Preview>
-
-        <Preview label="generateTheme" description="Generate a full theme from one color" glow="monitor" wide code={`import { generateTheme, themeToCSS } from '@ui/index'\nconst theme = generateTheme('#6366f1', 'dark')\nconst css = themeToCSS(theme, ':root')`}>
-          <div className="space-y-4">
-            <div className="flex flex-wrap items-center gap-4">
-              <div>
-                <label className="text-xs text-[hsl(var(--text-tertiary))] block mb-1">Brand Color</label>
-                <div className="flex items-center gap-2">
-                  <input
-                    type="color"
-                    value={brandColor}
-                    onChange={e => setBrandColor(e.target.value)}
-                    className="w-10 h-8 rounded border border-[hsl(var(--border-default))] cursor-pointer"
-                  />
-                  <span className="text-xs font-mono text-[hsl(var(--text-secondary))]">{brandColor}</span>
-                </div>
-              </div>
-              <div>
-                <label className="text-xs text-[hsl(var(--text-tertiary))] block mb-1">Mode</label>
-                <div className="flex gap-1">
-                  {(['dark', 'light'] as const).map(m => (
-                    <button
-                      key={m}
-                      onClick={() => setThemeMode(m)}
-                      className={`text-xs px-3 py-1.5 rounded-lg cursor-pointer transition-colors ${
-                        themeMode === m ? 'bg-[hsl(var(--brand-primary))]/15 text-[hsl(var(--brand-primary))] font-medium' : 'text-[hsl(var(--text-tertiary))] hover:bg-[hsl(var(--bg-elevated))]'
-                      }`}
-                    >
-                      {m}
-                    </button>
-                  ))}
-                </div>
-              </div>
+        {/* Sparkline */}
+        <Preview label="Sparkline" description="Inline trend visualization">
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+              <span style={{ fontSize: 'var(--text-xs)', color: 'var(--text-secondary)', width: 60 }}>CPU</span>
+              <Sparkline data={[45, 52, 49, 63, 72, 68, 75, 82, 87]} color="var(--status-warning)" />
             </div>
-            {/* Live preview swatch */}
-            <style>{themeCSS}</style>
-            <div className="theme-demo theme-preview-panel rounded-xl border border-current/10 p-4" style={{
-              background: `hsl(${generatedTheme['bg-surface']})`,
-              color: `hsl(${generatedTheme['text-primary']})`,
-              borderColor: `hsl(${generatedTheme['border-default']})`,
-            }}>
-              <div className="flex items-center gap-3 mb-3">
-                <div className="w-3 h-3 rounded-full" style={{ background: `hsl(${generatedTheme['brand-primary']})` }} />
-                <span className="text-sm font-semibold">Preview Panel</span>
-                <span className="text-xs ml-auto" style={{ color: `hsl(${generatedTheme['text-tertiary']})` }}>Generated theme</span>
-              </div>
-              <div className="grid grid-cols-4 gap-2 mb-3">
-                {(['bg-base', 'bg-surface', 'bg-elevated', 'bg-overlay'] as const).map(k => (
-                  <div key={k} className="rounded-lg p-2 text-center" style={{ background: `hsl(${generatedTheme[k]})`, border: `1px solid hsl(${generatedTheme['border-subtle']})` }}>
-                    <span className="text-[9px] font-mono" style={{ color: `hsl(${generatedTheme['text-tertiary']})` }}>{k.replace('bg-', '')}</span>
-                  </div>
-                ))}
-              </div>
-              <div className="flex gap-2">
-                {(['status-ok', 'status-warning', 'status-critical', 'brand-primary'] as const).map(k => (
-                  <div key={k} className="h-2 flex-1 rounded-full" style={{ background: `hsl(${generatedTheme[k]})` }} />
-                ))}
-              </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+              <span style={{ fontSize: 'var(--text-xs)', color: 'var(--text-secondary)', width: 60 }}>Memory</span>
+              <Sparkline data={[58, 60, 59, 61, 62, 61, 63, 62, 62]} color="var(--status-ok)" />
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+              <span style={{ fontSize: 'var(--text-xs)', color: 'var(--text-secondary)', width: 60 }}>Errors</span>
+              <Sparkline data={[0.12, 0.08, 0.06, 0.05, 0.04, 0.03, 0.02]} color="var(--status-critical)" />
             </div>
           </div>
         </Preview>
 
-        <Preview label="LogViewer" description="Structured log viewer" glow="monitor" wide code={`<LogViewer lines={logs} maxLines={200} autoTail />`}>
-          <LogViewer lines={logs} maxLines={200} autoTail />
+        {/* LogViewer */}
+        <Preview label="LogViewer" description="Real-time log output with levels" wide>
+          <LogViewer
+            lines={logLines}
+            showTimestamp
+            showLevel
+            maxLines={50}
+          />
+        </Preview>
+
+        {/* PipelineStage */}
+        <Preview label="PipelineStage" description="Build pipeline: build > test > deploy > release" wide>
+          <PipelineStage stages={pipelineStages} />
+        </Preview>
+
+        {/* UptimeTracker */}
+        <Preview label="UptimeTracker" description="30-day uptime bar chart">
+          <UptimeTracker days={uptimeDays} slaTarget={0.999} showSla />
+        </Preview>
+
+        {/* HeatmapCalendar */}
+        <Preview label="HeatmapCalendar" description="90-day activity heatmap">
+          <HeatmapCalendar data={heatmapData} showTooltip />
+        </Preview>
+
+        {/* SeverityTimeline */}
+        <Preview label="SeverityTimeline" description="Incident timeline with severity levels" wide>
+          <SeverityTimeline events={timelineEvents} expandable />
+        </Preview>
+
+        {/* PortStatusGrid */}
+        <Preview label="PortStatusGrid" description="Service port status overview">
+          <PortStatusGrid ports={ports} columns={4} size="md" />
+        </Preview>
+
+        {/* TimeRangeSelector */}
+        <Preview label="TimeRangeSelector" description="Time range presets with custom option">
+          <TimeRangeSelector showCustom />
         </Preview>
       </div>
     </div>
   )
 }
-export default MonitorPage

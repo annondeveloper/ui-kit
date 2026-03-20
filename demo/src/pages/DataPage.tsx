@@ -1,224 +1,254 @@
 import { useState } from 'react'
-import { Preview } from '../components/Preview.tsx'
-import {
-  SmartTable, DataTable, DiffViewer, HeatmapCalendar,
-  CopyBlock, TruncatedText, EmptyState, Button,
-  TreeView,
-  type HeatmapData, type TreeNode, type ColumnDef,
-} from '@ui/index'
-import { Folder, FileText, FileCode, FileJson, Image, Settings, Inbox, Plus, Search } from 'lucide-react'
+import { Preview } from '../components/Preview'
+import { Tabs, TabPanel } from '@ui/components/tabs'
+import { Button } from '@ui/components/button'
+import { Icon } from '@ui/core/icons/icon'
+import { DataTable } from '@ui/domain/data-table'
+import { SmartTable } from '@ui/domain/smart-table'
+import { TreeView } from '@ui/domain/tree-view'
+import { SortableList } from '@ui/domain/sortable-list'
+import { CopyBlock } from '@ui/domain/copy-block'
+import { DiffViewer } from '@ui/domain/diff-viewer'
+import { EmptyState } from '@ui/domain/empty-state'
+import type { ColumnDef } from '@ui/domain/data-table'
+import type { TreeNode } from '@ui/domain/tree-view'
+import type { SortableItem } from '@ui/domain/sortable-list'
 
-interface DeviceRow {
-  name: string
+interface Server {
+  hostname: string
   ip: string
-  vendor: string
-  status: string
+  os: string
   cpu: number
+  memory: number
+  status: string
   uptime: string
+  region: string
 }
 
-const deviceData: DeviceRow[] = [
-  { name: 'core-sw-01', ip: '10.0.0.1', vendor: 'Cisco', status: 'active', cpu: 67, uptime: '142d 3h' },
-  { name: 'dist-sw-02', ip: '10.0.1.2', vendor: 'Juniper', status: 'active', cpu: 45, uptime: '89d 12h' },
-  { name: 'edge-fw-01', ip: '10.0.2.1', vendor: 'FortiGate', status: 'warning', cpu: 82, uptime: '34d 7h' },
-  { name: 'access-sw-05', ip: '10.0.3.5', vendor: 'Arista', status: 'active', cpu: 23, uptime: '203d 1h' },
-  { name: 'dc-spine-01', ip: '10.0.4.1', vendor: 'Nokia', status: 'active', cpu: 55, uptime: '67d 18h' },
-  { name: 'wan-rtr-03', ip: '10.0.5.3', vendor: 'Cisco', status: 'critical', cpu: 94, uptime: '12d 5h' },
-  { name: 'lb-prod-01', ip: '10.0.6.1', vendor: 'F5', status: 'active', cpu: 38, uptime: '256d 0h' },
-  { name: 'mgmt-sw-01', ip: '10.0.7.1', vendor: 'HP', status: 'active', cpu: 12, uptime: '365d 2h' },
-  { name: 'wifi-ctrl-01', ip: '10.0.8.1', vendor: 'Aruba', status: 'active', cpu: 31, uptime: '78d 14h' },
-  { name: 'san-sw-01', ip: '10.0.9.1', vendor: 'Brocade', status: 'maintenance', cpu: 8, uptime: '445d 6h' },
+const serverData: Server[] = [
+  { hostname: 'prod-api-01', ip: '10.0.1.10', os: 'Ubuntu 24.04', cpu: 45, memory: 62, status: 'Online', uptime: '47d', region: 'us-east-1' },
+  { hostname: 'prod-api-02', ip: '10.0.1.11', os: 'Ubuntu 24.04', cpu: 72, memory: 81, status: 'Online', uptime: '47d', region: 'us-east-1' },
+  { hostname: 'prod-db-01', ip: '10.0.2.10', os: 'Debian 12', cpu: 38, memory: 55, status: 'Online', uptime: '120d', region: 'us-east-1' },
+  { hostname: 'staging-api', ip: '10.0.3.10', os: 'Ubuntu 24.04', cpu: 12, memory: 34, status: 'Online', uptime: '15d', region: 'eu-west-1' },
+  { hostname: 'edge-fw-01', ip: '10.0.0.1', os: 'pfSense', cpu: 94, memory: 67, status: 'Warning', uptime: '230d', region: 'us-east-1' },
+  { hostname: 'cache-01', ip: '10.0.4.10', os: 'Alpine 3.19', cpu: 8, memory: 92, status: 'Online', uptime: '60d', region: 'us-west-2' },
+  { hostname: 'monitor-01', ip: '10.0.5.10', os: 'Rocky 9', cpu: 25, memory: 48, status: 'Online', uptime: '90d', region: 'eu-west-1' },
+  { hostname: 'backup-01', ip: '10.0.6.10', os: 'Debian 12', cpu: 5, memory: 30, status: 'Offline', uptime: '0d', region: 'us-west-2' },
 ]
 
-const columns: ColumnDef<DeviceRow>[] = [
-  { id: 'name', header: 'Device', accessor: 'name', sortable: true },
-  { id: 'ip', header: 'IP Address', accessor: 'ip', sortable: true },
-  { id: 'vendor', header: 'Vendor', accessor: 'vendor', sortable: true },
+const columns: ColumnDef<Server>[] = [
+  { id: 'hostname', header: 'Hostname', accessor: 'hostname', sortable: true },
+  { id: 'ip', header: 'IP Address', accessor: 'ip' },
+  { id: 'os', header: 'OS', accessor: 'os' },
+  { id: 'cpu', header: 'CPU %', accessor: 'cpu', sortable: true, align: 'right', cell: (v) => `${v}%` },
+  { id: 'memory', header: 'Memory %', accessor: 'memory', sortable: true, align: 'right', cell: (v) => `${v}%` },
   { id: 'status', header: 'Status', accessor: 'status', sortable: true },
-  { id: 'cpu', header: 'CPU %', accessor: 'cpu', sortable: true, align: 'right' },
-  { id: 'uptime', header: 'Uptime', accessor: 'uptime' },
+  { id: 'uptime', header: 'Uptime', accessor: 'uptime', align: 'right' },
+  { id: 'region', header: 'Region', accessor: 'region' },
 ]
 
-const oldConfig = `hostname core-sw-01
-!
-interface GigabitEthernet0/0/0
-  ip address 10.0.0.1 255.255.255.0
-  no shutdown
-!
-router ospf 1
-  network 10.0.0.0 0.0.0.255 area 0
-  passive-interface default
-!`
+const treeNodes: TreeNode[] = [
+  {
+    id: 'src',
+    label: 'src',
+    icon: <Icon name="folder" size="sm" />,
+    children: [
+      {
+        id: 'components',
+        label: 'components',
+        icon: <Icon name="folder" size="sm" />,
+        children: [
+          { id: 'button.tsx', label: 'button.tsx', icon: <Icon name="file" size="sm" /> },
+          { id: 'card.tsx', label: 'card.tsx', icon: <Icon name="file" size="sm" /> },
+          { id: 'dialog.tsx', label: 'dialog.tsx', icon: <Icon name="file" size="sm" /> },
+        ],
+      },
+      {
+        id: 'core',
+        label: 'core',
+        icon: <Icon name="folder" size="sm" />,
+        children: [
+          { id: 'motion', label: 'motion', icon: <Icon name="folder" size="sm" />, children: [
+            { id: 'spring.ts', label: 'spring.ts', icon: <Icon name="file" size="sm" /> },
+            { id: 'use-spring.ts', label: 'use-spring.ts', icon: <Icon name="file" size="sm" /> },
+          ]},
+          { id: 'tokens', label: 'tokens', icon: <Icon name="folder" size="sm" />, children: [
+            { id: 'theme.css', label: 'theme.css', icon: <Icon name="file" size="sm" /> },
+          ]},
+        ],
+      },
+      { id: 'index.ts', label: 'index.ts', icon: <Icon name="file" size="sm" /> },
+    ],
+  },
+  {
+    id: 'package.json',
+    label: 'package.json',
+    icon: <Icon name="file" size="sm" />,
+  },
+]
 
-const newConfig = `hostname core-sw-01
-!
-interface GigabitEthernet0/0/0
-  ip address 10.0.0.1 255.255.255.0
-  description UPLINK-TO-SPINE
-  no shutdown
-!
-interface GigabitEthernet0/0/1
-  ip address 10.0.1.1 255.255.255.0
-  no shutdown
-!
-router ospf 1
-  network 10.0.0.0 0.0.0.255 area 0
-  network 10.0.1.0 0.0.0.255 area 0
-!`
+const codeExample = `import { Button } from '@annondeveloper/ui-kit'
+import { useForm, createForm, v } from '@annondeveloper/ui-kit/form'
+import { generateTheme } from '@annondeveloper/ui-kit/theme'
 
-const heatmapData: HeatmapData[] = Array.from({ length: 90 }, (_, i) => {
-  const d = new Date(); d.setDate(d.getDate() - 89 + i)
-  return { date: d.toISOString().slice(0, 10), value: Math.floor(Math.random() * 100) }
+const myForm = createForm({
+  fields: {
+    email: { initial: '', validate: v.pipe(v.required(), v.email()) },
+    password: { initial: '', validate: v.minLength(8) },
+  },
+  onSubmit: (values) => console.log(values),
 })
 
-const bashCode = `#!/bin/bash
-# Install and start netrak agent
-curl -sL https://get.netrak.io/agent | bash
-sudo systemctl enable --now netrak-agent
-netrak-agent --status`
+export function LoginPage() {
+  const form = useForm(myForm)
+  return <Form form={form}>...</Form>
+}`
 
-const jsonCode = `{
-  "entity": {
-    "type": "network_device",
-    "vendor": "Cisco",
-    "model": "C9300-48P",
-    "serial": "FCW2345G0AB"
-  },
-  "metrics": {
-    "cpu_usage": 67.2,
-    "mem_usage": 4.1,
-    "uptime_seconds": 12268800
+const oldCode = `function fetchData() {
+  return fetch('/api/data')
+    .then(res => res.json())
+    .then(data => {
+      setState(data)
+    })
+}`
+
+const newCode = `async function fetchData() {
+  try {
+    const res = await fetch('/api/data')
+    const data = await res.json()
+    setState(data)
+  } catch (err) {
+    setError(err.message)
   }
 }`
 
-const treeData: TreeNode[] = [
-  {
-    id: 'project',
-    label: 'netrak/',
-    icon: Folder,
-    children: [
-      {
-        id: 'backend',
-        label: 'backend/',
-        icon: Folder,
-        children: [
-          { id: 'cargo', label: 'Cargo.toml', icon: Settings },
-          {
-            id: 'crates',
-            label: 'crates/',
-            icon: Folder,
-            children: [
-              { id: 'server', label: 'server/', icon: Folder, children: [
-                { id: 'main-rs', label: 'main.rs', icon: FileCode },
-                { id: 'routes', label: 'routes/', icon: Folder, children: [
-                  { id: 'mod-rs', label: 'mod.rs', icon: FileCode },
-                  { id: 'entities-rs', label: 'entities.rs', icon: FileCode },
-                  { id: 'metrics-rs', label: 'metrics.rs', icon: FileCode },
-                ]},
-              ]},
-              { id: 'common', label: 'common/', icon: Folder, children: [
-                { id: 'lib-rs', label: 'lib.rs', icon: FileCode },
-              ]},
-              { id: 'snmp-engine', label: 'snmp-engine/', icon: Folder },
-            ],
-          },
-        ],
-      },
-      {
-        id: 'frontend',
-        label: 'frontend/',
-        icon: Folder,
-        children: [
-          { id: 'package-json', label: 'package.json', icon: FileJson },
-          { id: 'tsconfig', label: 'tsconfig.json', icon: FileJson },
-          { id: 'app', label: 'app/', icon: Folder, children: [
-            { id: 'layout', label: 'layout.tsx', icon: FileCode },
-            { id: 'page', label: 'page.tsx', icon: FileCode },
-          ]},
-          { id: 'components', label: 'components/', icon: Folder },
-        ],
-      },
-      { id: 'readme', label: 'README.md', icon: FileText },
-      { id: 'screenshot', label: 'screenshot.png', icon: Image, disabled: true },
-    ],
-  },
-]
+const grid: React.CSSProperties = {
+  display: 'grid',
+  gridTemplateColumns: 'repeat(auto-fill, minmax(400px, 1fr))',
+  gap: '1rem',
+}
 
-export function DataPage() {
-  const [selectedNode, setSelectedNode] = useState<string>('main-rs')
+export default function DataPage() {
+  const [activeTab, setActiveTab] = useState('overview')
+  const [sortItems, setSortItems] = useState<SortableItem[]>([
+    { id: '1', content: 'Deploy to production' },
+    { id: '2', content: 'Run integration tests' },
+    { id: '3', content: 'Review pull request' },
+    { id: '4', content: 'Update documentation' },
+    { id: '5', content: 'Fix CI pipeline' },
+  ])
 
   return (
-    <div className="max-w-5xl mx-auto px-4 sm:px-6 py-8 sm:py-10">
-      <div className="mb-8">
-        <h1 className="text-2xl font-bold text-[hsl(var(--text-primary))] mb-1">Data</h1>
-        <p className="text-sm text-[hsl(var(--text-secondary))]">9 components for data display, analysis, and interaction</p>
+    <div style={{ maxWidth: 1200, margin: '0 auto' }}>
+      <div style={{ marginBottom: '2rem' }}>
+        <h1 style={{ fontSize: 'var(--text-2xl)', fontWeight: 800, letterSpacing: '-0.02em', marginBottom: '0.25rem' }}>Data</h1>
+        <p style={{ fontSize: 'var(--text-sm)', color: 'var(--text-secondary)' }}>Tables, trees, code blocks, and data display components</p>
       </div>
-      <div className="grid grid-cols-1 gap-6 stagger">
-        <Preview label="SmartTable" description="Auto-suggested filters + full DataTable features" glow="realtime" wide code={`<SmartTable columns={columns} data={devices} />`}>
-          <SmartTable columns={columns} data={deviceData} />
+
+      <div style={grid}>
+        {/* Tabs */}
+        <Preview label="Tabs" description="3 variants: underline, pills, enclosed">
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+            <Tabs
+              tabs={[
+                { id: 'overview', label: 'Overview' },
+                { id: 'analytics', label: 'Analytics' },
+                { id: 'settings', label: 'Settings' },
+              ]}
+              activeTab={activeTab}
+              onChange={setActiveTab}
+              variant="underline"
+            >
+              <TabPanel tabId="overview">
+                <div style={{ padding: '0.75rem 0', fontSize: 'var(--text-sm)', color: 'var(--text-secondary)' }}>
+                  Welcome to the overview panel. This shows general information about your project.
+                </div>
+              </TabPanel>
+              <TabPanel tabId="analytics">
+                <div style={{ padding: '0.75rem 0', fontSize: 'var(--text-sm)', color: 'var(--text-secondary)' }}>
+                  Analytics dashboard with charts and metrics would appear here.
+                </div>
+              </TabPanel>
+              <TabPanel tabId="settings">
+                <div style={{ padding: '0.75rem 0', fontSize: 'var(--text-sm)', color: 'var(--text-secondary)' }}>
+                  Configure project settings: notifications, integrations, and team access.
+                </div>
+              </TabPanel>
+            </Tabs>
+          </div>
         </Preview>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <Preview label="DiffViewer" description="Side-by-side config diff" code={`<DiffViewer oldValue={old} newValue={new} />`}>
-            <div className="max-h-[240px] overflow-y-auto">
-              <DiffViewer oldValue={oldConfig} newValue={newConfig} />
-            </div>
-          </Preview>
+        {/* TreeView */}
+        <Preview label="TreeView" description="Nested file structure with expand/collapse">
+          <TreeView
+            nodes={treeNodes}
+            showGuides
+          />
+        </Preview>
 
-          <Preview label="TreeView" description="File browser tree with expand/collapse" code={`<TreeView\n  data={treeData}\n  selected={selectedNode}\n  onSelect={setSelected}\n/>`}>
-            <div className="max-h-[260px] overflow-y-auto">
-              <TreeView
-                data={treeData}
-                selected={selectedNode}
-                onSelect={setSelectedNode}
-                defaultExpanded={['project', 'backend', 'crates', 'server', 'frontend']}
-              />
-            </div>
-          </Preview>
-        </div>
+        {/* DataTable */}
+        <Preview label="DataTable" description="8 servers with sortable columns" wide>
+          <DataTable
+            data={serverData}
+            columns={columns}
+            selectable
+          />
+        </Preview>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <Preview label="HeatmapCalendar" description="90-day activity heatmap" code={`<HeatmapCalendar data={days} />`}>
-            <HeatmapCalendar data={heatmapData} />
-          </Preview>
+        {/* SmartTable */}
+        <Preview label="SmartTable" description="Built-in search and pagination" wide>
+          <SmartTable
+            data={serverData}
+            columns={columns}
+            searchable
+            searchPlaceholder="Search servers..."
+            paginated
+            pageSize={4}
+          />
+        </Preview>
 
-          <Preview label="CopyBlock" description="Code blocks with copy button" code={`<CopyBlock content={code} language="bash" />`}>
-            <div className="space-y-3">
-              <CopyBlock content={bashCode} language="bash" />
-              <CopyBlock content={jsonCode} language="json" />
-            </div>
-          </Preview>
-        </div>
+        {/* SortableList */}
+        <Preview label="SortableList" description="Drag to reorder items">
+          <SortableList
+            items={sortItems}
+            onChange={setSortItems}
+            handle
+          />
+        </Preview>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <Preview label="TruncatedText" description="Truncated text with tooltip" code={`<TruncatedText text={longText} maxWidth={200} />`}>
-            <div className="space-y-3">
-              <TruncatedText text="This is a very long hostname that will be truncated: dc01-rack14-sw-access-port-bundle-aggr-01.datacenter.example.com" maxWidth={280} />
-              <TruncatedText text="Short text" maxWidth={280} />
-              <TruncatedText text="Another long string: enterprise-monitoring-platform-core-service-mesh-gateway-primary.internal.corp.netrak.io" maxWidth={280} />
-            </div>
-          </Preview>
+        {/* CopyBlock */}
+        <Preview label="CopyBlock" description="Syntax-highlighted TypeScript with copy">
+          <CopyBlock
+            code={codeExample}
+            language="typescript"
+            showLineNumbers
+            title="Getting Started"
+          />
+        </Preview>
 
-          <Preview label="EmptyState" description="Purposeful empty state with CTA" code={`<EmptyState\n  icon={Inbox}\n  title="No devices found"\n  actions={<Button>Add</Button>}\n/>`}>
-            <EmptyState
-              icon={Inbox}
-              title="No devices found"
-              description="Add your first device to start monitoring."
-              actions={
-                <div className="flex flex-wrap gap-2">
-                  <Button size="sm"><Plus className="size-3.5" /> Add Device</Button>
-                  <Button variant="outline" size="sm"><Search className="size-3.5" /> Run Discovery</Button>
-                </div>
-              }
-            />
-          </Preview>
-        </div>
+        {/* DiffViewer */}
+        <Preview label="DiffViewer" description="Before/after code comparison" wide>
+          <DiffViewer
+            oldValue={oldCode}
+            newValue={newCode}
+            oldTitle="Before"
+            newTitle="After"
+            mode="unified"
+            showLineNumbers
+          />
+        </Preview>
 
-        <Preview label="DataTable" description="Full-featured data table" wide code={`<DataTable columns={columns} data={data} selectable pageSize={5} />`}>
-          <DataTable columns={columns} data={deviceData} selectable pageSize={5} />
+        {/* EmptyState */}
+        <Preview label="EmptyState" description="Placeholder for empty views">
+          <EmptyState
+            icon={<Icon name="search" size="lg" />}
+            title="No results found"
+            description="Try adjusting your search or filters to find what you're looking for."
+            action={<Button variant="primary" size="sm">Clear Filters</Button>}
+            secondaryAction={<Button variant="ghost" size="sm">Browse All</Button>}
+          />
         </Preview>
       </div>
     </div>
   )
 }
-export default DataPage

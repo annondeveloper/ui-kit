@@ -1,219 +1,104 @@
-import { useState, useEffect, useCallback, useRef } from 'react'
-import { Link } from 'react-router-dom'
-import { Copy, Check, Activity, Gauge, Database, MousePointerClick, Layers, PenLine, Layout } from 'lucide-react'
-import {
-  MetricCard, Sparkline, StatusBadge, Badge, AnimatedCounter,
-  DensityProvider, TypingIndicator, ThresholdGauge, UtilizationBar,
-  StatusPulse, Button, FilterPill,
-  type Density,
-} from '@ui/index'
+import { Button } from '@ui/components/button'
+import { Card } from '@ui/components/card'
+import { Badge } from '@ui/components/badge'
+import { Icon } from '@ui/core/icons/icon'
+import { AnimatedCounter } from '@ui/components/animated-counter'
+import { MetricCard } from '@ui/domain/metric-card'
 
-const sparkBase = [40, 42, 38, 45, 50, 48, 52, 55, 53, 58, 60, 62]
-
-const categories = [
-  { path: '/core',        label: 'Core',            icon: Layers,            count: 14, desc: 'Buttons, badges, cards, tabs, avatars, progress', preview: 'core' },
-  { path: '/forms',       label: 'Forms',           icon: PenLine,           count: 9,  desc: 'Inputs, selects, sliders, combobox', preview: 'forms' },
-  { path: '/overlays',    label: 'Overlays',        icon: Layout,            count: 9,  desc: 'Dialogs, sheets, tooltips, toasts, menus', preview: 'core' },
-  { path: '/data',        label: 'Data',            icon: Database,          count: 9,  desc: 'Tables, diffs, heatmaps, tree view', preview: 'data' },
-  { path: '/monitor',     label: 'Monitoring',      icon: Gauge,             count: 13, desc: 'Gauges, sparklines, grids, theme generator', preview: 'monitor' },
-  { path: '/ai',          label: 'AI & Realtime',   icon: Activity,          count: 5,  desc: 'Streaming, typing, confidence, live feed', preview: 'ai' },
-  { path: '/interactive', label: 'Interactive',      icon: MousePointerClick, count: 9,  desc: 'Drag, sort, kanban, density, scroll reveal', preview: 'interactive' },
-  { path: '/layout',      label: 'Layout',          icon: Layout,            count: 6,  desc: 'Skeletons, file upload, infinite scroll', preview: 'layout' },
-]
-
-function MiniPreview({ type }: { type: string }) {
-  switch (type) {
-    case 'ai':
-      return <TypingIndicator variant="dots" label="AI thinking" />
-    case 'monitor':
-      return (
-        <div className="flex items-center gap-2">
-          <StatusPulse status="ok" />
-          <Sparkline data={[30, 35, 32, 40, 42, 38, 45]} width={60} height={16} color="hsl(var(--status-ok))" />
-        </div>
-      )
-    case 'data':
-      return (
-        <div className="flex gap-1">
-          {[65, 82, 45, 90, 30].map((v, i) => (
-            <div key={i} className="w-2 rounded-sm bg-[hsl(var(--brand-primary))]" style={{ height: `${v * 0.2}px`, opacity: 0.3 + v / 140 }} />
-          ))}
-        </div>
-      )
-    case 'interactive':
-      return (
-        <div className="flex gap-1.5">
-          <FilterPill label="All" active onClick={() => {}} />
-          <FilterPill label="Active" active={false} onClick={() => {}} />
-        </div>
-      )
-    case 'core':
-      return (
-        <div className="flex gap-1">
-          <Badge color="green" size="xs">Active</Badge>
-          <Badge color="red" size="xs">Alert</Badge>
-        </div>
-      )
-    case 'forms':
-      return (
-        <div className="w-full h-2 rounded bg-[hsl(var(--bg-elevated))]">
-          <div className="h-full w-3/5 rounded bg-[hsl(var(--brand-primary))]" />
-        </div>
-      )
-    case 'layout':
-      return (
-        <div className="space-y-1">
-          <div className="h-1.5 w-full rounded bg-[hsl(var(--bg-elevated))] animate-pulse" />
-          <div className="h-1.5 w-3/4 rounded bg-[hsl(var(--bg-elevated))] animate-pulse" />
-        </div>
-      )
-    default:
-      return null
-  }
-}
-
-export function Home() {
-  const [copied, setCopied] = useState(false)
-  const [rps, setRps] = useState(12847)
-  const [latency, setLatency] = useState(2.4)
-  const [uptime, setUptime] = useState(99.97)
-  const [errors, setErrors] = useState(5)
-  const [sparkData, setSparkData] = useState(sparkBase)
-  const [density, setDensity] = useState<Density>('comfortable')
-  const heroRef = useRef<HTMLDivElement>(null)
-  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null)
-
-  // Only tick when hero is in viewport
-  useEffect(() => {
-    const el = heroRef.current
-    if (!el) return
-    const obs = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          if (!timerRef.current) {
-            timerRef.current = setInterval(() => {
-              setRps(p => p + Math.floor(Math.random() * 200 - 80))
-              setLatency(p => Math.max(0.5, p + (Math.random() - 0.5) * 0.4))
-              setUptime(p => Math.min(100, Math.max(99.8, p + (Math.random() - 0.5) * 0.02)))
-              setErrors(p => Math.max(0, p + Math.floor(Math.random() * 4 - 2)))
-              setSparkData(p => [...p.slice(1), p[p.length - 1] + Math.floor(Math.random() * 10 - 4)])
-            }, 2000)
-          }
-        } else if (timerRef.current) {
-          clearInterval(timerRef.current)
-          timerRef.current = null
-        }
-      },
-      { threshold: 0.1 },
-    )
-    obs.observe(el)
-    return () => {
-      obs.disconnect()
-      if (timerRef.current) clearInterval(timerRef.current)
-    }
-  }, [])
-
-  const handleCopy = useCallback(() => {
-    void navigator.clipboard.writeText('npm install @annondeveloper/ui-kit').then(() => {
-      setCopied(true)
-      setTimeout(() => setCopied(false), 2000)
-    })
-  }, [])
-
+export default function Home() {
   return (
-    <div className="max-w-5xl mx-auto px-4 sm:px-6 py-8 sm:py-12">
+    <div>
       {/* Hero */}
-      <div className="text-center mb-8 sm:mb-12 stagger">
-        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[hsl(var(--brand-primary))]/10 text-[hsl(var(--brand-primary))] text-xs font-medium mb-6">
-          <span className="size-1.5 rounded-full bg-[hsl(var(--brand-primary))] animate-pulse" />
-          v2 — 62 components, zero deps, Aurora Fluid design
-        </div>
-        <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-[hsl(var(--text-primary))] tracking-tight mb-4">
-          Build dashboards<br className="hidden sm:block" /> that <span className="text-[hsl(var(--brand-primary))]">operate.</span>
+      <div style={{ textAlign: 'center', padding: '4rem 0 3rem', maxWidth: 700, margin: '0 auto' }}>
+        <Badge variant="primary" size="md" style={{ marginBottom: '1rem' }}>v2.0 -- Zero Dependencies</Badge>
+        <h1 style={{
+          fontSize: 'var(--text-2xl)',
+          fontWeight: 800,
+          letterSpacing: '-0.03em',
+          lineHeight: 1.1,
+          marginBottom: '1rem',
+          textWrap: 'balance',
+        }}>
+          The component library<br />that needs nothing else
         </h1>
-        <p className="text-base sm:text-lg text-[hsl(var(--text-secondary))] max-w-xl mx-auto mb-6">
-          Production-grade React components for monitoring, observability, and infrastructure management.
+        <p style={{
+          fontSize: 'var(--text-lg)',
+          color: 'var(--text-secondary)',
+          lineHeight: 1.6,
+          maxWidth: 500,
+          margin: '0 auto 2rem',
+          textWrap: 'pretty',
+        }}>
+          62 components. Physics animations. OKLCH colors. Aurora Fluid design.
+          Built from scratch with zero external dependencies.
         </p>
-        <button
-          onClick={handleCopy}
-          className="inline-flex items-center gap-3 px-5 py-2.5 rounded-xl bg-[hsl(var(--bg-surface))] border border-[hsl(var(--border-default))] hover:border-[hsl(var(--brand-primary))] transition-colors text-sm font-mono text-[hsl(var(--text-secondary))] cursor-pointer"
-        >
-          <span className="hidden sm:inline">npm install @annondeveloper/ui-kit</span>
-          <span className="sm:hidden">npm i @annondeveloper/ui-kit</span>
-          {copied ? <Check className="size-4 text-[hsl(var(--status-ok))]" /> : <Copy className="size-4" />}
-        </button>
-      </div>
-
-      {/* Live mini dashboard hero */}
-      <div ref={heroRef} className="mb-10 sm:mb-16 rounded-2xl border border-[hsl(var(--border-subtle))] bg-[hsl(var(--bg-surface))] p-4 sm:p-6 shadow-lg stagger">
-        <div className="flex flex-wrap items-center gap-2 mb-4">
-          <span className="size-2 rounded-full bg-[hsl(var(--status-ok))] animate-pulse" />
-          <span className="text-xs font-medium text-[hsl(var(--text-secondary))]">Live dashboard preview</span>
-          <div className="ml-auto flex gap-1.5 items-center">
-            <StatusBadge status="active" size="sm" />
-            <Badge color="purple" size="xs">v2</Badge>
-          </div>
-        </div>
-
-        {/* Density toggle */}
-        <div className="flex items-center gap-2 mb-4">
-          <span className="text-xs text-[hsl(var(--text-tertiary))]">Density:</span>
-          {(['compact', 'comfortable', 'spacious'] as Density[]).map(d => (
-            <button
-              key={d}
-              onClick={() => setDensity(d)}
-              className={`text-xs px-2.5 py-1 rounded-lg transition-colors cursor-pointer ${
-                density === d
-                  ? 'bg-[hsl(var(--brand-primary))]/15 text-[hsl(var(--brand-primary))] font-medium'
-                  : 'text-[hsl(var(--text-tertiary))] hover:text-[hsl(var(--text-secondary))] hover:bg-[hsl(var(--bg-elevated))]'
-              }`}
-            >
-              {d}
-            </button>
-          ))}
-        </div>
-
-        <DensityProvider density={density}>
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-4">
-            <MetricCard title="Requests/sec" value={rps.toLocaleString()} change={{ value: 2.4, period: '1h' }} trend="up" status="ok" sparkline={sparkData} />
-            <MetricCard title="Avg Latency" value={`${latency.toFixed(1)}ms`} change={{ value: -0.2 }} trend="down" status="ok" />
-            <MetricCard title="Uptime" value={`${uptime.toFixed(2)}%`} change={{ value: 0.02 }} trend="up" status="ok" />
-            <MetricCard title="Errors" value={String(errors)} change={{ value: -3 }} trend="down" status={errors > 10 ? 'warning' : 'ok'} />
-          </div>
-        </DensityProvider>
-
-        <div className="flex flex-wrap items-center gap-4 sm:gap-6 text-xs text-[hsl(var(--text-tertiary))]">
-          <span className="tabular-nums"><AnimatedCounter value={rps} /> events processed</span>
-          <Sparkline data={sparkData} width={120} height={20} color="hsl(var(--brand-primary))" />
+        <div style={{ display: 'flex', gap: '0.75rem', justifyContent: 'center', flexWrap: 'wrap' }}>
+          <Button variant="primary" size="lg" icon={<Icon name="zap" size="sm" />}>Get Started</Button>
+          <Button variant="secondary" size="lg" icon={<Icon name="code" size="sm" />}>View Source</Button>
         </div>
       </div>
 
-      {/* Category grid */}
-      <h2 className="text-xl font-semibold text-[hsl(var(--text-primary))] mb-6">Browse components</h2>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 stagger">
-        {categories.map(c => (
-          <Link
-            key={c.path}
-            to={c.path}
-            className="group rounded-2xl border border-[hsl(var(--border-subtle))] bg-[hsl(var(--bg-surface))] p-4 sm:p-5 hover:border-[hsl(var(--border-default))] hover:shadow-lg transition-all duration-200"
-          >
-            <div className="flex items-start justify-between mb-3">
-              <c.icon className="size-5 text-[hsl(var(--text-tertiary))] group-hover:text-[hsl(var(--brand-primary))] transition-colors" />
-              <span className="text-[10px] tabular-nums px-2 py-0.5 rounded-full bg-[hsl(var(--bg-overlay))] text-[hsl(var(--text-tertiary))] font-medium">
-                {c.count}
-              </span>
-            </div>
-            <h3 className="text-sm font-semibold text-[hsl(var(--text-primary))] mb-1 group-hover:text-[hsl(var(--brand-primary))] transition-colors">
-              {c.label}
-            </h3>
-            <p className="text-xs text-[hsl(var(--text-tertiary))] mb-3">{c.desc}</p>
-            <div className="pt-2 border-t border-[hsl(var(--border-subtle))]">
-              <MiniPreview type={c.preview} />
-            </div>
-          </Link>
+      {/* Stats */}
+      <div style={{
+        display: 'grid',
+        gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))',
+        gap: '1rem',
+        marginBottom: '3rem',
+      }}>
+        <Card variant="default" padding="md">
+          <div style={{ fontSize: 'var(--text-xs)', color: 'var(--text-tertiary)', marginBottom: '0.25rem' }}>Components</div>
+          <AnimatedCounter value={62} style={{ fontSize: 'var(--text-xl)', fontWeight: 700 }} />
+        </Card>
+        <Card variant="default" padding="md">
+          <div style={{ fontSize: 'var(--text-xs)', color: 'var(--text-tertiary)', marginBottom: '0.25rem' }}>Tests Passing</div>
+          <AnimatedCounter value={2418} style={{ fontSize: 'var(--text-xl)', fontWeight: 700 }} />
+        </Card>
+        <Card variant="default" padding="md">
+          <div style={{ fontSize: 'var(--text-xs)', color: 'var(--text-tertiary)', marginBottom: '0.25rem' }}>Bundle Size (gzip)</div>
+          <div style={{ fontSize: 'var(--text-xl)', fontWeight: 700 }}>100 KB</div>
+        </Card>
+        <Card variant="default" padding="md">
+          <div style={{ fontSize: 'var(--text-xs)', color: 'var(--text-tertiary)', marginBottom: '0.25rem' }}>Dependencies</div>
+          <AnimatedCounter value={0} style={{ fontSize: 'var(--text-xl)', fontWeight: 700 }} />
+        </Card>
+      </div>
+
+      {/* Live Dashboard Preview */}
+      <h2 style={{ fontSize: 'var(--text-xl)', fontWeight: 700, marginBottom: '1rem' }}>Live Dashboard Preview</h2>
+      <div style={{
+        display: 'grid',
+        gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
+        gap: '1rem',
+        marginBottom: '3rem',
+      }}>
+        <MetricCard title="CPU Usage" value="87.4%" trend="up" status="warning" sparkline={[45, 52, 49, 63, 72, 68, 75, 82, 87]} />
+        <MetricCard title="Memory" value="62.1%" trend="flat" status="ok" sparkline={[58, 60, 59, 61, 62, 61, 63, 62, 62]} />
+        <MetricCard title="Requests/s" value="1,247" trend="up" status="ok" sparkline={[800, 920, 1050, 1100, 1180, 1200, 1247]} />
+        <MetricCard title="Error Rate" value="0.03%" trend="down" status="ok" sparkline={[0.12, 0.08, 0.06, 0.05, 0.04, 0.03]} />
+      </div>
+
+      {/* Feature grid */}
+      <h2 style={{ fontSize: 'var(--text-xl)', fontWeight: 700, marginBottom: '1rem' }}>What Makes This Different</h2>
+      <div style={{
+        display: 'grid',
+        gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))',
+        gap: '1rem',
+      }}>
+        {[
+          { icon: 'zap' as const, title: 'Zero Dependencies', desc: 'Only react and react-dom. Everything else built from scratch.' },
+          { icon: 'activity' as const, title: 'Physics Animations', desc: 'Real spring solver (RK4). Not approximated curves.' },
+          { icon: 'eye' as const, title: 'Aurora Fluid Design', desc: 'Deep atmospheric surfaces, ambient glows, OKLCH colors.' },
+          { icon: 'terminal' as const, title: 'AI-Ready', desc: 'StreamingText, LiveFeed, RealtimeValue — built for AI interfaces.' },
+          { icon: 'check-circle' as const, title: '2,418 Tests', desc: 'Every component tested: render, interaction, a11y, motion.' },
+          { icon: 'settings' as const, title: 'Motion Control', desc: '4 levels: none, subtle, expressive, cinematic. User chooses.' },
+        ].map(f => (
+          <Card key={f.title} variant="default" padding="md" interactive>
+            <Icon name={f.icon} size="lg" style={{ color: 'var(--brand)', marginBottom: '0.75rem' }} />
+            <div style={{ fontWeight: 600, marginBottom: '0.25rem' }}>{f.title}</div>
+            <div style={{ fontSize: 'var(--text-sm)', color: 'var(--text-secondary)', lineHeight: 1.5 }}>{f.desc}</div>
+          </Card>
         ))}
       </div>
     </div>
   )
 }
-export default Home

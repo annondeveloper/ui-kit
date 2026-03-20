@@ -1,55 +1,15 @@
 import { useRef, useEffect, useState, useCallback, type ReactNode } from 'react'
-import { Copy, Check } from 'lucide-react'
+import { Icon } from '@ui/core/icons/icon'
 
 interface PreviewProps {
   label: string
   description?: string
-  code: string
-  glow?: 'ai' | 'monitor' | 'realtime' | 'interactive'
+  code?: string
   wide?: boolean
   children: ReactNode
 }
 
-const glowClass: Record<string, string> = {
-  ai: 'glow-ai',
-  monitor: 'glow-monitor',
-  realtime: 'glow-realtime',
-  interactive: 'glow-interactive',
-}
-
-function highlightCode(code: string): ReactNode[] {
-  const keywords = /\b(import|from|const|let|function|return|export|type|interface|true|false|null|undefined|new|await|async)\b/g
-  const strings = /(["'`])(?:(?!\1).)*\1/g
-  const comments = /\/\/.*/g
-
-  const parts: { start: number; end: number; cls: string }[] = []
-
-  for (const m of code.matchAll(strings)) {
-    parts.push({ start: m.index!, end: m.index! + m[0].length, cls: 'text-[hsl(var(--status-ok))]' })
-  }
-  for (const m of code.matchAll(keywords)) {
-    if (!parts.some(p => m.index! >= p.start && m.index! < p.end)) {
-      parts.push({ start: m.index!, end: m.index! + m[0].length, cls: 'text-[hsl(var(--brand-primary))]' })
-    }
-  }
-  for (const m of code.matchAll(comments)) {
-    parts.push({ start: m.index!, end: m.index! + m[0].length, cls: 'text-[hsl(var(--text-tertiary))]' })
-  }
-
-  parts.sort((a, b) => a.start - b.start)
-
-  const result: ReactNode[] = []
-  let lastIdx = 0
-  for (const p of parts) {
-    if (p.start > lastIdx) result.push(code.slice(lastIdx, p.start))
-    result.push(<span key={p.start} className={p.cls}>{code.slice(p.start, p.end)}</span>)
-    lastIdx = p.end
-  }
-  if (lastIdx < code.length) result.push(code.slice(lastIdx))
-  return result
-}
-
-export function Preview({ label, description, code, glow, wide, children }: PreviewProps) {
+export function Preview({ label, description, code, wide, children }: PreviewProps) {
   const ref = useRef<HTMLDivElement>(null)
   const [copied, setCopied] = useState(false)
   const [inView, setInView] = useState(false)
@@ -59,12 +19,7 @@ export function Preview({ label, description, code, glow, wide, children }: Prev
     if (!el) return
     const obs = new IntersectionObserver(
       ([entry]) => {
-        if (entry.isIntersecting) {
-          el.classList.add('in-view')
-          setInView(true)
-        } else {
-          setInView(false)
-        }
+        if (entry.isIntersecting) setInView(true)
       },
       { threshold: 0.15 },
     )
@@ -72,16 +27,8 @@ export function Preview({ label, description, code, glow, wide, children }: Prev
     return () => obs.disconnect()
   }, [])
 
-  // Subtle glow pulse when entering viewport
-  useEffect(() => {
-    const el = ref.current
-    if (!el || !inView) return
-    el.classList.add('viewport-highlight')
-    const t = setTimeout(() => el.classList.remove('viewport-highlight'), 1200)
-    return () => clearTimeout(t)
-  }, [inView])
-
   const handleCopy = useCallback(() => {
+    if (!code) return
     void navigator.clipboard.writeText(code).then(() => {
       setCopied(true)
       setTimeout(() => setCopied(false), 2000)
@@ -91,34 +38,72 @@ export function Preview({ label, description, code, glow, wide, children }: Prev
   return (
     <div
       ref={ref}
-      className={`preview-card ${glow ? glowClass[glow] : ''} ${wide ? 'col-span-full' : ''}`}
+      style={{
+        borderRadius: 'var(--radius-lg)',
+        border: '1px solid var(--border-subtle)',
+        background: 'var(--bg-surface)',
+        overflow: 'hidden',
+        opacity: inView ? 1 : 0,
+        transform: inView ? 'translateY(0)' : 'translateY(16px)',
+        transition: 'opacity 0.4s ease-out, transform 0.4s ease-out',
+        ...(wide ? { gridColumn: '1 / -1' } : {}),
+      }}
     >
       {/* Header */}
-      <div className="px-4 sm:px-5 pt-4 pb-3 border-b border-[hsl(var(--border-subtle))]">
-        <h3 className="text-sm font-semibold text-[hsl(var(--text-primary))]">{label}</h3>
+      <div style={{
+        padding: '1rem 1.25rem 0.75rem',
+        borderBottom: '1px solid var(--border-subtle)',
+      }}>
+        <h3 style={{ fontSize: 'var(--text-sm)', fontWeight: 600, color: 'var(--text-primary)' }}>{label}</h3>
         {description && (
-          <p className="text-xs text-[hsl(var(--text-secondary))] mt-0.5">{description}</p>
+          <p style={{ fontSize: 'var(--text-xs)', color: 'var(--text-secondary)', marginTop: '0.25rem' }}>{description}</p>
         )}
       </div>
 
       {/* Live demo */}
-      <div className="p-4 sm:p-5 min-h-[80px]">
+      <div style={{ padding: '1.25rem', minHeight: 80 }}>
         {children}
       </div>
 
       {/* Code */}
-      <div className="relative border-t border-[hsl(var(--border-subtle))] bg-[hsl(var(--bg-base))]">
-        <pre className="p-3 sm:p-4 text-xs leading-relaxed overflow-x-auto font-mono text-[hsl(var(--text-secondary))]">
-          <code>{highlightCode(code.trim())}</code>
-        </pre>
-        <button
-          onClick={handleCopy}
-          className="absolute top-2 right-2 p-1.5 rounded-md text-[hsl(var(--text-tertiary))] hover:text-[hsl(var(--text-primary))] hover:bg-[hsl(var(--bg-elevated))] transition-colors cursor-pointer"
-          aria-label="Copy code"
-        >
-          {copied ? <Check className="size-3.5" /> : <Copy className="size-3.5" />}
-        </button>
-      </div>
+      {code && (
+        <div style={{
+          position: 'relative',
+          borderTop: '1px solid var(--border-subtle)',
+          background: 'var(--bg-base)',
+        }}>
+          <pre style={{
+            padding: '0.75rem 1rem',
+            fontSize: 'var(--text-xs)',
+            lineHeight: 1.7,
+            overflowX: 'auto',
+            fontFamily: "'SF Mono', 'Fira Code', monospace",
+            color: 'var(--text-secondary)',
+            margin: 0,
+          }}>
+            <code>{code.trim()}</code>
+          </pre>
+          <button
+            onClick={handleCopy}
+            style={{
+              position: 'absolute',
+              top: '0.5rem',
+              right: '0.5rem',
+              padding: '0.375rem',
+              borderRadius: 'var(--radius-sm)',
+              border: 'none',
+              background: 'transparent',
+              color: copied ? 'var(--status-ok)' : 'var(--text-tertiary)',
+              cursor: 'pointer',
+              display: 'grid',
+              placeItems: 'center',
+            }}
+            aria-label="Copy code"
+          >
+            <Icon name={copied ? 'check' : 'copy'} size="sm" />
+          </button>
+        </div>
+      )}
     </div>
   )
 }
@@ -153,23 +138,4 @@ export function useInViewTimer(intervalMs: number, callback: () => void) {
   }, [intervalMs, callback])
 
   return ref
-}
-
-/** Hook: returns [ref, isInView] based on IntersectionObserver */
-export function useInView(threshold = 0.1): [React.RefObject<HTMLDivElement | null>, boolean] {
-  const ref = useRef<HTMLDivElement>(null)
-  const [inView, setInView] = useState(false)
-
-  useEffect(() => {
-    const el = ref.current
-    if (!el) return
-    const obs = new IntersectionObserver(
-      ([entry]) => setInView(entry.isIntersecting),
-      { threshold },
-    )
-    obs.observe(el)
-    return () => obs.disconnect()
-  }, [threshold])
-
-  return [ref, inView]
 }

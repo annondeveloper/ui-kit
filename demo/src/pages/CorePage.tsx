@@ -1,228 +1,293 @@
-import { useState, type ChangeEvent } from 'react'
-import { Preview } from '../components/Preview.tsx'
-import {
-  Button, Badge, Card, Avatar, AvatarGroup,
-  Skeleton, Progress, Checkbox, RadioGroup,
-  ToggleSwitch, Slider, StatusBadge, StatusPulse,
-  SuccessCheckmark, AnimatedCounter, Tabs,
-} from '@ui/index'
+import { useState } from 'react'
+import { Preview } from '../components/Preview'
+import { Button } from '@ui/components/button'
+import { Badge } from '@ui/components/badge'
+import { Avatar, AvatarGroup } from '@ui/components/avatar'
+import { Card } from '@ui/components/card'
+import { Skeleton } from '@ui/components/skeleton'
+import { Progress } from '@ui/components/progress'
+import { Checkbox } from '@ui/components/checkbox'
+import { RadioGroup } from '@ui/components/radio-group'
+import { ToggleSwitch } from '@ui/components/toggle-switch'
+import { Slider } from '@ui/components/slider'
+import { StatusBadge } from '@ui/components/status-badge'
+import { StatusPulse } from '@ui/components/status-pulse'
+import { SuccessCheckmark } from '@ui/components/success-checkmark'
+import { AnimatedCounter } from '@ui/components/animated-counter'
+import { Icon } from '@ui/core/icons/icon'
 
-export function CorePage() {
-  const [activeTab, setActiveTab] = useState('overview')
-  const [pillTab, setPillTab] = useState('all')
-  const [encTab, setEncTab] = useState('config')
-  const [checkKey, setCheckKey] = useState(0)
-  const [counter, setCounter] = useState(1000)
+const sectionTitle: React.CSSProperties = {
+  fontSize: 'var(--text-sm)',
+  fontWeight: 600,
+  color: 'var(--text-primary)',
+  marginBottom: '0.5rem',
+}
+
+const row: React.CSSProperties = {
+  display: 'flex',
+  flexWrap: 'wrap',
+  alignItems: 'center',
+  gap: '0.75rem',
+}
+
+const grid: React.CSSProperties = {
+  display: 'grid',
+  gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))',
+  gap: '1rem',
+}
+
+export default function CorePage() {
   const [checked1, setChecked1] = useState(true)
   const [checked2, setChecked2] = useState(false)
+  const [indeterminate, setIndeterminate] = useState(true)
   const [toggle1, setToggle1] = useState(true)
   const [toggle2, setToggle2] = useState(false)
   const [radio, setRadio] = useState('sha256')
   const [slider, setSlider] = useState(60)
   const [progVal, setProgVal] = useState(65)
+  const [counter, setCounter] = useState(1000)
+  const [checkKey, setCheckKey] = useState(0)
+  const [loading, setLoading] = useState(false)
 
   return (
-    <div className="max-w-5xl mx-auto px-4 sm:px-6 py-8 sm:py-10">
-      <div className="mb-8">
-        <h1 className="text-2xl font-bold text-[hsl(var(--text-primary))] mb-1">Core</h1>
-        <p className="text-sm text-[hsl(var(--text-secondary))]">14 foundational components for building interfaces</p>
+    <div style={{ maxWidth: 1100, margin: '0 auto' }}>
+      <div style={{ marginBottom: '2rem' }}>
+        <h1 style={{ fontSize: 'var(--text-2xl)', fontWeight: 800, letterSpacing: '-0.02em', marginBottom: '0.25rem' }}>Core</h1>
+        <p style={{ fontSize: 'var(--text-sm)', color: 'var(--text-secondary)' }}>14 foundational components for building interfaces</p>
       </div>
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 stagger">
-        <Preview label="Button" description="5 variants, 4 sizes, loading state" code={`<Button variant="primary">Save</Button>\n<Button variant="danger" loading>Deleting</Button>`}>
-          <div className="space-y-3">
-            <div className="flex flex-wrap gap-2">
+
+      <div style={grid}>
+        {/* Button */}
+        <Preview label="Button" description="4 variants, 3 sizes, loading, icons, disabled">
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+            <div style={row}>
               <Button variant="primary">Primary</Button>
               <Button variant="secondary">Secondary</Button>
-              <Button variant="danger">Danger</Button>
-              <Button variant="outline">Outline</Button>
               <Button variant="ghost">Ghost</Button>
+              <Button variant="danger">Danger</Button>
             </div>
-            <div className="flex flex-wrap gap-2 items-center">
+            <div style={row}>
               <Button size="sm">Small</Button>
               <Button size="md">Medium</Button>
               <Button size="lg">Large</Button>
-              <Button size="icon"><span>+</span></Button>
-              <Button loading>Loading</Button>
+            </div>
+            <div style={row}>
+              <Button loading onClick={() => {}} variant="primary">Loading</Button>
+              <Button icon={<Icon name="zap" size="sm" />} variant="primary">With Icon</Button>
               <Button disabled>Disabled</Button>
             </div>
           </div>
         </Preview>
 
-        <Preview label="Badge" description="10 colors with size variants" code={`<Badge color="green">Active</Badge>\n<Badge color="red">Alert</Badge>`}>
-          <div className="space-y-3">
-            <div className="flex flex-wrap gap-2">
-              {(['brand', 'blue', 'green', 'yellow', 'red', 'orange', 'purple', 'pink', 'teal', 'gray'] as const).map(c => (
-                <Badge key={c} color={c}>{c}</Badge>
-              ))}
+        {/* Badge */}
+        <Preview label="Badge" description="6 variants, dot, pulse, counter overflow">
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+            <div style={row}>
+              <Badge variant="default">Default</Badge>
+              <Badge variant="primary">Primary</Badge>
+              <Badge variant="success">Success</Badge>
+              <Badge variant="warning">Warning</Badge>
+              <Badge variant="danger">Danger</Badge>
+              <Badge variant="info">Info</Badge>
             </div>
-            <div className="flex flex-wrap gap-2">
-              <Badge color="green" size="xs">Tiny</Badge>
-              <Badge color="purple" size="md">Medium</Badge>
-            </div>
-          </div>
-        </Preview>
-
-        <Preview label="Card" description="4 variants with interactive hover" code={`<Card variant="elevated">\n  <div>Content here</div>\n</Card>`}>
-          <div className="grid grid-cols-2 gap-3">
-            <Card variant="default" padding="sm">
-              <div className="p-3">
-                <h4 className="text-sm font-semibold text-[hsl(var(--text-primary))]">Default</h4>
-                <p className="text-xs text-[hsl(var(--text-secondary))]">Standard card with subtle border</p>
-              </div>
-            </Card>
-            <Card variant="elevated" padding="sm">
-              <div className="p-3">
-                <h4 className="text-sm font-semibold text-[hsl(var(--text-primary))]">Elevated</h4>
-                <p className="text-xs text-[hsl(var(--text-secondary))]">Stronger shadow and border</p>
-              </div>
-            </Card>
-            <Card variant="outlined" padding="sm">
-              <div className="p-3">
-                <h4 className="text-sm font-semibold text-[hsl(var(--text-primary))]">Outlined</h4>
-                <p className="text-xs text-[hsl(var(--text-secondary))]">Transparent with border</p>
-              </div>
-            </Card>
-            <Card interactive padding="sm">
-              <div className="p-3">
-                <h4 className="text-sm font-semibold text-[hsl(var(--text-primary))]">Interactive</h4>
-                <p className="text-xs text-[hsl(var(--text-secondary))]">Hover for effect</p>
-              </div>
-            </Card>
-          </div>
-        </Preview>
-
-        <Preview label="Avatar" description="Image, initials, status dot" code={`<Avatar alt="Alice" size="md" />\n<AvatarGroup max={3}>...</AvatarGroup>`}>
-          <div className="space-y-4">
-            <div className="flex items-end gap-3 flex-wrap">
-              <Avatar alt="A" size="xs" />
-              <Avatar alt="Bob Chen" size="sm" />
-              <Avatar alt="Carol Davis" size="md" />
-              <Avatar alt="Dave Evans" size="lg" />
-              <Avatar alt="Eve Foster" size="xl" />
-            </div>
-            <div>
-              <span className="text-[10px] text-[hsl(var(--text-tertiary))] uppercase tracking-wider mb-2 block">Group</span>
-              <AvatarGroup max={3}>
-                <Avatar alt="Alice" size="md" />
-                <Avatar alt="Bob" size="md" />
-                <Avatar alt="Carol" size="md" />
-                <Avatar alt="Dave" size="md" />
-                <Avatar alt="Eve" size="md" />
-              </AvatarGroup>
+            <div style={row}>
+              <Badge dot variant="success">Online</Badge>
+              <Badge pulse variant="danger">Live</Badge>
+              <Badge count={7} variant="primary" />
+              <Badge count={150} maxCount={99} variant="danger" />
             </div>
           </div>
         </Preview>
 
-        <Preview label="Tabs" description="3 visual variants" code={`<Tabs tabs={tabs} value={active} onChange={setActive} variant="underline" />`}>
-          <div className="space-y-4">
-            <div><span className="text-[10px] text-[hsl(var(--text-tertiary))] uppercase tracking-wider mb-1 block">Underline</span><Tabs tabs={[{ value: 'overview', label: 'Overview' }, { value: 'metrics', label: 'Metrics' }, { value: 'logs', label: 'Logs' }]} value={activeTab} onChange={setActiveTab} variant="underline" /></div>
-            <div><span className="text-[10px] text-[hsl(var(--text-tertiary))] uppercase tracking-wider mb-1 block">Pills</span><Tabs tabs={[{ value: 'all', label: 'All' }, { value: 'active', label: 'Active' }, { value: 'inactive', label: 'Inactive' }]} value={pillTab} onChange={setPillTab} variant="pills" /></div>
-            <div><span className="text-[10px] text-[hsl(var(--text-tertiary))] uppercase tracking-wider mb-1 block">Enclosed</span><Tabs tabs={[{ value: 'config', label: 'Config' }, { value: 'json', label: 'JSON' }, { value: 'yaml', label: 'YAML' }]} value={encTab} onChange={setEncTab} variant="enclosed" /></div>
+        {/* Avatar */}
+        <Preview label="Avatar" description="Images, initials, sizes, status, groups">
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+            <div style={row}>
+              <Avatar name="Alice Johnson" size="sm" status="online" />
+              <Avatar name="Bob" size="md" status="away" />
+              <Avatar name="Charlie Smith" size="lg" status="busy" />
+              <Avatar name="Dana White" size="xl" status="offline" />
+            </div>
+            <AvatarGroup>
+              <Avatar name="Alice" size="md" />
+              <Avatar name="Bob K" size="md" />
+              <Avatar name="Carol" size="md" />
+              <Avatar name="Dave" size="md" />
+              <Avatar name="Eve" size="md" />
+            </AvatarGroup>
           </div>
         </Preview>
 
-        <Preview label="Skeleton" description="Loading shimmer placeholders" code={`<Skeleton width="100%" height={32} />`}>
-          <div className="space-y-4">
-            <div className="flex items-center gap-3">
+        {/* Card */}
+        <Preview label="Card" description="4 variants, interactive hover, padding levels">
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem' }}>
+              <Card variant="default" padding="sm">Default</Card>
+              <Card variant="elevated" padding="sm">Elevated</Card>
+              <Card variant="outlined" padding="sm">Outlined</Card>
+              <Card variant="ghost" padding="sm">Ghost</Card>
+            </div>
+            <Card variant="default" padding="md" interactive>
+              <div style={{ fontWeight: 600, marginBottom: '0.25rem' }}>Interactive Card</div>
+              <div style={{ fontSize: 'var(--text-xs)', color: 'var(--text-secondary)' }}>Hover me for a lift effect</div>
+            </Card>
+          </div>
+        </Preview>
+
+        {/* Skeleton */}
+        <Preview label="Skeleton" description="Text lines, circular, rectangular">
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+            <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'flex-start' }}>
               <Skeleton variant="circular" width={40} height={40} />
-              <div className="flex-1 space-y-2">
-                <Skeleton width="75%" height={16} />
-                <Skeleton width="50%" height={12} />
+              <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                <Skeleton variant="text" width="60%" />
+                <Skeleton variant="text" width="90%" />
+                <Skeleton variant="text" width="45%" />
               </div>
             </div>
-            <Skeleton lines={3} />
-            <div className="grid grid-cols-2 gap-3">
-              <Skeleton height={80} />
-              <Skeleton height={80} />
+            <Skeleton variant="rectangular" width="100%" height={60} />
+          </div>
+        </Preview>
+
+        {/* Progress */}
+        <Preview label="Progress" description="Animated, indeterminate, all variants">
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+            <Progress value={progVal} variant="default" />
+            <Progress value={progVal} variant="success" />
+            <Progress value={progVal} variant="warning" />
+            <Progress value={progVal} variant="danger" />
+            <Progress indeterminate variant="default" />
+            <Button size="sm" onClick={() => setProgVal(Math.floor(Math.random() * 100))}>
+              Randomize ({progVal}%)
+            </Button>
+          </div>
+        </Preview>
+
+        {/* Checkbox */}
+        <Preview label="Checkbox" description="Checked, unchecked, indeterminate, disabled">
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+            <Checkbox
+              label="Checked"
+              checked={checked1}
+              onChange={() => setChecked1(c => !c)}
+            />
+            <Checkbox
+              label="Unchecked"
+              checked={checked2}
+              onChange={() => setChecked2(c => !c)}
+            />
+            <Checkbox
+              label="Indeterminate"
+              checked={indeterminate}
+              indeterminate
+              onChange={() => setIndeterminate(c => !c)}
+            />
+            <Checkbox label="Disabled" disabled checked />
+          </div>
+        </Preview>
+
+        {/* RadioGroup */}
+        <Preview label="RadioGroup" description="Horizontal and vertical layouts">
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+            <RadioGroup
+              name="hash-algo"
+              options={[
+                { value: 'md5', label: 'MD5' },
+                { value: 'sha256', label: 'SHA-256' },
+                { value: 'sha512', label: 'SHA-512' },
+              ]}
+              value={radio}
+              onChange={setRadio}
+            />
+          </div>
+        </Preview>
+
+        {/* ToggleSwitch */}
+        <Preview label="ToggleSwitch" description="On/off with labels, different sizes">
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+            <div style={row}>
+              <ToggleSwitch checked={toggle1} onChange={() => setToggle1(t => !t)} size="sm" />
+              <span style={{ fontSize: 'var(--text-sm)', color: 'var(--text-secondary)' }}>
+                Notifications {toggle1 ? 'On' : 'Off'}
+              </span>
+            </div>
+            <div style={row}>
+              <ToggleSwitch checked={toggle2} onChange={() => setToggle2(t => !t)} size="md" />
+              <span style={{ fontSize: 'var(--text-sm)', color: 'var(--text-secondary)' }}>
+                Dark mode {toggle2 ? 'On' : 'Off'}
+              </span>
             </div>
           </div>
         </Preview>
 
-        <Preview label="Progress" description="All variants + indeterminate" code={`<Progress value={65} label="Upload" showValue variant="success" />\n<Progress indeterminate label="Processing..." />`}>
-          <div className="space-y-4">
-            <Progress value={progVal} label="Migration Progress" showValue variant="default" />
-            <Progress value={85} label="Disk Usage" showValue variant="warning" size="md" />
-            <Progress value={95} label="CPU Critical" showValue variant="danger" size="lg" />
-            <Progress value={100} label="Complete" showValue variant="success" />
-            <Progress value={0} indeterminate label="Discovering devices..." />
-            <div className="flex gap-2 mt-2">
-              <Button size="sm" variant="outline" onClick={() => setProgVal(p => Math.max(0, p - 10))}>-10</Button>
-              <Button size="sm" variant="outline" onClick={() => setProgVal(p => Math.min(100, p + 10))}>+10</Button>
-            </div>
+        {/* Slider */}
+        <Preview label="Slider" description="Default, with value display, ticks">
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+            <Slider
+              min={0}
+              max={100}
+              value={slider}
+              onChange={setSlider}
+              showValue
+              label="Volume"
+            />
+            <Slider
+              min={0}
+              max={100}
+              step={25}
+              value={50}
+              showTicks
+              label="Quality"
+              size="sm"
+            />
           </div>
         </Preview>
 
-        <Preview label="Checkbox" description="Checkbox with label states" code={`<Checkbox checked={val} onChange={handler} />`}>
-          <div className="space-y-3">
-            <label className="flex items-center gap-2 cursor-pointer"><Checkbox checked={checked1} onChange={(e: ChangeEvent<HTMLInputElement>) => setChecked1(e.target.checked)} /><span className="text-sm text-[hsl(var(--text-primary))]">Enable SNMP polling</span></label>
-            <label className="flex items-center gap-2 cursor-pointer"><Checkbox checked={checked2} onChange={(e: ChangeEvent<HTMLInputElement>) => setChecked2(e.target.checked)} /><span className="text-sm text-[hsl(var(--text-primary))]">Enable syslog collection</span></label>
+        {/* StatusBadge */}
+        <Preview label="StatusBadge" description="All 6 statuses with labels">
+          <div style={row}>
+            <StatusBadge status="ok" label="Healthy" />
+            <StatusBadge status="warning" label="Degraded" />
+            <StatusBadge status="critical" label="Down" />
+            <StatusBadge status="info" label="Info" />
+            <StatusBadge status="unknown" label="Unknown" />
+            <StatusBadge status="maintenance" label="Maintenance" />
           </div>
         </Preview>
 
-        <Preview label="RadioGroup" description="Vertical and horizontal" code={`<RadioGroup options={opts} value={val} onChange={setVal} />`}>
-          <RadioGroup
-            options={[
-              { value: 'md5', label: 'MD5', description: 'Legacy' },
-              { value: 'sha1', label: 'SHA-1' },
-              { value: 'sha256', label: 'SHA-256', description: 'Recommended' },
-            ]}
-            value={radio}
-            onChange={setRadio}
-            orientation="vertical"
-          />
-        </Preview>
-
-        <Preview label="ToggleSwitch" description="On/off toggle with label" code={`<ToggleSwitch label="Auto-refresh" enabled={val} onChange={setVal} />`}>
-          <div className="space-y-4">
-            <ToggleSwitch label="Auto-refresh dashboard" enabled={toggle1} onChange={setToggle1} />
-            <ToggleSwitch label="Dark mode" enabled={toggle2} onChange={setToggle2} />
+        {/* StatusPulse */}
+        <Preview label="StatusPulse" description="All 4 statuses with pulse animation">
+          <div style={row}>
+            <StatusPulse status="ok" label="Online" />
+            <StatusPulse status="warning" label="Slow" />
+            <StatusPulse status="critical" label="Offline" />
+            <StatusPulse status="info" label="Syncing" />
           </div>
         </Preview>
 
-        <Preview label="Slider" description="Range slider with value display" code={`<Slider value={val} onChange={setVal} min={10} max={300} label="Interval" showValue />`}>
-          <div className="space-y-4 py-2">
-            <Slider value={slider} onChange={setSlider} min={10} max={300} step={5} label="Collection Interval (sec)" showValue />
-            <Slider value={75} onChange={() => {}} min={0} max={100} label="Alert Threshold (%)" showValue />
+        {/* SuccessCheckmark */}
+        <Preview label="SuccessCheckmark" description="Animated on mount, replay button">
+          <div style={{ ...row, gap: '1.5rem' }}>
+            <SuccessCheckmark key={checkKey} size="sm" animated label="Done" />
+            <SuccessCheckmark key={checkKey + 100} size="md" animated />
+            <SuccessCheckmark key={checkKey + 200} size="lg" animated />
+            <Button size="sm" variant="secondary" onClick={() => setCheckKey(k => k + 1)}>
+              Replay
+            </Button>
           </div>
         </Preview>
 
-        <Preview label="StatusBadge" description="All status variants" code={`<StatusBadge status="active" />\n<StatusBadge status="critical" pulse />`}>
-          <div className="flex flex-wrap gap-2">
-            {['ok', 'active', 'warning', 'critical', 'unknown', 'maintenance', 'stale', 'inactive', 'decommissioned', 'pending'].map(s => (
-              <StatusBadge key={s} status={s} pulse={s === 'critical'} />
-            ))}
-          </div>
-        </Preview>
-
-        <Preview label="StatusPulse" description="Animated status dots" code={`<StatusPulse status="ok" label="Healthy" />`}>
-          <div className="flex flex-wrap gap-6">
-            {(['ok', 'warning', 'critical', 'info'] as const).map(s => (
-              <StatusPulse key={s} status={s} label={s} />
-            ))}
-          </div>
-        </Preview>
-
-        <Preview label="SuccessCheckmark" description="Animated check SVG" code={`<SuccessCheckmark size={48} />`}>
-          <div className="flex flex-col items-center gap-4 py-4">
-            <div className="flex items-center justify-center gap-6">
-              <SuccessCheckmark key={`c32-${checkKey}`} size={32} />
-              <SuccessCheckmark key={`c48-${checkKey}`} size={48} />
-              <SuccessCheckmark key={`c64-${checkKey}`} size={64} />
-            </div>
-            <Button variant="ghost" size="sm" onClick={() => setCheckKey(k => k + 1)}>Replay</Button>
-          </div>
-        </Preview>
-
-        <Preview label="AnimatedCounter" description="Spring-animated number transitions" code={`<AnimatedCounter value={count} />`}>
-          <div className="text-center py-4">
-            <div className="text-4xl font-bold text-[hsl(var(--text-primary))] tabular-nums mb-4">
-              <AnimatedCounter value={counter} />
-            </div>
-            <Button variant="primary" onClick={() => setCounter(p => p + Math.floor(Math.random() * 500))}>Add random amount</Button>
+        {/* AnimatedCounter */}
+        <Preview label="AnimatedCounter" description="Button to add random amount" wide>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
+            <AnimatedCounter value={counter} style={{ fontSize: 'var(--text-2xl)', fontWeight: 800 }} />
+            <Button size="sm" onClick={() => setCounter(c => c + Math.floor(Math.random() * 500) + 100)}>
+              Add Random
+            </Button>
+            <Button size="sm" variant="ghost" onClick={() => setCounter(0)}>Reset</Button>
           </div>
         </Preview>
       </div>
     </div>
   )
 }
-export default CorePage
