@@ -26,3 +26,8 @@ export { PipelineStage, type PipelineStageProps, type Stage } from './pipeline-s
 export { UptimeTracker, type UptimeTrackerProps, type UptimeDay } from './uptime-tracker'
 export { TimeRangeSelector, type TimeRangeSelectorProps, type TimeRangePreset } from './time-range-selector'
 export { HeatmapCalendar, type HeatmapCalendarProps, type HeatmapData } from './heatmap-calendar'
+export { StreamingText, type StreamingTextProps } from './streaming-text'
+export { TypingIndicator, type TypingIndicatorProps } from './typing-indicator'
+export { ConfidenceBar, type ConfidenceBarProps } from './confidence-bar'
+export { LiveFeed, type LiveFeedProps, type FeedItem } from './live-feed'
+export { RealtimeValue, type RealtimeValueProps } from './realtime-value'
