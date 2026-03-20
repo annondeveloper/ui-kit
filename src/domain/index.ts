@@ -2,3 +2,4 @@ export { ToastProvider, useToast, type ToastOptions, type ToastApi, type ToastPr
 export { CommandBar, type CommandBarProps, type CommandItem } from './command-bar'
 export { NotificationStack, type NotificationStackProps, type Notification } from './notification-stack'
 export { StepWizard, type StepWizardProps, type Step } from './step-wizard'
+export { ScrollReveal, type ScrollRevealProps } from './scroll-reveal'
