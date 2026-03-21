@@ -51,3 +51,4 @@ export { HeroHighlight, Highlight, type HeroHighlightProps, type HighlightProps 
 export { TracingBeam, type TracingBeamProps } from './tracing-beam'
 export { NetworkTrafficCard, formatBitRate, type NetworkTrafficCardProps, type TrafficData } from './network-traffic-card'
 export { DashboardGrid, type DashboardGridProps, type DashboardGroup } from './dashboard-grid'
+export { GeoMap, geoToSvg, type GeoMapProps, type GeoPoint, type GeoConnection } from './geo-map'
