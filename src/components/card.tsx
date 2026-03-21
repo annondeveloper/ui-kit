@@ -1,6 +1,6 @@
 'use client'
 
-import { forwardRef, useRef, type HTMLAttributes, type ElementType } from 'react'
+import { forwardRef, useState, useRef, type HTMLAttributes, type ElementType, type ReactNode } from 'react'
 import { css } from '../core/styles/css-tag'
 import { useStyles } from '../core/styles/use-styles'
 import { useMotionLevel } from '../core/motion/use-motion-level'
@@ -9,10 +9,18 @@ import { cn } from '../core/utils/cn'
 
 export interface CardProps extends HTMLAttributes<HTMLElement> {
   as?: ElementType
-  variant?: 'default' | 'elevated' | 'outlined' | 'ghost'
+  variant?: 'default' | 'elevated' | 'outlined' | 'ghost' | 'glass' | 'gradient'
   padding?: 'none' | 'sm' | 'md' | 'lg'
   interactive?: boolean
   motion?: 0 | 1 | 2 | 3
+  /** Card header area (image, title bar, etc.) */
+  header?: ReactNode
+  /** Card footer area (action buttons) */
+  footer?: ReactNode
+  /** Click to expand/collapse content */
+  expandable?: boolean
+  /** Initial expanded state (default: true) */
+  defaultExpanded?: boolean
   /** Polymorphic pass-through: href, target, etc. */
   href?: string
   target?: string
@@ -54,6 +62,77 @@ const cardStyles = css`
         background: transparent;
         border: none;
       }
+      :scope[data-variant="glass"] {
+        background: oklch(from var(--bg-elevated) l c h / 0.6);
+        backdrop-filter: blur(16px) saturate(1.5);
+        border: 1px solid oklch(100% 0 0 / 0.08);
+      }
+      :scope[data-variant="gradient"] {
+        background: linear-gradient(135deg, var(--bg-elevated) 0%, oklch(from var(--brand) calc(l - 0.3) 0.05 h) 100%);
+        border: 1px solid oklch(100% 0 0 / 0.06);
+      }
+
+      /* ── Header area ── */
+      .ui-card__header {
+        margin: calc(-1 * var(--card-padding, 1rem));
+        margin-block-end: var(--card-padding, 1rem);
+        padding: var(--card-padding, 1rem);
+        border-block-end: 1px solid var(--border-subtle);
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+
+      /* ── Footer area ── */
+      .ui-card__footer {
+        margin: calc(-1 * var(--card-padding, 1rem));
+        margin-block-start: var(--card-padding, 1rem);
+        padding: var(--card-padding, 1rem);
+        border-block-start: 1px solid var(--border-subtle);
+        display: flex;
+        align-items: center;
+        gap: var(--space-sm, 0.5rem);
+        justify-content: flex-end;
+      }
+
+      /* ── Expandable content ── */
+      .ui-card__content {
+        display: grid;
+        grid-template-rows: 1fr;
+        transition: grid-template-rows 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      }
+      .ui-card__content[data-collapsed="true"] {
+        grid-template-rows: 0fr;
+      }
+      .ui-card__content-inner {
+        overflow: hidden;
+      }
+
+      /* ── Expand toggle button ── */
+      .ui-card__expand-toggle {
+        background: none;
+        border: none;
+        padding: 0.25rem;
+        cursor: pointer;
+        color: var(--text-tertiary);
+        display: flex;
+        align-items: center;
+        transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        border-radius: var(--radius-sm, 0.25rem);
+      }
+      .ui-card__expand-toggle:hover {
+        color: var(--text-primary);
+      }
+      .ui-card__expand-toggle[data-expanded="true"] {
+        transform: rotate(180deg);
+      }
+
+      /* Card padding CSS custom property mapping */
+      :scope[data-padding="none"] { --card-padding: 0; }
+      :scope[data-padding="sm"] { --card-padding: var(--space-sm, 0.5rem); }
+      :scope[data-padding="md"] { --card-padding: var(--space-md, 1rem); }
+      :scope[data-padding="lg"] { --card-padding: var(--space-lg, 1.5rem); }
 
       /* Aurora glow — default + elevated only */
       :scope[data-variant="default"]::before,
@@ -180,6 +259,10 @@ export const Card = forwardRef<HTMLElement, CardProps>(
       padding = 'md',
       interactive = false,
       motion: motionProp,
+      header,
+      footer,
+      expandable = false,
+      defaultExpanded = true,
       children,
       className,
       ...rest
@@ -189,6 +272,7 @@ export const Card = forwardRef<HTMLElement, CardProps>(
     const cls = useStyles('card', cardStyles)
     const motionLevel = useMotionLevel(motionProp)
     const internalRef = useRef<HTMLElement>(null)
+    const [expanded, setExpanded] = useState(defaultExpanded)
 
     // Subtle fade-up entrance at motion level 2+
     useEntrance(
@@ -204,6 +288,21 @@ export const Card = forwardRef<HTMLElement, CardProps>(
       else if (forwardedRef) (forwardedRef as React.MutableRefObject<HTMLElement | null>).current = node
     }
 
+    const expandToggle = expandable ? (
+      <button
+        type="button"
+        className="ui-card__expand-toggle"
+        data-expanded={expanded}
+        onClick={() => setExpanded(prev => !prev)}
+        aria-label={expanded ? 'Collapse' : 'Expand'}
+        aria-expanded={expanded}
+      >
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+          <path d="M4 6l4 4 4-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+        </svg>
+      </button>
+    ) : null
+
     return (
       <Component
         ref={setRef}
@@ -214,7 +313,24 @@ export const Card = forwardRef<HTMLElement, CardProps>(
         data-interactive={interactive || undefined}
         {...rest}
       >
-        {children}
+        {header && (
+          <div className="ui-card__header">
+            <span>{header}</span>
+            {expandToggle}
+          </div>
+        )}
+        {!header && expandToggle && (
+          <div className="ui-card__header" style={{ borderBlockEnd: 'none', marginBlockEnd: 0 }}>
+            <span />
+            {expandToggle}
+          </div>
+        )}
+        {expandable ? (
+          <div className="ui-card__content" data-collapsed={!expanded}>
+            <div className="ui-card__content-inner">{children}</div>
+          </div>
+        ) : children}
+        {footer && <div className="ui-card__footer">{footer}</div>}
       </Component>
     )
   }

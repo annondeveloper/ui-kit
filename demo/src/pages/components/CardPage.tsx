@@ -423,7 +423,7 @@ const pageStyles = css`
 
       .card-page__tiers {
         display: grid;
-        grid-template-columns: repeat(3, 1fr);
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
         gap: 1rem;
       }
 
@@ -437,8 +437,8 @@ const pageStyles = css`
         gap: 0.75rem;
         cursor: pointer;
         transition: border-color 0.2s, box-shadow 0.2s, transform 0.2s;
+        overflow: visible;
         min-width: 0;
-        overflow: hidden;
       }
 
       .card-page__tier-card:hover {
@@ -499,7 +499,13 @@ const pageStyles = css`
       .card-page__tier-preview {
         display: flex;
         justify-content: center;
-        padding-block-start: 0.5rem;
+        padding: 1rem;
+        min-height: 120px;
+        align-items: center;
+      }
+
+      .card-page__tier-preview .ui-premium-card {
+        width: 100%;
       }
 
       /* ── Color picker ──────────────────────────────── */
@@ -767,11 +773,15 @@ const pageStyles = css`
 // ─── Props Data ───────────────────────────────────────────────────────────────
 
 const cardProps: PropDef[] = [
-  { name: 'variant', type: "'default' | 'elevated' | 'outlined' | 'ghost'", default: "'default'", description: 'Visual style variant controlling surface appearance and border.' },
+  { name: 'variant', type: "'default' | 'elevated' | 'outlined' | 'ghost' | 'glass' | 'gradient'", default: "'default'", description: 'Visual style variant controlling surface appearance and border.' },
   { name: 'padding', type: "'none' | 'sm' | 'md' | 'lg'", default: "'md'", description: 'Internal padding scale.' },
   { name: 'interactive', type: 'boolean', default: 'false', description: 'Enable hover lift and cursor glow effects.' },
   { name: 'as', type: 'React.ElementType', default: "'div'", description: 'Render as a different HTML element (div, article, a, section).' },
   { name: 'motion', type: '0 | 1 | 2 | 3', description: 'Animation intensity override. Cascades from OS > prop > CSS --motion > UIProvider.' },
+  { name: 'header', type: 'ReactNode', description: 'Card header area (image, title bar, etc.). Renders above content with a bottom border.' },
+  { name: 'footer', type: 'ReactNode', description: 'Card footer area (action buttons). Renders below content with a top border.' },
+  { name: 'expandable', type: 'boolean', default: 'false', description: 'Enable click to expand/collapse content.' },
+  { name: 'defaultExpanded', type: 'boolean', default: 'true', description: 'Initial expanded state when expandable is true.' },
   { name: 'className', type: 'string', description: 'Additional CSS class names merged with the component class.' },
   { name: 'style', type: 'React.CSSProperties', description: 'Inline styles applied to the root element.' },
   { name: 'children', type: 'ReactNode', required: true, description: 'Card content.' },
@@ -783,11 +793,11 @@ const cardProps: PropDef[] = [
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
-type Variant = 'default' | 'elevated' | 'outlined' | 'ghost'
+type Variant = 'default' | 'elevated' | 'outlined' | 'ghost' | 'glass' | 'gradient'
 type Padding = 'none' | 'sm' | 'md' | 'lg'
 type AsElement = 'div' | 'article' | 'a' | 'section'
 
-const VARIANTS: Variant[] = ['default', 'elevated', 'outlined', 'ghost']
+const VARIANTS: Variant[] = ['default', 'elevated', 'outlined', 'ghost', 'glass', 'gradient']
 const PADDINGS: Padding[] = ['none', 'sm', 'md', 'lg']
 const AS_ELEMENTS: AsElement[] = ['div', 'article', 'a', 'section']
 
@@ -1499,6 +1509,147 @@ export default function CardPage() {
         </div>
       </section>
 
+      {/* ── 6d. Special Variants (Glass & Gradient) ────── */}
+      {tier !== 'lite' && (
+        <section className="card-page__section" id="special-variants">
+          <h2 className="card-page__section-title">
+            <a href="#special-variants">Special Variants</a>
+          </h2>
+          <p className="card-page__section-desc">
+            Glass and gradient cards for hero sections and premium UI.
+          </p>
+          <div className="card-page__preview">
+            <CardComponent variant="glass" padding="lg" style={{ maxWidth: 300 }}>
+              <h3 style={{ margin: '0 0 0.5rem', fontSize: '1rem', fontWeight: 700, color: 'var(--text-primary)' }}>Glass Card</h3>
+              <p style={{ margin: 0, fontSize: '0.875rem', color: 'var(--text-secondary)', lineHeight: 1.6 }}>
+                Frosted glass effect with backdrop blur. Perfect for overlaying images or gradients.
+              </p>
+            </CardComponent>
+            <CardComponent variant="gradient" padding="lg" style={{ maxWidth: 300 }}>
+              <h3 style={{ margin: '0 0 0.5rem', fontSize: '1rem', fontWeight: 700, color: 'var(--text-primary)' }}>Gradient Card</h3>
+              <p style={{ margin: 0, fontSize: '0.875rem', color: 'var(--text-secondary)', lineHeight: 1.6 }}>
+                Subtle gradient from elevated to brand-tinted. Great for featured content.
+              </p>
+            </CardComponent>
+          </div>
+        </section>
+      )}
+
+      {/* ── 6e. Header & Footer ──────────────────────────── */}
+      {tier !== 'lite' && (
+        <section className="card-page__section" id="header-footer">
+          <h2 className="card-page__section-title">
+            <a href="#header-footer">Header & Footer</a>
+          </h2>
+          <p className="card-page__section-desc">
+            Structured cards with dedicated header and footer areas.
+          </p>
+          <div className="card-page__preview card-page__preview--col" style={{ alignItems: 'center' }}>
+            <CardComponent
+              padding="none"
+              style={{ maxWidth: 360, width: '100%' }}
+              header={
+                <div style={{ padding: '1rem 1.25rem', borderBottom: '1px solid var(--border-subtle)' }}>
+                  <strong style={{ color: 'var(--text-primary)' }}>Project Settings</strong>
+                </div>
+              }
+              footer={
+                <div style={{ padding: '0.75rem 1.25rem', borderTop: '1px solid var(--border-subtle)', display: 'flex', gap: '0.5rem', justifyContent: 'flex-end' }}>
+                  <Button size="sm" variant="ghost">Cancel</Button>
+                  <Button size="sm" variant="primary">Save</Button>
+                </div>
+              }
+            >
+              <div style={{ padding: '1.25rem' }}>
+                <p style={{ margin: 0, color: 'var(--text-secondary)', fontSize: 'var(--text-sm, 0.875rem)', lineHeight: 1.6 }}>
+                  Configure your project name, description, and visibility settings.
+                </p>
+              </div>
+            </CardComponent>
+          </div>
+          <div style={{ marginBlockStart: '1rem' }}>
+            <CopyBlock
+              code={`<Card\n  padding="none"\n  header={\n    <div style={{ padding: '1rem 1.25rem' }}>\n      <strong>Project Settings</strong>\n    </div>\n  }\n  footer={\n    <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'flex-end' }}>\n      <Button size="sm" variant="ghost">Cancel</Button>\n      <Button size="sm" variant="primary">Save</Button>\n    </div>\n  }\n>\n  <div style={{ padding: '1.25rem' }}>\n    <p>Configure your project settings.</p>\n  </div>\n</Card>`}
+              language="typescript"
+            />
+          </div>
+        </section>
+      )}
+
+      {/* ── 6f. Expandable ──────────────────────────────── */}
+      {tier !== 'lite' && (
+        <section className="card-page__section" id="expandable">
+          <h2 className="card-page__section-title">
+            <a href="#expandable">Expandable</a>
+          </h2>
+          <p className="card-page__section-desc">
+            Click the toggle to expand or collapse card content.
+          </p>
+          <div className="card-page__preview card-page__preview--col" style={{ alignItems: 'center', gap: '1rem' }}>
+            <CardComponent expandable padding="md" style={{ maxWidth: 400, width: '100%' }}>
+              <h4 style={{ margin: '0 0 0.5rem', fontSize: '0.9375rem', fontWeight: 600, color: 'var(--text-primary)' }}>Click to expand</h4>
+              <p style={{ margin: '0 0 0.75rem', fontSize: '0.8125rem', color: 'var(--text-secondary)', lineHeight: 1.6 }}>
+                This content is initially visible. When collapsed, only the header area shows.
+              </p>
+              <p style={{ margin: 0, fontSize: '0.8125rem', color: 'var(--text-secondary)', lineHeight: 1.6 }}>
+                Additional content that appears when expanded. Great for FAQs, settings panels, or any content you want to show progressively.
+              </p>
+            </CardComponent>
+            <CardComponent expandable defaultExpanded={false} padding="md" style={{ maxWidth: 400, width: '100%' }}>
+              <h4 style={{ margin: '0 0 0.5rem', fontSize: '0.9375rem', fontWeight: 600, color: 'var(--text-primary)' }}>Initially collapsed</h4>
+              <p style={{ margin: 0, fontSize: '0.8125rem', color: 'var(--text-secondary)', lineHeight: 1.6 }}>
+                This card starts collapsed. Click the toggle arrow to reveal this content.
+              </p>
+            </CardComponent>
+          </div>
+          <div style={{ marginBlockStart: '1rem' }}>
+            <CopyBlock
+              code={`<Card expandable padding="md">\n  <h4>Click to expand</h4>\n  <p>Content visible when expanded.</p>\n</Card>\n\n<Card expandable defaultExpanded={false}>\n  <h4>Initially collapsed</h4>\n  <p>Hidden until user expands.</p>\n</Card>`}
+              language="typescript"
+            />
+          </div>
+        </section>
+      )}
+
+      {/* ── 6g. Real-World Compositions ─────────────────── */}
+      <section className="card-page__section" id="compositions">
+        <h2 className="card-page__section-title">
+          <a href="#compositions">Real-World Compositions</a>
+        </h2>
+        <p className="card-page__section-desc">
+          Cards combined with other elements for common UI patterns.
+        </p>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '1rem' }}>
+          {/* Profile card */}
+          <CardComponent variant="elevated" padding="md">
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '0.75rem' }}>
+              <div style={{ width: 40, height: 40, borderRadius: '50%', background: 'var(--brand)', display: 'grid', placeItems: 'center', color: 'white', fontWeight: 700, fontSize: '0.875rem', flexShrink: 0 }}>JD</div>
+              <div>
+                <div style={{ fontWeight: 600, fontSize: 'var(--text-sm, 0.875rem)', color: 'var(--text-primary)' }}>Jane Doe</div>
+                <div style={{ fontSize: 'var(--text-xs, 0.75rem)', color: 'var(--text-tertiary)' }}>Senior Engineer</div>
+              </div>
+            </div>
+            <p style={{ margin: 0, fontSize: 'var(--text-sm, 0.875rem)', color: 'var(--text-secondary)', lineHeight: 1.5 }}>Building next-gen infrastructure with zero-dependency components.</p>
+          </CardComponent>
+
+          {/* Stats card */}
+          <CardComponent variant="default" padding="md">
+            <div style={{ fontSize: 'var(--text-xs, 0.75rem)', color: 'var(--text-tertiary)', marginBottom: '0.25rem' }}>Revenue</div>
+            <div style={{ fontSize: 'var(--text-xl, 1.25rem)', fontWeight: 700, marginBottom: '0.5rem', color: 'var(--text-primary)' }}>$48,290</div>
+            <div style={{ fontSize: 'var(--text-xs, 0.75rem)', color: 'var(--status-ok, oklch(72% 0.19 155))' }}>&#8593; 12.5% from last month</div>
+          </CardComponent>
+
+          {/* Action card */}
+          <CardComponent variant="outlined" padding="md" {...(tier !== 'lite' ? { interactive: true } : {})}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem' }}>
+              <Icon name="upload" size="md" style={{ color: 'var(--brand)' }} />
+              <strong style={{ fontSize: 'var(--text-sm, 0.875rem)', color: 'var(--text-primary)' }}>Deploy to Production</strong>
+            </div>
+            <p style={{ margin: 0, fontSize: 'var(--text-xs, 0.75rem)', color: 'var(--text-secondary)', lineHeight: 1.5 }}>Push the latest build to production servers.</p>
+          </CardComponent>
+        </div>
+      </section>
+
       {/* ── 7. Weight Tiers ────────────────────────────── */}
       <section className="card-page__section" id="tiers">
         <h2 className="card-page__section-title">
@@ -1530,8 +1681,9 @@ export default function CardPage() {
               import {'{'} Card {'}'} from '@annondeveloper/ui-kit/lite'
             </div>
             <div className="card-page__tier-preview">
-              <LiteCard variant="elevated" padding="sm">
-                <p style={{ margin: 0, fontSize: '0.75rem', color: 'var(--text-secondary)' }}>Lite Card</p>
+              <LiteCard variant="elevated" padding="sm" style={{ width: '100%' }}>
+                <h4 style={{ margin: '0 0 0.25rem', fontSize: '0.8125rem', fontWeight: 600, color: 'var(--text-primary)' }}>Lite Card</h4>
+                <p style={{ margin: 0, fontSize: '0.6875rem', color: 'var(--text-secondary)', lineHeight: 1.4 }}>Minimal footprint, CSS-only styling.</p>
               </LiteCard>
             </div>
             <div className="card-page__size-breakdown">
@@ -1563,8 +1715,9 @@ export default function CardPage() {
               import {'{'} Card {'}'} from '@annondeveloper/ui-kit'
             </div>
             <div className="card-page__tier-preview">
-              <Card variant="elevated" padding="sm" interactive>
-                <p style={{ margin: 0, fontSize: '0.75rem', color: 'var(--text-secondary)' }}>Standard Card</p>
+              <Card variant="elevated" padding="sm" interactive style={{ width: '100%' }}>
+                <h4 style={{ margin: '0 0 0.25rem', fontSize: '0.8125rem', fontWeight: 600, color: 'var(--text-primary)' }}>Standard Card</h4>
+                <p style={{ margin: 0, fontSize: '0.6875rem', color: 'var(--text-secondary)', lineHeight: 1.4 }}>Full variants, interactive hover, aurora glow.</p>
               </Card>
             </div>
             <div className="card-page__size-breakdown">
@@ -1595,8 +1748,9 @@ export default function CardPage() {
               import {'{'} Card {'}'} from '@annondeveloper/ui-kit/premium'
             </div>
             <div className="card-page__tier-preview">
-              <PremiumCard variant="elevated" padding="sm" interactive>
-                <p style={{ margin: 0, fontSize: '0.75rem', color: 'var(--text-secondary)' }}>Premium Card</p>
+              <PremiumCard variant="elevated" padding="sm" interactive style={{ width: '100%' }}>
+                <h4 style={{ margin: '0 0 0.25rem', fontSize: '0.8125rem', fontWeight: 600, color: 'var(--text-primary)' }}>Premium Card</h4>
+                <p style={{ margin: 0, fontSize: '0.6875rem', color: 'var(--text-secondary)', lineHeight: 1.4 }}>3D tilt, cursor glow, entrance animation.</p>
               </PremiumCard>
             </div>
             <div className="card-page__size-breakdown">
