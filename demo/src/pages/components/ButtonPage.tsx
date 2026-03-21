@@ -115,12 +115,13 @@ const pageStyles = css`
       /* ── Sections ───────────────────────────────────── */
 
       .button-page__section {
-        margin-block-end: 2rem;
+        margin-block-end: 2.5rem;
         background: var(--bg-surface);
         border: 1px solid var(--border-subtle);
         border-radius: var(--radius-lg);
-        padding: 1.75rem;
-        overflow: hidden;
+        padding: 2rem;
+        /* DO NOT use overflow:hidden — it clips popovers like ColorInput */
+        overflow: visible;
         animation: button-page-reveal 0.4s ease-out both;
         animation-timeline: view();
         animation-range: entry 0% entry 30%;
@@ -1207,36 +1208,33 @@ export default function ButtonPage() {
   const pageRef = useRef<HTMLDivElement>(null)
   const { mode } = useTheme()
 
-  // Dynamic bundle size estimation based on tier and enabled features
-  // These are measured gzip sizes from the actual built artifacts
-  const BUNDLE_SIZES = {
-    lite: {
-      base: 0.33,        // forwardRef wrapper
-      css: 1.16,          // CSS for button only
-    },
-    standard: {
-      base: 2.35,         // component code
-      styleEngine: 0.52,  // useStyles (shared, amortized)
-      motionHook: 0.28,   // useMotionLevel
-      cn: 0.12,           // cn() utility
-    },
-    premium: {
-      base: 1.60,         // premium wrapper
-      standardDeps: 3.25, // pulls in standard
-      entranceHook: 0.18, // useEntrance
-    },
-  }
-
-  // Calculate total based on tier
-  const estimatedSize = useMemo(() => {
+  // Dynamic bundle size estimation based on tier
+  // Measured from actual gzip'd built artifacts
+  // Shows COMPONENT cost + one-time SHARED cost separately
+  const sizeInfo = useMemo(() => {
     if (tier === 'lite') {
-      return BUNDLE_SIZES.lite.base + BUNDLE_SIZES.lite.css
+      return {
+        component: 1.5,   // JS wrapper (0.3KB) + CSS for button (1.2KB)
+        shared: 3.7,      // theme.css (one-time, shared across all lite components)
+        total: 5.2,
+        note: 'First component loads 3.7KB theme CSS (shared). Each additional lite component adds ~0.3-1.2KB.',
+      }
     }
     if (tier === 'premium') {
-      return BUNDLE_SIZES.premium.base + BUNDLE_SIZES.premium.standardDeps + BUNDLE_SIZES.premium.entranceHook
+      return {
+        component: 1.6,   // premium wrapper
+        shared: 3.3,      // standard button + style engine + motion (shared)
+        total: 4.9,
+        note: 'Premium wraps Standard — includes all Standard features + entrance animations, ripple, cursor glow.',
+      }
     }
     // Standard
-    return BUNDLE_SIZES.standard.base + BUNDLE_SIZES.standard.styleEngine + BUNDLE_SIZES.standard.motionHook + BUNDLE_SIZES.standard.cn
+    return {
+      component: 2.4,     // button.tsx component code with embedded CSS
+      shared: 0.9,        // useStyles (0.5KB) + useMotionLevel (0.3KB) + cn (0.1KB) — shared across all components
+      total: 3.3,
+      note: 'Style engine (0.5KB) and motion hook (0.3KB) are shared — only loaded once regardless of component count.',
+    }
   }, [tier])
 
   // Generate full OKLCH theme from brand color — MODE AWARE
@@ -1323,11 +1321,21 @@ export default function ButtonPage() {
               )
             })}
           </div>
-          {/* Dynamic estimated size */}
-          <div style={{ fontSize: '0.75rem', color: 'var(--text-tertiary)', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-            <span>Estimated bundle:</span>
-            <strong style={{ color: 'var(--brand)', fontVariantNumeric: 'tabular-nums' }}>{estimatedSize.toFixed(1)} KB</strong>
-            <span>gzip (tree-shaken)</span>
+          {/* Dynamic estimated size breakdown */}
+          <div style={{ fontSize: '0.75rem', color: 'var(--text-tertiary)', display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <span>Component:</span>
+              <strong style={{ color: 'var(--text-primary)', fontVariantNumeric: 'tabular-nums' }}>{sizeInfo.component.toFixed(1)} KB</strong>
+              <span>+</span>
+              <span>Shared:</span>
+              <strong style={{ color: 'var(--text-primary)', fontVariantNumeric: 'tabular-nums' }}>{sizeInfo.shared.toFixed(1)} KB</strong>
+              <span>=</span>
+              <strong style={{ color: 'var(--brand)', fontVariantNumeric: 'tabular-nums', fontSize: '0.875rem' }}>{sizeInfo.total.toFixed(1)} KB</strong>
+              <span>gzip</span>
+            </div>
+            <div style={{ fontSize: '0.6875rem', color: 'var(--text-tertiary)', lineHeight: 1.4 }}>
+              {sizeInfo.note}
+            </div>
           </div>
 
           {/* Color customization */}
