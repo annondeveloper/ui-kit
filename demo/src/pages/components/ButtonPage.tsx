@@ -23,7 +23,7 @@ const pageStyles = css`
   @layer demo {
     @scope (.button-page) {
       :scope {
-        max-inline-size: 860px;
+        max-inline-size: min(960px, 100%);
         margin-inline: auto;
         container-type: inline-size;
         container-name: button-page;
@@ -115,7 +115,12 @@ const pageStyles = css`
       /* ── Sections ───────────────────────────────────── */
 
       .button-page__section {
-        margin-block-end: 4rem;
+        margin-block-end: 2rem;
+        background: var(--bg-surface);
+        border: 1px solid var(--border-subtle);
+        border-radius: var(--radius-lg);
+        padding: 1.75rem;
+        overflow: hidden;
         animation: button-page-reveal 0.4s ease-out both;
         animation-timeline: view();
         animation-range: entry 0% entry 30%;
@@ -140,11 +145,11 @@ const pageStyles = css`
       }
 
       .button-page__section-title {
-        font-size: 1.25rem;
+        font-size: 1.125rem;
         font-weight: 700;
         color: var(--text-primary);
-        margin: 0 0 0.5rem;
-        padding-inline-start: 0.75rem;
+        margin: 0 0 0.375rem;
+        padding-inline-start: 0.625rem;
         border-inline-start: 3px solid var(--brand, oklch(65% 0.2 270));
         line-height: 1.3;
         scroll-margin-block-start: 2rem;
@@ -170,19 +175,15 @@ const pageStyles = css`
       /* ── Preview box ────────────────────────────────── */
 
       .button-page__preview {
-        padding: 2.5rem;
-        margin-block-end: 0.5rem;
-        border: 1px solid var(--border-subtle);
-        border-radius: var(--radius-lg);
-        background: var(--bg-surface);
+        padding: 1.75rem;
+        border-radius: var(--radius-md);
+        background: var(--bg-base);
         position: relative;
         overflow: hidden;
         display: flex;
         flex-wrap: wrap;
         align-items: center;
         gap: 1rem;
-        /* Subtle inner glow */
-        box-shadow: inset 0 1px 0 oklch(100% 0 0 / 0.03);
       }
 
       /* Dot grid pattern background */
@@ -714,7 +715,8 @@ const pageStyles = css`
         }
 
         .button-page__section {
-          margin-block-end: 2rem;
+          margin-block-end: 1.5rem;
+          padding: 1.25rem;
         }
       }
 
@@ -764,6 +766,32 @@ const pageStyles = css`
         .button-page__labeled-row {
           gap: 2.5rem;
         }
+      }
+
+      /* ── Code blocks scroll horizontally ──────────── */
+
+      .button-page__import-code,
+      .button-page code,
+      pre {
+        overflow-x: auto;
+        scrollbar-width: thin;
+        scrollbar-color: var(--border-default) transparent;
+      }
+
+      /* WebKit custom scrollbar for all scrollable areas */
+      :scope ::-webkit-scrollbar {
+        width: 4px;
+        height: 4px;
+      }
+      :scope ::-webkit-scrollbar-track {
+        background: transparent;
+      }
+      :scope ::-webkit-scrollbar-thumb {
+        background: var(--border-default);
+        border-radius: 2px;
+      }
+      :scope ::-webkit-scrollbar-thumb:hover {
+        background: var(--border-strong);
       }
     }
   }

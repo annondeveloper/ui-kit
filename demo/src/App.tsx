@@ -221,17 +221,22 @@ const layoutStyles = css`
     .site-main {
       flex: 1;
       min-width: 0;
-      padding: 1.5rem 2rem;
-      /* Center content within the available space */
-      display: flex;
-      flex-direction: column;
-      align-items: center;
+      padding: 2rem 3rem;
+      overflow-y: auto;
+      overflow-x: hidden;
     }
 
-    /* Page content wrapper — centers and constrains width */
-    .site-main > * {
-      width: 100%;
-      max-width: 960px;
+    /* On large screens, add MORE padding to push content toward center */
+    @media (min-width: 1400px) {
+      .site-main {
+        padding-inline: clamp(3rem, 8vw, 12rem);
+      }
+    }
+
+    @media (min-width: 1920px) {
+      .site-main {
+        padding-inline: clamp(6rem, 12vw, 20rem);
+      }
     }
 
     /* ─── Responsive ─── */
@@ -245,9 +250,6 @@ const layoutStyles = css`
       .site-main {
         padding: 1rem;
         padding-top: calc(48px + 1rem);
-      }
-      .site-main > * {
-        max-width: 100%;
       }
     }
   }
