@@ -1688,35 +1688,149 @@ export default function CardPage() {
           <a href="#compositions">Real-World Compositions</a>
         </h2>
         <p className="card-page__section-desc">
-          Cards combined with other elements for common UI patterns.
+          Card is a generic container. Here's what you can build by composing it with content.
+          For dedicated monitoring metrics, see <a href="/ui-kit/components/metric-card" style={{ color: 'var(--brand)', textDecoration: 'underline' }}>MetricCard</a>.
         </p>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '1rem' }}>
-          {/* Profile card */}
-          <CardComponent variant="elevated" padding="md">
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '0.75rem' }}>
-              <div style={{ width: 40, height: 40, borderRadius: '50%', background: 'var(--brand)', display: 'grid', placeItems: 'center', color: 'white', fontWeight: 700, fontSize: '0.875rem', flexShrink: 0 }}>JD</div>
+
+        {/* Row 1: Photo cards */}
+        <h3 style={{ fontSize: '0.875rem', fontWeight: 600, color: 'var(--text-secondary)', margin: '0 0 0.75rem', paddingInlineStart: '0.5rem' }}>Photo / Image Cards</h3>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '1rem', marginBottom: '2rem' }}>
+          <CardComponent variant="default" padding="none">
+            <div style={{ height: 140, background: 'linear-gradient(135deg, oklch(35% 0.15 250), oklch(25% 0.1 300))', borderRadius: 'var(--radius-lg) var(--radius-lg) 0 0', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <Icon name="image" size="lg" style={{ color: 'oklch(100% 0 0 / 0.3)' }} />
+            </div>
+            <div style={{ padding: '1rem 1.25rem' }}>
+              <h4 style={{ margin: '0 0 0.375rem', fontSize: '0.9375rem', fontWeight: 700, color: 'var(--text-primary)' }}>Mountain Vista</h4>
+              <p style={{ margin: 0, fontSize: '0.8125rem', color: 'var(--text-secondary)', lineHeight: 1.5 }}>A breathtaking view of the alpine landscape at sunset.</p>
+            </div>
+          </CardComponent>
+
+          <CardComponent variant="elevated" padding="none">
+            <div style={{ height: 140, background: 'linear-gradient(135deg, oklch(30% 0.12 180), oklch(20% 0.08 220))', borderRadius: 'var(--radius-lg) var(--radius-lg) 0 0', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <Icon name="terminal" size="lg" style={{ color: 'oklch(100% 0 0 / 0.3)' }} />
+            </div>
+            <div style={{ padding: '1rem 1.25rem' }}>
+              <h4 style={{ margin: '0 0 0.375rem', fontSize: '0.9375rem', fontWeight: 700, color: 'var(--text-primary)' }}>Dev Environment</h4>
+              <p style={{ margin: '0 0 0.75rem', fontSize: '0.8125rem', color: 'var(--text-secondary)', lineHeight: 1.5 }}>Your cloud workspace is ready with all tools configured.</p>
+              <Button size="xs" variant="primary">Open IDE</Button>
+            </div>
+          </CardComponent>
+
+          <CardComponent variant="default" padding="none" {...(tier !== 'lite' ? { interactive: true } : {})}>
+            <div style={{ height: 140, background: 'linear-gradient(135deg, oklch(28% 0.1 30), oklch(22% 0.06 60))', borderRadius: 'var(--radius-lg) var(--radius-lg) 0 0', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <Icon name="activity" size="lg" style={{ color: 'oklch(100% 0 0 / 0.3)' }} />
+            </div>
+            <div style={{ padding: '1rem 1.25rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <div>
-                <div style={{ fontWeight: 600, fontSize: 'var(--text-sm, 0.875rem)', color: 'var(--text-primary)' }}>Jane Doe</div>
-                <div style={{ fontSize: 'var(--text-xs, 0.75rem)', color: 'var(--text-tertiary)' }}>Senior Engineer</div>
+                <h4 style={{ margin: '0 0 0.125rem', fontSize: '0.875rem', fontWeight: 600, color: 'var(--text-primary)' }}>Analytics</h4>
+                <span style={{ fontSize: '0.75rem', color: 'var(--text-tertiary)' }}>Updated 2m ago</span>
+              </div>
+              <Icon name="arrow-right" size="sm" style={{ color: 'var(--text-tertiary)' }} />
+            </div>
+          </CardComponent>
+        </div>
+
+        {/* Row 2: Metric & Trend cards */}
+        <h3 style={{ fontSize: '0.875rem', fontWeight: 600, color: 'var(--text-secondary)', margin: '0 0 0.75rem', paddingInlineStart: '0.5rem' }}>Metric & Trend Cards</h3>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem', marginBottom: '2rem' }}>
+          <CardComponent variant="default" padding="md">
+            <div style={{ fontSize: '0.6875rem', color: 'var(--text-tertiary)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '0.375rem' }}>Revenue</div>
+            <div style={{ fontSize: '1.75rem', fontWeight: 800, color: 'var(--text-primary)', letterSpacing: '-0.02em', lineHeight: 1 }}>$48.3K</div>
+            <div style={{ fontSize: '0.75rem', color: 'var(--status-ok)', marginTop: '0.5rem', display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+              <Icon name="arrow-up" size={12} /> 12.5%
+            </div>
+          </CardComponent>
+
+          <CardComponent variant="default" padding="md">
+            <div style={{ fontSize: '0.6875rem', color: 'var(--text-tertiary)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '0.375rem' }}>Active Users</div>
+            <div style={{ fontSize: '1.75rem', fontWeight: 800, color: 'var(--text-primary)', letterSpacing: '-0.02em', lineHeight: 1 }}>2,847</div>
+            <div style={{ fontSize: '0.75rem', color: 'var(--status-warning)', marginTop: '0.5rem', display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+              <Icon name="arrow-down" size={12} /> 3.2%
+            </div>
+          </CardComponent>
+
+          <CardComponent variant="default" padding="md">
+            <div style={{ fontSize: '0.6875rem', color: 'var(--text-tertiary)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '0.375rem' }}>Uptime</div>
+            <div style={{ fontSize: '1.75rem', fontWeight: 800, color: 'var(--status-ok)', letterSpacing: '-0.02em', lineHeight: 1 }}>99.98%</div>
+            <div style={{ fontSize: '0.75rem', color: 'var(--text-tertiary)', marginTop: '0.5rem' }}>Last 30 days</div>
+          </CardComponent>
+
+          <CardComponent variant="elevated" padding="md">
+            <div style={{ fontSize: '0.6875rem', color: 'var(--text-tertiary)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '0.375rem' }}>Error Rate</div>
+            <div style={{ fontSize: '1.75rem', fontWeight: 800, color: 'var(--status-critical)', letterSpacing: '-0.02em', lineHeight: 1 }}>0.42%</div>
+            <div style={{ fontSize: '0.75rem', color: 'var(--status-critical)', marginTop: '0.5rem', display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+              <Icon name="alert-triangle" size={12} /> Above threshold
+            </div>
+          </CardComponent>
+        </div>
+
+        {/* Row 3: Metric with trendline */}
+        <h3 style={{ fontSize: '0.875rem', fontWeight: 600, color: 'var(--text-secondary)', margin: '0 0 0.75rem', paddingInlineStart: '0.5rem' }}>Metric + Trendline</h3>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1rem', marginBottom: '2rem' }}>
+          <CardComponent variant="default" padding="md">
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '0.75rem' }}>
+              <div>
+                <div style={{ fontSize: '0.6875rem', color: 'var(--text-tertiary)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '0.25rem' }}>CPU Usage</div>
+                <div style={{ fontSize: '1.5rem', fontWeight: 800, color: 'var(--text-primary)', lineHeight: 1 }}>87.4%</div>
+              </div>
+              <div style={{ fontSize: '0.75rem', color: 'var(--status-warning)', display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+                <Icon name="arrow-up" size={12} /> 5.2%
               </div>
             </div>
-            <p style={{ margin: 0, fontSize: 'var(--text-sm, 0.875rem)', color: 'var(--text-secondary)', lineHeight: 1.5 }}>Building next-gen infrastructure with zero-dependency components.</p>
-          </CardComponent>
-
-          {/* Stats card */}
-          <CardComponent variant="default" padding="md">
-            <div style={{ fontSize: 'var(--text-xs, 0.75rem)', color: 'var(--text-tertiary)', marginBottom: '0.25rem' }}>Revenue</div>
-            <div style={{ fontSize: 'var(--text-xl, 1.25rem)', fontWeight: 700, marginBottom: '0.5rem', color: 'var(--text-primary)' }}>$48,290</div>
-            <div style={{ fontSize: 'var(--text-xs, 0.75rem)', color: 'var(--status-ok, oklch(72% 0.19 155))' }}>&#8593; 12.5% from last month</div>
-          </CardComponent>
-
-          {/* Action card */}
-          <CardComponent variant="outlined" padding="md" {...(tier !== 'lite' ? { interactive: true } : {})}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem' }}>
-              <Icon name="upload" size="md" style={{ color: 'var(--brand)' }} />
-              <strong style={{ fontSize: 'var(--text-sm, 0.875rem)', color: 'var(--text-primary)' }}>Deploy to Production</strong>
+            {/* Fake sparkline using CSS gradient */}
+            <div style={{ height: 32, borderRadius: 4, background: 'linear-gradient(90deg, oklch(65% 0.15 270 / 0.1) 0%, oklch(65% 0.15 270 / 0.3) 40%, oklch(78% 0.17 85 / 0.3) 70%, oklch(62% 0.22 25 / 0.3) 100%)', position: 'relative', overflow: 'hidden' }}>
+              <svg viewBox="0 0 200 32" preserveAspectRatio="none" style={{ width: '100%', height: '100%', display: 'block' }}>
+                <polyline fill="none" stroke="var(--brand)" strokeWidth="2" points="0,28 20,24 40,26 60,20 80,22 100,16 120,14 140,10 160,8 180,6 200,4" />
+              </svg>
             </div>
-            <p style={{ margin: 0, fontSize: 'var(--text-xs, 0.75rem)', color: 'var(--text-secondary)', lineHeight: 1.5 }}>Push the latest build to production servers.</p>
+          </CardComponent>
+
+          <CardComponent variant="default" padding="md">
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '0.75rem' }}>
+              <div>
+                <div style={{ fontSize: '0.6875rem', color: 'var(--text-tertiary)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '0.25rem' }}>Network I/O</div>
+                <div style={{ fontSize: '1.5rem', fontWeight: 800, color: 'var(--text-primary)', lineHeight: 1 }}>2.4 Gbps</div>
+              </div>
+              <div style={{ fontSize: '0.75rem', color: 'var(--status-ok)', display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+                <Icon name="activity" size={12} /> Stable
+              </div>
+            </div>
+            <div style={{ height: 32, borderRadius: 4, overflow: 'hidden' }}>
+              <svg viewBox="0 0 200 32" preserveAspectRatio="none" style={{ width: '100%', height: '100%', display: 'block' }}>
+                <polyline fill="none" stroke="var(--status-ok)" strokeWidth="2" points="0,16 20,18 40,14 60,16 80,15 100,17 120,14 140,16 160,15 180,16 200,14" />
+              </svg>
+            </div>
+          </CardComponent>
+        </div>
+
+        {/* Row 4: Profile & Action cards */}
+        <h3 style={{ fontSize: '0.875rem', fontWeight: 600, color: 'var(--text-secondary)', margin: '0 0 0.75rem', paddingInlineStart: '0.5rem' }}>Profile & Action Cards</h3>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '1rem' }}>
+          <CardComponent variant="elevated" padding="md">
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '0.75rem' }}>
+              <div style={{ width: 44, height: 44, borderRadius: '50%', background: 'var(--brand)', display: 'grid', placeItems: 'center', color: 'white', fontWeight: 700, fontSize: '0.9375rem', flexShrink: 0 }}>JD</div>
+              <div>
+                <div style={{ fontWeight: 600, fontSize: '0.9375rem', color: 'var(--text-primary)' }}>Jane Doe</div>
+                <div style={{ fontSize: '0.75rem', color: 'var(--text-tertiary)' }}>Senior Engineer · San Francisco</div>
+              </div>
+            </div>
+            <p style={{ margin: '0 0 0.75rem', fontSize: '0.8125rem', color: 'var(--text-secondary)', lineHeight: 1.5 }}>Building next-gen infrastructure with zero-dependency components.</p>
+            <div style={{ display: 'flex', gap: '0.5rem' }}>
+              <Button size="xs" variant="primary">Follow</Button>
+              <Button size="xs" variant="secondary">Message</Button>
+            </div>
+          </CardComponent>
+
+          <CardComponent variant="outlined" padding="md" {...(tier !== 'lite' ? { interactive: true } : {})}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.625rem', marginBottom: '0.625rem' }}>
+              <Icon name="upload" size="md" style={{ color: 'var(--brand)' }} />
+              <strong style={{ fontSize: '0.9375rem', color: 'var(--text-primary)' }}>Deploy to Production</strong>
+            </div>
+            <p style={{ margin: '0 0 0.75rem', fontSize: '0.8125rem', color: 'var(--text-secondary)', lineHeight: 1.5 }}>Push the latest build to production servers with zero-downtime rolling update.</p>
+            <div style={{ display: 'flex', gap: '0.5rem' }}>
+              <Button size="xs" variant="primary" icon={<Icon name="zap" size="sm" />}>Deploy Now</Button>
+              <Button size="xs" variant="ghost">Schedule</Button>
+            </div>
           </CardComponent>
         </div>
       </section>
