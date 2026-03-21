@@ -23,6 +23,8 @@ const pageStyles = css`
       :scope {
         max-inline-size: 860px;
         margin-inline: auto;
+        container-type: inline-size;
+        container-name: button-page;
       }
 
       /* ── Hero header ────────────────────────────────── */
@@ -90,7 +92,7 @@ const pageStyles = css`
       .button-page__import-code {
         font-family: 'SF Mono', 'Fira Code', 'JetBrains Mono', monospace;
         font-size: var(--text-sm, 0.875rem);
-        background: oklch(100% 0 0 / 0.05);
+        background: var(--border-subtle);
         border: 1px solid var(--border-subtle);
         border-radius: var(--radius-md);
         padding: 0.5rem 0.875rem;
@@ -100,7 +102,7 @@ const pageStyles = css`
         overflow-x: auto;
         white-space: nowrap;
         backdrop-filter: blur(8px);
-        box-shadow: inset 0 1px 0 oklch(100% 0 0 / 0.04);
+        box-shadow: inset 0 1px 0 oklch(100% 0 0 / 0.03);
       }
 
       .button-page__copy-btn {
@@ -292,7 +294,7 @@ const pageStyles = css`
         background: var(--brand);
         color: oklch(100% 0 0);
         border-color: var(--brand);
-        box-shadow: 0 0 0 3px oklch(65% 0.2 270 / 0.12);
+        box-shadow: 0 0 0 3px var(--brand-subtle);
       }
 
       .button-page__toggle-row {
@@ -324,7 +326,7 @@ const pageStyles = css`
         outline: 2px solid var(--brand);
         outline-offset: 1px;
         border-color: transparent;
-        box-shadow: 0 0 0 4px oklch(65% 0.2 270 / 0.1);
+        box-shadow: 0 0 0 4px var(--brand-subtle);
       }
 
       /* ── Color picker ──────────────────────────────── */
@@ -352,7 +354,7 @@ const pageStyles = css`
       .button-page__color-swatch:focus-visible {
         outline: 2px solid var(--brand);
         outline-offset: 2px;
-        box-shadow: 0 0 0 4px oklch(65% 0.2 270 / 0.15);
+        box-shadow: 0 0 0 4px var(--brand-glow);
       }
       .button-page__color-swatch::-webkit-color-swatch-wrapper { padding: 2px; }
       .button-page__color-swatch::-webkit-color-swatch { border: none; border-radius: 6px; }
@@ -371,7 +373,7 @@ const pageStyles = css`
       }
       .button-page__color-hex:focus {
         border-color: var(--brand);
-        box-shadow: 0 0 0 3px oklch(65% 0.2 270 / 0.1);
+        box-shadow: 0 0 0 3px var(--brand-subtle);
       }
 
       .button-page__color-presets {
@@ -434,13 +436,13 @@ const pageStyles = css`
         border-inline-end: 1px solid var(--border-default);
       }
       .button-page__tier-btn:hover {
-        background: oklch(100% 0 0 / 0.04);
+        background: var(--border-subtle);
         color: var(--text-primary);
       }
       .button-page__tier-btn--active {
         background: linear-gradient(135deg, var(--brand) 0%, oklch(from var(--brand, oklch(65% 0.2 270)) calc(l + 0.1) c h) 100%);
         color: oklch(100% 0 0);
-        box-shadow: 0 2px 8px oklch(65% 0.2 270 / 0.25);
+        box-shadow: 0 2px 8px var(--brand-glow);
       }
       .button-page__tier-btn--active:hover {
         background: linear-gradient(135deg, var(--brand) 0%, oklch(from var(--brand, oklch(65% 0.2 270)) calc(l + 0.1) c h) 100%);
@@ -481,8 +483,8 @@ const pageStyles = css`
 
       .button-page__states-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-        gap: 1rem;
+        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+        gap: 0.75rem;
       }
 
       .button-page__state-cell {
@@ -564,7 +566,7 @@ const pageStyles = css`
         font-family: 'SF Mono', 'Fira Code', 'JetBrains Mono', monospace;
         font-size: 0.6875rem;
         color: oklch(from var(--brand) calc(l + 0.1) c h);
-        background: oklch(100% 0 0 / 0.04);
+        background: var(--border-subtle);
         padding: 0.375rem 0.5rem;
         border-radius: var(--radius-sm);
         overflow-x: auto;
@@ -606,7 +608,7 @@ const pageStyles = css`
       .button-page__a11y-key {
         font-family: 'SF Mono', 'Fira Code', 'JetBrains Mono', monospace;
         font-size: var(--text-xs, 0.75rem);
-        background: oklch(100% 0 0 / 0.06);
+        background: var(--border-subtle);
         padding: 0.125rem 0.375rem;
         border-radius: var(--radius-sm);
         border: 1px solid var(--border-subtle);
@@ -648,6 +650,104 @@ const pageStyles = css`
         font-size: var(--text-xs, 0.75rem);
         color: var(--text-tertiary);
         font-style: italic;
+      }
+
+      /* ── Responsive: Mobile ──────────────────────── */
+      @media (max-width: 768px) {
+        .button-page__hero {
+          padding: 1.5rem 1rem;
+          margin: -1rem -1rem 1.5rem;
+        }
+
+        .button-page__title {
+          font-size: 1.75rem;
+        }
+
+        .button-page__preview {
+          padding: 1.25rem;
+        }
+
+        .button-page__playground {
+          grid-template-columns: 1fr;
+        }
+
+        .button-page__playground-result {
+          padding: 1.5rem;
+        }
+
+        .button-page__labeled-row {
+          gap: 0.75rem;
+        }
+
+        .button-page__tier-selector {
+          flex-wrap: wrap;
+          inline-size: 100%;
+        }
+
+        .button-page__tier-btn {
+          flex: 1;
+          min-inline-size: 0;
+        }
+
+        .button-page__states-grid {
+          grid-template-columns: repeat(2, 1fr);
+        }
+
+        .button-page__tiers {
+          grid-template-columns: 1fr;
+        }
+
+        .button-page__section {
+          margin-block-end: 2rem;
+        }
+      }
+
+      /* ── Responsive: Small mobile ────────────────── */
+      @media (max-width: 400px) {
+        .button-page__hero {
+          padding: 1rem 0.75rem;
+          margin: -0.5rem -0.75rem 1rem;
+        }
+
+        .button-page__title {
+          font-size: 1.5rem;
+        }
+
+        .button-page__preview {
+          padding: 1rem;
+        }
+
+        .button-page__states-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .button-page__labeled-row {
+          gap: 0.5rem;
+          justify-content: center;
+        }
+
+        .button-page__color-group {
+          flex-wrap: wrap;
+        }
+      }
+
+      /* ── Responsive: Video wall ──────────────────── */
+      @media (min-width: 3000px) {
+        :scope {
+          max-inline-size: 1400px;
+        }
+
+        .button-page__title {
+          font-size: 4rem;
+        }
+
+        .button-page__preview {
+          padding: 3.5rem;
+        }
+
+        .button-page__labeled-row {
+          gap: 2.5rem;
+        }
       }
     }
   }
