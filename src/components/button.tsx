@@ -1,10 +1,16 @@
 'use client'
 
-import { forwardRef, useRef, useCallback, type ButtonHTMLAttributes, type ReactNode } from 'react'
+import { forwardRef, useRef, useCallback, useEffect, type ButtonHTMLAttributes, type ReactNode } from 'react'
 import { css } from '../core/styles/css-tag'
 import { useStyles } from '../core/styles/use-styles'
 import { useMotionLevel } from '../core/motion/use-motion-level'
 import { cn } from '../core/utils/cn'
+import { haptic, type HapticType } from '../core/input/haptics'
+
+export interface ButtonShortcuts {
+  /** Key combo to activate this button (default: Enter, Space handled natively) */
+  activate?: string
+}
 
 export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: 'primary' | 'secondary' | 'ghost' | 'danger'
@@ -13,6 +19,10 @@ export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   icon?: ReactNode
   iconEnd?: ReactNode
   motion?: 0 | 1 | 2 | 3
+  /** Enable haptic feedback on click. `true` uses 'light', or pass a specific pattern. */
+  haptics?: boolean | HapticType
+  /** Custom keyboard shortcuts for this button */
+  shortcuts?: ButtonShortcuts
 }
 
 const buttonStyles = css`
@@ -242,6 +252,8 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       icon,
       iconEnd,
       motion: motionProp,
+      haptics: hapticsProp,
+      shortcuts,
       disabled,
       children,
       className,
@@ -254,22 +266,64 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
     const cls = useStyles('button', buttonStyles)
     const motionLevel = useMotionLevel(motionProp)
     const lastClickRef = useRef(0)
+    const internalRef = useRef<HTMLButtonElement>(null)
 
-    // Debounce rapid clicks (150ms)
+    // Merge refs
+    const setRef = useCallback((el: HTMLButtonElement | null) => {
+      internalRef.current = el
+      if (typeof ref === 'function') ref(el)
+      else if (ref) (ref as React.MutableRefObject<HTMLButtonElement | null>).current = el
+    }, [ref])
+
+    // Debounce rapid clicks (150ms) + haptic feedback
     const handleClick = useCallback(
       (e: React.MouseEvent<HTMLButtonElement>) => {
         if (loading || disabled) return
         const now = Date.now()
         if (now - lastClickRef.current < 150) return
         lastClickRef.current = now
+
+        // Haptic feedback
+        if (hapticsProp) {
+          const pattern = hapticsProp === true ? 'light' : hapticsProp
+          haptic(pattern)
+        }
+
         onClick?.(e)
       },
-      [onClick, loading, disabled]
+      [onClick, loading, disabled, hapticsProp]
     )
+
+    // Custom keyboard shortcuts
+    useEffect(() => {
+      if (!shortcuts?.activate) return
+
+      const combo = shortcuts.activate.toLowerCase()
+      const parts = combo.split('+').map(p => p.trim())
+      const key = parts[parts.length - 1]
+      const needsCtrl = parts.includes('ctrl') || parts.includes('control')
+      const needsMeta = parts.includes('meta') || parts.includes('cmd')
+      const needsShift = parts.includes('shift')
+      const needsAlt = parts.includes('alt')
+
+      const handler = (e: KeyboardEvent) => {
+        if (e.key.toLowerCase() !== key) return
+        if (needsCtrl && !e.ctrlKey) return
+        if (needsMeta && !e.metaKey) return
+        if (needsShift && !e.shiftKey) return
+        if (needsAlt && !e.altKey) return
+
+        e.preventDefault()
+        internalRef.current?.click()
+      }
+
+      document.addEventListener('keydown', handler)
+      return () => document.removeEventListener('keydown', handler)
+    }, [shortcuts?.activate])
 
     return (
       <button
-        ref={ref}
+        ref={setRef}
         type={type}
         disabled={disabled}
         className={cn(cls('root'), className)}
@@ -280,6 +334,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         onClick={handleClick}
         aria-busy={loading || undefined}
         aria-disabled={disabled || undefined}
+        aria-keyshortcuts={shortcuts?.activate || undefined}
         {...rest}
       >
         {icon && <span className="ui-button__icon">{icon}</span>}

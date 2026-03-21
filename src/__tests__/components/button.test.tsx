@@ -329,6 +329,67 @@ describe('Button', () => {
     })
   })
 
+  // ─── Haptic feedback ──────────────────────────────────────────────
+
+  describe('haptic feedback', () => {
+    it('triggers haptic on click when haptics=true', () => {
+      const vibrateMock = vi.fn()
+      Object.defineProperty(navigator, 'vibrate', { value: vibrateMock, writable: true })
+
+      render(<Button haptics>Haptic</Button>)
+      fireEvent.click(screen.getByText('Haptic'))
+      expect(vibrateMock).toHaveBeenCalledWith([5]) // 'light' pattern
+    })
+
+    it('triggers specific haptic pattern when haptics="heavy"', () => {
+      const vibrateMock = vi.fn()
+      Object.defineProperty(navigator, 'vibrate', { value: vibrateMock, writable: true })
+
+      render(<Button haptics="heavy">Heavy</Button>)
+      fireEvent.click(screen.getByText('Heavy'))
+      expect(vibrateMock).toHaveBeenCalledWith([30])
+    })
+
+    it('does not trigger haptic when haptics is not set', () => {
+      const vibrateMock = vi.fn()
+      Object.defineProperty(navigator, 'vibrate', { value: vibrateMock, writable: true })
+
+      render(<Button>No Haptic</Button>)
+      fireEvent.click(screen.getByText('No Haptic'))
+      expect(vibrateMock).not.toHaveBeenCalled()
+    })
+  })
+
+  // ─── Keyboard shortcuts ─────────────────────────────────────────
+
+  describe('keyboard shortcuts', () => {
+    it('activates button via custom shortcut', () => {
+      const onClick = vi.fn()
+      render(<Button shortcuts={{ activate: 'ctrl+k' }} onClick={onClick}>Shortcut</Button>)
+
+      fireEvent.keyDown(document, { key: 'k', ctrlKey: true })
+      expect(onClick).toHaveBeenCalled()
+    })
+
+    it('does not activate without modifier key', () => {
+      const onClick = vi.fn()
+      render(<Button shortcuts={{ activate: 'ctrl+k' }} onClick={onClick}>Shortcut</Button>)
+
+      fireEvent.keyDown(document, { key: 'k', ctrlKey: false })
+      expect(onClick).not.toHaveBeenCalled()
+    })
+
+    it('sets aria-keyshortcuts attribute', () => {
+      render(<Button shortcuts={{ activate: 'ctrl+enter' }}>Save</Button>)
+      expect(screen.getByText('Save')).toHaveAttribute('aria-keyshortcuts', 'ctrl+enter')
+    })
+
+    it('does not set aria-keyshortcuts when no shortcuts', () => {
+      render(<Button>Normal</Button>)
+      expect(screen.getByText('Normal')).not.toHaveAttribute('aria-keyshortcuts')
+    })
+  })
+
   // ─── Display name ─────────────────────────────────────────────────
 
   describe('display name', () => {

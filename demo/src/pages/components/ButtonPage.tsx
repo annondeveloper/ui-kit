@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useMemo, useCallback, useRef } from 'react'
+import { useState, useMemo, useCallback, useRef, useEffect } from 'react'
 import { css } from '@ui/core/styles/css-tag'
 import { useStyles } from '@ui/core/styles/use-styles'
 import { Button } from '@ui/components/button'
@@ -133,23 +133,31 @@ const pageStyles = css`
         position: relative;
         box-shadow: inset 0 1px 0 oklch(100% 0 0 / 0.04), 0 2px 8px oklch(0% 0 0 / 0.15);
         opacity: 0;
-        transform: translateY(24px);
+        transform: translateY(32px) scale(0.98);
+        filter: blur(4px);
         animation: section-reveal 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
         animation-timeline: view();
         animation-range: entry 0% entry 40%;
       }
 
       @keyframes section-reveal {
+        from {
+          opacity: 0;
+          transform: translateY(32px) scale(0.98);
+          filter: blur(4px);
+        }
         to {
           opacity: 1;
-          transform: translateY(0);
+          transform: translateY(0) scale(1);
+          filter: blur(0);
         }
       }
 
       @supports not (animation-timeline: view()) {
         .button-page__section {
-          opacity: 1;
-          transform: none;
+          opacity: 0;
+          transform: translateY(32px) scale(0.98);
+          filter: blur(4px);
           animation: none;
         }
       }
@@ -840,6 +848,8 @@ const buttonProps: PropDef[] = [
   { name: 'className', type: 'string', description: 'Additional CSS class name merged with the component class.' },
   { name: 'children', type: 'ReactNode', description: 'Button label content.' },
   { name: 'ref', type: 'Ref<HTMLButtonElement>', description: 'Forwarded ref to the underlying <button> element.' },
+  { name: 'haptics', type: "boolean | 'light' | 'medium' | 'heavy' | 'selection' | 'success' | 'error'", description: 'Enable haptic vibration feedback on click. true uses light pattern.' },
+  { name: 'shortcuts', type: '{ activate?: string }', description: "Custom keyboard shortcut to activate this button. Example: 'ctrl+s'" },
 ]
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -1288,6 +1298,39 @@ export default function ButtonPage() {
     return style as React.CSSProperties
   }, [themeTokens, brandColor])
 
+  // Scroll reveal for sections — JS fallback for browsers without animation-timeline
+  useEffect(() => {
+    const sections = document.querySelectorAll('.button-page__section')
+    if (!sections.length) return
+
+    // Check if CSS animation-timeline is supported
+    if (CSS.supports?.('animation-timeline', 'view()')) return // CSS handles it
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            ;(entry.target as HTMLElement).style.opacity = '1'
+            ;(entry.target as HTMLElement).style.transform = 'translateY(0) scale(1)'
+            ;(entry.target as HTMLElement).style.filter = 'blur(0)'
+            observer.unobserve(entry.target)
+          }
+        })
+      },
+      { threshold: 0.1, rootMargin: '0px 0px -50px 0px' }
+    )
+
+    sections.forEach(section => {
+      ;(section as HTMLElement).style.opacity = '0'
+      ;(section as HTMLElement).style.transform = 'translateY(32px) scale(0.98)'
+      ;(section as HTMLElement).style.filter = 'blur(4px)'
+      ;(section as HTMLElement).style.transition = 'opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1), transform 0.6s cubic-bezier(0.16, 1, 0.3, 1), filter 0.6s cubic-bezier(0.16, 1, 0.3, 1)'
+      observer.observe(section)
+    })
+
+    return () => observer.disconnect()
+  }, [])
+
   const ButtonComponent = tier === 'lite' ? LiteButton : tier === 'premium' ? PremiumButton : Button
 
   return (
@@ -1430,6 +1473,79 @@ export default function ButtonPage() {
           </div>
         </section>
       )}
+
+      {/* ── Haptic Feedback ─────────────────────────────── */}
+      {tier !== 'lite' ? (
+        <section className="button-page__section" id="haptics">
+          <h2 className="button-page__section-title">
+            <a href="#haptics">Haptic Feedback</a>
+          </h2>
+          <p className="button-page__section-desc">
+            Add tactile vibration feedback on supported devices (mobile, gamepad controllers).
+            Enable with <code>haptics</code> prop — uses the Vibration API.
+          </p>
+          <div className="button-page__preview">
+            <ButtonComponent haptics variant="primary">Light Haptic (default)</ButtonComponent>
+            <ButtonComponent haptics="medium" variant="secondary">Medium</ButtonComponent>
+            <ButtonComponent haptics="heavy" variant="secondary">Heavy</ButtonComponent>
+            <ButtonComponent haptics="success" variant="primary">Success Pattern</ButtonComponent>
+            <ButtonComponent haptics="error" variant="danger">Error Pattern</ButtonComponent>
+          </div>
+          <div className="button-page__code-snippet">
+            <CopyBlock
+              code={`<Button haptics>Light vibration</Button>\n<Button haptics="medium">Medium</Button>\n<Button haptics="heavy">Heavy</Button>\n<Button haptics="success">Success pattern</Button>\n<Button haptics="error">Error pattern</Button>`}
+              language="typescript"
+            />
+          </div>
+        </section>
+      ) : (
+        <section className="button-page__section" id="haptics">
+          <h2 className="button-page__section-title">
+            <a href="#haptics">Haptic Feedback</a>
+          </h2>
+          <p className="button-page__section-desc">
+            Add tactile vibration feedback on supported devices (mobile, gamepad controllers).
+            Enable with <code>haptics</code> prop — uses the Vibration API.
+          </p>
+          <p className="button-page__section-desc" style={{ fontStyle: 'italic', color: 'var(--text-tertiary)' }}>
+            Haptic feedback requires Standard or Premium tier.
+          </p>
+        </section>
+      )}
+
+      {/* ── Keyboard Shortcuts ──────────────────────────── */}
+      <section className="button-page__section" id="shortcuts">
+        <h2 className="button-page__section-title">
+          <a href="#shortcuts">Keyboard Shortcuts</a>
+        </h2>
+        <p className="button-page__section-desc">
+          Bind custom keyboard shortcuts to buttons. The shortcut activates the button from
+          anywhere on the page. Uses <code>aria-keyshortcuts</code> for accessibility.
+        </p>
+        <div className="button-page__preview">
+          <ButtonComponent
+            shortcuts={{ activate: 'ctrl+s' }}
+            variant="primary"
+            icon={tier !== 'lite' ? <Icon name="download" size="sm" /> : undefined}
+            onClick={() => alert('Saved! (Ctrl+S)')}
+          >
+            Save (Ctrl+S)
+          </ButtonComponent>
+          <ButtonComponent
+            shortcuts={{ activate: 'ctrl+enter' }}
+            variant="secondary"
+            onClick={() => alert('Submitted! (Ctrl+Enter)')}
+          >
+            Submit (Ctrl+Enter)
+          </ButtonComponent>
+        </div>
+        <div className="button-page__code-snippet">
+          <CopyBlock
+            code={`<Button\n  shortcuts={{ activate: 'ctrl+s' }}\n  onClick={() => handleSave()}\n>\n  Save (Ctrl+S)\n</Button>`}
+            language="typescript"
+          />
+        </div>
+      </section>
 
       {/* ── 7. Weight Tiers ────────────────────────────── */}
       <section className="button-page__section" id="tiers">
