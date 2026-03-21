@@ -1131,9 +1131,11 @@ function PlaygroundSection({ tier: tierProp, brandColor }: { tier: Tier; brandCo
         {/* Preview area */}
         <div className="card-page__playground-preview">
           <div className="card-page__playground-result">
-            <CardComponent {...previewProps} style={{ maxInlineSize: '320px', inlineSize: '100%' }}>
-              <SampleCardContent />
-            </CardComponent>
+            <div style={{ width: '100%', maxWidth: '360px' }}>
+              <CardComponent {...previewProps}>
+                <SampleCardContent />
+              </CardComponent>
+            </div>
           </div>
 
           {/* Tabbed code output */}
