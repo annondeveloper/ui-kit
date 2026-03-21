@@ -27,3 +27,12 @@ export { motion } from './controller'
 export { MotionContext, MotionProvider } from './motion-context'
 
 export { useMotionLevel } from './use-motion-level'
+
+export { useEntrance } from './use-entrance'
+export type { EntranceAnimation } from './use-entrance'
+
+export { useSkeletonTransition } from './use-skeleton-transition'
+export type { SkeletonTransitionResult } from './use-skeleton-transition'
+
+export { useScrollScene } from './scroll-scene'
+export type { ScrollSceneConfig } from './scroll-scene'

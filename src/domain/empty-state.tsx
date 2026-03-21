@@ -1,12 +1,14 @@
 'use client'
 
 import {
+  useRef,
   type HTMLAttributes,
   type ReactNode,
 } from 'react'
 import { css } from '../core/styles/css-tag'
 import { useStyles } from '../core/styles/use-styles'
 import { useMotionLevel } from '../core/motion/use-motion-level'
+import { useEntrance } from '../core/motion/use-entrance'
 import { cn } from '../core/utils/cn'
 
 // ─── Types ──────────────────────────────────────────────────────────────────
@@ -227,11 +229,20 @@ export function EmptyState({
 }: EmptyStateProps) {
   useStyles('empty-state', emptyStateStyles)
   const motionLevel = useMotionLevel(motionProp)
+  const containerRef = useRef<HTMLDivElement>(null)
+
+  // Scale entrance at motion level 2+
+  useEntrance(
+    containerRef,
+    motionLevel >= 2 ? 'scale' : 'none',
+    { duration: 350 }
+  )
 
   const hasActions = Boolean(action || secondaryAction)
 
   return (
     <div
+      ref={containerRef}
       className={cn('ui-empty-state', className)}
       data-size={size}
       data-motion={motionLevel}

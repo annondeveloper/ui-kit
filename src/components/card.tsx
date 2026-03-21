@@ -1,9 +1,10 @@
 'use client'
 
-import { forwardRef, type HTMLAttributes, type ElementType } from 'react'
+import { forwardRef, useRef, type HTMLAttributes, type ElementType } from 'react'
 import { css } from '../core/styles/css-tag'
 import { useStyles } from '../core/styles/use-styles'
 import { useMotionLevel } from '../core/motion/use-motion-level'
+import { useEntrance } from '../core/motion/use-entrance'
 import { cn } from '../core/utils/cn'
 
 export interface CardProps extends HTMLAttributes<HTMLElement> {
@@ -85,18 +86,39 @@ const cardStyles = css`
         cursor: pointer;
       }
 
+      /* Interactive — base transition for smooth hover */
+      :scope[data-interactive="true"]:not([data-motion="0"]) {
+        transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1),
+                    box-shadow 0.25s var(--ease-out, ease-out),
+                    border-color 0.25s var(--ease-out, ease-out);
+      }
+
       /* Interactive hover lift — motion level 1+ */
       @media (hover: hover) {
         :scope[data-interactive="true"]:hover:not([data-motion="0"]) {
           transform: translateY(-2px);
-          transition: transform 0.2s var(--ease-out, ease-out),
-                      box-shadow 0.2s var(--ease-out, ease-out);
         }
         :scope[data-interactive="true"][data-variant="elevated"]:hover:not([data-motion="0"]) {
           box-shadow: var(--shadow-lg, 0 8px 24px oklch(0% 0 0 / 0.25));
         }
         :scope[data-interactive="true"][data-variant="default"]:hover:not([data-motion="0"]) {
           border-color: var(--border-default, oklch(100% 0 0 / 0.12));
+          box-shadow: var(--shadow-md, 0 4px 12px oklch(0% 0 0 / 0.15));
+        }
+
+        /* Aurora glow intensifies on hover — motion level 2+ */
+        :scope[data-interactive="true"][data-variant="default"]:hover:not([data-motion="0"]):not([data-motion="1"])::before,
+        :scope[data-interactive="true"][data-variant="elevated"]:hover:not([data-motion="0"]):not([data-motion="1"])::before {
+          background: radial-gradient(
+            ellipse at 20% 0%,
+            oklch(from var(--aurora-1, oklch(70% 0.15 270)) l c h / 0.08) 0%,
+            transparent 60%
+          ),
+          radial-gradient(
+            ellipse at 80% 100%,
+            oklch(from var(--aurora-2, oklch(70% 0.15 330)) l c h / 0.06) 0%,
+            transparent 50%
+          );
         }
       }
 
@@ -162,14 +184,29 @@ export const Card = forwardRef<HTMLElement, CardProps>(
       className,
       ...rest
     },
-    ref
+    forwardedRef
   ) => {
     const cls = useStyles('card', cardStyles)
     const motionLevel = useMotionLevel(motionProp)
+    const internalRef = useRef<HTMLElement>(null)
+
+    // Subtle fade-up entrance at motion level 2+
+    useEntrance(
+      internalRef,
+      motionLevel >= 2 ? 'fade-up' : 'none',
+      { duration: 250 }
+    )
+
+    // Merge refs
+    const setRef = (node: HTMLElement | null) => {
+      (internalRef as React.MutableRefObject<HTMLElement | null>).current = node
+      if (typeof forwardedRef === 'function') forwardedRef(node)
+      else if (forwardedRef) (forwardedRef as React.MutableRefObject<HTMLElement | null>).current = node
+    }
 
     return (
       <Component
-        ref={ref}
+        ref={setRef}
         className={cn(cls('root'), className)}
         data-variant={variant}
         data-padding={padding}

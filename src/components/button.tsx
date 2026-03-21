@@ -32,7 +32,7 @@ const buttonStyles = css`
         cursor: pointer;
         user-select: none;
         white-space: nowrap;
-        transition: all 0.15s var(--ease-out);
+        transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
         outline: none;
         text-decoration: none;
         font-family: inherit;

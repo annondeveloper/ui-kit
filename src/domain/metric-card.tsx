@@ -1,12 +1,14 @@
 'use client'
 
 import {
+  useRef,
   type HTMLAttributes,
   type ReactNode,
 } from 'react'
 import { css } from '../core/styles/css-tag'
 import { useStyles } from '../core/styles/use-styles'
 import { useMotionLevel } from '../core/motion/use-motion-level'
+import { useEntrance } from '../core/motion/use-entrance'
 import { cn } from '../core/utils/cn'
 import { ComponentErrorBoundary } from '../core/utils/error-boundary'
 
@@ -334,6 +336,14 @@ function MetricCardInner({
 }: MetricCardProps) {
   useStyles('metric-card', metricCardStyles)
   const motionLevel = useMotionLevel(motionProp)
+  const cardRef = useRef<HTMLDivElement>(null)
+
+  // Fade-up entrance at motion level 2+
+  useEntrance(
+    cardRef,
+    motionLevel >= 2 ? 'fade-up' : 'none',
+    { duration: 280 }
+  )
 
   // Determine what body to show
   const showError = error !== undefined
@@ -341,6 +351,7 @@ function MetricCardInner({
 
   return (
     <div
+      ref={cardRef}
       className={cn('ui-metric-card', className)}
       data-motion={motionLevel}
       {...(status && { 'data-status': status })}
