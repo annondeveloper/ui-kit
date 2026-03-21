@@ -6,6 +6,7 @@ export default defineConfig({
     form: 'src/form.ts',
     theme: 'src/theme.ts',
     lite: 'src/lite/index.ts',
+    premium: 'src/premium/index.ts',
   },
   outDir: 'dist/esm',
   format: ['esm'],

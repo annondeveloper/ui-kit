@@ -31,6 +31,12 @@
         "default": "./dist/esm/lite.js"
       }
     },
+    "./premium": {
+      "import": {
+        "types": "./dist/esm/premium.d.ts",
+        "default": "./dist/esm/premium.js"
+      }
+    },
     "./lite/styles.css": "./src/lite/lite.css",
     "./css/theme.css": "./dist/css/theme.css",
     "./css/all.css": "./dist/css/all.css",
