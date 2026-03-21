@@ -1,6 +1,6 @@
 {
   "name": "@annondeveloper/ui-kit",
-  "version": "2.0.4",
+  "version": "2.1.0",
   "type": "module",
   "description": "A zero-dependency React component library with built-in theming, motion, and accessibility.",
   "main": "dist/esm/index.js",
