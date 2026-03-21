@@ -13,6 +13,8 @@ import { Tabs, TabPanel } from '@ui/components/tabs'
 import { Icon } from '@ui/core/icons/icon'
 import { generateTheme } from '@ui/core/tokens/generator'
 import { TOKEN_TO_CSS, type ThemeTokens } from '@ui/core/tokens/tokens'
+import { useTheme } from '@ui/core/tokens/theme-context'
+import { ColorInput } from '@ui/components/color-input'
 import { PropsTable, type PropDef } from '../../components/PropsTable'
 
 // ─── Page Styles ──────────────────────────────────────────────────────────────
@@ -655,8 +657,8 @@ const pageStyles = css`
       /* ── Responsive: Mobile ──────────────────────── */
       @media (max-width: 768px) {
         .button-page__hero {
-          padding: 1.5rem 1rem;
-          margin: -1rem -1rem 1.5rem;
+          padding: 2rem 1.25rem;
+          margin: -1rem -1rem 2rem;
         }
 
         .button-page__title {
@@ -664,7 +666,7 @@ const pageStyles = css`
         }
 
         .button-page__preview {
-          padding: 1.25rem;
+          padding: 1.75rem;
         }
 
         .button-page__playground {
@@ -672,11 +674,12 @@ const pageStyles = css`
         }
 
         .button-page__playground-result {
-          padding: 1.5rem;
+          padding: 2rem;
+          min-block-size: 100px;
         }
 
         .button-page__labeled-row {
-          gap: 0.75rem;
+          gap: 1rem;
         }
 
         .button-page__tier-selector {
@@ -1161,15 +1164,16 @@ export default function ButtonPage() {
   const [tier, setTier] = useState<Tier>('standard')
   const [brandColor, setBrandColor] = useState('#6366f1')
   const pageRef = useRef<HTMLDivElement>(null)
+  const { mode } = useTheme()
 
-  // Generate full OKLCH theme from brand color and apply to page container
+  // Generate full OKLCH theme from brand color — MODE AWARE
   const themeTokens = useMemo(() => {
     try {
-      return generateTheme(brandColor)
+      return generateTheme(brandColor, mode)
     } catch {
       return null
     }
-  }, [brandColor])
+  }, [brandColor, mode])
 
   const themeStyle = useMemo(() => {
     if (!themeTokens || brandColor === '#6366f1') return undefined
@@ -1236,39 +1240,16 @@ export default function ButtonPage() {
         </div>
 
         {/* Color customization */}
-        <div style={{ marginBlockStart: '1rem' }}>
+        <div style={{ marginBlockStart: '1.25rem' }}>
           <div className="button-page__control-group">
             <span className="button-page__control-label">Brand Color</span>
-            <div className="button-page__color-group">
-              <input
-                type="color"
-                value={brandColor}
-                onChange={e => setBrandColor(e.target.value)}
-                className="button-page__color-swatch"
-                aria-label="Pick brand color"
-              />
-              <input
-                type="text"
-                value={brandColor}
-                onChange={e => {
-                  const v = e.target.value
-                  if (/^#[0-9a-fA-F]{0,6}$/.test(v)) setBrandColor(v)
-                }}
-                className="button-page__color-hex"
-                maxLength={7}
-                placeholder="#6366f1"
-                aria-label="Brand color hex value"
-              />
-              {brandColor !== '#6366f1' && (
-                <Button
-                  size="xs"
-                  variant="ghost"
-                  onClick={() => setBrandColor('#6366f1')}
-                >
-                  Reset
-                </Button>
-              )}
-            </div>
+            <ColorInput
+              name="brand-color"
+              value={brandColor}
+              onChange={setBrandColor}
+              size="sm"
+              swatches={['#6366f1','#f97316','#f43f5e','#0ea5e9','#10b981','#8b5cf6','#d946ef','#f59e0b','#06b6d4','#64748b']}
+            />
           </div>
           {/* Preset color swatches */}
           <div className="button-page__color-presets" style={{ marginBlockStart: '0.5rem' }}>
