@@ -1733,72 +1733,89 @@ export default function CardPage() {
         {/* Row 2: Metric & Trend cards */}
         <h3 style={{ fontSize: '0.875rem', fontWeight: 600, color: 'var(--text-secondary)', margin: '0 0 0.75rem', paddingInlineStart: '0.5rem' }}>Metric & Trend Cards</h3>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem', marginBottom: '2rem' }}>
-          <CardComponent variant="default" padding="md">
-            <div style={{ fontSize: '0.6875rem', color: 'var(--text-tertiary)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '0.375rem' }}>Revenue</div>
-            <div style={{ fontSize: '1.75rem', fontWeight: 800, color: 'var(--text-primary)', letterSpacing: '-0.02em', lineHeight: 1 }}>$48.3K</div>
-            <div style={{ fontSize: '0.75rem', color: 'var(--status-ok)', marginTop: '0.5rem', display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
-              <Icon name="arrow-up" size={12} /> 12.5%
+          <CardComponent variant="default" padding="lg">
+            <div style={{ fontSize: '0.625rem', color: 'var(--text-tertiary)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '0.5rem' }}>Revenue</div>
+            <div style={{ fontSize: 'clamp(2rem, 5vw, 3rem)', fontWeight: 900, color: 'var(--text-primary)', letterSpacing: '-0.03em', lineHeight: 1, fontVariantNumeric: 'tabular-nums' }}>$48.3K</div>
+            <div style={{ fontSize: '0.8125rem', color: 'var(--status-ok)', marginTop: '0.75rem', display: 'flex', alignItems: 'center', gap: '0.25rem', fontWeight: 600 }}>
+              <Icon name="arrow-up" size={14} /> 12.5%
+              <span style={{ color: 'var(--text-tertiary)', fontWeight: 400, marginInlineStart: '0.25rem' }}>vs last month</span>
             </div>
           </CardComponent>
 
-          <CardComponent variant="default" padding="md">
-            <div style={{ fontSize: '0.6875rem', color: 'var(--text-tertiary)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '0.375rem' }}>Active Users</div>
-            <div style={{ fontSize: '1.75rem', fontWeight: 800, color: 'var(--text-primary)', letterSpacing: '-0.02em', lineHeight: 1 }}>2,847</div>
-            <div style={{ fontSize: '0.75rem', color: 'var(--status-warning)', marginTop: '0.5rem', display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
-              <Icon name="arrow-down" size={12} /> 3.2%
+          <CardComponent variant="default" padding="lg">
+            <div style={{ fontSize: '0.625rem', color: 'var(--text-tertiary)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '0.5rem' }}>Active Users</div>
+            <div style={{ fontSize: 'clamp(2rem, 5vw, 3rem)', fontWeight: 900, color: 'var(--text-primary)', letterSpacing: '-0.03em', lineHeight: 1, fontVariantNumeric: 'tabular-nums' }}>2,847</div>
+            <div style={{ fontSize: '0.8125rem', color: 'var(--status-warning)', marginTop: '0.75rem', display: 'flex', alignItems: 'center', gap: '0.25rem', fontWeight: 600 }}>
+              <Icon name="arrow-down" size={14} /> 3.2%
+              <span style={{ color: 'var(--text-tertiary)', fontWeight: 400, marginInlineStart: '0.25rem' }}>this week</span>
             </div>
           </CardComponent>
 
-          <CardComponent variant="default" padding="md">
-            <div style={{ fontSize: '0.6875rem', color: 'var(--text-tertiary)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '0.375rem' }}>Uptime</div>
-            <div style={{ fontSize: '1.75rem', fontWeight: 800, color: 'var(--status-ok)', letterSpacing: '-0.02em', lineHeight: 1 }}>99.98%</div>
-            <div style={{ fontSize: '0.75rem', color: 'var(--text-tertiary)', marginTop: '0.5rem' }}>Last 30 days</div>
+          <CardComponent variant="default" padding="lg">
+            <div style={{ fontSize: '0.625rem', color: 'var(--text-tertiary)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '0.5rem' }}>Uptime</div>
+            <div style={{ fontSize: 'clamp(2rem, 5vw, 3rem)', fontWeight: 900, color: 'var(--status-ok)', letterSpacing: '-0.03em', lineHeight: 1, fontVariantNumeric: 'tabular-nums' }}>99.98<span style={{ fontSize: '0.5em', color: 'var(--text-tertiary)' }}>%</span></div>
+            <div style={{ fontSize: '0.8125rem', color: 'var(--text-tertiary)', marginTop: '0.75rem' }}>Last 30 days · SLA target 99.9%</div>
           </CardComponent>
 
-          <CardComponent variant="elevated" padding="md">
-            <div style={{ fontSize: '0.6875rem', color: 'var(--text-tertiary)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '0.375rem' }}>Error Rate</div>
-            <div style={{ fontSize: '1.75rem', fontWeight: 800, color: 'var(--status-critical)', letterSpacing: '-0.02em', lineHeight: 1 }}>0.42%</div>
-            <div style={{ fontSize: '0.75rem', color: 'var(--status-critical)', marginTop: '0.5rem', display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
-              <Icon name="alert-triangle" size={12} /> Above threshold
+          <CardComponent variant="elevated" padding="lg">
+            <div style={{ fontSize: '0.625rem', color: 'var(--text-tertiary)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '0.5rem' }}>Error Rate</div>
+            <div style={{ fontSize: 'clamp(2rem, 5vw, 3rem)', fontWeight: 900, color: 'var(--status-critical)', letterSpacing: '-0.03em', lineHeight: 1, fontVariantNumeric: 'tabular-nums' }}>0.42<span style={{ fontSize: '0.5em', color: 'var(--text-tertiary)' }}>%</span></div>
+            <div style={{ fontSize: '0.8125rem', color: 'var(--status-critical)', marginTop: '0.75rem', display: 'flex', alignItems: 'center', gap: '0.25rem', fontWeight: 600 }}>
+              <Icon name="alert-triangle" size={14} /> Above 0.1% threshold
             </div>
           </CardComponent>
         </div>
 
-        {/* Row 3: Metric with trendline */}
-        <h3 style={{ fontSize: '0.875rem', fontWeight: 600, color: 'var(--text-secondary)', margin: '0 0 0.75rem', paddingInlineStart: '0.5rem' }}>Metric + Trendline</h3>
+        {/* Row 3: Metric with trendline — metric SUPERIMPOSED over the sparkline */}
+        <h3 style={{ fontSize: '0.875rem', fontWeight: 600, color: 'var(--text-secondary)', margin: '0 0 0.75rem', paddingInlineStart: '0.5rem' }}>Metric + Trendline (superimposed)</h3>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1rem', marginBottom: '2rem' }}>
-          <CardComponent variant="default" padding="md">
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '0.75rem' }}>
-              <div>
-                <div style={{ fontSize: '0.6875rem', color: 'var(--text-tertiary)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '0.25rem' }}>CPU Usage</div>
-                <div style={{ fontSize: '1.5rem', fontWeight: 800, color: 'var(--text-primary)', lineHeight: 1 }}>87.4%</div>
-              </div>
-              <div style={{ fontSize: '0.75rem', color: 'var(--status-warning)', display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
-                <Icon name="arrow-up" size={12} /> 5.2%
-              </div>
-            </div>
-            {/* Fake sparkline using CSS gradient */}
-            <div style={{ height: 32, borderRadius: 4, background: 'linear-gradient(90deg, oklch(65% 0.15 270 / 0.1) 0%, oklch(65% 0.15 270 / 0.3) 40%, oklch(78% 0.17 85 / 0.3) 70%, oklch(62% 0.22 25 / 0.3) 100%)', position: 'relative', overflow: 'hidden' }}>
-              <svg viewBox="0 0 200 32" preserveAspectRatio="none" style={{ width: '100%', height: '100%', display: 'block' }}>
-                <polyline fill="none" stroke="var(--brand)" strokeWidth="2" points="0,28 20,24 40,26 60,20 80,22 100,16 120,14 140,10 160,8 180,6 200,4" />
+          {/* CPU — metric overlays the sparkline */}
+          <CardComponent variant="default" padding="none">
+            <div style={{ position: 'relative', padding: '1.5rem', minHeight: 140, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+              {/* Sparkline fills the entire card background */}
+              <svg viewBox="0 0 200 80" preserveAspectRatio="none" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', opacity: 0.15 }}>
+                <defs>
+                  <linearGradient id="cpuFill" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor="var(--brand)" stopOpacity="0.5" />
+                    <stop offset="100%" stopColor="var(--brand)" stopOpacity="0" />
+                  </linearGradient>
+                </defs>
+                <polygon fill="url(#cpuFill)" points="0,80 0,60 20,52 40,56 60,40 80,44 100,32 120,28 140,20 160,16 180,12 200,8 200,80" />
+                <polyline fill="none" stroke="var(--brand)" strokeWidth="2.5" points="0,60 20,52 40,56 60,40 80,44 100,32 120,28 140,20 160,16 180,12 200,8" />
               </svg>
+              {/* Content overlays the sparkline */}
+              <div style={{ position: 'relative', zIndex: 1 }}>
+                <div style={{ fontSize: '0.625rem', color: 'var(--text-tertiary)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '0.375rem' }}>CPU Usage</div>
+                <div style={{ fontSize: 'clamp(2.5rem, 8vw, 4rem)', fontWeight: 900, color: 'var(--text-primary)', letterSpacing: '-0.04em', lineHeight: 1, fontVariantNumeric: 'tabular-nums' }}>87.4<span style={{ fontSize: '0.4em', color: 'var(--text-tertiary)' }}>%</span></div>
+              </div>
+              <div style={{ position: 'relative', zIndex: 1, display: 'flex', alignItems: 'center', gap: '0.375rem', fontSize: '0.8125rem' }}>
+                <span style={{ color: 'var(--status-warning)', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '0.25rem' }}><Icon name="arrow-up" size={14} /> 5.2%</span>
+                <span style={{ color: 'var(--text-tertiary)' }}>last 24h</span>
+              </div>
             </div>
           </CardComponent>
 
-          <CardComponent variant="default" padding="md">
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '0.75rem' }}>
-              <div>
-                <div style={{ fontSize: '0.6875rem', color: 'var(--text-tertiary)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '0.25rem' }}>Network I/O</div>
-                <div style={{ fontSize: '1.5rem', fontWeight: 800, color: 'var(--text-primary)', lineHeight: 1 }}>2.4 Gbps</div>
-              </div>
-              <div style={{ fontSize: '0.75rem', color: 'var(--status-ok)', display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
-                <Icon name="activity" size={12} /> Stable
-              </div>
-            </div>
-            <div style={{ height: 32, borderRadius: 4, overflow: 'hidden' }}>
-              <svg viewBox="0 0 200 32" preserveAspectRatio="none" style={{ width: '100%', height: '100%', display: 'block' }}>
-                <polyline fill="none" stroke="var(--status-ok)" strokeWidth="2" points="0,16 20,18 40,14 60,16 80,15 100,17 120,14 140,16 160,15 180,16 200,14" />
+          {/* Network — metric overlays sparkline */}
+          <CardComponent variant="default" padding="none">
+            <div style={{ position: 'relative', padding: '1.5rem', minHeight: 140, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+              <svg viewBox="0 0 200 80" preserveAspectRatio="none" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', opacity: 0.12 }}>
+                <defs>
+                  <linearGradient id="netFill" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor="var(--status-ok)" stopOpacity="0.5" />
+                    <stop offset="100%" stopColor="var(--status-ok)" stopOpacity="0" />
+                  </linearGradient>
+                </defs>
+                <polygon fill="url(#netFill)" points="0,80 0,40 20,44 40,36 60,40 80,38 100,42 120,36 140,40 160,38 180,40 200,36 200,80" />
+                <polyline fill="none" stroke="var(--status-ok)" strokeWidth="2.5" points="0,40 20,44 40,36 60,40 80,38 100,42 120,36 140,40 160,38 180,40 200,36" />
               </svg>
+              <div style={{ position: 'relative', zIndex: 1 }}>
+                <div style={{ fontSize: '0.625rem', color: 'var(--text-tertiary)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '0.375rem' }}>Network I/O</div>
+                <div style={{ fontSize: 'clamp(2.5rem, 8vw, 4rem)', fontWeight: 900, color: 'var(--text-primary)', letterSpacing: '-0.04em', lineHeight: 1, fontVariantNumeric: 'tabular-nums' }}>2.4<span style={{ fontSize: '0.4em', color: 'var(--text-tertiary)' }}> Gbps</span></div>
+              </div>
+              <div style={{ position: 'relative', zIndex: 1, display: 'flex', alignItems: 'center', gap: '0.375rem', fontSize: '0.8125rem' }}>
+                <span style={{ color: 'var(--status-ok)', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '0.25rem' }}><Icon name="activity" size={14} /> Stable</span>
+                <span style={{ color: 'var(--text-tertiary)' }}>99.7% utilization</span>
+              </div>
             </div>
           </CardComponent>
         </div>
