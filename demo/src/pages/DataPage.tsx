@@ -1,5 +1,7 @@
 import { useState } from 'react'
 import { Preview } from '../components/Preview'
+import { ComponentShowcase, type ShowcaseExample } from '../components/ComponentShowcase'
+import type { PropDef } from '../components/PropsTable'
 import { Tabs, TabPanel } from '@ui/components/tabs'
 import { Button } from '@ui/components/button'
 import { Icon } from '@ui/core/icons/icon'
@@ -132,6 +134,25 @@ const kanbanCards: KanbanCard[] = [
   { id: 'k4', title: 'Spring animation', description: 'Physics-based motion solver', tags: ['motion'], priority: 'low' },
 ]
 
+// ─── DataTable Showcase ───────────────────────────────────────────────────────
+
+const dataTableProps: PropDef[] = [
+  { name: 'data', type: 'T[]', description: 'Array of row data objects' },
+  { name: 'columns', type: 'ColumnDef<T>[]', description: 'Column definitions with id, header, accessor, cell renderer' },
+  { name: 'searchable', type: 'boolean', default: 'false', description: 'Enable full-text search across all columns' },
+  { name: 'sortable', type: 'boolean', default: 'false', description: 'Enable column header click-to-sort' },
+  { name: 'paginated', type: 'boolean', default: 'false', description: 'Enable pagination controls' },
+  { name: 'pageSize', type: 'number', default: '10', description: 'Default rows per page' },
+  { name: 'pageSizes', type: 'number[]', description: 'Available page size options' },
+  { name: 'selectable', type: 'boolean', default: 'false', description: 'Enable row selection with checkboxes' },
+  { name: 'resizable', type: 'boolean', default: 'false', description: 'Enable column resize by dragging header borders' },
+  { name: 'reorderable', type: 'boolean', default: 'false', description: 'Enable column drag-to-reorder' },
+  { name: 'exportable', type: 'boolean', default: 'false', description: 'Show CSV/JSON export button' },
+  { name: 'stickyHeader', type: 'boolean', default: 'false', description: 'Keep header visible when scrolling' },
+  { name: 'striped', type: 'boolean', default: 'false', description: 'Alternate row background shading' },
+  { name: 'onSelectionChange', type: '(selected: T[]) => void', description: 'Callback when row selection changes' },
+]
+
 const grid: React.CSSProperties = {
   display: 'grid',
   gridTemplateColumns: 'repeat(auto-fill, minmax(400px, 1fr))',
@@ -166,6 +187,47 @@ export default function DataPage() {
     { id: '5', content: 'Fix CI pipeline' },
   ])
 
+  const dataTableExamples: ShowcaseExample[] = [
+    {
+      title: 'Full-Featured Table',
+      description: 'Search, sort, paginate, select, resize, reorder, and export — all enabled.',
+      code: `<DataTable
+  data={servers}
+  columns={columns}
+  searchable
+  sortable
+  paginated
+  pageSize={5}
+  pageSizes={[5, 10, 25, 50]}
+  selectable
+  resizable
+  reorderable
+  exportable
+  stickyHeader
+  striped
+/>`,
+      render: () => (
+        <div style={{ width: '100%' }}>
+          <DataTable
+            data={serverData}
+            columns={columns}
+            searchable
+            sortable
+            paginated
+            pageSize={5}
+            pageSizes={[5, 10, 25, 50]}
+            selectable
+            resizable
+            reorderable
+            exportable
+            stickyHeader
+            striped
+          />
+        </div>
+      ),
+    },
+  ]
+
   return (
     <div style={{ maxWidth: 1200, margin: '0 auto' }}>
       <div style={{ marginBottom: '2rem' }}>
@@ -173,6 +235,19 @@ export default function DataPage() {
         <p style={{ fontSize: 'var(--text-sm)', color: 'var(--text-secondary)' }}>Tables, trees, code blocks, and data display components</p>
       </div>
 
+      {/* ── DataTable Showcase ────────────────────────────────────────── */}
+      <ComponentShowcase
+        name="DataTable"
+        description="A full-featured data table with built-in search, sorting, pagination, row selection, column resize/reorder, and CSV/JSON export. Designed for server inventories, log tables, and admin dashboards."
+        examples={dataTableExamples}
+        props={dataTableProps}
+        accessibility={`Keyboard navigation: Arrow keys move between cells, Enter activates sort on headers.\nRow selection: Space toggles selection, Shift+Click for range select.\nSort state is announced to screen readers via aria-sort on column headers.\nSearch input is labeled and focuses results as you type.\nExport button has descriptive aria-label for screen readers.`}
+      />
+
+      <div style={{ marginBlock: '2rem' }} />
+
+      {/* ── Remaining components as Preview cards ─────────────────────── */}
+      <h2 style={{ fontSize: 'var(--text-lg)', fontWeight: 700, marginBottom: '1rem' }}>More Data Components</h2>
       <div style={grid}>
         {/* Tabs */}
         <Preview label="Tabs" description="3 variants: underline, pills, enclosed">
@@ -211,25 +286,6 @@ export default function DataPage() {
           <TreeView
             nodes={treeNodes}
             showGuides
-          />
-        </Preview>
-
-        {/* DataTable */}
-        <Preview label="DataTable" description="Full-featured: search, sort, resize, reorder, export, select, paginate" wide>
-          <DataTable
-            data={serverData}
-            columns={columns}
-            searchable
-            sortable
-            paginated
-            pageSize={5}
-            pageSizes={[5, 10, 25, 50]}
-            selectable
-            resizable
-            reorderable
-            exportable
-            stickyHeader
-            striped
           />
         </Preview>
 

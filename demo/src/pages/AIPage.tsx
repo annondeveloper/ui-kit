@@ -1,5 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
 import { Preview } from '../components/Preview'
+import { ComponentShowcase, type ShowcaseExample } from '../components/ComponentShowcase'
+import type { PropDef } from '../components/PropsTable'
 import { StreamingText } from '@ui/domain/streaming-text'
 import { TypingIndicator } from '@ui/domain/typing-indicator'
 import { ConfidenceBar } from '@ui/domain/confidence-bar'
@@ -11,6 +13,18 @@ import { Avatar } from '@ui/components/avatar'
 import type { FeedItem } from '@ui/domain/live-feed'
 
 const streamingParagraph = `The Aurora Fluid design system represents a new paradigm in component library design. By combining perceptually uniform OKLCH colors with physics-based spring animations, we achieve a level of visual fidelity that was previously only possible with hand-crafted animations. Every transition is governed by real differential equations, not bezier approximations. The result is interfaces that feel alive — responsive, natural, and deeply satisfying to interact with.`
+
+// ─── StreamingText Showcase ───────────────────────────────────────────────────
+
+const streamingTextProps: PropDef[] = [
+  { name: 'text', type: 'string', description: 'The text content to display (grows as tokens arrive)' },
+  { name: 'streaming', type: 'boolean', default: 'false', description: 'Whether text is still being streamed in' },
+  { name: 'showCursor', type: 'boolean', default: 'false', description: 'Show a blinking cursor at the end of the text' },
+  { name: 'speed', type: 'number', description: 'Rendering speed multiplier for character animation' },
+  { name: 'className', type: 'string', description: 'Additional CSS class names' },
+  { name: 'style', type: 'CSSProperties', description: 'Inline style overrides' },
+  { name: 'onComplete', type: '() => void', description: 'Callback fired when streaming finishes' },
+]
 
 const grid: React.CSSProperties = {
   display: 'grid',
@@ -80,6 +94,61 @@ export default function AIPage() {
     setRtValue(prev => prev + Math.floor(Math.random() * 200) - 50)
   }, [rtValue])
 
+  const streamingTextExamples: ShowcaseExample[] = [
+    {
+      title: 'Basic Streaming',
+      description: 'Text appears character-by-character, simulating an LLM streaming response.',
+      code: `const [text, setText] = useState('')
+const [streaming, setStreaming] = useState(true)
+
+// Feed text incrementally...
+<StreamingText text={text} streaming={streaming} />`,
+      render: () => (
+        <div style={{ width: '100%' }}>
+          <StreamingText
+            text={streamText}
+            streaming={streaming}
+            showCursor={streaming}
+          />
+        </div>
+      ),
+    },
+    {
+      title: 'With Cursor',
+      description: 'A blinking cursor indicates active streaming. It disappears when streaming completes.',
+      code: `<StreamingText
+  text={text}
+  streaming={true}
+  showCursor={true}
+/>`,
+      render: () => (
+        <StreamingText
+          text="The model is generating a response..."
+          streaming={true}
+          showCursor={true}
+        />
+      ),
+    },
+    {
+      title: 'Completed State',
+      description: 'When streaming is false, the full text is displayed without a cursor.',
+      code: `<StreamingText
+  text="Response complete. All tokens have been received."
+  streaming={false}
+  showCursor={false}
+/>`,
+      render: () => (
+        <div style={{ width: '100%' }}>
+          <StreamingText
+            text="Response complete. The Aurora Fluid design system combines OKLCH colors with physics-based spring animations to create interfaces that feel alive."
+            streaming={false}
+            showCursor={false}
+          />
+        </div>
+      ),
+    },
+  ]
+
   return (
     <div style={{ maxWidth: 1100, margin: '0 auto' }}>
       <div style={{ marginBottom: '2rem' }}>
@@ -87,21 +156,26 @@ export default function AIPage() {
         <p style={{ fontSize: 'var(--text-sm)', color: 'var(--text-secondary)' }}>Components designed for AI interfaces and real-time data streams</p>
       </div>
 
-      <div style={grid}>
-        {/* StreamingText */}
-        <Preview label="StreamingText" description="Simulated character-by-character streaming" wide>
-          <div style={{ marginBottom: '0.75rem' }}>
-            <StreamingText
-              text={streamText}
-              streaming={streaming}
-              showCursor={streaming}
-            />
-          </div>
-          <Button size="sm" variant="secondary" onClick={() => setStreamKey(k => k + 1)}>
-            Restart Stream
-          </Button>
-        </Preview>
+      {/* ── StreamingText Showcase ────────────────────────────────────── */}
+      <ComponentShowcase
+        name="StreamingText"
+        description="Renders text that streams in character-by-character, designed for AI chat interfaces and LLM response rendering. Supports a blinking cursor, completion callbacks, and smooth rendering."
+        examples={streamingTextExamples}
+        props={streamingTextProps}
+        accessibility={`Text content is rendered in a live region so screen readers announce new content as it arrives.\nThe blinking cursor is purely decorative (aria-hidden).\nThe component uses semantic paragraph elements for proper reading flow.`}
+      />
 
+      <div style={{ marginBlock: '1rem' }}>
+        <Button size="sm" variant="secondary" onClick={() => setStreamKey(k => k + 1)}>
+          Restart Stream Demo
+        </Button>
+      </div>
+
+      <div style={{ marginBlock: '2rem' }} />
+
+      {/* ── Remaining components as Preview cards ─────────────────────── */}
+      <h2 style={{ fontSize: 'var(--text-lg)', fontWeight: 700, marginBottom: '1rem' }}>More AI & Realtime Components</h2>
+      <div style={grid}>
         {/* TypingIndicator */}
         <Preview label="TypingIndicator" description="Chat-style typing animation">
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>

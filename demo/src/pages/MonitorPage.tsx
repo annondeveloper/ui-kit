@@ -1,5 +1,7 @@
 import { useState } from 'react'
 import { Preview } from '../components/Preview'
+import { ComponentShowcase, type ShowcaseExample } from '../components/ComponentShowcase'
+import type { PropDef } from '../components/PropsTable'
 import { MetricCard } from '@ui/domain/metric-card'
 import { ThresholdGauge } from '@ui/domain/threshold-gauge'
 import { UtilizationBar } from '@ui/domain/utilization-bar'
@@ -89,6 +91,58 @@ const ports: PortStatus[] = [
   { port: 5672, status: 'ok', label: 'RabbitMQ' },
 ]
 
+// ─── MetricCard Showcase ──────────────────────────────────────────────────────
+
+const metricCardProps: PropDef[] = [
+  { name: 'title', type: 'string', description: 'Metric label displayed above the value' },
+  { name: 'value', type: 'string | number', description: 'Primary metric value to display' },
+  { name: 'trend', type: "'up' | 'down' | 'flat'", description: 'Trend direction indicator arrow' },
+  { name: 'status', type: "'ok' | 'warning' | 'critical'", description: 'Status color: green, amber, or red' },
+  { name: 'sparkline', type: 'number[]', description: 'Array of values to render as an inline sparkline chart' },
+  { name: 'icon', type: 'ReactNode', description: 'Optional icon displayed alongside the title' },
+  { name: 'change', type: 'string', description: 'Percentage or delta text shown next to trend arrow' },
+  { name: 'subtitle', type: 'string', description: 'Secondary text below the value' },
+]
+
+const metricCardExamples: ShowcaseExample[] = [
+  {
+    title: 'Basic MetricCard',
+    description: 'A simple metric with title and value.',
+    code: `<MetricCard title="CPU Usage" value="87.4%" />`,
+    render: () => (
+      <MetricCard title="CPU Usage" value="87.4%" />
+    ),
+  },
+  {
+    title: 'With Sparkline',
+    description: 'Inline sparkline chart shows recent trend data.',
+    code: `<MetricCard
+  title="CPU Usage"
+  value="87.4%"
+  sparkline={[45, 52, 49, 63, 72, 68, 75, 82, 87]}
+/>`,
+    render: () => (
+      <MetricCard title="CPU Usage" value="87.4%" sparkline={[45, 52, 49, 63, 72, 68, 75, 82, 87]} />
+    ),
+  },
+  {
+    title: 'With Trend & Status',
+    description: 'Trend arrows and status colors provide at-a-glance health indication.',
+    code: `<MetricCard title="CPU" value="87.4%" trend="up" status="warning" sparkline={[45, 52, 49, 63, 72, 68, 75, 82, 87]} />
+<MetricCard title="Memory" value="62.1%" trend="flat" status="ok" sparkline={[58, 60, 59, 61, 62, 61, 63, 62, 62]} />
+<MetricCard title="Disk" value="78.3%" trend="up" status="warning" sparkline={[70, 72, 73, 74, 75, 76, 77, 78]} />
+<MetricCard title="Network" value="2.4 Gb/s" trend="up" status="ok" sparkline={[1.2, 1.5, 1.8, 2.0, 2.1, 2.3, 2.4]} />`,
+    render: () => (
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem', width: '100%' }}>
+        <MetricCard title="CPU Usage" value="87.4%" trend="up" status="warning" sparkline={[45, 52, 49, 63, 72, 68, 75, 82, 87]} />
+        <MetricCard title="Memory" value="62.1%" trend="flat" status="ok" sparkline={[58, 60, 59, 61, 62, 61, 63, 62, 62]} />
+        <MetricCard title="Disk" value="78.3%" trend="up" status="warning" sparkline={[70, 72, 73, 74, 75, 76, 77, 78]} />
+        <MetricCard title="Network I/O" value="2.4 Gb/s" trend="up" status="ok" sparkline={[1.2, 1.5, 1.8, 2.0, 2.1, 2.3, 2.4]} />
+      </div>
+    ),
+  },
+]
+
 const grid: React.CSSProperties = {
   display: 'grid',
   gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))',
@@ -106,14 +160,19 @@ export default function MonitorPage() {
         <p style={{ fontSize: 'var(--text-sm)', color: 'var(--text-secondary)' }}>Real-time dashboards, gauges, logs, and infrastructure monitoring</p>
       </div>
 
-      {/* Top row: 4 MetricCards */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem', marginBottom: '1.5rem' }}>
-        <MetricCard title="CPU Usage" value="87.4%" trend="up" status="warning" sparkline={[45, 52, 49, 63, 72, 68, 75, 82, 87]} />
-        <MetricCard title="Memory" value="62.1%" trend="flat" status="ok" sparkline={[58, 60, 59, 61, 62, 61, 63, 62, 62]} />
-        <MetricCard title="Network I/O" value="2.4 Gb/s" trend="up" status="ok" sparkline={[1.2, 1.5, 1.8, 2.0, 2.1, 2.3, 2.4]} />
-        <MetricCard title="Disk" value="78.3%" trend="up" status="warning" sparkline={[70, 72, 73, 74, 75, 76, 77, 78]} />
-      </div>
+      {/* ── MetricCard Showcase ──────────────────────────────────────── */}
+      <ComponentShowcase
+        name="MetricCard"
+        description="A compact dashboard card for displaying key metrics with optional sparkline charts, trend indicators, and status colors. Designed for infrastructure monitoring dashboards."
+        examples={metricCardExamples}
+        props={metricCardProps}
+        accessibility={`Status colors are paired with text labels (ok/warning/critical) so they are not color-only.\nTrend arrows include sr-only text describing the direction.\nSparkline charts have aria-hidden since they are decorative — the numeric value is the accessible content.`}
+      />
 
+      <div style={{ marginBlock: '2rem' }} />
+
+      {/* ── Remaining components as Preview cards ─────────────────────── */}
+      <h2 style={{ fontSize: 'var(--text-lg)', fontWeight: 700, marginBottom: '1rem' }}>More Monitoring Components</h2>
       <div style={grid}>
         {/* ThresholdGauge */}
         <Preview label="ThresholdGauge" description="Gauge with warning/critical thresholds">
