@@ -223,7 +223,8 @@ const layoutStyles = css`
       min-width: 0;
       padding: 2rem 3rem;
       overflow-y: auto;
-      overflow-x: hidden;
+      /* overflow-x: clip instead of hidden — doesn't create stacking context that clips popovers */
+      overflow-x: clip;
     }
 
     /* On large screens, add MORE padding to push content toward center */
