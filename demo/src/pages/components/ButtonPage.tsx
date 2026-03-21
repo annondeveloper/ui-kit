@@ -443,6 +443,8 @@ const pageStyles = css`
         flex-direction: column;
         gap: 1rem;
         transition: border-color 0.2s, box-shadow 0.2s;
+        min-width: 0;        /* Prevent grid overflow */
+        overflow: hidden;    /* Clip any remaining overflow */
       }
 
       .button-page__tier-card--active {
@@ -482,14 +484,15 @@ const pageStyles = css`
 
       .button-page__tier-import {
         font-family: 'SF Mono', 'Fira Code', 'JetBrains Mono', monospace;
-        font-size: 0.6875rem;
+        font-size: 0.625rem;
         color: oklch(from var(--brand) calc(l + 0.1) c h);
         background: var(--border-subtle);
         padding: 0.375rem 0.5rem;
         border-radius: var(--radius-sm);
-        overflow-x: auto;
-        white-space: nowrap;
+        overflow-wrap: break-word;
+        word-break: break-all;
         text-align: start;
+        line-height: 1.4;
       }
 
       .button-page__tier-preview {
