@@ -28,16 +28,47 @@ const pageStyles = css`
       /* ── Hero header ────────────────────────────────── */
 
       .button-page__hero {
-        margin-block-end: 2.5rem;
+        position: relative;
+        padding: 2.5rem 2rem;
+        margin: -1.5rem -2rem 2.5rem;
+        border-radius: var(--radius-lg);
+        background: var(--bg-surface);
+        border: 1px solid var(--border-subtle);
+        overflow: hidden;
+      }
+
+      /* Aurora glow behind hero */
+      .button-page__hero::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -30%;
+        width: 400px;
+        height: 400px;
+        background: radial-gradient(circle, var(--aurora-1, oklch(60% 0.15 250 / 0.08)) 0%, transparent 70%);
+        pointer-events: none;
+      }
+      .button-page__hero::after {
+        content: '';
+        position: absolute;
+        bottom: -30%;
+        left: -20%;
+        width: 300px;
+        height: 300px;
+        background: radial-gradient(circle, var(--aurora-2, oklch(55% 0.18 300 / 0.06)) 0%, transparent 70%);
+        pointer-events: none;
       }
 
       .button-page__title {
-        font-size: clamp(1.75rem, 4vw, 2.5rem);
+        font-size: clamp(2rem, 5vw, 3rem);
         font-weight: 800;
-        letter-spacing: -0.02em;
-        color: var(--text-primary);
+        letter-spacing: -0.03em;
+        background: linear-gradient(135deg, var(--text-primary) 0%, var(--brand, oklch(65% 0.2 270)) 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
         margin: 0 0 0.5rem;
-        line-height: 1.15;
+        line-height: 1.1;
       }
 
       .button-page__desc {
@@ -68,6 +99,8 @@ const pageStyles = css`
         min-inline-size: 0;
         overflow-x: auto;
         white-space: nowrap;
+        backdrop-filter: blur(8px);
+        box-shadow: inset 0 1px 0 oklch(100% 0 0 / 0.04);
       }
 
       .button-page__copy-btn {
@@ -79,13 +112,37 @@ const pageStyles = css`
 
       .button-page__section {
         margin-block-end: 3rem;
+        animation: button-page-reveal 0.4s ease-out both;
+        animation-timeline: view();
+        animation-range: entry 0% entry 30%;
+      }
+
+      @keyframes button-page-reveal {
+        from {
+          opacity: 0;
+          transform: translateY(16px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      /* Fallback for browsers without animation-timeline */
+      @supports not (animation-timeline: view()) {
+        .button-page__section {
+          animation: none;
+        }
       }
 
       .button-page__section-title {
         font-size: var(--text-lg, 1.125rem);
         font-weight: 700;
         color: var(--text-primary);
-        margin: 0 0 0.25rem;
+        margin: 0 0 0.375rem;
+        padding-inline-start: 0.75rem;
+        border-inline-start: 3px solid var(--brand, oklch(65% 0.2 270));
+        line-height: 1.3;
         scroll-margin-block-start: 2rem;
       }
 
@@ -109,14 +166,28 @@ const pageStyles = css`
       /* ── Preview box ────────────────────────────────── */
 
       .button-page__preview {
-        padding: 2rem;
+        padding: 2.5rem;
         border: 1px solid var(--border-subtle);
         border-radius: var(--radius-lg);
         background: var(--bg-surface);
+        position: relative;
+        overflow: hidden;
         display: flex;
         flex-wrap: wrap;
         align-items: center;
         gap: 1rem;
+        /* Subtle inner glow */
+        box-shadow: inset 0 1px 0 oklch(100% 0 0 / 0.03);
+      }
+
+      /* Dot grid pattern background */
+      .button-page__preview::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background-image: radial-gradient(oklch(100% 0 0 / 0.04) 1px, transparent 1px);
+        background-size: 20px 20px;
+        pointer-events: none;
       }
 
       .button-page__preview--col {
@@ -155,12 +226,29 @@ const pageStyles = css`
         border-radius: var(--radius-lg);
         background: var(--bg-base);
         padding: 2rem;
+        position: relative;
+        overflow: hidden;
+        box-shadow: inset 0 1px 0 oklch(100% 0 0 / 0.03);
+      }
+
+      /* Dot grid for playground result */
+      .button-page__playground-result::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background-image: radial-gradient(oklch(100% 0 0 / 0.04) 1px, transparent 1px);
+        background-size: 20px 20px;
+        pointer-events: none;
       }
 
       .button-page__playground-controls {
+        background: var(--bg-elevated);
+        border: 1px solid var(--border-subtle);
+        border-radius: var(--radius-lg);
+        padding: 1.25rem;
         display: flex;
         flex-direction: column;
-        gap: 1rem;
+        gap: 0.875rem;
       }
 
       .button-page__control-group {
@@ -204,6 +292,7 @@ const pageStyles = css`
         background: var(--brand);
         color: oklch(100% 0 0);
         border-color: var(--brand);
+        box-shadow: 0 0 0 3px oklch(65% 0.2 270 / 0.12);
       }
 
       .button-page__toggle-row {
@@ -235,6 +324,7 @@ const pageStyles = css`
         outline: 2px solid var(--brand);
         outline-offset: 1px;
         border-color: transparent;
+        box-shadow: 0 0 0 4px oklch(65% 0.2 270 / 0.1);
       }
 
       /* ── Color picker ──────────────────────────────── */
@@ -291,20 +381,25 @@ const pageStyles = css`
       }
 
       .button-page__color-preset {
-        inline-size: 20px;
-        block-size: 20px;
-        border-radius: var(--radius-sm, 6px);
+        inline-size: 24px;
+        block-size: 24px;
+        border-radius: 50%;
         border: 2px solid transparent;
         cursor: pointer;
         padding: 0;
-        transition: border-color 0.15s, transform 0.15s;
+        transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1),
+                    border-color 0.15s,
+                    box-shadow 0.15s;
+        box-shadow: 0 1px 3px oklch(0% 0 0 / 0.2);
       }
       .button-page__color-preset:hover {
-        transform: scale(1.15);
+        transform: scale(1.2);
+        box-shadow: 0 2px 8px oklch(0% 0 0 / 0.3);
       }
       .button-page__color-preset--active {
-        border-color: var(--text-primary);
-        transform: scale(1.15);
+        border-color: oklch(100% 0 0);
+        transform: scale(1.2);
+        box-shadow: 0 0 0 2px var(--bg-base), 0 0 0 4px oklch(100% 0 0 / 0.5);
       }
 
       /* ── Tier selector ─────────────────────────────── */
@@ -312,9 +407,11 @@ const pageStyles = css`
       .button-page__tier-selector {
         display: flex;
         border: 1px solid var(--border-default);
-        border-radius: var(--radius-md, 10px);
+        border-radius: var(--radius-lg);
         overflow: hidden;
         inline-size: fit-content;
+        background: var(--bg-surface);
+        box-shadow: var(--shadow-sm, 0 1px 3px oklch(0% 0 0 / 0.08));
       }
 
       .button-page__tier-btn {
@@ -341,11 +438,12 @@ const pageStyles = css`
         color: var(--text-primary);
       }
       .button-page__tier-btn--active {
-        background: var(--brand);
+        background: linear-gradient(135deg, var(--brand) 0%, oklch(from var(--brand, oklch(65% 0.2 270)) calc(l + 0.1) c h) 100%);
         color: oklch(100% 0 0);
+        box-shadow: 0 2px 8px oklch(65% 0.2 270 / 0.25);
       }
       .button-page__tier-btn--active:hover {
-        background: var(--brand);
+        background: linear-gradient(135deg, var(--brand) 0%, oklch(from var(--brand, oklch(65% 0.2 270)) calc(l + 0.1) c h) 100%);
         color: oklch(100% 0 0);
       }
 
@@ -360,23 +458,23 @@ const pageStyles = css`
       .button-page__labeled-row {
         display: flex;
         flex-wrap: wrap;
+        gap: 1.5rem;
         align-items: flex-end;
-        gap: 1.25rem;
       }
 
       .button-page__labeled-item {
         display: flex;
         flex-direction: column;
         align-items: center;
-        gap: 0.375rem;
+        gap: 0.625rem;
       }
 
       .button-page__item-label {
-        font-size: var(--text-xs, 0.75rem);
-        font-weight: 500;
+        font-size: 0.6875rem;
         color: var(--text-tertiary);
-        text-transform: uppercase;
-        letter-spacing: 0.05em;
+        font-family: 'SF Mono', 'Fira Code', 'JetBrains Mono', monospace;
+        text-transform: lowercase;
+        letter-spacing: 0.03em;
       }
 
       /* ── States grid ────────────────────────────────── */
@@ -396,6 +494,11 @@ const pageStyles = css`
         border: 1px solid var(--border-subtle);
         border-radius: var(--radius-md);
         background: var(--bg-base);
+        transition: border-color 0.2s, box-shadow 0.2s;
+      }
+      .button-page__state-cell:hover {
+        border-color: var(--border-default);
+        box-shadow: 0 2px 8px oklch(0% 0 0 / 0.05);
       }
 
       .button-page__state-label {
@@ -426,6 +529,11 @@ const pageStyles = css`
         border: 1px solid var(--border-subtle);
         border-radius: var(--radius-lg);
         background: var(--bg-surface);
+        transition: border-color 0.2s, box-shadow 0.2s;
+      }
+      .button-page__tier-card:hover {
+        border-color: var(--border-default);
+        box-shadow: 0 4px 16px oklch(0% 0 0 / 0.06);
       }
 
       .button-page__tier-header {
