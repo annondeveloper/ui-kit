@@ -1,5 +1,5 @@
 'use client'
-import { useState, useCallback, Suspense } from 'react'
+import { useState, useCallback, Suspense, createContext, useContext } from 'react'
 import { NavLink, Outlet, useLocation } from 'react-router-dom'
 import { UIProvider } from '@ui/components/ui-provider'
 import { Drawer } from '@ui/components/drawer'
@@ -7,6 +7,11 @@ import { Icon, type IconName } from '@ui/core/icons/icon'
 import { Skeleton } from '@ui/components/skeleton'
 import { css } from '@ui/core/styles/css-tag'
 import { useStyles } from '@ui/core/styles/use-styles'
+
+// ─── Global Tier Context ──────────────────────────────────────────────────────
+export type Tier = 'lite' | 'standard' | 'premium'
+const TierContext = createContext<{ tier: Tier; setTier: (t: Tier) => void }>({ tier: 'standard', setTier: () => {} })
+export function useTier() { return useContext(TierContext) }
 
 const pages: { path: string; label: string; icon: IconName }[] = [
   { path: '/', label: 'Home', icon: 'zap' },
@@ -277,12 +282,24 @@ function NavLinks({ onClick }: { onClick?: () => void }) {
   )
 }
 
-function Controls({ motion, setMotion, light, toggleLight }: {
+function Controls({ motion, setMotion, light, toggleLight, tier, setTier }: {
   motion: number; setMotion: (n: number) => void
   light: boolean; toggleLight: () => void
+  tier: Tier; setTier: (t: Tier) => void
 }) {
   return (
     <>
+      <div className="site-control-row">
+        <span className="site-control-label">Tier</span>
+        {(['lite', 'standard', 'premium'] as const).map(t => (
+          <button
+            key={t}
+            className={`site-motion-btn${tier === t ? ' site-motion-btn--active' : ''}`}
+            onClick={() => setTier(t)}
+            style={{ fontSize: '0.5625rem', width: 'auto', paddingInline: '0.375rem' }}
+          >{t === 'lite' ? 'L' : t === 'standard' ? 'S' : 'P'}</button>
+        ))}
+      </div>
       <div className="site-control-row">
         <span className="site-control-label">Motion</span>
         {[0, 1, 2, 3].map(n => (
@@ -304,6 +321,7 @@ function Controls({ motion, setMotion, light, toggleLight }: {
 export default function App() {
   const [light, setLight] = useState(false)
   const [motion, setMotion] = useState(3)
+  const [tier, setTier] = useState<Tier>('standard')
   const [drawerOpen, setDrawerOpen] = useState(false)
   const location = useLocation()
 
@@ -313,6 +331,7 @@ export default function App() {
 
   return (
     <UIProvider motion={motion as 0|1|2|3} mode={light ? 'light' : 'dark'}>
+      <TierContext.Provider value={{ tier, setTier }}>
       <div className="site">
         {/* Desktop sidebar */}
         <aside className="site-sidebar">
@@ -329,7 +348,7 @@ export default function App() {
             <NavLinks />
           </nav>
           <div className="site-sidebar-footer">
-            <Controls motion={motion} setMotion={setMotion} light={light} toggleLight={toggleLight} />
+            <Controls motion={motion} setMotion={setMotion} light={light} toggleLight={toggleLight} tier={tier} setTier={setTier} />
           </div>
         </aside>
 
@@ -374,6 +393,7 @@ export default function App() {
           </Suspense>
         </main>
       </div>
+      </TierContext.Provider>
     </UIProvider>
   )
 }

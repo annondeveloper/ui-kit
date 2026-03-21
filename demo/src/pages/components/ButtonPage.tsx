@@ -15,6 +15,7 @@ import { TOKEN_TO_CSS, type ThemeTokens } from '@ui/core/tokens/tokens'
 import { useTheme } from '@ui/core/tokens/theme-context'
 import { ColorInput } from '@ui/components/color-input'
 import { PropsTable, type PropDef } from '../../components/PropsTable'
+import { useTier, type Tier } from '../../App'
 
 // ─── Page Styles ──────────────────────────────────────────────────────────────
 
@@ -26,6 +27,9 @@ const pageStyles = css`
         margin-inline: auto;
         container-type: inline-size;
         container-name: button-page;
+        display: flex;
+        flex-direction: column;
+        gap: 2rem;
       }
 
       /* ── Hero header ────────────────────────────────── */
@@ -37,7 +41,6 @@ const pageStyles = css`
         background: var(--bg-elevated);
         border: 1px solid var(--border-default);
         overflow: hidden;
-        margin-block-end: 2rem;
       }
 
       /* Animated aurora glow */
@@ -122,13 +125,13 @@ const pageStyles = css`
       /* ── Sections ───────────────────────────────────── */
 
       .button-page__section {
-        margin-block-end: 1.5rem;
-        background: var(--bg-elevated);
+        background: oklch(from var(--bg-elevated) calc(l + 0.02) c h);
         border: 1px solid var(--border-default);
         border-radius: var(--radius-lg);
         padding: 2rem;
         overflow: visible;
         position: relative;
+        box-shadow: inset 0 1px 0 oklch(100% 0 0 / 0.04), 0 2px 8px oklch(0% 0 0 / 0.15);
         opacity: 0;
         transform: translateY(24px);
         animation: section-reveal 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
@@ -438,23 +441,30 @@ const pageStyles = css`
         border: 1px solid var(--border-subtle);
         border-radius: var(--radius-md);
         padding: 1.5rem;
-        text-align: center;
         display: flex;
         flex-direction: column;
-        gap: 1rem;
-        transition: border-color 0.2s, box-shadow 0.2s;
-        min-width: 0;        /* Prevent grid overflow */
-        overflow: hidden;    /* Clip any remaining overflow */
+        gap: 0.75rem;
+        cursor: pointer;
+        transition: border-color 0.2s, box-shadow 0.2s, transform 0.2s;
+        min-width: 0;
+        overflow: hidden;
+      }
+
+      .button-page__tier-card:hover {
+        border-color: var(--border-strong);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 16px oklch(0% 0 0 / 0.2);
       }
 
       .button-page__tier-card--active {
         border-color: var(--brand);
-        box-shadow: 0 0 0 1px var(--brand), var(--shadow-glow, 0 0 20px oklch(from var(--brand) l c h / 0.15));
+        box-shadow: 0 0 0 1px var(--brand), 0 0 20px oklch(from var(--brand) l c h / 0.12);
+        background: oklch(from var(--bg-surface) calc(l + 0.02) c h);
       }
 
-      .button-page__tier-card:hover:not(.button-page__tier-card--active) {
-        border-color: var(--border-default);
-        box-shadow: 0 4px 16px oklch(0% 0 0 / 0.06);
+      .button-page__tier-card--active:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 0 0 1px var(--brand), 0 0 20px oklch(from var(--brand) l c h / 0.18), 0 4px 16px oklch(0% 0 0 / 0.2);
       }
 
       .button-page__tier-header {
@@ -735,7 +745,6 @@ const pageStyles = css`
         }
 
         .button-page__section {
-          margin-block-end: 1rem;
           padding: 1.25rem;
         }
       }
@@ -837,7 +846,6 @@ const buttonProps: PropDef[] = [
 
 type Variant = 'primary' | 'secondary' | 'ghost' | 'danger'
 type Size = 'xs' | 'sm' | 'md' | 'lg' | 'xl'
-type Tier = 'lite' | 'standard' | 'premium'
 type AnimationStyle = 'smooth' | 'spring' | 'bounce' | 'none'
 
 const VARIANTS: Variant[] = ['primary', 'secondary', 'ghost', 'danger']
@@ -1226,7 +1234,7 @@ function PlaygroundSection({ tier, brandColor }: { tier: Tier; brandColor: strin
 export default function ButtonPage() {
   useStyles('button-page', pageStyles)
 
-  const [tier, setTier] = useState<Tier>('standard')
+  const { tier, setTier } = useTier()
   const [brandColor, setBrandColor] = useState('#6366f1')
   const pageRef = useRef<HTMLDivElement>(null)
   const { mode } = useTheme()
@@ -1435,7 +1443,13 @@ export default function ButtonPage() {
 
         <div className="button-page__tiers">
           {/* Lite */}
-          <div className={`button-page__tier-card${tier === 'lite' ? ' button-page__tier-card--active' : ''}`}>
+          <div
+            className={`button-page__tier-card${tier === 'lite' ? ' button-page__tier-card--active' : ''}`}
+            onClick={() => setTier('lite')}
+            role="button"
+            tabIndex={0}
+            onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setTier('lite') } }}
+          >
             <div className="button-page__tier-header">
               <span className="button-page__tier-name">Lite</span>
               <span className="button-page__tier-size">~0.3 KB</span>
@@ -1450,10 +1464,23 @@ export default function ButtonPage() {
             <div className="button-page__tier-preview">
               <LiteButton variant="primary">Lite Button</LiteButton>
             </div>
+            <div className="button-page__size-breakdown">
+              <div className="button-page__size-row">
+                <span>Component: <strong style={{ color: 'var(--text-primary)' }}>1.5 KB</strong></span>
+                <span>+ Shared: <strong style={{ color: 'var(--text-primary)' }}>3.7 KB</strong></span>
+                <span>= <strong style={{ color: 'var(--brand)' }}>5.2 KB</strong> gzip</span>
+              </div>
+            </div>
           </div>
 
           {/* Standard */}
-          <div className={`button-page__tier-card${tier === 'standard' ? ' button-page__tier-card--active' : ''}`}>
+          <div
+            className={`button-page__tier-card${tier === 'standard' ? ' button-page__tier-card--active' : ''}`}
+            onClick={() => setTier('standard')}
+            role="button"
+            tabIndex={0}
+            onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setTier('standard') } }}
+          >
             <div className="button-page__tier-header">
               <span className="button-page__tier-name">Standard</span>
               <span className="button-page__tier-size">~2 KB</span>
@@ -1468,10 +1495,23 @@ export default function ButtonPage() {
             <div className="button-page__tier-preview">
               <Button variant="primary" icon={<Icon name="zap" size="sm" />}>Standard</Button>
             </div>
+            <div className="button-page__size-breakdown">
+              <div className="button-page__size-row">
+                <span>Component: <strong style={{ color: 'var(--text-primary)' }}>2.4 KB</strong></span>
+                <span>+ Shared: <strong style={{ color: 'var(--text-primary)' }}>0.9 KB</strong></span>
+                <span>= <strong style={{ color: 'var(--brand)' }}>3.3 KB</strong> gzip</span>
+              </div>
+            </div>
           </div>
 
           {/* Premium */}
-          <div className={`button-page__tier-card${tier === 'premium' ? ' button-page__tier-card--active' : ''}`}>
+          <div
+            className={`button-page__tier-card${tier === 'premium' ? ' button-page__tier-card--active' : ''}`}
+            onClick={() => setTier('premium')}
+            role="button"
+            tabIndex={0}
+            onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setTier('premium') } }}
+          >
             <div className="button-page__tier-header">
               <span className="button-page__tier-name">Premium</span>
               <span className="button-page__tier-size">~3 KB</span>
@@ -1486,69 +1526,44 @@ export default function ButtonPage() {
             <div className="button-page__tier-preview">
               <PremiumButton variant="primary" icon={<Icon name="zap" size="sm" />}>Premium</PremiumButton>
             </div>
+            <div className="button-page__size-breakdown">
+              <div className="button-page__size-row">
+                <span>Component: <strong style={{ color: 'var(--text-primary)' }}>1.6 KB</strong></span>
+                <span>+ Shared: <strong style={{ color: 'var(--text-primary)' }}>3.3 KB</strong></span>
+                <span>= <strong style={{ color: 'var(--brand)' }}>4.9 KB</strong> gzip</span>
+              </div>
+            </div>
           </div>
         </div>
 
-        {/* Combined tier selector + color picker config panel */}
-        <div className="button-page__config-panel">
-          <div className="button-page__tier-selector">
-            {TIERS.map(t => {
-              const tierSizes = { lite: 1.5, standard: 3.3, premium: 5.0 }
-              return (
-                <button
-                  key={t.id}
-                  type="button"
-                  className={`button-page__tier-btn${t.id === tier ? ' button-page__tier-btn--active' : ''}`}
-                  onClick={() => setTier(t.id)}
-                >
-                  {t.label}
-                  <span className="button-page__tier-size-label">{tierSizes[t.id].toFixed(1)} KB</span>
-                </button>
-              )
-            })}
-          </div>
-
-          {/* Dynamic size breakdown */}
-          <div className="button-page__size-breakdown">
-            <div className="button-page__size-row">
-              <span>Component:</span>
-              <strong style={{ color: 'var(--text-primary)', fontVariantNumeric: 'tabular-nums' }}>{sizeInfo.component.toFixed(1)} KB</strong>
-              <span>+</span>
-              <span>Shared:</span>
-              <strong style={{ color: 'var(--text-primary)', fontVariantNumeric: 'tabular-nums' }}>{sizeInfo.shared.toFixed(1)} KB</strong>
-              <span>=</span>
-              <strong style={{ color: 'var(--brand)', fontVariantNumeric: 'tabular-nums', fontSize: '0.875rem' }}>{sizeInfo.total.toFixed(1)} KB</strong>
-              <span>gzip</span>
-            </div>
-            <div className="button-page__size-note">
-              {sizeInfo.note}
-            </div>
-          </div>
-
-          {/* Color customization */}
-          <div className="button-page__control-group">
-            <span className="button-page__control-label">Brand Color</span>
-            <ColorInput
-              name="brand-color"
-              value={brandColor}
-              onChange={setBrandColor}
-              size="sm"
-              swatches={['#6366f1','#f97316','#f43f5e','#0ea5e9','#10b981','#8b5cf6','#d946ef','#f59e0b','#06b6d4','#64748b']}
+        {/* Color customization */}
+        <div className="button-page__control-group">
+          <span className="button-page__control-label">Brand Color</span>
+          <ColorInput
+            name="brand-color"
+            value={brandColor}
+            onChange={setBrandColor}
+            size="sm"
+            swatches={['#6366f1','#f97316','#f43f5e','#0ea5e9','#10b981','#8b5cf6','#d946ef','#f59e0b','#06b6d4','#64748b']}
+          />
+        </div>
+        <div className="button-page__color-presets">
+          {COLOR_PRESETS.map(p => (
+            <button
+              key={p.hex}
+              type="button"
+              className={`button-page__color-preset${brandColor === p.hex ? ' button-page__color-preset--active' : ''}`}
+              style={{ background: p.hex }}
+              onClick={() => setBrandColor(p.hex)}
+              title={p.name}
+              aria-label={`Set brand color to ${p.name}`}
             />
-          </div>
-          <div className="button-page__color-presets">
-            {COLOR_PRESETS.map(p => (
-              <button
-                key={p.hex}
-                type="button"
-                className={`button-page__color-preset${brandColor === p.hex ? ' button-page__color-preset--active' : ''}`}
-                style={{ background: p.hex }}
-                onClick={() => setBrandColor(p.hex)}
-                title={p.name}
-                aria-label={`Set brand color to ${p.name}`}
-              />
-            ))}
-          </div>
+          ))}
+        </div>
+
+        {/* Size note for selected tier */}
+        <div className="button-page__size-note">
+          {sizeInfo.note}
         </div>
       </section>
 
