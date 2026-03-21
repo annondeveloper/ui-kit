@@ -11,9 +11,11 @@ import { CopyBlock } from '@ui/domain/copy-block'
 import { InfiniteScroll } from '@ui/domain/infinite-scroll'
 import { DiffViewer } from '@ui/domain/diff-viewer'
 import { EmptyState } from '@ui/domain/empty-state'
+import { KanbanColumn } from '@ui/domain/kanban-column'
 import type { ColumnDef } from '@ui/domain/data-table'
 import type { TreeNode } from '@ui/domain/tree-view'
 import type { SortableItem } from '@ui/domain/sortable-list'
+import type { KanbanCard } from '@ui/domain/kanban-column'
 
 interface Server {
   hostname: string
@@ -123,6 +125,13 @@ const newCode = `async function fetchData() {
   }
 }`
 
+const kanbanCards: KanbanCard[] = [
+  { id: 'k1', title: 'Design system tokens', description: 'Define OKLCH color palette and spacing scale', tags: ['design', 'tokens'], priority: 'high' },
+  { id: 'k2', title: 'Button component', description: 'Build primary, secondary, ghost variants', tags: ['component'], priority: 'medium' },
+  { id: 'k3', title: 'Dialog accessibility', description: 'Focus trap, ESC to close, ARIA labels', tags: ['a11y'], priority: 'critical' },
+  { id: 'k4', title: 'Spring animation', description: 'Physics-based motion solver', tags: ['motion'], priority: 'low' },
+]
+
 const grid: React.CSSProperties = {
   display: 'grid',
   gridTemplateColumns: 'repeat(auto-fill, minmax(400px, 1fr))',
@@ -206,16 +215,26 @@ export default function DataPage() {
         </Preview>
 
         {/* DataTable */}
-        <Preview label="DataTable" description="8 servers with sortable columns" wide>
+        <Preview label="DataTable" description="Full-featured: search, sort, resize, reorder, export, select, paginate" wide>
           <DataTable
             data={serverData}
             columns={columns}
+            searchable
+            sortable
+            paginated
+            pageSize={5}
+            pageSizes={[5, 10, 25, 50]}
             selectable
+            resizable
+            reorderable
+            exportable
+            stickyHeader
+            striped
           />
         </Preview>
 
         {/* SmartTable */}
-        <Preview label="SmartTable" description="Search, column toggle, and pagination" wide>
+        <Preview label="SmartTable" description="Search, column toggle, pagination, sorting, striped rows" wide>
           <SmartTable
             data={serverData}
             columns={columns}
@@ -223,8 +242,13 @@ export default function DataPage() {
             searchPlaceholder="Search servers..."
             columnToggle
             selectable
+            sortable
             paginated
             pageSize={4}
+            pageSizes={[4, 8, 25]}
+            striped
+            exportable
+            stickyHeader
           />
         </Preview>
 
@@ -278,6 +302,24 @@ export default function DataPage() {
               </div>
             ))}
           </InfiniteScroll>
+        </Preview>
+
+        {/* KanbanColumn */}
+        <Preview label="KanbanColumn" description="Kanban board column with cards, tags, priorities">
+          <div style={{ display: 'flex', gap: '1rem' }}>
+            <KanbanColumn
+              columnId="in-progress"
+              title="In Progress"
+              cards={kanbanCards.slice(0, 2)}
+              wipLimit={3}
+            />
+            <KanbanColumn
+              columnId="review"
+              title="Review"
+              cards={kanbanCards.slice(2)}
+              wipLimit={5}
+            />
+          </div>
         </Preview>
 
         {/* EmptyState */}
