@@ -305,6 +305,17 @@ export const Card = forwardRef<HTMLElement, CardProps>(
       </button>
     ) : null
 
+    // Click-to-expand: toggle on card click unless clicking interactive child
+    const handleCardClick = expandable ? (e: React.MouseEvent) => {
+      const target = e.target as HTMLElement
+      // Don't toggle if clicking a button, link, input, or other interactive element
+      if (target.closest('button, a, input, select, textarea, [role="button"], [tabindex]')) {
+        // Exception: our own expand toggle should still work
+        if (!target.closest('.ui-card__expand-toggle')) return
+      }
+      setExpanded(prev => !prev)
+    } : undefined
+
     return (
       <Component
         ref={setRef}
@@ -313,6 +324,9 @@ export const Card = forwardRef<HTMLElement, CardProps>(
         data-padding={padding}
         data-motion={motionLevel}
         data-interactive={interactive || undefined}
+        data-expandable={expandable || undefined}
+        onClick={handleCardClick}
+        style={expandable ? { cursor: 'pointer', ...rest.style } : rest.style}
         {...rest}
       >
         {header && (

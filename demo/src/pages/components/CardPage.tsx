@@ -216,6 +216,11 @@ const pageStyles = css`
         pointer-events: none;
       }
 
+      .card-page__preview .ui-card,
+      .card-page__preview .ui-premium-card {
+        min-width: 200px;
+      }
+
       .card-page__preview--col {
         flex-direction: column;
         align-items: flex-start;
@@ -555,6 +560,9 @@ const pageStyles = css`
 
       .card-page__code-tabs {
         margin-block-start: 1rem;
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
       }
 
       /* ── Export button row ─────────────────────────── */
@@ -1060,6 +1068,9 @@ function PlaygroundSection({ tier: tierProp, brandColor }: { tier: Tier; brandCo
   const [interactive, setInteractive] = useState(false)
   const [asElement, setAsElement] = useState<AsElement>('div')
   const [motion, setMotion] = useState<0 | 1 | 2 | 3>(3)
+  const [showHeader, setShowHeader] = useState(false)
+  const [showFooter, setShowFooter] = useState(false)
+  const [isExpandable, setIsExpandable] = useState(false)
   const [copyStatus, setCopyStatus] = useState('')
 
   const CardComponent = tier === 'lite' ? LiteCard : tier === 'premium' ? PremiumCard : Card
@@ -1116,6 +1127,14 @@ function PlaygroundSection({ tier: tierProp, brandColor }: { tier: Tier; brandCo
     previewProps.interactive = interactive
     if (asElement !== 'div') previewProps.as = asElement
     previewProps.motion = motion
+    if (showHeader) previewProps.header = <span style={{ fontWeight: 600 }}>Card Header</span>
+    if (showFooter) previewProps.footer = (
+      <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'flex-end' }}>
+        <Button size="xs" variant="ghost">Cancel</Button>
+        <Button size="xs" variant="primary">Save</Button>
+      </div>
+    )
+    if (isExpandable) previewProps.expandable = true
   }
 
   return (
@@ -1199,6 +1218,9 @@ function PlaygroundSection({ tier: tierProp, brandColor }: { tier: Tier; brandCo
               <span className="card-page__control-label">Toggles</span>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.375rem' }}>
                 <Toggle label="Interactive" checked={interactive} onChange={setInteractive} />
+                <Toggle label="Header" checked={showHeader} onChange={setShowHeader} />
+                <Toggle label="Footer" checked={showFooter} onChange={setShowFooter} />
+                <Toggle label="Expandable" checked={isExpandable} onChange={setIsExpandable} />
               </div>
             </div>
           )}
@@ -1435,6 +1457,39 @@ export default function CardPage() {
         </section>
       )}
 
+      {/* ── 6a2. Visual Effects (Premium) ────────────── */}
+      {tier === 'premium' && (
+        <section className="card-page__section" id="effects">
+          <h2 className="card-page__section-title">
+            <a href="#effects">Visual Effects (Premium)</a>
+          </h2>
+          <p className="card-page__section-desc">
+            Premium tier adds 3D tilt, cursor-tracking glow, and entrance animations.
+            These effects activate at motion level 3.
+          </p>
+          <div className="card-page__preview" style={{ minHeight: 200, flexDirection: 'column', gap: '1rem' }}>
+            <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap', justifyContent: 'center' }}>
+              <div style={{ width: '100%', maxWidth: 280 }}>
+                <PremiumCard variant="elevated" padding="md" motion={3}>
+                  <h4 style={{ margin: '0 0 0.5rem', fontSize: '0.875rem' }}>3D Tilt + Glow</h4>
+                  <p style={{ margin: 0, fontSize: '0.8125rem', color: 'var(--text-secondary)' }}>
+                    Hover to see 3D perspective tilt and cursor-tracking aurora glow.
+                  </p>
+                </PremiumCard>
+              </div>
+              <div style={{ width: '100%', maxWidth: 280 }}>
+                <PremiumCard variant="default" padding="md" motion={2}>
+                  <h4 style={{ margin: '0 0 0.5rem', fontSize: '0.875rem' }}>Entrance Only</h4>
+                  <p style={{ margin: 0, fontSize: '0.8125rem', color: 'var(--text-secondary)' }}>
+                    Motion level 2: fade-up entrance, no 3D tilt.
+                  </p>
+                </PremiumCard>
+              </div>
+            </div>
+          </div>
+        </section>
+      )}
+
       {/* ── 6b. Polymorphic as ───────────────────────── */}
       {tier !== 'lite' && (
         <section className="card-page__section" id="polymorphic">
@@ -1535,13 +1590,13 @@ export default function CardPage() {
           </p>
           {/* Glass card needs a colorful background behind it to show the blur */}
           <div className="card-page__preview" style={{ background: 'linear-gradient(135deg, oklch(20% 0.08 250), oklch(15% 0.06 300), oklch(18% 0.07 200))', position: 'relative' }}>
-            <CardComponent variant="glass" padding="lg" style={{ maxWidth: 300 }}>
+            <CardComponent variant="glass" padding="lg" style={{ width: '100%', maxWidth: 320 }}>
               <h3 style={{ margin: '0 0 0.5rem', fontSize: '1rem', fontWeight: 700, color: 'var(--text-primary)' }}>Glass Card</h3>
               <p style={{ margin: 0, fontSize: '0.875rem', color: 'var(--text-secondary)', lineHeight: 1.6 }}>
                 Frosted glass effect with backdrop blur. Perfect for overlaying images or gradients.
               </p>
             </CardComponent>
-            <CardComponent variant="gradient" padding="lg" style={{ maxWidth: 300 }}>
+            <CardComponent variant="gradient" padding="lg" style={{ width: '100%', maxWidth: 320 }}>
               <h3 style={{ margin: '0 0 0.5rem', fontSize: '1rem', fontWeight: 700, color: 'var(--text-primary)' }}>Gradient Card</h3>
               <p style={{ margin: 0, fontSize: '0.875rem', color: 'var(--text-secondary)', lineHeight: 1.6 }}>
                 Subtle gradient from elevated to brand-tinted. Great for featured content.
