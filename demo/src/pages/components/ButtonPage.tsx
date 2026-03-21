@@ -1031,16 +1031,30 @@ function generateLiteCss(variant: Variant, size: Size, brandColor: string): stri
   return `${baseCSS}\n${sizesMap[size]}\n${variantsMap[variant]}`
 }
 
-function generateHtmlExport(variant: Variant, size: Size, label: string, brandColor: string): string {
+function generateHtmlExport(tier: Tier, variant: Variant, size: Size, label: string, brandColor: string): string {
+  const className = tier === 'lite' ? 'ui-lite-button' : 'ui-button'
+  const tierLabel = tier === 'lite' ? 'lite' : tier === 'premium' ? 'premium' : 'standard'
+  const cssImport = tier === 'lite'
+    ? `@import '@annondeveloper/ui-kit/lite/styles.css';`
+    : `@import '@annondeveloper/ui-kit/css/components/button.css';`
   const cssCode = generateLiteCss(variant, size, brandColor)
-  return `<!-- Button — @annondeveloper/ui-kit lite tier -->
-<button class="ui-lite-button" data-variant="${variant}" data-size="${size}">
+
+  return `<!-- Button — @annondeveloper/ui-kit ${tierLabel} tier -->
+<link rel="stylesheet" href="https://unpkg.com/@annondeveloper/ui-kit/${tier === 'lite' ? 'lite/styles.css' : 'css/components/button.css'}">
+
+<button class="${className}" data-variant="${variant}" data-size="${size}">
   ${label}
 </button>
 
+<!-- Or import in your CSS: -->
+<!-- ${cssImport} -->
+
+<!-- Inline styles (if not using the CSS file): -->
+<!--
 <style>
 ${cssCode}
-</style>`
+</style>
+-->`
 }
 
 function generateReactCode(
@@ -1148,8 +1162,8 @@ function PlaygroundSection({ tier: tierProp, brandColor }: { tier: Tier; brandCo
   )
 
   const htmlCssCode = useMemo(
-    () => generateHtmlExport(variant, size, label, brandColor),
-    [variant, size, label, brandColor],
+    () => generateHtmlExport(tier, variant, size, label, brandColor),
+    [tier, variant, size, label, brandColor],
   )
 
   const vueCode = useMemo(
