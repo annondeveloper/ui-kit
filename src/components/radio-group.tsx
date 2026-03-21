@@ -28,7 +28,7 @@ export interface RadioGroupProps extends Omit<HTMLAttributes<HTMLFieldSetElement
   defaultValue?: string
   onChange?: (value: string) => void
   orientation?: 'horizontal' | 'vertical'
-  size?: 'sm' | 'md' | 'lg'
+  size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl'
   label?: string
   error?: string
   motion?: 0 | 1 | 2 | 3
@@ -108,6 +108,10 @@ const radioGroupStyles = css`
       }
 
       /* Sizes */
+      :scope[data-size="xs"] .ui-radio-group__circle {
+        inline-size: 14px;
+        block-size: 14px;
+      }
       :scope[data-size="sm"] .ui-radio-group__circle {
         inline-size: 16px;
         block-size: 16px;
@@ -119,6 +123,10 @@ const radioGroupStyles = css`
       :scope[data-size="lg"] .ui-radio-group__circle {
         inline-size: 24px;
         block-size: 24px;
+      }
+      :scope[data-size="xl"] .ui-radio-group__circle {
+        inline-size: 28px;
+        block-size: 28px;
       }
 
       /* Inner dot */

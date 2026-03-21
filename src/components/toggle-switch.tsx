@@ -13,7 +13,7 @@ import { cn } from '../core/utils/cn'
 
 export interface ToggleSwitchProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 'type' | 'size'> {
   label?: ReactNode
-  size?: 'sm' | 'md' | 'lg'
+  size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl'
   error?: string
   motion?: 0 | 1 | 2 | 3
 }
@@ -70,6 +70,10 @@ const toggleSwitchStyles = css`
       }
 
       /* Sizes — track dimensions */
+      :scope[data-size="xs"] .ui-toggle-switch__track {
+        inline-size: 22px;
+        block-size: 12px;
+      }
       :scope[data-size="sm"] .ui-toggle-switch__track {
         inline-size: 28px;
         block-size: 16px;
@@ -81,6 +85,10 @@ const toggleSwitchStyles = css`
       :scope[data-size="lg"] .ui-toggle-switch__track {
         inline-size: 44px;
         block-size: 24px;
+      }
+      :scope[data-size="xl"] .ui-toggle-switch__track {
+        inline-size: 52px;
+        block-size: 28px;
       }
 
       /* Thumb: white circle */
@@ -94,6 +102,10 @@ const toggleSwitchStyles = css`
       }
 
       /* Thumb sizes */
+      :scope[data-size="xs"] .ui-toggle-switch__thumb {
+        inline-size: 8px;
+        block-size: 8px;
+      }
       :scope[data-size="sm"] .ui-toggle-switch__thumb {
         inline-size: 12px;
         block-size: 12px;
@@ -105,6 +117,10 @@ const toggleSwitchStyles = css`
       :scope[data-size="lg"] .ui-toggle-switch__thumb {
         inline-size: 20px;
         block-size: 20px;
+      }
+      :scope[data-size="xl"] .ui-toggle-switch__thumb {
+        inline-size: 24px;
+        block-size: 24px;
       }
 
       /* Motion level 0: instant */
@@ -134,6 +150,10 @@ const toggleSwitchStyles = css`
         border-color: var(--brand, oklch(65% 0.2 270));
       }
 
+      /* Checked state — thumb slides right (xs) */
+      :scope[data-size="xs"] .ui-toggle-switch__input:checked ~ .ui-toggle-switch__track .ui-toggle-switch__thumb {
+        inset-inline-start: 10px;
+      }
       /* Checked state — thumb slides right (sm) */
       :scope[data-size="sm"] .ui-toggle-switch__input:checked ~ .ui-toggle-switch__track .ui-toggle-switch__thumb {
         inset-inline-start: 12px;
@@ -145,6 +165,10 @@ const toggleSwitchStyles = css`
       /* Checked state — thumb slides right (lg) */
       :scope[data-size="lg"] .ui-toggle-switch__input:checked ~ .ui-toggle-switch__track .ui-toggle-switch__thumb {
         inset-inline-start: 20px;
+      }
+      /* Checked state — thumb slides right (xl) */
+      :scope[data-size="xl"] .ui-toggle-switch__input:checked ~ .ui-toggle-switch__track .ui-toggle-switch__thumb {
+        inset-inline-start: 24px;
       }
 
       /* Stretch effect at motion level 3 — thumb widens during active press */

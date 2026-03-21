@@ -10,7 +10,7 @@ export interface StatusBadgeProps extends HTMLAttributes<HTMLSpanElement> {
   status: 'ok' | 'warning' | 'critical' | 'info' | 'unknown' | 'maintenance'
   label?: string
   icon?: ReactNode
-  size?: 'sm' | 'md'
+  size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl'
   pulse?: boolean
   motion?: 0 | 1 | 2 | 3
 }
@@ -35,6 +35,12 @@ const statusBadgeStyles = css`
       }
 
       /* Sizes */
+      :scope[data-size="xs"] {
+        padding-block: 0.0625rem;
+        padding-inline: 0.375rem;
+        font-size: var(--text-xs, 0.6875rem);
+        gap: var(--space-xs, 0.1875rem);
+      }
       :scope[data-size="sm"] {
         padding-block: 0.125rem;
         padding-inline: 0.5rem;
@@ -46,6 +52,18 @@ const statusBadgeStyles = css`
         padding-inline: 0.625rem;
         font-size: var(--text-sm, 0.875rem);
         gap: var(--space-xs, 0.375rem);
+      }
+      :scope[data-size="lg"] {
+        padding-block: 0.375rem;
+        padding-inline: 0.75rem;
+        font-size: var(--text-base, 1rem);
+        gap: var(--space-sm, 0.5rem);
+      }
+      :scope[data-size="xl"] {
+        padding-block: 0.5rem;
+        padding-inline: 0.875rem;
+        font-size: var(--text-lg, 1.125rem);
+        gap: var(--space-sm, 0.5rem);
       }
 
       /* Status dot */

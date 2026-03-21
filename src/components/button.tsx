@@ -8,7 +8,7 @@ import { cn } from '../core/utils/cn'
 
 export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: 'primary' | 'secondary' | 'ghost' | 'danger'
-  size?: 'sm' | 'md' | 'lg'
+  size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl'
   loading?: boolean
   icon?: ReactNode
   iconEnd?: ReactNode
@@ -39,6 +39,13 @@ const buttonStyles = css`
       }
 
       /* Sizes */
+      :scope[data-size="xs"] {
+        padding-block: 0.25rem;
+        padding-inline: 0.5rem;
+        font-size: var(--text-xs, 0.6875rem);
+        border-radius: var(--radius-sm);
+        min-block-size: 24px;
+      }
       :scope[data-size="sm"] {
         padding-block: 0.375rem;
         padding-inline: 0.75rem;
@@ -57,6 +64,12 @@ const buttonStyles = css`
         padding-inline: 1.25rem;
         font-size: var(--text-base);
         min-block-size: 44px;
+      }
+      :scope[data-size="xl"] {
+        padding-block: 0.75rem;
+        padding-inline: 1.5rem;
+        font-size: var(--text-lg, 1.125rem);
+        min-block-size: 52px;
       }
 
       /* Variants */

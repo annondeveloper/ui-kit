@@ -20,7 +20,7 @@ export interface AvatarProps extends HTMLAttributes<HTMLDivElement> {
   src?: string
   alt?: string
   name?: string
-  size?: 'sm' | 'md' | 'lg' | 'xl'
+  size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl'
   status?: 'online' | 'offline' | 'away' | 'busy'
   icon?: ReactNode
 }
@@ -51,6 +51,11 @@ const avatarStyles = css`
       }
 
       /* Sizes */
+      :scope[data-size="xs"] {
+        inline-size: 22px;
+        block-size: 22px;
+        font-size: var(--text-xs, 0.6875rem);
+      }
       :scope[data-size="sm"] {
         inline-size: 28px;
         block-size: 28px;
@@ -67,8 +72,8 @@ const avatarStyles = css`
         font-size: var(--text-base, 1rem);
       }
       :scope[data-size="xl"] {
-        inline-size: 56px;
-        block-size: 56px;
+        inline-size: 64px;
+        block-size: 64px;
         font-size: var(--text-lg, 1.125rem);
       }
 

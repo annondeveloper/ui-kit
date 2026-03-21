@@ -13,6 +13,7 @@ export interface AlertProps extends Omit<HTMLAttributes<HTMLDivElement>, 'title'
   dismissible?: boolean
   onDismiss?: () => void
   action?: { label: string; onClick: () => void }
+  size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl'
   motion?: 0 | 1 | 2 | 3
   children: ReactNode
 }
@@ -86,6 +87,41 @@ const alertStyles = css`
         border-inline-start: 4px solid transparent;
         font-family: inherit;
         line-height: 1.5;
+      }
+
+      /* Sizes */
+      :scope[data-size="xs"] {
+        padding-block: 0.25rem;
+        padding-inline: 0.5rem;
+        gap: var(--space-xs, 0.25rem);
+        font-size: var(--text-xs, 0.6875rem);
+        border-inline-start-width: 2px;
+      }
+      :scope[data-size="sm"] {
+        padding-block: 0.375rem;
+        padding-inline: 0.75rem;
+        gap: var(--space-xs, 0.375rem);
+        font-size: var(--text-xs, 0.75rem);
+        border-inline-start-width: 3px;
+      }
+      :scope[data-size="md"] {
+        padding-block: 0.75rem;
+        padding-inline: 1rem;
+        font-size: var(--text-sm, 0.875rem);
+      }
+      :scope[data-size="lg"] {
+        padding-block: 1rem;
+        padding-inline: 1.25rem;
+        gap: var(--space-md, 0.75rem);
+        font-size: var(--text-base, 1rem);
+        border-inline-start-width: 5px;
+      }
+      :scope[data-size="xl"] {
+        padding-block: 1.25rem;
+        padding-inline: 1.5rem;
+        gap: var(--space-md, 1rem);
+        font-size: var(--text-lg, 1.125rem);
+        border-inline-start-width: 6px;
       }
 
       /* Variant colors */
@@ -268,6 +304,7 @@ export const Alert = forwardRef<HTMLDivElement, AlertProps>(
       dismissible = false,
       onDismiss,
       action,
+      size = 'md',
       motion: motionProp,
       children,
       className,
@@ -286,6 +323,7 @@ export const Alert = forwardRef<HTMLDivElement, AlertProps>(
         ref={ref}
         className={cn(cls('root'), className)}
         data-variant={variant}
+        data-size={size}
         data-motion={motionLevel}
         role={role}
         {...rest}

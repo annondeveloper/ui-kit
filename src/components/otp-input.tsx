@@ -25,7 +25,7 @@ export interface OtpInputProps extends Omit<HTMLAttributes<HTMLDivElement>, 'onC
   error?: string
   disabled?: boolean
   autoFocus?: boolean
-  size?: 'sm' | 'md' | 'lg'
+  size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl'
   motion?: 0 | 1 | 2 | 3
 }
 
@@ -63,6 +63,11 @@ const otpInputStyles = css`
       }
 
       /* Sizes */
+      :scope[data-size="xs"] .ui-otp-input__digit {
+        inline-size: 1.5rem;
+        block-size: 2rem;
+        font-size: var(--text-xs, 0.75rem);
+      }
       :scope[data-size="sm"] .ui-otp-input__digit {
         inline-size: 2rem;
         block-size: 2.5rem;
@@ -77,6 +82,11 @@ const otpInputStyles = css`
         inline-size: 3rem;
         block-size: 3.5rem;
         font-size: var(--text-xl, 1.25rem);
+      }
+      :scope[data-size="xl"] .ui-otp-input__digit {
+        inline-size: 3.5rem;
+        block-size: 4rem;
+        font-size: var(--text-2xl, 1.5rem);
       }
 
       /* Focus glow */

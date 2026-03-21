@@ -15,7 +15,7 @@ import { cn } from '../core/utils/cn'
 
 export interface CheckboxProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 'type' | 'size'> {
   label?: ReactNode
-  size?: 'sm' | 'md' | 'lg'
+  size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl'
   indeterminate?: boolean
   error?: string
   motion?: 0 | 1 | 2 | 3
@@ -63,6 +63,10 @@ const checkboxStyles = css`
       }
 
       /* Sizes */
+      :scope[data-size="xs"] .ui-checkbox__box {
+        inline-size: 14px;
+        block-size: 14px;
+      }
       :scope[data-size="sm"] .ui-checkbox__box {
         inline-size: 16px;
         block-size: 16px;
@@ -74,6 +78,10 @@ const checkboxStyles = css`
       :scope[data-size="lg"] .ui-checkbox__box {
         inline-size: 24px;
         block-size: 24px;
+      }
+      :scope[data-size="xl"] .ui-checkbox__box {
+        inline-size: 28px;
+        block-size: 28px;
       }
 
       /* Checked state */

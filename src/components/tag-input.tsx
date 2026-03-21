@@ -21,7 +21,7 @@ export interface TagInputProps extends Omit<HTMLAttributes<HTMLDivElement>, 'onC
   maxTags?: number
   allowDuplicates?: boolean
   validate?: (tag: string) => boolean
-  size?: 'sm' | 'md' | 'lg'
+  size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl'
   error?: string
   disabled?: boolean
   motion?: 0 | 1 | 2 | 3
@@ -62,6 +62,10 @@ const tagInputStyles = css`
         cursor: text;
       }
 
+      :scope[data-size="xs"] .ui-tag-input__wrapper {
+        min-block-size: 28px;
+        padding: 0.0625rem 0.25rem;
+      }
       :scope[data-size="sm"] .ui-tag-input__wrapper {
         min-block-size: 32px;
         padding: 0.125rem 0.375rem;
@@ -72,6 +76,10 @@ const tagInputStyles = css`
       :scope[data-size="lg"] .ui-tag-input__wrapper {
         min-block-size: 44px;
         padding: var(--space-xs, 0.375rem) var(--space-md, 0.75rem);
+      }
+      :scope[data-size="xl"] .ui-tag-input__wrapper {
+        min-block-size: 48px;
+        padding: var(--space-sm, 0.5rem) var(--space-md, 1rem);
       }
 
       /* Focus within */
@@ -109,10 +117,20 @@ const tagInputStyles = css`
         white-space: nowrap;
       }
 
+      :scope[data-size="xs"] .ui-tag-input__tag {
+        font-size: var(--text-xs, 0.6875rem);
+        padding-block: 0.0625rem;
+        padding-inline: 0.375rem;
+      }
       :scope[data-size="lg"] .ui-tag-input__tag {
         font-size: var(--text-sm, 0.875rem);
         padding-block: 0.25rem;
         padding-inline: 0.625rem;
+      }
+      :scope[data-size="xl"] .ui-tag-input__tag {
+        font-size: var(--text-base, 1rem);
+        padding-block: 0.375rem;
+        padding-inline: 0.75rem;
       }
 
       /* Tag entry animation — motion 1+ */
@@ -159,11 +177,17 @@ const tagInputStyles = css`
         padding: 0.125rem 0;
       }
 
+      :scope[data-size="xs"] .ui-tag-input__field {
+        font-size: var(--text-xs, 0.6875rem);
+      }
       :scope[data-size="sm"] .ui-tag-input__field {
         font-size: var(--text-xs, 0.75rem);
       }
       :scope[data-size="lg"] .ui-tag-input__field {
         font-size: var(--text-base, 1rem);
+      }
+      :scope[data-size="xl"] .ui-tag-input__field {
+        font-size: var(--text-lg, 1.125rem);
       }
 
       .ui-tag-input__field::placeholder {

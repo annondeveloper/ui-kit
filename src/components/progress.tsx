@@ -9,7 +9,7 @@ import { cn } from '../core/utils/cn'
 export interface ProgressProps extends HTMLAttributes<HTMLDivElement> {
   value?: number
   max?: number
-  size?: 'sm' | 'md' | 'lg'
+  size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl'
   variant?: 'default' | 'success' | 'warning' | 'danger'
   label?: string
   showValue?: boolean
@@ -37,6 +37,9 @@ const progressStyles = css`
       }
 
       /* Track sizes */
+      :scope[data-size="xs"] .ui-progress__track {
+        block-size: 2px;
+      }
       :scope[data-size="sm"] .ui-progress__track {
         block-size: 4px;
       }
@@ -45,6 +48,9 @@ const progressStyles = css`
       }
       :scope[data-size="lg"] .ui-progress__track {
         block-size: 12px;
+      }
+      :scope[data-size="xl"] .ui-progress__track {
+        block-size: 16px;
       }
 
       /* Fill */

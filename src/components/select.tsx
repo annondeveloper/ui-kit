@@ -40,7 +40,7 @@ export interface SelectProps
   label?: ReactNode
   error?: string
   disabled?: boolean
-  size?: 'sm' | 'md' | 'lg'
+  size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl'
   searchable?: boolean
   clearable?: boolean
   multiple?: boolean
@@ -87,6 +87,12 @@ const selectStyles = css`
       }
 
       /* Sizes */
+      :scope[data-size="xs"] .ui-select__trigger {
+        min-block-size: 28px;
+        padding-block: 0.125rem;
+        padding-inline: 0.375rem;
+        font-size: var(--text-xs, 0.6875rem);
+      }
       :scope[data-size="sm"] .ui-select__trigger {
         min-block-size: 32px;
         padding-block: 0.25rem;
@@ -104,6 +110,12 @@ const selectStyles = css`
         padding-block: 0.5rem;
         padding-inline: 1rem;
         font-size: var(--text-base, 1rem);
+      }
+      :scope[data-size="xl"] .ui-select__trigger {
+        min-block-size: 48px;
+        padding-block: 0.625rem;
+        padding-inline: 1.25rem;
+        font-size: var(--text-lg, 1.125rem);
       }
 
       /* Focus glow */

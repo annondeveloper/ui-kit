@@ -8,7 +8,7 @@ import { cn } from '../core/utils/cn'
 
 export interface BadgeProps extends HTMLAttributes<HTMLSpanElement> {
   variant?: 'default' | 'primary' | 'success' | 'warning' | 'danger' | 'info'
-  size?: 'sm' | 'md'
+  size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl'
   dot?: boolean
   pulse?: boolean
   count?: number
@@ -36,6 +36,11 @@ const badgeStyles = css`
       }
 
       /* Sizes */
+      :scope[data-size="xs"] {
+        padding-block: 0.0625rem;
+        padding-inline: 0.25rem;
+        font-size: var(--text-xs, 0.6875rem);
+      }
       :scope[data-size="sm"] {
         padding-block: 0.125rem;
         padding-inline: 0.375rem;
@@ -45,6 +50,16 @@ const badgeStyles = css`
         padding-block: 0.25rem;
         padding-inline: 0.5rem;
         font-size: var(--text-sm, 0.875rem);
+      }
+      :scope[data-size="lg"] {
+        padding-block: 0.375rem;
+        padding-inline: 0.625rem;
+        font-size: var(--text-base, 1rem);
+      }
+      :scope[data-size="xl"] {
+        padding-block: 0.5rem;
+        padding-inline: 0.75rem;
+        font-size: var(--text-lg, 1.125rem);
       }
 
       /* Variants */

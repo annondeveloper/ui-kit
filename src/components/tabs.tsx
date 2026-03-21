@@ -31,7 +31,7 @@ export interface TabsProps extends Omit<HTMLAttributes<HTMLDivElement>, 'onChang
   defaultTab?: string
   onChange?: (tabId: string) => void
   variant?: 'underline' | 'pills' | 'enclosed'
-  size?: 'sm' | 'md' | 'lg'
+  size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl'
   orientation?: 'horizontal' | 'vertical'
   lazy?: boolean
   motion?: 0 | 1 | 2 | 3
@@ -155,6 +155,11 @@ const tabsStyles = css`
 
       /* ── Sizes ─────────────────────────────────────────── */
 
+      :scope[data-size="xs"] .ui-tabs__tab {
+        padding-block: 0.25rem;
+        padding-inline: 0.5rem;
+        font-size: var(--text-xs, 0.6875rem);
+      }
       :scope[data-size="sm"] .ui-tabs__tab {
         padding-block: 0.375rem;
         padding-inline: 0.625rem;
@@ -169,6 +174,11 @@ const tabsStyles = css`
         padding-block: 0.625rem;
         padding-inline: 1.125rem;
         font-size: var(--text-base, 1rem);
+      }
+      :scope[data-size="xl"] .ui-tabs__tab {
+        padding-block: 0.75rem;
+        padding-inline: 1.375rem;
+        font-size: var(--text-lg, 1.125rem);
       }
 
       /* ── Underline Variant ─────────────────────────────── */

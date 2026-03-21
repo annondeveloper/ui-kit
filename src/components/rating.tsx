@@ -18,7 +18,7 @@ export interface RatingProps extends Omit<HTMLAttributes<HTMLDivElement>, 'onCha
   defaultValue?: number
   onChange?: (value: number) => void
   max?: number
-  size?: 'sm' | 'md' | 'lg'
+  size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl'
   readOnly?: boolean
   allowHalf?: boolean
   icon?: ReactNode
@@ -88,6 +88,10 @@ const ratingStyles = css`
       }
 
       /* Sizes */
+      :scope[data-size="xs"] .ui-rating__star svg {
+        inline-size: 0.75rem;
+        block-size: 0.75rem;
+      }
       :scope[data-size="sm"] .ui-rating__star svg {
         inline-size: 1rem;
         block-size: 1rem;
@@ -95,6 +99,10 @@ const ratingStyles = css`
       :scope[data-size="lg"] .ui-rating__star svg {
         inline-size: 2rem;
         block-size: 2rem;
+      }
+      :scope[data-size="xl"] .ui-rating__star svg {
+        inline-size: 2.5rem;
+        block-size: 2.5rem;
       }
 
       /* Filled state */

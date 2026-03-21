@@ -24,7 +24,7 @@ export interface SliderProps extends Omit<HTMLAttributes<HTMLDivElement>, 'onCha
   showValue?: boolean
   showTicks?: boolean
   disabled?: boolean
-  size?: 'sm' | 'md' | 'lg'
+  size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl'
   motion?: 0 | 1 | 2 | 3
 }
 
@@ -90,7 +90,10 @@ const sliderStyles = css`
         z-index: 1;
       }
 
-      /* Track styling — sm (2px), md (4px), lg (6px) */
+      /* Track styling — xs (1px), sm (2px), md (4px), lg (6px), xl (8px) */
+      :scope[data-size="xs"] .ui-slider__input {
+        block-size: 1px;
+      }
       :scope[data-size="sm"] .ui-slider__input {
         block-size: 2px;
       }
@@ -100,11 +103,17 @@ const sliderStyles = css`
       :scope[data-size="lg"] .ui-slider__input {
         block-size: 6px;
       }
+      :scope[data-size="xl"] .ui-slider__input {
+        block-size: 8px;
+      }
 
       /* WebKit track */
       .ui-slider__input::-webkit-slider-runnable-track {
         border-radius: var(--radius-full, 9999px);
         border: 1px solid var(--border-default, oklch(100% 0 0 / 0.12));
+      }
+      :scope[data-size="xs"] .ui-slider__input::-webkit-slider-runnable-track {
+        block-size: 1px;
       }
       :scope[data-size="sm"] .ui-slider__input::-webkit-slider-runnable-track {
         block-size: 2px;
@@ -115,12 +124,18 @@ const sliderStyles = css`
       :scope[data-size="lg"] .ui-slider__input::-webkit-slider-runnable-track {
         block-size: 6px;
       }
+      :scope[data-size="xl"] .ui-slider__input::-webkit-slider-runnable-track {
+        block-size: 8px;
+      }
 
       /* Firefox track */
       .ui-slider__input::-moz-range-track {
         border-radius: var(--radius-full, 9999px);
         border: 1px solid var(--border-default, oklch(100% 0 0 / 0.12));
         background: transparent;
+      }
+      :scope[data-size="xs"] .ui-slider__input::-moz-range-track {
+        block-size: 1px;
       }
       :scope[data-size="sm"] .ui-slider__input::-moz-range-track {
         block-size: 2px;
@@ -130,6 +145,9 @@ const sliderStyles = css`
       }
       :scope[data-size="lg"] .ui-slider__input::-moz-range-track {
         block-size: 6px;
+      }
+      :scope[data-size="xl"] .ui-slider__input::-moz-range-track {
+        block-size: 8px;
       }
 
       /* WebKit thumb */

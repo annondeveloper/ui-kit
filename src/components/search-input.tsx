@@ -24,7 +24,7 @@ export interface SearchInputProps extends Omit<InputHTMLAttributes<HTMLInputElem
   onClear?: () => void
   debounce?: number
   loading?: boolean
-  size?: 'sm' | 'md' | 'lg'
+  size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl'
   clearable?: boolean
   motion?: 0 | 1 | 2 | 3
 }
@@ -80,6 +80,11 @@ const searchInputStyles = css`
       }
 
       /* Sizes */
+      :scope[data-size="xs"] .ui-search-input__field {
+        min-block-size: 28px;
+        padding-block: 0.125rem;
+        font-size: var(--text-xs, 0.6875rem);
+      }
       :scope[data-size="sm"] .ui-search-input__field {
         min-block-size: 32px;
         padding-block: 0.25rem;
@@ -94,6 +99,11 @@ const searchInputStyles = css`
         min-block-size: 44px;
         padding-block: 0.5rem;
         font-size: var(--text-base, 1rem);
+      }
+      :scope[data-size="xl"] .ui-search-input__field {
+        min-block-size: 48px;
+        padding-block: 0.625rem;
+        font-size: var(--text-lg, 1.125rem);
       }
 
       /* Focus glow */

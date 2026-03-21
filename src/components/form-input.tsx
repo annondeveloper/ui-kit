@@ -20,7 +20,7 @@ export interface FormInputProps extends Omit<InputHTMLAttributes<HTMLInputElemen
   label?: ReactNode
   description?: string
   error?: string
-  size?: 'sm' | 'md' | 'lg'
+  size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl'
   variant?: 'default' | 'filled'
   icon?: ReactNode
   iconEnd?: ReactNode
@@ -68,6 +68,12 @@ const formInputStyles = css`
       }
 
       /* Sizes */
+      :scope[data-size="xs"] .ui-form-input__field {
+        min-block-size: 28px;
+        padding-block: 0.125rem;
+        padding-inline: 0.375rem;
+        font-size: var(--text-xs, 0.6875rem);
+      }
       :scope[data-size="sm"] .ui-form-input__field {
         min-block-size: 32px;
         padding-block: 0.25rem;
@@ -85,6 +91,12 @@ const formInputStyles = css`
         padding-block: 0.5rem;
         padding-inline: 1rem;
         font-size: var(--text-base, 1rem);
+      }
+      :scope[data-size="xl"] .ui-form-input__field {
+        min-block-size: 48px;
+        padding-block: 0.625rem;
+        padding-inline: 1.25rem;
+        font-size: var(--text-lg, 1.125rem);
       }
 
       /* Icon padding adjustments */

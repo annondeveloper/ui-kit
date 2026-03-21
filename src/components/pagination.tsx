@@ -19,7 +19,7 @@ export interface PaginationProps extends Omit<HTMLAttributes<HTMLElement>, 'onCh
   siblingCount?: number
   showFirst?: boolean
   showPrevNext?: boolean
-  size?: 'sm' | 'md'
+  size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl'
   motion?: 0 | 1 | 2 | 3
 }
 
@@ -72,14 +72,29 @@ const paginationStyles = css`
       }
 
       /* Sizes */
-      :scope[data-size="md"] button {
-        min-inline-size: 2.25rem;
-        block-size: 2.25rem;
+      :scope[data-size="xs"] button {
+        min-inline-size: 1.5rem;
+        block-size: 1.5rem;
+        font-size: var(--text-xs, 0.6875rem);
       }
       :scope[data-size="sm"] button {
         min-inline-size: 1.75rem;
         block-size: 1.75rem;
         font-size: var(--text-xs, 0.75rem);
+      }
+      :scope[data-size="md"] button {
+        min-inline-size: 2.25rem;
+        block-size: 2.25rem;
+      }
+      :scope[data-size="lg"] button {
+        min-inline-size: 2.75rem;
+        block-size: 2.75rem;
+        font-size: var(--text-base, 1rem);
+      }
+      :scope[data-size="xl"] button {
+        min-inline-size: 3.25rem;
+        block-size: 3.25rem;
+        font-size: var(--text-lg, 1.125rem);
       }
 
       /* Ellipsis */
