@@ -1536,9 +1536,18 @@ export default function ButtonPage() {
           </div>
         </div>
 
-        {/* Color customization */}
-        <div className="button-page__control-group">
-          <span className="button-page__control-label">Brand Color</span>
+      </section>
+
+      {/* ── Brand Color ───────────────────────────────── */}
+      <section className="button-page__section" id="brand-color">
+        <h2 className="button-page__section-title">
+          <a href="#brand-color">Brand Color</a>
+        </h2>
+        <p className="button-page__section-desc">
+          Pick a brand color to see all buttons update in real-time. The theme generates
+          derived colors (light, dark, subtle, glow) automatically from your choice.
+        </p>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
           <ColorInput
             name="brand-color"
             value={brandColor}
@@ -1546,68 +1555,28 @@ export default function ButtonPage() {
             size="sm"
             swatches={['#6366f1','#f97316','#f43f5e','#0ea5e9','#10b981','#8b5cf6','#d946ef','#f59e0b','#06b6d4','#64748b']}
           />
-        </div>
-        <div className="button-page__color-presets">
-          {COLOR_PRESETS.map(p => (
-            <button
-              key={p.hex}
-              type="button"
-              className={`button-page__color-preset${brandColor === p.hex ? ' button-page__color-preset--active' : ''}`}
-              style={{ background: p.hex }}
-              onClick={() => setBrandColor(p.hex)}
-              title={p.name}
-              aria-label={`Set brand color to ${p.name}`}
-            />
-          ))}
-        </div>
-
-        {/* Size note for selected tier */}
-        <div className="button-page__size-note">
-          {sizeInfo.note}
+          <div className="button-page__color-presets">
+            {COLOR_PRESETS.map(p => (
+              <button
+                key={p.hex}
+                type="button"
+                className={`button-page__color-preset${brandColor === p.hex ? ' button-page__color-preset--active' : ''}`}
+                style={{ background: p.hex }}
+                onClick={() => setBrandColor(p.hex)}
+                title={p.name}
+                aria-label={`Set brand color to ${p.name}`}
+              />
+            ))}
+          </div>
+          {brandColor !== '#6366f1' && (
+            <Button size="xs" variant="ghost" onClick={() => setBrandColor('#6366f1')}>
+              <Icon name="refresh" size="sm" /> Reset to default
+            </Button>
+          )}
         </div>
       </section>
 
-      {/* ── 8. Code Export ──────────────────────────────── */}
-      <section className="button-page__section" id="code-export">
-        <h2 className="button-page__section-title">
-          <a href="#code-export">Code Export</a>
-        </h2>
-        <p className="button-page__section-desc">
-          Copy-paste ready code for React, vanilla HTML+CSS, and Vue.
-        </p>
-        <Tabs
-          tabs={[
-            { id: 'react', label: 'React' },
-            { id: 'html', label: 'HTML+CSS' },
-            { id: 'vue', label: 'Vue' },
-          ]}
-          defaultTab="react"
-          size="sm"
-          variant="pills"
-        >
-          <TabPanel tabId="react">
-            <CopyBlock
-              code={`${IMPORT_STRINGS[tier]}\nimport { Icon } from '@annondeveloper/ui-kit'\n\n<Button\n  variant="primary"\n  size="md"\n  icon={<Icon name="zap" size="sm" />}\n>\n  Get Started\n</Button>`}
-              language="typescript"
-              showLineNumbers
-            />
-          </TabPanel>
-          <TabPanel tabId="html">
-            <CopyBlock
-              code={generateHtmlExport('primary', 'md', 'Get Started', brandColor)}
-              language="html"
-              showLineNumbers
-            />
-          </TabPanel>
-          <TabPanel tabId="vue">
-            <CopyBlock
-              code={generateVueCode('primary', 'md', 'Get Started', false)}
-              language="html"
-              showLineNumbers
-            />
-          </TabPanel>
-        </Tabs>
-      </section>
+      {/* Code Export section REMOVED — duplicate of playground code tabs */}
 
       {/* ── 9. Props API ───────────────────────────────── */}
       <section className="button-page__section" id="props">
