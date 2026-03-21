@@ -14,6 +14,7 @@ import { generateTheme } from '@ui/core/tokens/generator'
 import { TOKEN_TO_CSS, type ThemeTokens } from '@ui/core/tokens/tokens'
 import { useTheme } from '@ui/core/tokens/theme-context'
 import { ColorInput } from '@ui/components/color-input'
+import { useToast } from '@ui/domain/toast'
 import { PropsTable, type PropDef } from '../../components/PropsTable'
 import { useTier, type Tier } from '../../App'
 
@@ -1087,6 +1088,32 @@ function generateVueCode(variant: Variant, size: Size, label: string, disabled: 
   return `<template>\n${template}\n</template>\n\n<script setup>\n// Vue adapter — wrap the Web Component or use CSS-only:\nimport '@annondeveloper/ui-kit/css/components/button.css'\n</script>`
 }
 
+// ─── Section: Shortcut Buttons (uses Toast instead of native alert) ──────────
+
+function ShortcutButtons({ tier, ButtonComponent }: { tier: Tier; ButtonComponent: React.ComponentType<any> }) {
+  const { toast } = useToast()
+
+  return (
+    <div className="button-page__preview">
+      <ButtonComponent
+        shortcuts={{ activate: 'ctrl+s' }}
+        variant="primary"
+        icon={tier !== 'lite' ? <Icon name="download" size="sm" /> : undefined}
+        onClick={() => toast({ title: 'Saved!', description: 'Triggered via Ctrl+S shortcut', variant: 'success', duration: 3000 })}
+      >
+        Save (Ctrl+S)
+      </ButtonComponent>
+      <ButtonComponent
+        shortcuts={{ activate: 'ctrl+enter' }}
+        variant="secondary"
+        onClick={() => toast({ title: 'Submitted!', description: 'Triggered via Ctrl+Enter shortcut', variant: 'info', duration: 3000 })}
+      >
+        Submit (Ctrl+Enter)
+      </ButtonComponent>
+    </div>
+  )
+}
+
 // ─── Section: Interactive Playground ──────────────────────────────────────────
 
 function PlaygroundSection({ tier, brandColor }: { tier: Tier; brandColor: string }) {
@@ -1539,23 +1566,7 @@ export default function ButtonPage() {
           Bind custom keyboard shortcuts to buttons. The shortcut activates the button from
           anywhere on the page. Uses <code>aria-keyshortcuts</code> for accessibility.
         </p>
-        <div className="button-page__preview">
-          <ButtonComponent
-            shortcuts={{ activate: 'ctrl+s' }}
-            variant="primary"
-            icon={tier !== 'lite' ? <Icon name="download" size="sm" /> : undefined}
-            onClick={() => alert('Saved! (Ctrl+S)')}
-          >
-            Save (Ctrl+S)
-          </ButtonComponent>
-          <ButtonComponent
-            shortcuts={{ activate: 'ctrl+enter' }}
-            variant="secondary"
-            onClick={() => alert('Submitted! (Ctrl+Enter)')}
-          >
-            Submit (Ctrl+Enter)
-          </ButtonComponent>
-        </div>
+        <ShortcutButtons tier={tier} ButtonComponent={ButtonComponent} />
         <div className="button-page__code-snippet">
           <CopyBlock
             code={`<Button\n  shortcuts={{ activate: 'ctrl+s' }}\n  onClick={() => handleSave()}\n>\n  Save (Ctrl+S)\n</Button>`}
