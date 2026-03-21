@@ -1096,6 +1096,8 @@ function PlaygroundSection({ tier, brandColor }: { tier: Tier; brandColor: strin
   const [disabled, setDisabled] = useState(false)
   const [showIcon, setShowIcon] = useState(false)
   const [showIconEnd, setShowIconEnd] = useState(false)
+  const [enableHaptics, setEnableHaptics] = useState(false)
+  const [hapticType, setHapticType] = useState<'light' | 'medium' | 'heavy' | 'success' | 'error'>('light')
   const [label, setLabel] = useState('Click me')
   const [motion, setMotion] = useState<0 | 1 | 2 | 3>(3)
   const [animationStyle, setAnimationStyle] = useState<AnimationStyle>('smooth')
@@ -1135,6 +1137,7 @@ function PlaygroundSection({ tier, brandColor }: { tier: Tier; brandColor: strin
     previewProps.icon = showIcon ? <Icon name="zap" size="sm" /> : undefined
     previewProps.iconEnd = showIconEnd ? <Icon name="arrow-right" size="sm" /> : undefined
     previewProps.motion = motion
+    if (enableHaptics) previewProps.haptics = hapticType
   } else {
     previewProps.disabled = disabled
   }
@@ -1220,8 +1223,18 @@ function PlaygroundSection({ tier, brandColor }: { tier: Tier; brandColor: strin
               <Toggle label="Disabled" checked={disabled} onChange={setDisabled} />
               {tier !== 'lite' && <Toggle label="Leading icon" checked={showIcon} onChange={setShowIcon} />}
               {tier !== 'lite' && <Toggle label="Trailing icon" checked={showIconEnd} onChange={setShowIconEnd} />}
+              {tier !== 'lite' && <Toggle label="Haptic feedback" checked={enableHaptics} onChange={setEnableHaptics} />}
             </div>
           </div>
+
+          {enableHaptics && tier !== 'lite' && (
+            <OptionGroup
+              label="Haptic Pattern"
+              options={['light', 'medium', 'heavy', 'success', 'error'] as const}
+              value={hapticType}
+              onChange={setHapticType}
+            />
+          )}
 
           <div className="button-page__control-group">
             <span className="button-page__control-label">Label</span>
