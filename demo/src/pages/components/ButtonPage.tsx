@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useMemo, useCallback } from 'react'
+import { useState, useMemo, useCallback, useEffect, useRef } from 'react'
 import { css } from '@ui/core/styles/css-tag'
 import { useStyles } from '@ui/core/styles/use-styles'
 import { Button } from '@ui/components/button'
@@ -11,6 +11,8 @@ import { CopyBlock } from '@ui/domain/copy-block'
 import { Divider } from '@ui/components/divider'
 import { Tabs, TabPanel } from '@ui/components/tabs'
 import { Icon } from '@ui/core/icons/icon'
+import { generateTheme } from '@ui/core/tokens/generator'
+import { TOKEN_TO_CSS, type ThemeTokens } from '@ui/core/tokens/tokens'
 import { PropsTable, type PropDef } from '../../components/PropsTable'
 
 // ─── Page Styles ──────────────────────────────────────────────────────────────
@@ -244,27 +246,65 @@ const pageStyles = css`
       }
 
       .button-page__color-swatch {
-        inline-size: 28px;
-        block-size: 28px;
-        border-radius: var(--radius-sm, 6px);
+        inline-size: 32px;
+        block-size: 32px;
+        border-radius: var(--radius-md, 10px);
         border: 2px solid var(--border-default);
         cursor: pointer;
         padding: 0;
         appearance: none;
         -webkit-appearance: none;
+        transition: border-color 0.15s, box-shadow 0.15s;
       }
-      .button-page__color-swatch::-webkit-color-swatch-wrapper { padding: 0; }
-      .button-page__color-swatch::-webkit-color-swatch { border: none; border-radius: 4px; }
+      .button-page__color-swatch:hover {
+        border-color: var(--border-strong);
+      }
+      .button-page__color-swatch:focus-visible {
+        outline: 2px solid var(--brand);
+        outline-offset: 2px;
+        box-shadow: 0 0 0 4px oklch(65% 0.2 270 / 0.15);
+      }
+      .button-page__color-swatch::-webkit-color-swatch-wrapper { padding: 2px; }
+      .button-page__color-swatch::-webkit-color-swatch { border: none; border-radius: 6px; }
 
       .button-page__color-hex {
         font-family: 'SF Mono', 'Fira Code', 'JetBrains Mono', monospace;
         font-size: var(--text-xs, 0.75rem);
-        padding: 0.25rem 0.5rem;
+        padding: 0.375rem 0.625rem;
         border: 1px solid var(--border-default);
         border-radius: var(--radius-sm);
-        background: transparent;
+        background: var(--bg-elevated);
         color: var(--text-primary);
-        inline-size: 7ch;
+        inline-size: 8ch;
+        outline: none;
+        transition: border-color 0.15s, box-shadow 0.15s;
+      }
+      .button-page__color-hex:focus {
+        border-color: var(--brand);
+        box-shadow: 0 0 0 3px oklch(65% 0.2 270 / 0.1);
+      }
+
+      .button-page__color-presets {
+        display: flex;
+        gap: 0.25rem;
+        flex-wrap: wrap;
+      }
+
+      .button-page__color-preset {
+        inline-size: 20px;
+        block-size: 20px;
+        border-radius: var(--radius-sm, 6px);
+        border: 2px solid transparent;
+        cursor: pointer;
+        padding: 0;
+        transition: border-color 0.15s, transform 0.15s;
+      }
+      .button-page__color-preset:hover {
+        transform: scale(1.15);
+      }
+      .button-page__color-preset--active {
+        border-color: var(--text-primary);
+        transform: scale(1.15);
       }
 
       /* ── Tier selector ─────────────────────────────── */
@@ -821,7 +861,7 @@ function PlaygroundSection({ tier, brandColor }: { tier: Tier; brandColor: strin
           <div className="button-page__playground-preview">
             <div
               className="button-page__playground-result"
-              style={brandColor !== '#7c3aed' ? { ['--brand' as string]: brandColor } : undefined}
+              style={undefined}
             >
               <ButtonComponent {...previewProps}>{label}</ButtonComponent>
             </div>
@@ -911,12 +951,45 @@ export default function ButtonPage() {
   useStyles('button-page', pageStyles)
 
   const [tier, setTier] = useState<Tier>('standard')
-  const [brandColor, setBrandColor] = useState('#7c3aed')
+  const [brandColor, setBrandColor] = useState('#6366f1')
+  const pageRef = useRef<HTMLDivElement>(null)
+
+  // Generate full OKLCH theme from brand color and apply to page container
+  const themeTokens = useMemo(() => {
+    try {
+      return generateTheme(brandColor)
+    } catch {
+      return null
+    }
+  }, [brandColor])
+
+  const themeStyle = useMemo(() => {
+    if (!themeTokens || brandColor === '#6366f1') return undefined
+    const style: Record<string, string> = {}
+    for (const [key, value] of Object.entries(themeTokens)) {
+      const cssVar = TOKEN_TO_CSS[key as keyof ThemeTokens]
+      if (cssVar) style[cssVar] = value
+    }
+    return style as React.CSSProperties
+  }, [themeTokens, brandColor])
+
+  const COLOR_PRESETS = [
+    { hex: '#6366f1', name: 'Indigo' },
+    { hex: '#f97316', name: 'Orange' },
+    { hex: '#f43f5e', name: 'Rose' },
+    { hex: '#0ea5e9', name: 'Sky' },
+    { hex: '#10b981', name: 'Emerald' },
+    { hex: '#8b5cf6', name: 'Violet' },
+    { hex: '#d946ef', name: 'Fuchsia' },
+    { hex: '#f59e0b', name: 'Amber' },
+    { hex: '#06b6d4', name: 'Cyan' },
+    { hex: '#64748b', name: 'Slate' },
+  ]
 
   const ButtonComponent = tier === 'lite' ? LiteButton : tier === 'premium' ? PremiumButton : Button
 
   return (
-    <div className="button-page">
+    <div className="button-page" ref={pageRef} style={themeStyle}>
       {/* ── 1. Hero Header ──────────────────────────────── */}
       <div className="button-page__hero">
         <h1 className="button-page__title">Button</h1>
@@ -964,6 +1037,7 @@ export default function ButtonPage() {
                 value={brandColor}
                 onChange={e => setBrandColor(e.target.value)}
                 className="button-page__color-swatch"
+                aria-label="Pick brand color"
               />
               <input
                 type="text"
@@ -974,18 +1048,33 @@ export default function ButtonPage() {
                 }}
                 className="button-page__color-hex"
                 maxLength={7}
-                placeholder="#7c3aed"
+                placeholder="#6366f1"
+                aria-label="Brand color hex value"
               />
-              {brandColor !== '#7c3aed' && (
+              {brandColor !== '#6366f1' && (
                 <Button
                   size="xs"
                   variant="ghost"
-                  onClick={() => setBrandColor('#7c3aed')}
+                  onClick={() => setBrandColor('#6366f1')}
                 >
                   Reset
                 </Button>
               )}
             </div>
+          </div>
+          {/* Preset color swatches */}
+          <div className="button-page__color-presets" style={{ marginBlockStart: '0.5rem' }}>
+            {COLOR_PRESETS.map(p => (
+              <button
+                key={p.hex}
+                type="button"
+                className={`button-page__color-preset${brandColor === p.hex ? ' button-page__color-preset--active' : ''}`}
+                style={{ background: p.hex }}
+                onClick={() => setBrandColor(p.hex)}
+                title={p.name}
+                aria-label={`Set brand color to ${p.name}`}
+              />
+            ))}
           </div>
         </div>
       </section>
@@ -1007,7 +1096,7 @@ export default function ButtonPage() {
         </p>
         <div
           className="button-page__preview"
-          style={brandColor !== '#7c3aed' ? { ['--brand' as string]: brandColor } : undefined}
+          style={undefined}
         >
           <div className="button-page__labeled-row">
             {VARIANTS.map(v => (
@@ -1033,7 +1122,7 @@ export default function ButtonPage() {
         </p>
         <div
           className="button-page__preview"
-          style={brandColor !== '#7c3aed' ? { ['--brand' as string]: brandColor } : undefined}
+          style={undefined}
         >
           <div className="button-page__labeled-row" style={{ alignItems: 'flex-end' }}>
             {SIZES.map(s => (
@@ -1058,7 +1147,7 @@ export default function ButtonPage() {
         </p>
         <div
           className="button-page__states-grid"
-          style={brandColor !== '#7c3aed' ? { ['--brand' as string]: brandColor } : undefined}
+          style={undefined}
         >
           <div className="button-page__state-cell">
             <ButtonComponent>Default</ButtonComponent>
@@ -1243,7 +1332,7 @@ export default function ButtonPage() {
             </p>
             <div
               className="button-page__preview"
-              style={brandColor !== '#7c3aed' ? { ['--brand' as string]: brandColor } : undefined}
+              style={undefined}
             >
               <div className="button-page__labeled-row">
                 {([0, 1, 2, 3] as const).map(m => (
