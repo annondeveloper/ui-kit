@@ -1075,17 +1075,24 @@ function generateReactCode(
   return `${importStr}${iconImport}\n\n${jsx}`
 }
 
-function generateVueCode(variant: Variant, size: Size, label: string, disabled: boolean): string {
+function generateVueCode(tier: Tier, variant: Variant, size: Size, label: string, disabled: boolean): string {
+  if (tier === 'lite') {
+    const attrs: string[] = [`class="ui-lite-button"`, `data-variant="${variant}"`, `data-size="${size}"`]
+    if (disabled) attrs.push(':disabled="true"')
+    return `<template>\n  <button ${attrs.join(' ')}>\n    ${label}\n  </button>\n</template>\n\n<style>\n@import '@annondeveloper/ui-kit/lite/styles.css';\n</style>`
+  }
+
+  const importPath = tier === 'premium' ? '@annondeveloper/ui-kit/premium' : '@annondeveloper/ui-kit'
   const attrs: string[] = []
   if (variant !== 'primary') attrs.push(`  variant="${variant}"`)
   if (size !== 'md') attrs.push(`  size="${size}"`)
   if (disabled) attrs.push('  disabled')
 
   const template = attrs.length === 0
-    ? `  <UiButton>${label}</UiButton>`
-    : `  <UiButton\n  ${attrs.join('\n  ')}\n  >${label}</UiButton>`
+    ? `  <Button>${label}</Button>`
+    : `  <Button\n  ${attrs.join('\n  ')}\n  >${label}</Button>`
 
-  return `<template>\n${template}\n</template>\n\n<script setup>\n// Vue adapter — wrap the Web Component or use CSS-only:\nimport '@annondeveloper/ui-kit/css/components/button.css'\n</script>`
+  return `<template>\n${template}\n</template>\n\n<script setup>\nimport { Button } from '${importPath}'\n</script>`
 }
 
 // ─── Section: Shortcut Buttons (uses Toast instead of native alert) ──────────
@@ -1146,8 +1153,8 @@ function PlaygroundSection({ tier: tierProp, brandColor }: { tier: Tier; brandCo
   )
 
   const vueCode = useMemo(
-    () => generateVueCode(variant, size, label, disabled),
-    [variant, size, label, disabled],
+    () => generateVueCode(tier, variant, size, label, disabled),
+    [tier, variant, size, label, disabled],
   )
 
   const handleCopyHtmlCss = useCallback(() => {
@@ -1183,12 +1190,25 @@ function PlaygroundSection({ tier: tierProp, brandColor }: { tier: Tier; brandCo
   ]
 
   const angularCode = useMemo(() => {
-    return `<!-- Angular Component Template -->\n<button\n  class="ui-lite-button"\n  data-variant="${variant}"\n  data-size="${size}"\n  ${disabled ? '[disabled]="true"' : ''}\n>\n  ${label}\n</button>\n\n<!-- In your component.ts -->\nimport '@annondeveloper/ui-kit/lite/styles.css'`
-  }, [variant, size, label, disabled])
+    if (tier === 'lite') {
+      const attrs = [`class="ui-lite-button"`, `data-variant="${variant}"`, `data-size="${size}"`]
+      if (disabled) attrs.push('[disabled]="true"')
+      return `<!-- Angular — Lite tier (CSS-only) -->\n<button ${attrs.join(' ')}>\n  ${label}\n</button>\n\n/* In styles.css */\n@import '@annondeveloper/ui-kit/lite/styles.css';`
+    }
+    const importPath = tier === 'premium' ? '@annondeveloper/ui-kit/premium' : '@annondeveloper/ui-kit'
+    const props = [`variant="${variant}"`]
+    if (size !== 'md') props.push(`size="${size}"`)
+    if (disabled) props.push('[disabled]="true"')
+    return `<!-- Angular — ${tier === 'premium' ? 'Premium' : 'Standard'} tier -->\n<!-- Use the React wrapper or CSS-only approach -->\n<button\n  class="ui-button"\n  data-variant="${variant}"\n  data-size="${size}"\n  ${disabled ? '[disabled]="true"' : ''}\n>\n  ${label}\n</button>\n\n/* Import component CSS */\n@import '${importPath}/css/components/button.css';`
+  }, [variant, size, label, disabled, tier])
 
   const svelteCode = useMemo(() => {
-    return `<script>\n  import { Button } from '@annondeveloper/ui-kit';\n</script>\n\n<Button\n  variant="${variant}"\n  size="${size}"\n  ${disabled ? 'disabled' : ''}\n>\n  ${label}\n</Button>`
-  }, [variant, size, label, disabled])
+    if (tier === 'lite') {
+      return `<!-- Svelte — Lite tier (CSS-only) -->\n<button\n  class="ui-lite-button"\n  data-variant="${variant}"\n  data-size="${size}"\n  ${disabled ? 'disabled' : ''}\n>\n  ${label}\n</button>\n\n<style>\n  @import '@annondeveloper/ui-kit/lite/styles.css';\n</style>`
+    }
+    const importPath = tier === 'premium' ? '@annondeveloper/ui-kit/premium' : '@annondeveloper/ui-kit'
+    return `<script>\n  import { Button } from '${importPath}';\n</script>\n\n<Button\n  variant="${variant}"\n  size="${size}"\n  ${disabled ? 'disabled' : ''}\n>\n  ${label}\n</Button>`
+  }, [variant, size, label, disabled, tier])
 
   const activeCode = useMemo(() => {
     switch (activeCodeTab) {
