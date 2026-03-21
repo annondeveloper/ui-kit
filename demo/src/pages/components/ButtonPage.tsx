@@ -115,7 +115,7 @@ const pageStyles = css`
       /* ── Sections ───────────────────────────────────── */
 
       .button-page__section {
-        margin-block-end: 3rem;
+        margin-block-end: 4rem;
         animation: button-page-reveal 0.4s ease-out both;
         animation-timeline: view();
         animation-range: entry 0% entry 30%;
@@ -140,10 +140,10 @@ const pageStyles = css`
       }
 
       .button-page__section-title {
-        font-size: var(--text-lg, 1.125rem);
+        font-size: 1.25rem;
         font-weight: 700;
         color: var(--text-primary);
-        margin: 0 0 0.375rem;
+        margin: 0 0 0.5rem;
         padding-inline-start: 0.75rem;
         border-inline-start: 3px solid var(--brand, oklch(65% 0.2 270));
         line-height: 1.3;
@@ -163,7 +163,7 @@ const pageStyles = css`
         color: var(--text-secondary);
         font-size: var(--text-sm, 0.875rem);
         line-height: 1.6;
-        margin: 0 0 1rem;
+        margin: 0 0 1.5rem;
         text-wrap: pretty;
       }
 
@@ -171,6 +171,7 @@ const pageStyles = css`
 
       .button-page__preview {
         padding: 2.5rem;
+        margin-block-end: 0.5rem;
         border: 1px solid var(--border-subtle);
         border-radius: var(--radius-lg);
         background: var(--bg-surface);
@@ -208,7 +209,7 @@ const pageStyles = css`
       .button-page__playground {
         display: grid;
         grid-template-columns: 1fr 1fr;
-        gap: 1.5rem;
+        gap: 2rem;
       }
       @container (max-width: 600px) {
         .button-page__playground {
@@ -457,6 +458,18 @@ const pageStyles = css`
         opacity: 0.7;
       }
 
+      /* ── Tier section controls wrapper ────────────── */
+
+      .button-page__tier-section-controls {
+        display: flex;
+        flex-direction: column;
+        gap: 1.25rem;
+        padding: 1.5rem;
+        background: var(--bg-surface);
+        border: 1px solid var(--border-subtle);
+        border-radius: var(--radius-lg);
+      }
+
       /* ── Labeled row ────────────────────────────────── */
 
       .button-page__labeled-row {
@@ -470,7 +483,7 @@ const pageStyles = css`
         display: flex;
         flex-direction: column;
         align-items: center;
-        gap: 0.625rem;
+        gap: 0.75rem;
       }
 
       .button-page__item-label {
@@ -486,7 +499,7 @@ const pageStyles = css`
       .button-page__states-grid {
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-        gap: 0.75rem;
+        gap: 1rem;
       }
 
       .button-page__state-cell {
@@ -522,14 +535,14 @@ const pageStyles = css`
       .button-page__tiers {
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-        gap: 1rem;
+        gap: 1.25rem;
       }
 
       .button-page__tier-card {
         display: flex;
         flex-direction: column;
         gap: 0.75rem;
-        padding: 1.25rem;
+        padding: 1.5rem;
         border: 1px solid var(--border-subtle);
         border-radius: var(--radius-lg);
         background: var(--bg-surface);
@@ -1223,7 +1236,7 @@ export default function ButtonPage() {
         </div>
       </div>
 
-      <Divider spacing="sm" />
+      <Divider spacing="md" />
 
       {/* ── 2. Weight Tier Selector ─────────────────────── */}
       <section className="button-page__section" id="tier-selector">
@@ -1233,55 +1246,57 @@ export default function ButtonPage() {
         <p className="button-page__section-desc">
           Select a weight tier to switch ALL button examples on this page. Each tier trades features for bundle size.
         </p>
-        <div className="button-page__tier-selector">
-          {TIERS.map(t => (
-            <button
-              key={t.id}
-              type="button"
-              className={`button-page__tier-btn${t.id === tier ? ' button-page__tier-btn--active' : ''}`}
-              onClick={() => setTier(t.id)}
-            >
-              {t.label}
-              <span className="button-page__tier-size-label">{t.size}</span>
-            </button>
-          ))}
-        </div>
-
-        {/* Color customization */}
-        <div style={{ marginBlockStart: '1.25rem' }}>
-          <div className="button-page__control-group">
-            <span className="button-page__control-label">Brand Color</span>
-            <ColorInput
-              name="brand-color"
-              value={brandColor}
-              onChange={setBrandColor}
-              size="sm"
-              swatches={['#6366f1','#f97316','#f43f5e','#0ea5e9','#10b981','#8b5cf6','#d946ef','#f59e0b','#06b6d4','#64748b']}
-            />
-          </div>
-          {/* Preset color swatches */}
-          <div className="button-page__color-presets" style={{ marginBlockStart: '0.5rem' }}>
-            {COLOR_PRESETS.map(p => (
+        <div className="button-page__tier-section-controls">
+          <div className="button-page__tier-selector">
+            {TIERS.map(t => (
               <button
-                key={p.hex}
+                key={t.id}
                 type="button"
-                className={`button-page__color-preset${brandColor === p.hex ? ' button-page__color-preset--active' : ''}`}
-                style={{ background: p.hex }}
-                onClick={() => setBrandColor(p.hex)}
-                title={p.name}
-                aria-label={`Set brand color to ${p.name}`}
-              />
+                className={`button-page__tier-btn${t.id === tier ? ' button-page__tier-btn--active' : ''}`}
+                onClick={() => setTier(t.id)}
+              >
+                {t.label}
+                <span className="button-page__tier-size-label">{t.size}</span>
+              </button>
             ))}
+          </div>
+
+          {/* Color customization */}
+          <div>
+            <div className="button-page__control-group">
+              <span className="button-page__control-label">Brand Color</span>
+              <ColorInput
+                name="brand-color"
+                value={brandColor}
+                onChange={setBrandColor}
+                size="sm"
+                swatches={['#6366f1','#f97316','#f43f5e','#0ea5e9','#10b981','#8b5cf6','#d946ef','#f59e0b','#06b6d4','#64748b']}
+              />
+            </div>
+            {/* Preset color swatches */}
+            <div className="button-page__color-presets" style={{ marginBlockStart: '0.5rem' }}>
+              {COLOR_PRESETS.map(p => (
+                <button
+                  key={p.hex}
+                  type="button"
+                  className={`button-page__color-preset${brandColor === p.hex ? ' button-page__color-preset--active' : ''}`}
+                  style={{ background: p.hex }}
+                  onClick={() => setBrandColor(p.hex)}
+                  title={p.name}
+                  aria-label={`Set brand color to ${p.name}`}
+                />
+              ))}
+            </div>
           </div>
         </div>
       </section>
 
-      <Divider spacing="sm" />
+      <Divider spacing="md" />
 
       {/* ── 3. Interactive Playground ───────────────────── */}
       <PlaygroundSection tier={tier} brandColor={brandColor} />
 
-      <Divider spacing="sm" />
+      <Divider spacing="md" />
 
       {/* ── 4. Variant Gallery ─────────────────────────── */}
       <section className="button-page__section" id="variants">
@@ -1306,7 +1321,7 @@ export default function ButtonPage() {
         </div>
       </section>
 
-      <Divider spacing="sm" />
+      <Divider spacing="md" />
 
       {/* ── 5. Size Scale ──────────────────────────────── */}
       <section className="button-page__section" id="sizes">
@@ -1332,7 +1347,7 @@ export default function ButtonPage() {
         </div>
       </section>
 
-      <Divider spacing="sm" />
+      <Divider spacing="md" />
 
       {/* ── 6. States ──────────────────────────────────── */}
       <section className="button-page__section" id="states">
@@ -1378,7 +1393,7 @@ export default function ButtonPage() {
         </div>
       </section>
 
-      <Divider spacing="sm" />
+      <Divider spacing="md" />
 
       {/* ── 7. With Icons ──────────────────────────────── */}
       {tier !== 'lite' && (
@@ -1444,7 +1459,7 @@ export default function ButtonPage() {
             </div>
           </section>
 
-          <Divider spacing="sm" />
+          <Divider spacing="md" />
         </>
       )}
 
@@ -1514,7 +1529,7 @@ export default function ButtonPage() {
         </div>
       </section>
 
-      <Divider spacing="sm" />
+      <Divider spacing="md" />
 
       {/* ── 9. Motion Levels ───────────────────────────── */}
       {tier !== 'lite' && (
@@ -1554,7 +1569,7 @@ export default function ButtonPage() {
             </div>
           </section>
 
-          <Divider spacing="sm" />
+          <Divider spacing="md" />
         </>
       )}
 
@@ -1572,7 +1587,7 @@ export default function ButtonPage() {
         </Card>
       </section>
 
-      <Divider spacing="sm" />
+      <Divider spacing="md" />
 
       {/* ── 11. Accessibility Notes ────────────────────── */}
       <section className="button-page__section" id="accessibility">
@@ -1630,7 +1645,7 @@ export default function ButtonPage() {
         </Card>
       </section>
 
-      <Divider spacing="sm" />
+      <Divider spacing="md" />
 
       {/* ── 12. Source Code ─────────────────────────────── */}
       <section className="button-page__section" id="source">
