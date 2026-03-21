@@ -32,10 +32,20 @@ const buttonStyles = css`
         cursor: pointer;
         user-select: none;
         white-space: nowrap;
-        transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
         outline: none;
         text-decoration: none;
         font-family: inherit;
+        overflow: hidden;
+        will-change: transform;
+        -webkit-tap-highlight-color: transparent;
+        /* Explicit transition — never 'all' to avoid corner artifacts */
+        transition:
+          background 0.15s cubic-bezier(0.16, 1, 0.3, 1),
+          border-color 0.15s cubic-bezier(0.16, 1, 0.3, 1),
+          box-shadow 0.2s cubic-bezier(0.16, 1, 0.3, 1),
+          transform 0.2s cubic-bezier(0.16, 1, 0.3, 1),
+          color 0.15s cubic-bezier(0.16, 1, 0.3, 1),
+          opacity 0.15s cubic-bezier(0.16, 1, 0.3, 1);
       }
 
       /* Sizes */
@@ -136,29 +146,44 @@ const buttonStyles = css`
       :scope[data-loading="true"]::after {
         content: '';
         position: absolute;
-        inline-size: 1em;
-        block-size: 1em;
+        inline-size: 1.125em;
+        block-size: 1.125em;
         inset-block-start: 50%;
         inset-inline-start: 50%;
         translate: -50% -50%;
-        border: 2px solid currentColor;
-        border-inline-start-color: transparent;
-        border-radius: var(--radius-full);
-        opacity: 0.8;
-        animation: ui-button-spin 0.6s linear infinite;
+        border: 2px solid oklch(100% 0 0 / 0.3);
+        border-block-start-color: oklch(100% 0 0 / 0.9);
+        border-radius: 50%;
+        animation: ui-button-spin 0.65s linear infinite;
+      }
+      /* Secondary/ghost spinner uses dark colors */
+      :scope[data-variant="secondary"][data-loading="true"]::after,
+      :scope[data-variant="ghost"][data-loading="true"]::after {
+        border-color: oklch(50% 0 0 / 0.2);
+        border-block-start-color: var(--text-primary, oklch(97% 0 0));
       }
 
-      /* Active press — motion level 1+ */
+      /* Active press — fast snap down, no overshoot */
       :scope:active:not(:disabled):not([data-motion="0"]) {
         transform: scale(0.97);
-        transition-duration: 0.05s;
+        transition: transform 0.06s ease-out;
       }
 
-      /* Hover lift — motion level 1+ */
+      /* Hover lift — smooth ease-out */
       @media (hover: hover) {
         :scope:hover:not(:disabled):not(:active):not([data-motion="0"]) {
           transform: translateY(-1px);
+          transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1),
+                      background 0.15s, border-color 0.15s,
+                      box-shadow 0.2s cubic-bezier(0.16, 1, 0.3, 1);
         }
+      }
+
+      /* Return from hover/press — spring bounce back */
+      :scope:not(:hover):not(:active):not([data-motion="0"]):not([data-motion="1"]) {
+        transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1),
+                    background 0.15s, border-color 0.15s,
+                    box-shadow 0.25s;
       }
 
       /* Touch targets */
