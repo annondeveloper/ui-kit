@@ -47,11 +47,12 @@ const cardStyles = css`
       /* Variants */
       :scope[data-variant="default"] {
         background: var(--bg-surface, oklch(22% 0.02 270));
-        border: 1px solid var(--border-subtle, oklch(100% 0 0 / 0.08));
+        border: 1px solid var(--border-default, oklch(100% 0 0 / 0.1));
+        box-shadow: 0 1px 3px oklch(0% 0 0 / 0.2);
       }
       :scope[data-variant="elevated"] {
         background: var(--bg-elevated, oklch(28% 0.02 270));
-        border: none;
+        border: 1px solid var(--border-subtle, oklch(100% 0 0 / 0.06));
         box-shadow: var(--shadow-md, 0 4px 12px oklch(0% 0 0 / 0.2));
       }
       :scope[data-variant="outlined"] {
@@ -63,9 +64,10 @@ const cardStyles = css`
         border: none;
       }
       :scope[data-variant="glass"] {
-        background: oklch(from var(--bg-elevated) l c h / 0.6);
-        backdrop-filter: blur(16px) saturate(1.5);
-        border: 1px solid oklch(100% 0 0 / 0.08);
+        background: oklch(from var(--bg-elevated) l c h / 0.5);
+        backdrop-filter: blur(20px) saturate(1.8);
+        border: 1px solid oklch(100% 0 0 / 0.12);
+        box-shadow: 0 4px 24px oklch(0% 0 0 / 0.15), inset 0 1px 0 oklch(100% 0 0 / 0.06);
       }
       :scope[data-variant="gradient"] {
         background: linear-gradient(135deg, var(--bg-elevated) 0%, oklch(from var(--brand) calc(l - 0.3) 0.05 h) 100%);

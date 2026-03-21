@@ -13,6 +13,8 @@ const premiumCardStyles = css`
       :scope {
         position: relative;
         perspective: 800px;
+        width: 100%;
+        min-width: 0;
       }
       /* Cursor-tracking aurora glow */
       :scope::before {

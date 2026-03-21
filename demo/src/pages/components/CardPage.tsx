@@ -260,13 +260,26 @@ const pageStyles = css`
 
       .card-page__playground-result {
         min-block-size: 200px;
-        display: grid;
-        place-items: center;
-        padding: 3rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 2.5rem;
         background: var(--bg-base);
         border-radius: var(--radius-md);
         position: relative;
-        overflow: hidden;
+        overflow: visible;  /* Don't clip premium 3D perspective */
+      }
+
+      /* Ensure premium card wrapper fills available space */
+      .card-page__playground-result .ui-premium-card {
+        width: 100%;
+        max-width: 400px;
+      }
+
+      /* Ensure card inside playground has readable width */
+      .card-page__playground-result .ui-card {
+        width: 100%;
+        max-width: 400px;
       }
 
       /* Dot grid for playground result */
@@ -1518,7 +1531,8 @@ export default function CardPage() {
           <p className="card-page__section-desc">
             Glass and gradient cards for hero sections and premium UI.
           </p>
-          <div className="card-page__preview">
+          {/* Glass card needs a colorful background behind it to show the blur */}
+          <div className="card-page__preview" style={{ background: 'linear-gradient(135deg, oklch(20% 0.08 250), oklch(15% 0.06 300), oklch(18% 0.07 200))', position: 'relative' }}>
             <CardComponent variant="glass" padding="lg" style={{ maxWidth: 300 }}>
               <h3 style={{ margin: '0 0 0.5rem', fontSize: '1rem', fontWeight: 700, color: 'var(--text-primary)' }}>Glass Card</h3>
               <p style={{ margin: 0, fontSize: '0.875rem', color: 'var(--text-secondary)', lineHeight: 1.6 }}>
