@@ -17,6 +17,12 @@ const AnimationsPage = lazy(() => import('./pages/AnimationsPage'))
 const IconsPage = lazy(() => import('./pages/IconsPage'))
 const ThemePage = lazy(() => import('./pages/ThemePage'))
 const ButtonPage = lazy(() => import('./pages/components/ButtonPage'))
+const SelectPage = lazy(() => import('./pages/components/SelectPage'))
+const DialogPage = lazy(() => import('./pages/components/DialogPage'))
+const DataTablePage = lazy(() => import('./pages/components/DataTablePage'))
+const MetricCardPage = lazy(() => import('./pages/components/MetricCardPage'))
+const CardPage = lazy(() => import('./pages/components/CardPage'))
+const BadgePage = lazy(() => import('./pages/components/BadgePage'))
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
@@ -35,6 +41,12 @@ createRoot(document.getElementById('root')!).render(
             <Route path="icons" element={<Suspense><IconsPage /></Suspense>} />
             <Route path="themes" element={<Suspense><ThemePage /></Suspense>} />
             <Route path="components/button" element={<Suspense><ButtonPage /></Suspense>} />
+            <Route path="components/select" element={<Suspense><SelectPage /></Suspense>} />
+            <Route path="components/dialog" element={<Suspense><DialogPage /></Suspense>} />
+            <Route path="components/data-table" element={<Suspense><DataTablePage /></Suspense>} />
+            <Route path="components/metric-card" element={<Suspense><MetricCardPage /></Suspense>} />
+            <Route path="components/card" element={<Suspense><CardPage /></Suspense>} />
+            <Route path="components/badge" element={<Suspense><BadgePage /></Suspense>} />
             <Route path="docs" element={<Suspense><DocsPage /></Suspense>} />
           </Route>
         </Routes>
