@@ -222,7 +222,16 @@ const layoutStyles = css`
       flex: 1;
       min-width: 0;
       padding: 1.5rem 2rem;
-      max-width: 1200px;
+      /* Center content within the available space */
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    /* Page content wrapper — centers and constrains width */
+    .site-main > * {
+      width: 100%;
+      max-width: 960px;
     }
 
     /* ─── Responsive ─── */
@@ -236,6 +245,9 @@ const layoutStyles = css`
       .site-main {
         padding: 1rem;
         padding-top: calc(48px + 1rem);
+      }
+      .site-main > * {
+        max-width: 100%;
       }
     }
   }

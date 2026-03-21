@@ -207,15 +207,30 @@ const colorInputStyles = css`
         inset-block-start: 100%;
         inset-inline-start: 0;
         margin-block-start: var(--space-xs, 0.25rem);
-        background: var(--bg-surface, oklch(15% 0 0));
+        background: var(--bg-elevated, oklch(16% 0.02 275));
         border: 1px solid var(--border-default, oklch(100% 0 0 / 0.12));
-        border-radius: var(--radius-lg, 0.5rem);
+        border-radius: var(--radius-lg, 0.75rem);
         padding: var(--space-md, 0.75rem);
         box-shadow: var(--shadow-lg, 0 8px 32px oklch(0% 0 0 / 0.25));
         display: flex;
         flex-direction: column;
         gap: var(--space-sm, 0.5rem);
         min-inline-size: 220px;
+        max-inline-size: min(320px, calc(100vw - 2rem));
+      }
+
+      /* Mobile: position popover to not overflow viewport */
+      @media (max-width: 480px) {
+        .ui-color-input__popover {
+          position: fixed;
+          inset-block-end: 0;
+          inset-block-start: auto;
+          inset-inline: 0;
+          margin: 0;
+          max-inline-size: 100%;
+          border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+          padding: 1rem;
+        }
       }
 
       /* Entry animation */
@@ -480,6 +495,22 @@ export const ColorInput = forwardRef<HTMLDivElement, ColorInputProps>(
       },
       []
     )
+
+    // Close on click outside
+    useEffect(() => {
+      if (!isOpen) return
+      const handler = (e: MouseEvent) => {
+        const target = e.target as Node
+        if (popoverRef.current && !popoverRef.current.contains(target)) {
+          // Also check if click was on the trigger
+          const trigger = popoverRef.current.parentElement?.querySelector('.ui-color-input__trigger')
+          if (trigger && trigger.contains(target)) return
+          setIsOpen(false)
+        }
+      }
+      document.addEventListener('mousedown', handler)
+      return () => document.removeEventListener('mousedown', handler)
+    }, [isOpen])
 
     const handleHexBlur = useCallback(() => {
       const trimmed = hexInputValue.trim()
