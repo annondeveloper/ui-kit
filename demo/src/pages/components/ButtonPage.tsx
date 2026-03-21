@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useMemo, useCallback } from 'react'
 import { css } from '@ui/core/styles/css-tag'
 import { useStyles } from '@ui/core/styles/use-styles'
 import { Button } from '@ui/components/button'
@@ -9,6 +9,7 @@ import { Button as PremiumButton } from '@ui/premium/button'
 import { Card } from '@ui/components/card'
 import { CopyBlock } from '@ui/domain/copy-block'
 import { Divider } from '@ui/components/divider'
+import { Tabs, TabPanel } from '@ui/components/tabs'
 import { Icon } from '@ui/core/icons/icon'
 import { PropsTable, type PropDef } from '../../components/PropsTable'
 
@@ -234,6 +235,86 @@ const pageStyles = css`
         border-color: transparent;
       }
 
+      /* ── Color picker ──────────────────────────────── */
+
+      .button-page__color-group {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+
+      .button-page__color-swatch {
+        inline-size: 28px;
+        block-size: 28px;
+        border-radius: var(--radius-sm, 6px);
+        border: 2px solid var(--border-default);
+        cursor: pointer;
+        padding: 0;
+        appearance: none;
+        -webkit-appearance: none;
+      }
+      .button-page__color-swatch::-webkit-color-swatch-wrapper { padding: 0; }
+      .button-page__color-swatch::-webkit-color-swatch { border: none; border-radius: 4px; }
+
+      .button-page__color-hex {
+        font-family: 'SF Mono', 'Fira Code', 'JetBrains Mono', monospace;
+        font-size: var(--text-xs, 0.75rem);
+        padding: 0.25rem 0.5rem;
+        border: 1px solid var(--border-default);
+        border-radius: var(--radius-sm);
+        background: transparent;
+        color: var(--text-primary);
+        inline-size: 7ch;
+      }
+
+      /* ── Tier selector ─────────────────────────────── */
+
+      .button-page__tier-selector {
+        display: flex;
+        border: 1px solid var(--border-default);
+        border-radius: var(--radius-md, 10px);
+        overflow: hidden;
+        inline-size: fit-content;
+      }
+
+      .button-page__tier-btn {
+        padding: 0.5rem 1rem;
+        font-size: var(--text-sm, 0.875rem);
+        font-weight: 600;
+        font-family: inherit;
+        border: none;
+        background: transparent;
+        color: var(--text-secondary);
+        cursor: pointer;
+        transition: all 0.12s;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.125rem;
+        line-height: 1.2;
+      }
+      .button-page__tier-btn:not(:last-child) {
+        border-inline-end: 1px solid var(--border-default);
+      }
+      .button-page__tier-btn:hover {
+        background: oklch(100% 0 0 / 0.04);
+        color: var(--text-primary);
+      }
+      .button-page__tier-btn--active {
+        background: var(--brand);
+        color: oklch(100% 0 0);
+      }
+      .button-page__tier-btn--active:hover {
+        background: var(--brand);
+        color: oklch(100% 0 0);
+      }
+
+      .button-page__tier-size-label {
+        font-size: 0.5625rem;
+        font-weight: 400;
+        opacity: 0.7;
+      }
+
       /* ── Labeled row ────────────────────────────────── */
 
       .button-page__labeled-row {
@@ -399,6 +480,27 @@ const pageStyles = css`
         text-decoration: underline;
         text-underline-offset: 0.2em;
       }
+
+      /* ── Code tabs ─────────────────────────────────── */
+
+      .button-page__code-tabs {
+        margin-block-start: 1rem;
+      }
+
+      /* ── Export button row ─────────────────────────── */
+
+      .button-page__export-row {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin-block-start: 0.75rem;
+      }
+
+      .button-page__export-status {
+        font-size: var(--text-xs, 0.75rem);
+        color: var(--text-tertiary);
+        font-style: italic;
+      }
     }
   }
 `
@@ -424,10 +526,23 @@ const buttonProps: PropDef[] = [
 
 type Variant = 'primary' | 'secondary' | 'ghost' | 'danger'
 type Size = 'xs' | 'sm' | 'md' | 'lg' | 'xl'
+type Tier = 'lite' | 'standard' | 'premium'
+type AnimationStyle = 'smooth' | 'spring' | 'bounce' | 'none'
 
 const VARIANTS: Variant[] = ['primary', 'secondary', 'ghost', 'danger']
 const SIZES: Size[] = ['xs', 'sm', 'md', 'lg', 'xl']
-const IMPORT_STR = "import { Button } from '@annondeveloper/ui-kit'"
+const TIERS: { id: Tier; label: string; size: string }[] = [
+  { id: 'lite', label: 'Lite', size: '~0.3KB' },
+  { id: 'standard', label: 'Standard', size: '~2KB' },
+  { id: 'premium', label: 'Premium', size: '~3KB' },
+]
+const ANIMATION_STYLES: AnimationStyle[] = ['smooth', 'spring', 'bounce', 'none']
+
+const IMPORT_STRINGS: Record<Tier, string> = {
+  lite: "import { Button } from '@annondeveloper/ui-kit/lite'",
+  standard: "import { Button } from '@annondeveloper/ui-kit'",
+  premium: "import { Button } from '@annondeveloper/ui-kit/premium'",
+}
 
 function CopyButton({ text }: { text: string }) {
   const [copied, setCopied] = useState(false)
@@ -501,9 +616,138 @@ function Toggle({
   )
 }
 
+// ─── Code Generation ─────────────────────────────────────────────────────────
+
+function generateLiteCss(variant: Variant, size: Size, brandColor: string): string {
+  const defaultBrand = '#7c3aed'
+  const brandCss = brandColor !== defaultBrand ? `\n  --brand: ${brandColor};` : ''
+
+  const baseCSS = `.ui-lite-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.375rem;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  line-height: 1;
+  white-space: nowrap;
+  user-select: none;
+  outline: none;
+  transition: all 0.15s cubic-bezier(0.16, 1, 0.3, 1);${brandCss}
+}`
+
+  const sizesMap: Record<Size, string> = {
+    xs: '.ui-lite-button[data-size="xs"] { padding: 0.25rem 0.5rem; font-size: 0.6875rem; min-height: 24px; border-radius: 6px; }',
+    sm: '.ui-lite-button[data-size="sm"] { padding: 0.375rem 0.75rem; font-size: 0.75rem; min-height: 32px; border-radius: 6px; }',
+    md: '.ui-lite-button[data-size="md"] { padding: 0.5rem 1rem; font-size: 0.875rem; min-height: 36px; }',
+    lg: '.ui-lite-button[data-size="lg"] { padding: 0.625rem 1.25rem; font-size: 1rem; min-height: 44px; }',
+    xl: '.ui-lite-button[data-size="xl"] { padding: 0.75rem 1.5rem; font-size: 1.125rem; min-height: 52px; }',
+  }
+
+  const variantsMap: Record<Variant, string> = {
+    primary: `.ui-lite-button[data-variant="primary"] {
+  background: var(--brand, oklch(65% 0.2 270));
+  color: oklch(100% 0 0);
+  box-shadow: 0 1px 2px oklch(0% 0 0 / 0.3);
+}
+.ui-lite-button[data-variant="primary"]:hover:not(:disabled) {
+  box-shadow: 0 4px 12px oklch(0% 0 0 / 0.25);
+  transform: translateY(-1px);
+}`,
+    secondary: `.ui-lite-button[data-variant="secondary"] {
+  background: oklch(100% 0 0 / 0.06);
+  color: oklch(97% 0 0);
+  border-color: oklch(100% 0 0 / 0.08);
+}
+.ui-lite-button[data-variant="secondary"]:hover:not(:disabled) {
+  background: oklch(100% 0 0 / 0.1);
+  transform: translateY(-1px);
+}`,
+    ghost: `.ui-lite-button[data-variant="ghost"] {
+  background: transparent;
+  color: oklch(70% 0 0);
+}
+.ui-lite-button[data-variant="ghost"]:hover:not(:disabled) {
+  background: oklch(100% 0 0 / 0.06);
+  color: oklch(97% 0 0);
+}`,
+    danger: `.ui-lite-button[data-variant="danger"] {
+  background: oklch(62% 0.22 25);
+  color: oklch(100% 0 0);
+  box-shadow: 0 1px 2px oklch(0% 0 0 / 0.3);
+}
+.ui-lite-button[data-variant="danger"]:hover:not(:disabled) {
+  filter: brightness(1.1);
+  transform: translateY(-1px);
+}`,
+  }
+
+  return `${baseCSS}\n${sizesMap[size]}\n${variantsMap[variant]}`
+}
+
+function generateHtmlExport(variant: Variant, size: Size, label: string, brandColor: string): string {
+  const cssCode = generateLiteCss(variant, size, brandColor)
+  return `<!-- Button — @annondeveloper/ui-kit lite tier -->
+<button class="ui-lite-button" data-variant="${variant}" data-size="${size}">
+  ${label}
+</button>
+
+<style>
+${cssCode}
+</style>`
+}
+
+function generateReactCode(
+  tier: Tier,
+  variant: Variant,
+  size: Size,
+  label: string,
+  loading: boolean,
+  disabled: boolean,
+  showIcon: boolean,
+  showIconEnd: boolean,
+  motion: number,
+  animationStyle: AnimationStyle,
+): string {
+  const importStr = IMPORT_STRINGS[tier]
+  const iconImport = (showIcon || showIconEnd) ? "\nimport { Icon } from '@annondeveloper/ui-kit'" : ''
+
+  const props: string[] = []
+  if (variant !== 'primary') props.push(`  variant="${variant}"`)
+  if (size !== 'md') props.push(`  size="${size}"`)
+  if (loading && tier !== 'lite') props.push('  loading')
+  if (disabled) props.push('  disabled')
+  if (showIcon && tier !== 'lite') props.push('  icon={<Icon name="zap" size="sm" />}')
+  if (showIconEnd && tier !== 'lite') props.push('  iconEnd={<Icon name="arrow-right" size="sm" />}')
+  if (motion !== 3 && tier !== 'lite') props.push(`  motion={${motion}}`)
+  if (tier === 'premium' && animationStyle !== 'smooth') props.push(`  animationStyle="${animationStyle}"`)
+
+  const jsx = props.length === 0
+    ? `<Button>${label}</Button>`
+    : `<Button\n${props.join('\n')}\n>${label}</Button>`
+
+  return `${importStr}${iconImport}\n\n${jsx}`
+}
+
+function generateVueCode(variant: Variant, size: Size, label: string, disabled: boolean): string {
+  const attrs: string[] = []
+  if (variant !== 'primary') attrs.push(`  variant="${variant}"`)
+  if (size !== 'md') attrs.push(`  size="${size}"`)
+  if (disabled) attrs.push('  disabled')
+
+  const template = attrs.length === 0
+    ? `  <UiButton>${label}</UiButton>`
+    : `  <UiButton\n  ${attrs.join('\n  ')}\n  >${label}</UiButton>`
+
+  return `<template>\n${template}\n</template>\n\n<script setup>\n// Vue adapter — wrap the Web Component or use CSS-only:\nimport '@annondeveloper/ui-kit/css/components/button.css'\n</script>`
+}
+
 // ─── Section: Interactive Playground ──────────────────────────────────────────
 
-function PlaygroundSection() {
+function PlaygroundSection({ tier, brandColor }: { tier: Tier; brandColor: string }) {
   const [variant, setVariant] = useState<Variant>('primary')
   const [size, setSize] = useState<Size>('md')
   const [loading, setLoading] = useState(false)
@@ -512,19 +756,55 @@ function PlaygroundSection() {
   const [showIconEnd, setShowIconEnd] = useState(false)
   const [label, setLabel] = useState('Click me')
   const [motion, setMotion] = useState<0 | 1 | 2 | 3>(3)
+  const [animationStyle, setAnimationStyle] = useState<AnimationStyle>('smooth')
+  const [copyStatus, setCopyStatus] = useState('')
 
-  const codeLines: string[] = ['<Button']
-  if (variant !== 'primary') codeLines.push(`  variant="${variant}"`)
-  if (size !== 'md') codeLines.push(`  size="${size}"`)
-  if (loading) codeLines.push('  loading')
-  if (disabled) codeLines.push('  disabled')
-  if (showIcon) codeLines.push('  icon={<Icon name="zap" size="sm" />}')
-  if (showIconEnd) codeLines.push('  iconEnd={<Icon name="arrow-right" size="sm" />}')
-  if (motion !== 3) codeLines.push(`  motion={${motion}}`)
-  codeLines.push(`>${label}</Button>`)
-  const code = codeLines.length <= 2
-    ? `<Button>${label}</Button>`
-    : codeLines.join('\n')
+  // Resolve component for active tier
+  const ButtonComponent = tier === 'lite' ? LiteButton : tier === 'premium' ? PremiumButton : Button
+
+  // Generate codes for all tabs
+  const reactCode = useMemo(
+    () => generateReactCode(tier, variant, size, label, loading, disabled, showIcon, showIconEnd, motion, animationStyle),
+    [tier, variant, size, label, loading, disabled, showIcon, showIconEnd, motion, animationStyle],
+  )
+
+  const htmlCssCode = useMemo(
+    () => generateHtmlExport(variant, size, label, brandColor),
+    [variant, size, label, brandColor],
+  )
+
+  const vueCode = useMemo(
+    () => generateVueCode(variant, size, label, disabled),
+    [variant, size, label, disabled],
+  )
+
+  const handleCopyHtmlCss = useCallback(() => {
+    navigator.clipboard.writeText(htmlCssCode).then(() => {
+      setCopyStatus('Copied HTML+CSS!')
+      setTimeout(() => setCopyStatus(''), 2000)
+    })
+  }, [htmlCssCode])
+
+  // Build props for the preview button (lite has fewer features)
+  const previewProps: Record<string, unknown> = {
+    variant,
+    size,
+  }
+  if (tier !== 'lite') {
+    previewProps.loading = loading
+    previewProps.disabled = disabled
+    previewProps.icon = showIcon ? <Icon name="zap" size="sm" /> : undefined
+    previewProps.iconEnd = showIconEnd ? <Icon name="arrow-right" size="sm" /> : undefined
+    previewProps.motion = motion
+  } else {
+    previewProps.disabled = disabled
+  }
+
+  const codeTabs = [
+    { id: 'react', label: 'React' },
+    { id: 'html', label: 'HTML+CSS' },
+    { id: 'vue', label: 'Vue' },
+  ]
 
   return (
     <section className="button-page__section" id="playground">
@@ -539,40 +819,72 @@ function PlaygroundSection() {
         <div className="button-page__playground">
           {/* Preview + Code */}
           <div className="button-page__playground-preview">
-            <div className="button-page__playground-result">
-              <Button
-                variant={variant}
-                size={size}
-                loading={loading}
-                disabled={disabled}
-                icon={showIcon ? <Icon name="zap" size="sm" /> : undefined}
-                iconEnd={showIconEnd ? <Icon name="arrow-right" size="sm" /> : undefined}
-                motion={motion}
-              >
-                {label}
-              </Button>
+            <div
+              className="button-page__playground-result"
+              style={brandColor !== '#7c3aed' ? { ['--brand' as string]: brandColor } : undefined}
+            >
+              <ButtonComponent {...previewProps}>{label}</ButtonComponent>
             </div>
-            <CopyBlock code={code} language="typescript" showLineNumbers />
+
+            {/* Export button */}
+            <div className="button-page__export-row">
+              <Button
+                size="xs"
+                variant="secondary"
+                icon={<Icon name="copy" size="sm" />}
+                onClick={handleCopyHtmlCss}
+              >
+                Copy HTML+CSS
+              </Button>
+              {copyStatus && <span className="button-page__export-status">{copyStatus}</span>}
+            </div>
+
+            {/* Tabbed code output */}
+            <div className="button-page__code-tabs">
+              <Tabs tabs={codeTabs} defaultTab="react" size="sm" variant="pills">
+                <TabPanel tabId="react">
+                  <CopyBlock code={reactCode} language="typescript" showLineNumbers />
+                </TabPanel>
+                <TabPanel tabId="html">
+                  <CopyBlock code={htmlCssCode} language="html" showLineNumbers />
+                </TabPanel>
+                <TabPanel tabId="vue">
+                  <CopyBlock code={vueCode} language="html" showLineNumbers />
+                </TabPanel>
+              </Tabs>
+            </div>
           </div>
 
           {/* Controls */}
           <div className="button-page__playground-controls">
             <OptionGroup label="Variant" options={VARIANTS} value={variant} onChange={setVariant} />
             <OptionGroup label="Size" options={SIZES} value={size} onChange={setSize} />
-            <OptionGroup
-              label="Motion"
-              options={['0', '1', '2', '3'] as const}
-              value={String(motion) as '0' | '1' | '2' | '3'}
-              onChange={v => setMotion(Number(v) as 0 | 1 | 2 | 3)}
-            />
+
+            {tier !== 'lite' && (
+              <OptionGroup
+                label="Motion"
+                options={['0', '1', '2', '3'] as const}
+                value={String(motion) as '0' | '1' | '2' | '3'}
+                onChange={v => setMotion(Number(v) as 0 | 1 | 2 | 3)}
+              />
+            )}
+
+            {tier === 'premium' && (
+              <OptionGroup
+                label="Animation Style"
+                options={ANIMATION_STYLES}
+                value={animationStyle}
+                onChange={setAnimationStyle}
+              />
+            )}
 
             <div className="button-page__control-group">
               <span className="button-page__control-label">Toggles</span>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.375rem' }}>
-                <Toggle label="Loading" checked={loading} onChange={setLoading} />
+                {tier !== 'lite' && <Toggle label="Loading" checked={loading} onChange={setLoading} />}
                 <Toggle label="Disabled" checked={disabled} onChange={setDisabled} />
-                <Toggle label="Leading icon" checked={showIcon} onChange={setShowIcon} />
-                <Toggle label="Trailing icon" checked={showIconEnd} onChange={setShowIconEnd} />
+                {tier !== 'lite' && <Toggle label="Leading icon" checked={showIcon} onChange={setShowIcon} />}
+                {tier !== 'lite' && <Toggle label="Trailing icon" checked={showIconEnd} onChange={setShowIconEnd} />}
               </div>
             </div>
 
@@ -598,6 +910,11 @@ function PlaygroundSection() {
 export default function ButtonPage() {
   useStyles('button-page', pageStyles)
 
+  const [tier, setTier] = useState<Tier>('standard')
+  const [brandColor, setBrandColor] = useState('#7c3aed')
+
+  const ButtonComponent = tier === 'lite' ? LiteButton : tier === 'premium' ? PremiumButton : Button
+
   return (
     <div className="button-page">
       {/* ── 1. Hero Header ──────────────────────────────── */}
@@ -608,19 +925,79 @@ export default function ButtonPage() {
           Ships in three weight tiers from 0.3KB CSS-only to 3KB premium with ripple effects.
         </p>
         <div className="button-page__import-row">
-          <code className="button-page__import-code">{IMPORT_STR}</code>
-          <CopyButton text={IMPORT_STR} />
+          <code className="button-page__import-code">{IMPORT_STRINGS[tier]}</code>
+          <CopyButton text={IMPORT_STRINGS[tier]} />
         </div>
       </div>
 
       <Divider spacing="sm" />
 
-      {/* ── 2. Interactive Playground ───────────────────── */}
-      <PlaygroundSection />
+      {/* ── 2. Weight Tier Selector ─────────────────────── */}
+      <section className="button-page__section" id="tier-selector">
+        <h2 className="button-page__section-title">
+          <a href="#tier-selector">Weight Tier</a>
+        </h2>
+        <p className="button-page__section-desc">
+          Select a weight tier to switch ALL button examples on this page. Each tier trades features for bundle size.
+        </p>
+        <div className="button-page__tier-selector">
+          {TIERS.map(t => (
+            <button
+              key={t.id}
+              type="button"
+              className={`button-page__tier-btn${t.id === tier ? ' button-page__tier-btn--active' : ''}`}
+              onClick={() => setTier(t.id)}
+            >
+              {t.label}
+              <span className="button-page__tier-size-label">{t.size}</span>
+            </button>
+          ))}
+        </div>
+
+        {/* Color customization */}
+        <div style={{ marginBlockStart: '1rem' }}>
+          <div className="button-page__control-group">
+            <span className="button-page__control-label">Brand Color</span>
+            <div className="button-page__color-group">
+              <input
+                type="color"
+                value={brandColor}
+                onChange={e => setBrandColor(e.target.value)}
+                className="button-page__color-swatch"
+              />
+              <input
+                type="text"
+                value={brandColor}
+                onChange={e => {
+                  const v = e.target.value
+                  if (/^#[0-9a-fA-F]{0,6}$/.test(v)) setBrandColor(v)
+                }}
+                className="button-page__color-hex"
+                maxLength={7}
+                placeholder="#7c3aed"
+              />
+              {brandColor !== '#7c3aed' && (
+                <Button
+                  size="xs"
+                  variant="ghost"
+                  onClick={() => setBrandColor('#7c3aed')}
+                >
+                  Reset
+                </Button>
+              )}
+            </div>
+          </div>
+        </div>
+      </section>
 
       <Divider spacing="sm" />
 
-      {/* ── 3. Variant Gallery ─────────────────────────── */}
+      {/* ── 3. Interactive Playground ───────────────────── */}
+      <PlaygroundSection tier={tier} brandColor={brandColor} />
+
+      <Divider spacing="sm" />
+
+      {/* ── 4. Variant Gallery ─────────────────────────── */}
       <section className="button-page__section" id="variants">
         <h2 className="button-page__section-title">
           <a href="#variants">Variants</a>
@@ -628,11 +1005,14 @@ export default function ButtonPage() {
         <p className="button-page__section-desc">
           Four built-in variants for different levels of emphasis and semantic meaning.
         </p>
-        <div className="button-page__preview">
+        <div
+          className="button-page__preview"
+          style={brandColor !== '#7c3aed' ? { ['--brand' as string]: brandColor } : undefined}
+        >
           <div className="button-page__labeled-row">
             {VARIANTS.map(v => (
               <div key={v} className="button-page__labeled-item">
-                <Button variant={v}>{v.charAt(0).toUpperCase() + v.slice(1)}</Button>
+                <ButtonComponent variant={v}>{v.charAt(0).toUpperCase() + v.slice(1)}</ButtonComponent>
                 <span className="button-page__item-label">{v}</span>
               </div>
             ))}
@@ -642,7 +1022,7 @@ export default function ButtonPage() {
 
       <Divider spacing="sm" />
 
-      {/* ── 4. Size Scale ──────────────────────────────── */}
+      {/* ── 5. Size Scale ──────────────────────────────── */}
       <section className="button-page__section" id="sizes">
         <h2 className="button-page__section-title">
           <a href="#sizes">Size Scale</a>
@@ -651,11 +1031,14 @@ export default function ButtonPage() {
           Five sizes from compact inline actions (xs) to large call-to-action buttons (xl).
           Sizes control padding, font-size, and minimum block-size.
         </p>
-        <div className="button-page__preview">
+        <div
+          className="button-page__preview"
+          style={brandColor !== '#7c3aed' ? { ['--brand' as string]: brandColor } : undefined}
+        >
           <div className="button-page__labeled-row" style={{ alignItems: 'flex-end' }}>
             {SIZES.map(s => (
               <div key={s} className="button-page__labeled-item">
-                <Button size={s}>Button</Button>
+                <ButtonComponent size={s}>Button</ButtonComponent>
                 <span className="button-page__item-label">{s}</span>
               </div>
             ))}
@@ -665,7 +1048,7 @@ export default function ButtonPage() {
 
       <Divider spacing="sm" />
 
-      {/* ── 5. States ──────────────────────────────────── */}
+      {/* ── 6. States ──────────────────────────────────── */}
       <section className="button-page__section" id="states">
         <h2 className="button-page__section-title">
           <a href="#states">States</a>
@@ -673,32 +1056,37 @@ export default function ButtonPage() {
         <p className="button-page__section-desc">
           Buttons handle all interaction states with clear visual feedback.
         </p>
-        <div className="button-page__states-grid">
+        <div
+          className="button-page__states-grid"
+          style={brandColor !== '#7c3aed' ? { ['--brand' as string]: brandColor } : undefined}
+        >
           <div className="button-page__state-cell">
-            <Button>Default</Button>
+            <ButtonComponent>Default</ButtonComponent>
             <span className="button-page__state-label">Default</span>
           </div>
           <div className="button-page__state-cell">
-            <Button>Hover me</Button>
+            <ButtonComponent>Hover me</ButtonComponent>
             <span className="button-page__state-label">Hover</span>
             <span className="button-page__state-hint">move cursor over</span>
           </div>
           <div className="button-page__state-cell">
-            <Button>Focus me</Button>
+            <ButtonComponent>Focus me</ButtonComponent>
             <span className="button-page__state-label">Focus</span>
             <span className="button-page__state-hint">press Tab key</span>
           </div>
           <div className="button-page__state-cell">
-            <Button>Press me</Button>
+            <ButtonComponent>Press me</ButtonComponent>
             <span className="button-page__state-label">Active</span>
             <span className="button-page__state-hint">click and hold</span>
           </div>
+          {tier !== 'lite' && (
+            <div className="button-page__state-cell">
+              <ButtonComponent loading>Saving...</ButtonComponent>
+              <span className="button-page__state-label">Loading</span>
+            </div>
+          )}
           <div className="button-page__state-cell">
-            <Button loading>Saving...</Button>
-            <span className="button-page__state-label">Loading</span>
-          </div>
-          <div className="button-page__state-cell">
-            <Button disabled>Disabled</Button>
+            <ButtonComponent disabled>Disabled</ButtonComponent>
             <span className="button-page__state-label">Disabled</span>
           </div>
         </div>
@@ -706,44 +1094,52 @@ export default function ButtonPage() {
 
       <Divider spacing="sm" />
 
-      {/* ── 6. With Icons ──────────────────────────────── */}
-      <section className="button-page__section" id="icons">
-        <h2 className="button-page__section-title">
-          <a href="#icons">With Icons</a>
-        </h2>
-        <p className="button-page__section-desc">
-          Buttons accept leading and trailing icon elements. Icons automatically scale to match the button's font-size.
-        </p>
-        <div className="button-page__preview button-page__preview--col" style={{ gap: '1.25rem' }}>
-          <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '0.75rem' }}>
-            <div className="button-page__labeled-item">
-              <Button icon={<Icon name="zap" size="sm" />}>Deploy</Button>
-              <span className="button-page__item-label">Leading</span>
-            </div>
-            <div className="button-page__labeled-item">
-              <Button iconEnd={<Icon name="arrow-right" size="sm" />}>Next Step</Button>
-              <span className="button-page__item-label">Trailing</span>
-            </div>
-            <div className="button-page__labeled-item">
-              <Button
-                icon={<Icon name="download" size="sm" />}
-                iconEnd={<Icon name="arrow-right" size="sm" />}
-              >
-                Download
-              </Button>
-              <span className="button-page__item-label">Both</span>
-            </div>
-            <div className="button-page__labeled-item">
-              <Button
-                icon={<Icon name="plus" size="sm" />}
-                aria-label="Add item"
-                style={{ paddingInline: '0.5rem' }}
-              />
-              <span className="button-page__item-label">Icon only</span>
-            </div>
-          </div>
-          <CopyBlock
-            code={`// Leading icon
+      {/* ── 7. With Icons ──────────────────────────────── */}
+      {tier !== 'lite' && (
+        <>
+          <section className="button-page__section" id="icons">
+            <h2 className="button-page__section-title">
+              <a href="#icons">With Icons</a>
+            </h2>
+            <p className="button-page__section-desc">
+              Buttons accept leading and trailing icon elements. Icons automatically scale to match the button's font-size.
+            </p>
+            <div
+              className="button-page__preview button-page__preview--col"
+              style={{
+                gap: '1.25rem',
+                ...(brandColor !== '#7c3aed' ? { ['--brand' as string]: brandColor } : {}),
+              }}
+            >
+              <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '0.75rem' }}>
+                <div className="button-page__labeled-item">
+                  <ButtonComponent icon={<Icon name="zap" size="sm" />}>Deploy</ButtonComponent>
+                  <span className="button-page__item-label">Leading</span>
+                </div>
+                <div className="button-page__labeled-item">
+                  <ButtonComponent iconEnd={<Icon name="arrow-right" size="sm" />}>Next Step</ButtonComponent>
+                  <span className="button-page__item-label">Trailing</span>
+                </div>
+                <div className="button-page__labeled-item">
+                  <ButtonComponent
+                    icon={<Icon name="download" size="sm" />}
+                    iconEnd={<Icon name="arrow-right" size="sm" />}
+                  >
+                    Download
+                  </ButtonComponent>
+                  <span className="button-page__item-label">Both</span>
+                </div>
+                <div className="button-page__labeled-item">
+                  <ButtonComponent
+                    icon={<Icon name="plus" size="sm" />}
+                    aria-label="Add item"
+                    style={{ paddingInline: '0.5rem' }}
+                  />
+                  <span className="button-page__item-label">Icon only</span>
+                </div>
+              </div>
+              <CopyBlock
+                code={`// Leading icon
 <Button icon={<Icon name="zap" size="sm" />}>Deploy</Button>
 
 // Trailing icon
@@ -756,15 +1152,17 @@ export default function ButtonPage() {
 
 // Icon-only (provide aria-label)
 <Button icon={<Icon name="plus" size="sm" />} aria-label="Add item" />`}
-            language="typescript"
-            showLineNumbers
-          />
-        </div>
-      </section>
+                language="typescript"
+                showLineNumbers
+              />
+            </div>
+          </section>
 
-      <Divider spacing="sm" />
+          <Divider spacing="sm" />
+        </>
+      )}
 
-      {/* ── 7. Weight Tiers ────────────────────────────── */}
+      {/* ── 8. Weight Tiers ────────────────────────────── */}
       <section className="button-page__section" id="tiers">
         <h2 className="button-page__section-title">
           <a href="#tiers">Weight Tiers</a>
@@ -832,42 +1230,49 @@ export default function ButtonPage() {
 
       <Divider spacing="sm" />
 
-      {/* ── 8. Motion Levels ───────────────────────────── */}
-      <section className="button-page__section" id="motion">
-        <h2 className="button-page__section-title">
-          <a href="#motion">Motion Levels</a>
-        </h2>
-        <p className="button-page__section-desc">
-          Each button can be pinned to a specific motion level via the motion prop.
-          Level 0 disables all animation; level 3 enables cinematic spring physics.
-        </p>
-        <div className="button-page__preview">
-          <div className="button-page__labeled-row">
-            {([0, 1, 2, 3] as const).map(m => (
-              <div key={m} className="button-page__labeled-item">
-                <Button motion={m}>Motion {m}</Button>
-                <span className="button-page__item-label">
-                  {m === 0 ? 'Instant' : m === 1 ? 'Subtle' : m === 2 ? 'Spring' : 'Cinematic'}
-                </span>
+      {/* ── 9. Motion Levels ───────────────────────────── */}
+      {tier !== 'lite' && (
+        <>
+          <section className="button-page__section" id="motion">
+            <h2 className="button-page__section-title">
+              <a href="#motion">Motion Levels</a>
+            </h2>
+            <p className="button-page__section-desc">
+              Each button can be pinned to a specific motion level via the motion prop.
+              Level 0 disables all animation; level 3 enables cinematic spring physics.
+            </p>
+            <div
+              className="button-page__preview"
+              style={brandColor !== '#7c3aed' ? { ['--brand' as string]: brandColor } : undefined}
+            >
+              <div className="button-page__labeled-row">
+                {([0, 1, 2, 3] as const).map(m => (
+                  <div key={m} className="button-page__labeled-item">
+                    <ButtonComponent motion={m}>Motion {m}</ButtonComponent>
+                    <span className="button-page__item-label">
+                      {m === 0 ? 'Instant' : m === 1 ? 'Subtle' : m === 2 ? 'Spring' : 'Cinematic'}
+                    </span>
+                  </div>
+                ))}
               </div>
-            ))}
-          </div>
-        </div>
-        <div style={{ marginBlockStart: '0.75rem' }}>
-          <CopyBlock
-            code={`<Button motion={0}>Instant</Button>    // No animation
+            </div>
+            <div style={{ marginBlockStart: '0.75rem' }}>
+              <CopyBlock
+                code={`<Button motion={0}>Instant</Button>    // No animation
 <Button motion={1}>Subtle</Button>     // CSS transitions only
 <Button motion={2}>Spring</Button>     // Spring physics, no overshoot
 <Button motion={3}>Cinematic</Button>  // Full physics + effects`}
-            language="typescript"
-            showLineNumbers
-          />
-        </div>
-      </section>
+                language="typescript"
+                showLineNumbers
+              />
+            </div>
+          </section>
 
-      <Divider spacing="sm" />
+          <Divider spacing="sm" />
+        </>
+      )}
 
-      {/* ── 9. Props API Table ─────────────────────────── */}
+      {/* ── 10. Props API Table ─────────────────────────── */}
       <section className="button-page__section" id="props">
         <h2 className="button-page__section-title">
           <a href="#props">Props API</a>
@@ -883,7 +1288,7 @@ export default function ButtonPage() {
 
       <Divider spacing="sm" />
 
-      {/* ── 10. Accessibility Notes ────────────────────── */}
+      {/* ── 11. Accessibility Notes ────────────────────── */}
       <section className="button-page__section" id="accessibility">
         <h2 className="button-page__section-title">
           <a href="#accessibility">Accessibility</a>
@@ -941,7 +1346,7 @@ export default function ButtonPage() {
 
       <Divider spacing="sm" />
 
-      {/* ── 11. Source Code ─────────────────────────────── */}
+      {/* ── 12. Source Code ─────────────────────────────── */}
       <section className="button-page__section" id="source">
         <h2 className="button-page__section-title">
           <a href="#source">Source</a>
