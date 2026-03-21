@@ -1116,7 +1116,10 @@ function ShortcutButtons({ tier, ButtonComponent }: { tier: Tier; ButtonComponen
 
 // ─── Section: Interactive Playground ──────────────────────────────────────────
 
-function PlaygroundSection({ tier, brandColor }: { tier: Tier; brandColor: string }) {
+function PlaygroundSection({ tier: tierProp, brandColor }: { tier: Tier; brandColor: string }) {
+  // Use prop OR context — prop takes priority, context as fallback
+  const { tier: contextTier } = useTier()
+  const tier = tierProp ?? contextTier
   const [variant, setVariant] = useState<Variant>('primary')
   const [size, setSize] = useState<Size>('md')
   const [loading, setLoading] = useState(false)
