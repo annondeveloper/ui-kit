@@ -1169,11 +1169,34 @@ function PlaygroundSection({ tier, brandColor }: { tier: Tier; brandColor: strin
     previewProps.disabled = disabled
   }
 
+  const [activeCodeTab, setActiveCodeTab] = useState('react')
+
   const codeTabs = [
     { id: 'react', label: 'React' },
     { id: 'html', label: 'HTML+CSS' },
     { id: 'vue', label: 'Vue' },
+    { id: 'angular', label: 'Angular' },
+    { id: 'svelte', label: 'Svelte' },
   ]
+
+  const angularCode = useMemo(() => {
+    return `<!-- Angular Component Template -->\n<button\n  class="ui-lite-button"\n  data-variant="${variant}"\n  data-size="${size}"\n  ${disabled ? '[disabled]="true"' : ''}\n>\n  ${label}\n</button>\n\n<!-- In your component.ts -->\nimport '@annondeveloper/ui-kit/lite/styles.css'`
+  }, [variant, size, label, disabled])
+
+  const svelteCode = useMemo(() => {
+    return `<script>\n  import { Button } from '@annondeveloper/ui-kit';\n</script>\n\n<Button\n  variant="${variant}"\n  size="${size}"\n  ${disabled ? 'disabled' : ''}\n>\n  ${label}\n</Button>`
+  }, [variant, size, label, disabled])
+
+  const activeCode = useMemo(() => {
+    switch (activeCodeTab) {
+      case 'react': return reactCode
+      case 'html': return htmlCssCode
+      case 'vue': return vueCode
+      case 'angular': return angularCode
+      case 'svelte': return svelteCode
+      default: return reactCode
+    }
+  }, [activeCodeTab, reactCode, htmlCssCode, vueCode, angularCode, svelteCode])
 
   return (
     <section className="button-page__section" id="playground">
@@ -1191,22 +1214,25 @@ function PlaygroundSection({ tier, brandColor }: { tier: Tier; brandColor: strin
             <ButtonComponent {...previewProps}>{label}</ButtonComponent>
           </div>
 
-          {/* Export button */}
-          <div className="button-page__export-row">
-            <Button
-              size="xs"
-              variant="secondary"
-              icon={<Icon name="copy" size="sm" />}
-              onClick={handleCopyHtmlCss}
-            >
-              Copy HTML+CSS
-            </Button>
-            {copyStatus && <span className="button-page__export-status">{copyStatus}</span>}
-          </div>
-
           {/* Tabbed code output */}
           <div className="button-page__code-tabs">
-            <Tabs tabs={codeTabs} defaultTab="react" size="sm" variant="pills">
+            <div className="button-page__export-row">
+              <Button
+                size="xs"
+                variant="secondary"
+                icon={<Icon name="copy" size="sm" />}
+                onClick={() => {
+                  navigator.clipboard?.writeText(activeCode).then(() => {
+                    setCopyStatus(`Copied ${codeTabs.find(t => t.id === activeCodeTab)?.label}!`)
+                    setTimeout(() => setCopyStatus(''), 2000)
+                  })
+                }}
+              >
+                Copy {codeTabs.find(t => t.id === activeCodeTab)?.label}
+              </Button>
+              {copyStatus && <span className="button-page__export-status">{copyStatus}</span>}
+            </div>
+            <Tabs tabs={codeTabs} activeTab={activeCodeTab} onChange={setActiveCodeTab} size="sm" variant="pills">
               <TabPanel tabId="react">
                 <CopyBlock code={reactCode} language="typescript" showLineNumbers />
               </TabPanel>
@@ -1215,6 +1241,12 @@ function PlaygroundSection({ tier, brandColor }: { tier: Tier; brandColor: strin
               </TabPanel>
               <TabPanel tabId="vue">
                 <CopyBlock code={vueCode} language="html" showLineNumbers />
+              </TabPanel>
+              <TabPanel tabId="angular">
+                <CopyBlock code={angularCode} language="html" showLineNumbers />
+              </TabPanel>
+              <TabPanel tabId="svelte">
+                <CopyBlock code={svelteCode} language="html" showLineNumbers />
               </TabPanel>
             </Tabs>
           </div>
