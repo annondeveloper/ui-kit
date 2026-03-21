@@ -1175,12 +1175,20 @@ export default function ButtonPage() {
     }
   }, [brandColor, mode])
 
+  // Only override BRAND-related tokens — never surfaces/text/borders
+  // Surfaces must come from the global theme (html.light / :root) for consistent dark/light switching
+  const BRAND_ONLY_KEYS: (keyof ThemeTokens)[] = [
+    'brand', 'brandLight', 'brandDark', 'brandSubtle', 'brandGlow',
+    'borderGlow', 'aurora1', 'aurora2',
+  ]
+
   const themeStyle = useMemo(() => {
     if (!themeTokens || brandColor === '#6366f1') return undefined
     const style: Record<string, string> = {}
-    for (const [key, value] of Object.entries(themeTokens)) {
-      const cssVar = TOKEN_TO_CSS[key as keyof ThemeTokens]
-      if (cssVar) style[cssVar] = value
+    for (const key of BRAND_ONLY_KEYS) {
+      const cssVar = TOKEN_TO_CSS[key]
+      const value = themeTokens[key]
+      if (cssVar && value) style[cssVar] = value
     }
     return style as React.CSSProperties
   }, [themeTokens, brandColor])

@@ -1,6 +1,9 @@
 /* Import Aurora Fluid theme tokens */
 @import '../../src/core/tokens/theme.css';
 
+/* Import lite tier CSS for weight tier demos */
+@import '../../src/lite/lite.css';
+
 /* Demo site base styles — using Aurora Fluid tokens */
 *, *::before, *::after {
   box-sizing: border-box;
