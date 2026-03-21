@@ -18,6 +18,7 @@ const pages: { path: string; label: string; icon: IconName }[] = [
   { path: '/ai', label: 'AI & Realtime', icon: 'terminal' },
   { path: '/animations', label: 'Animations', icon: 'zap' },
   { path: '/icons', label: 'Icons', icon: 'image' },
+  { path: '/themes', label: 'Theme Playground', icon: 'settings' as const },
   { path: '/docs', label: 'Documentation', icon: 'file' },
 ]
 
