@@ -5,6 +5,7 @@ export default defineConfig({
     index: 'src/index.ts',
     form: 'src/form.ts',
     theme: 'src/theme.ts',
+    lite: 'src/lite/index.ts',
   },
   outDir: 'dist/esm',
   format: ['esm'],

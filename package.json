@@ -25,6 +25,13 @@
         "default": "./dist/esm/theme.js"
       }
     },
+    "./lite": {
+      "import": {
+        "types": "./dist/esm/lite.d.ts",
+        "default": "./dist/esm/lite.js"
+      }
+    },
+    "./lite/styles.css": "./src/lite/lite.css",
     "./css/theme.css": "./dist/css/theme.css",
     "./css/all.css": "./dist/css/all.css",
     "./css/components/*": "./dist/css/components/*"
