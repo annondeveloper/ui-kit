@@ -9,8 +9,9 @@ const patterns: Record<HapticType, number[]> = {
   error: [20, 40, 20, 40, 20],
 }
 
-export function haptic(type: HapticType): void {
+export function haptic(type: HapticType): boolean {
   if (typeof navigator !== 'undefined' && navigator.vibrate) {
-    navigator.vibrate(patterns[type])
+    return navigator.vibrate(patterns[type])
   }
+  return false
 }

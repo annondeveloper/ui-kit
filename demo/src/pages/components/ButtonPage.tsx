@@ -1498,12 +1498,16 @@ export default function ButtonPage() {
             Enable with <code>haptics</code> prop — uses the Vibration API.
           </p>
           <div className="button-page__preview">
-            <ButtonComponent haptics variant="primary">Light Haptic (default)</ButtonComponent>
-            <ButtonComponent haptics="medium" variant="secondary">Medium</ButtonComponent>
-            <ButtonComponent haptics="heavy" variant="secondary">Heavy</ButtonComponent>
-            <ButtonComponent haptics="success" variant="primary">Success Pattern</ButtonComponent>
-            <ButtonComponent haptics="error" variant="danger">Error Pattern</ButtonComponent>
+            <ButtonComponent haptics onClick={() => {}} variant="primary">Light (default)</ButtonComponent>
+            <ButtonComponent haptics="medium" onClick={() => {}} variant="secondary">Medium</ButtonComponent>
+            <ButtonComponent haptics="heavy" onClick={() => {}} variant="secondary">Heavy</ButtonComponent>
+            <ButtonComponent haptics="success" onClick={() => {}} variant="primary">Success</ButtonComponent>
+            <ButtonComponent haptics="error" onClick={() => {}} variant="danger">Error</ButtonComponent>
           </div>
+          <p style={{ fontSize: '0.75rem', color: 'var(--text-tertiary)', marginBlockStart: '0.75rem', lineHeight: 1.5 }}>
+            <strong>Requirements:</strong> Mobile device with vibration enabled. Check Settings &gt; Sound &amp; vibration &gt; Vibration &amp; haptics on Android.
+            Desktop browsers don't support vibration. Device must not be in Silent/DND mode.
+          </p>
           <div className="button-page__code-snippet">
             <CopyBlock
               code={`<Button haptics>Light vibration</Button>\n<Button haptics="medium">Medium</Button>\n<Button haptics="heavy">Heavy</Button>\n<Button haptics="success">Success pattern</Button>\n<Button haptics="error">Error pattern</Button>`}
