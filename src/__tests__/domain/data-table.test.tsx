@@ -1143,4 +1143,506 @@ describe('DataTable', () => {
       expect(results).toHaveNoViolations()
     }, 15000)
   })
+
+  // ═══════════════════════════════════════════════════════════════════
+  // 21. VIRTUAL SCROLL — ENTERPRISE (100K+ rows)
+  // ═══════════════════════════════════════════════════════════════════
+
+  describe('virtual scroll (enterprise)', () => {
+    it('renders only a subset of rows for large datasets', () => {
+      const largeData = generateLargeData(1000)
+      const { container } = render(
+        <DataTable data={largeData} columns={columns} virtualScroll />
+      )
+      // Should NOT render all 1000 rows
+      const rows = container.querySelectorAll('.ui-data-table__tr')
+      expect(rows.length).toBeLessThan(100)
+    })
+
+    it('uses configurable rowHeight', () => {
+      const largeData = generateLargeData(100)
+      const { container } = render(
+        <DataTable data={largeData} columns={columns} virtualScroll rowHeight={60} />
+      )
+      const spacer = container.querySelector('.ui-data-table__virtual-spacer') as HTMLElement
+      // 100 rows * 60px = 6000px
+      expect(spacer.style.height).toBe('6000px')
+    })
+
+    it('has correct total height in spacer', () => {
+      const largeData = generateLargeData(500)
+      const { container } = render(
+        <DataTable data={largeData} columns={columns} virtualScroll />
+      )
+      const spacer = container.querySelector('.ui-data-table__virtual-spacer') as HTMLElement
+      // 500 rows * 40px (default) = 20000px
+      expect(spacer.style.height).toBe('20000px')
+    })
+
+    it('renders virtual scroll container with data-testid', () => {
+      const largeData = generateLargeData(100)
+      render(
+        <DataTable data={largeData} columns={columns} virtualScroll />
+      )
+      expect(screen.getByTestId('virtual-scroll-container')).toBeInTheDocument()
+    })
+  })
+
+  // ═══════════════════════════════════════════════════════════════════
+  // 22. PER-COLUMN FILTERS
+  // ═══════════════════════════════════════════════════════════════════
+
+  describe('per-column filters', () => {
+    const filterColumns: ColumnDef<Person>[] = [
+      { id: 'name', header: 'Name', accessor: 'name', filterable: true, filterType: 'text' },
+      { id: 'age', header: 'Age', accessor: 'age', filterable: true, filterType: 'number' },
+      { id: 'role', header: 'Role', accessor: 'role', filterable: true, filterType: 'select' },
+      { id: 'email', header: 'Email', accessor: 'email' },
+    ]
+
+    it('renders filter buttons for filterable columns', () => {
+      const cols: ColumnDef<Person>[] = [
+        { id: 'name', header: 'Name', accessor: 'name', filterable: true, filterType: 'text' },
+        { id: 'age', header: 'Age', accessor: 'age', filterable: true, filterType: 'number' },
+        { id: 'role', header: 'Role', accessor: 'role', filterable: true, filterType: 'select' },
+        { id: 'email', header: 'Email', accessor: 'email', filterable: false },
+      ]
+      const { container } = render(
+        <DataTable data={sampleData} columns={cols} filterable />
+      )
+      const filterBtns = container.querySelectorAll('.ui-data-table__filter-btn')
+      expect(filterBtns.length).toBe(3) // name, age, role (email is filterable: false)
+    })
+
+    it('opens filter popover on click', async () => {
+      render(
+        <DataTable data={sampleData} columns={filterColumns} filterable />
+      )
+      const filterBtn = screen.getByLabelText('Filter Name')
+      await userEvent.click(filterBtn)
+      expect(screen.getByTestId('filter-popover-name')).toBeInTheDocument()
+    })
+
+    it('applies text contains filter', async () => {
+      vi.useFakeTimers({ shouldAdvanceTime: true })
+      const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime })
+      render(
+        <DataTable data={sampleData} columns={filterColumns} filterable />
+      )
+      const filterBtn = screen.getByLabelText('Filter Name')
+      await user.click(filterBtn)
+      const input = screen.getByTestId('filter-input-name')
+      await user.type(input, 'ali')
+      // Filter should apply immediately (no debounce on column filters)
+      expect(screen.getByText('Alice')).toBeInTheDocument()
+      expect(screen.queryByText('Bob')).not.toBeInTheDocument()
+      vi.useRealTimers()
+    })
+
+    it('calls onFilterChange callback', async () => {
+      const onFilterChange = vi.fn()
+      render(
+        <DataTable
+          data={sampleData}
+          columns={filterColumns}
+          filterable
+          filters={{}}
+          onFilterChange={onFilterChange}
+        />
+      )
+      const filterBtn = screen.getByLabelText('Filter Name')
+      await userEvent.click(filterBtn)
+      const input = screen.getByTestId('filter-input-name')
+      fireEvent.change(input, { target: { value: 'test' } })
+      expect(onFilterChange).toHaveBeenCalledWith(
+        expect.objectContaining({
+          name: expect.objectContaining({ value: 'test' }),
+        })
+      )
+    })
+
+    it('shows active filter indicator', async () => {
+      const { container } = render(
+        <DataTable
+          data={sampleData}
+          columns={filterColumns}
+          filterable
+          filters={{ name: { value: 'alice', operator: 'contains' } }}
+        />
+      )
+      const activeBtn = container.querySelector('.ui-data-table__filter-btn[data-active]')
+      expect(activeBtn).toBeInTheDocument()
+    })
+
+    it('clears filter on clear button', async () => {
+      const onFilterChange = vi.fn()
+      render(
+        <DataTable
+          data={sampleData}
+          columns={filterColumns}
+          filterable
+          filters={{ name: { value: 'alice', operator: 'contains' } }}
+          onFilterChange={onFilterChange}
+        />
+      )
+      const filterBtn = screen.getByLabelText('Filter Name')
+      await userEvent.click(filterBtn)
+      await userEvent.click(screen.getByText('Clear'))
+      // Should have called onFilterChange without the name filter
+      expect(onFilterChange).toHaveBeenCalledWith(expect.not.objectContaining({ name: expect.anything() }))
+    })
+
+    it('renders select-type filter with checkboxes', async () => {
+      render(
+        <DataTable data={sampleData} columns={filterColumns} filterable />
+      )
+      const filterBtn = screen.getByLabelText('Filter Role')
+      await userEvent.click(filterBtn)
+      expect(screen.getByTestId('filter-popover-role')).toBeInTheDocument()
+      // Should show unique role values as checkboxes
+      const checkboxes = within(screen.getByTestId('filter-popover-role')).getAllByRole('checkbox')
+      expect(checkboxes.length).toBeGreaterThanOrEqual(4) // Engineer, Designer, Manager, Director
+    })
+
+    it('number filter shows number operators', async () => {
+      render(
+        <DataTable data={sampleData} columns={filterColumns} filterable />
+      )
+      const filterBtn = screen.getByLabelText('Filter Age')
+      await userEvent.click(filterBtn)
+      const select = screen.getByTestId('filter-operator-age')
+      expect(select).toBeInTheDocument()
+      // Should have number-specific operators
+      expect(within(select as HTMLElement).getByText('Greater than')).toBeInTheDocument()
+    })
+  })
+
+  // ═══════════════════════════════════════════════════════════════════
+  // 23. CELL EDITING
+  // ═══════════════════════════════════════════════════════════════════
+
+  describe('cell editing', () => {
+    it('enters edit mode on double-click', () => {
+      const { container } = render(
+        <DataTable data={sampleData} columns={columns} editable />
+      )
+      const cell = container.querySelector('.ui-data-table__td:not(.ui-data-table__checkbox-cell)') as HTMLElement
+      fireEvent.doubleClick(cell)
+      expect(container.querySelector('.ui-data-table__edit-input')).toBeInTheDocument()
+    })
+
+    it('shows current value in edit input', () => {
+      const { container } = render(
+        <DataTable data={sampleData} columns={columns} editable />
+      )
+      // Find the cell with "Alice"
+      const cells = container.querySelectorAll('.ui-data-table__td')
+      const aliceCell = Array.from(cells).find(c => c.textContent === 'Alice')!
+      fireEvent.doubleClick(aliceCell)
+      const input = container.querySelector('.ui-data-table__edit-input') as HTMLInputElement
+      expect(input.value).toBe('Alice')
+    })
+
+    it('calls onCellEdit on Enter', () => {
+      const onCellEdit = vi.fn()
+      const { container } = render(
+        <DataTable data={sampleData} columns={columns} editable onCellEdit={onCellEdit} />
+      )
+      const cells = container.querySelectorAll('.ui-data-table__td')
+      const aliceCell = Array.from(cells).find(c => c.textContent === 'Alice')!
+      fireEvent.doubleClick(aliceCell)
+      const input = container.querySelector('.ui-data-table__edit-input') as HTMLInputElement
+      fireEvent.change(input, { target: { value: 'Alice Updated' } })
+      fireEvent.keyDown(input, { key: 'Enter' })
+      expect(onCellEdit).toHaveBeenCalledWith(0, 'name', 'Alice Updated')
+    })
+
+    it('cancels edit on Escape', () => {
+      const onCellEdit = vi.fn()
+      const { container } = render(
+        <DataTable data={sampleData} columns={columns} editable onCellEdit={onCellEdit} />
+      )
+      const cells = container.querySelectorAll('.ui-data-table__td')
+      const aliceCell = Array.from(cells).find(c => c.textContent === 'Alice')!
+      fireEvent.doubleClick(aliceCell)
+      const input = container.querySelector('.ui-data-table__edit-input')!
+      fireEvent.keyDown(input, { key: 'Escape' })
+      expect(onCellEdit).not.toHaveBeenCalled()
+      expect(container.querySelector('.ui-data-table__edit-input')).not.toBeInTheDocument()
+    })
+
+    it('does not enter edit mode when editable is false', () => {
+      const { container } = render(
+        <DataTable data={sampleData} columns={columns} />
+      )
+      const cell = container.querySelector('.ui-data-table__td') as HTMLElement
+      fireEvent.doubleClick(cell)
+      expect(container.querySelector('.ui-data-table__edit-input')).not.toBeInTheDocument()
+    })
+
+    it('respects column-level editable=false', () => {
+      const cols: ColumnDef<Person>[] = [
+        { id: 'name', header: 'Name', accessor: 'name', editable: false },
+        { id: 'age', header: 'Age', accessor: 'age' },
+      ]
+      const { container } = render(
+        <DataTable data={sampleData} columns={cols} editable />
+      )
+      const cells = container.querySelectorAll('.ui-data-table__td')
+      const nameCell = Array.from(cells).find(c => c.textContent === 'Alice')!
+      fireEvent.doubleClick(nameCell)
+      expect(container.querySelector('.ui-data-table__edit-input')).not.toBeInTheDocument()
+    })
+  })
+
+  // ═══════════════════════════════════════════════════════════════════
+  // 24. SERVER-SIDE PAGINATION
+  // ═══════════════════════════════════════════════════════════════════
+
+  describe('server-side mode', () => {
+    it('calls onFetchData on mount with initial params', () => {
+      const onFetchData = vi.fn()
+      render(
+        <DataTable
+          data={sampleData}
+          columns={columns}
+          serverSide
+          totalRows={100}
+          paginated
+          pageSize={10}
+          onFetchData={onFetchData}
+        />
+      )
+      expect(onFetchData).toHaveBeenCalledWith(
+        expect.objectContaining({
+          page: 0,
+          pageSize: 10,
+          sortBy: [],
+          filters: {},
+          search: '',
+        })
+      )
+    })
+
+    it('calls onFetchData when sort changes', async () => {
+      const onFetchData = vi.fn()
+      render(
+        <DataTable
+          data={sampleData}
+          columns={columns}
+          serverSide
+          totalRows={100}
+          paginated
+          pageSize={10}
+          onFetchData={onFetchData}
+        />
+      )
+      onFetchData.mockClear()
+      const nameHeader = screen.getByText('Name').closest('th')!
+      await userEvent.click(nameHeader)
+      expect(onFetchData).toHaveBeenCalledWith(
+        expect.objectContaining({
+          sortBy: [{ column: 'name', direction: 'asc' }],
+        })
+      )
+    })
+
+    it('uses totalRows for pagination instead of data.length', () => {
+      render(
+        <DataTable
+          data={sampleData.slice(0, 2)}
+          columns={columns}
+          serverSide
+          totalRows={50}
+          paginated
+          pageSize={10}
+        />
+      )
+      // Should show "Showing 1-10 of 50 results" (using totalRows)
+      expect(screen.getByText(/of 50/)).toBeInTheDocument()
+    })
+
+    it('does not sort data client-side when serverSide is true', async () => {
+      const onFetchData = vi.fn()
+      const data = [
+        { id: 1, name: 'Charlie', age: 35, email: 'c@test.com', role: 'Manager' },
+        { id: 2, name: 'Alice', age: 30, email: 'a@test.com', role: 'Engineer' },
+      ]
+      render(
+        <DataTable
+          data={data}
+          columns={columns}
+          serverSide
+          totalRows={2}
+          onFetchData={onFetchData}
+        />
+      )
+      const nameHeader = screen.getByText('Name').closest('th')!
+      await userEvent.click(nameHeader)
+      // Data should remain in original order (server sorts)
+      const cells = screen.getAllByRole('gridcell')
+      const firstNameCell = cells[0]
+      expect(firstNameCell).toHaveTextContent('Charlie')
+    })
+  })
+
+  // ═══════════════════════════════════════════════════════════════════
+  // 25. ROW GROUPING + AGGREGATION
+  // ═══════════════════════════════════════════════════════════════════
+
+  describe('row grouping', () => {
+    it('groups data by specified column', () => {
+      render(
+        <DataTable
+          data={sampleData}
+          columns={columns}
+          groupBy="role"
+          expandedGroups={new Set()}
+        />
+      )
+      // Should render group header rows
+      expect(screen.getByTestId('group-row-Engineer')).toBeInTheDocument()
+      expect(screen.getByTestId('group-row-Designer')).toBeInTheDocument()
+      expect(screen.getByTestId('group-row-Manager')).toBeInTheDocument()
+      expect(screen.getByTestId('group-row-Director')).toBeInTheDocument()
+    })
+
+    it('shows group count', () => {
+      render(
+        <DataTable
+          data={sampleData}
+          columns={columns}
+          groupBy="role"
+          expandedGroups={new Set()}
+        />
+      )
+      // Engineers: Alice and Diana = 2
+      const groupRow = screen.getByTestId('group-row-Engineer')
+      expect(groupRow).toHaveTextContent('(2)')
+    })
+
+    it('expands group to show child rows', () => {
+      render(
+        <DataTable
+          data={sampleData}
+          columns={columns}
+          groupBy="role"
+          expandedGroups={new Set(['Engineer'])}
+        />
+      )
+      // Engineer group is expanded, should see Alice and Diana
+      expect(screen.getByText('Alice')).toBeInTheDocument()
+      expect(screen.getByText('Diana')).toBeInTheDocument()
+      // Designer group is collapsed, should NOT see Bob
+      expect(screen.queryByText('Bob')).not.toBeInTheDocument()
+    })
+
+    it('calls onGroupToggle when group header clicked', async () => {
+      const onGroupToggle = vi.fn()
+      render(
+        <DataTable
+          data={sampleData}
+          columns={columns}
+          groupBy="role"
+          expandedGroups={new Set()}
+          onGroupToggle={onGroupToggle}
+        />
+      )
+      await userEvent.click(screen.getByTestId('group-row-Engineer'))
+      expect(onGroupToggle).toHaveBeenCalledWith('Engineer')
+    })
+
+    it('shows aggregation values in group row', () => {
+      render(
+        <DataTable
+          data={sampleData}
+          columns={columns}
+          groupBy="role"
+          expandedGroups={new Set()}
+          aggregations={{ age: 'avg' }}
+        />
+      )
+      // Engineers: Alice (30) + Diana (28) = avg 29.0
+      const aggEl = screen.getByTestId('group-agg-Engineer-age')
+      expect(aggEl).toHaveTextContent('29.0')
+    })
+
+    it('toggles group expand/collapse with internal state', async () => {
+      render(
+        <DataTable
+          data={sampleData}
+          columns={columns}
+          groupBy="role"
+        />
+      )
+      // Initially collapsed (internal state starts empty)
+      expect(screen.queryByText('Alice')).not.toBeInTheDocument()
+      // Click to expand
+      await userEvent.click(screen.getByTestId('group-row-Engineer'))
+      expect(screen.getByText('Alice')).toBeInTheDocument()
+    })
+  })
+
+  // ═══════════════════════════════════════════════════════════════════
+  // 26. AUTO-SIZE COLUMNS
+  // ═══════════════════════════════════════════════════════════════════
+
+  describe('auto-size columns', () => {
+    it('sets column widths when autoSizeColumns is true', () => {
+      const { container } = render(
+        <DataTable data={sampleData} columns={columns} autoSizeColumns />
+      )
+      // Headers should have inline styles with calculated widths
+      const headers = container.querySelectorAll('.ui-data-table__th:not(.ui-data-table__checkbox-cell)')
+      let hasWidth = false
+      headers.forEach(h => {
+        if (h.getAttribute('style')?.includes('px')) hasWidth = true
+      })
+      expect(hasWidth).toBe(true)
+    })
+  })
+
+  // ═══════════════════════════════════════════════════════════════════
+  // 27. PINNED COLUMNS — IMPROVED
+  // ═══════════════════════════════════════════════════════════════════
+
+  describe('pinned columns (improved)', () => {
+    it('applies correct left offset for stacked pinned columns', () => {
+      const cols: ColumnDef<Person>[] = [
+        { id: 'name', header: 'Name', accessor: 'name', pinned: 'left', width: 100 },
+        { id: 'age', header: 'Age', accessor: 'age', pinned: 'left', width: 80 },
+        { id: 'email', header: 'Email', accessor: 'email' },
+        { id: 'role', header: 'Role', accessor: 'role' },
+      ]
+      const { container } = render(<DataTable data={sampleData} columns={cols} />)
+      const pinnedHeaders = container.querySelectorAll('.ui-data-table__th[data-pinned="left"]')
+      expect(pinnedHeaders).toHaveLength(2)
+      // First pinned should be left: 0, second should be left: 100
+      expect((pinnedHeaders[0] as HTMLElement).style.left).toBe('0px')
+      expect((pinnedHeaders[1] as HTMLElement).style.left).toBe('100px')
+    })
+
+    it('applies shadow on last left-pinned column', () => {
+      const cols: ColumnDef<Person>[] = [
+        { id: 'name', header: 'Name', accessor: 'name', pinned: 'left', width: 100 },
+        { id: 'age', header: 'Age', accessor: 'age', pinned: 'left', width: 80 },
+        { id: 'email', header: 'Email', accessor: 'email' },
+      ]
+      const { container } = render(<DataTable data={sampleData} columns={cols} />)
+      // Age is the last left-pinned, should have shadow
+      const ageHeaders = container.querySelectorAll('.ui-data-table__th[data-pinned-shadow="left"]')
+      expect(ageHeaders).toHaveLength(1)
+    })
+
+    it('applies shadow on first right-pinned column', () => {
+      const cols: ColumnDef<Person>[] = [
+        { id: 'name', header: 'Name', accessor: 'name' },
+        { id: 'email', header: 'Email', accessor: 'email', pinned: 'right', width: 100 },
+        { id: 'role', header: 'Role', accessor: 'role', pinned: 'right', width: 80 },
+      ]
+      const { container } = render(<DataTable data={sampleData} columns={cols} />)
+      const shadowHeaders = container.querySelectorAll('.ui-data-table__th[data-pinned-shadow="right"]')
+      expect(shadowHeaders).toHaveLength(1)
+    })
+  })
 })

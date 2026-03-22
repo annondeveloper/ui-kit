@@ -31,6 +31,15 @@ export interface ColumnDef<T> {
   align?: 'left' | 'center' | 'right'
   hidden?: boolean
   searchable?: boolean
+  // Per-column filter
+  filterable?: boolean
+  filterType?: 'text' | 'number' | 'select' | 'date'
+  filterOptions?: string[]
+  // Cell editing
+  editable?: boolean
+  onCellEdit?: (rowIndex: number, value: unknown) => void
+  // Auto-size
+  autoSize?: boolean
 }
 
 export interface DataTableProps<T extends object>
@@ -81,6 +90,38 @@ export interface DataTableProps<T extends object>
 
   // Motion
   motion?: 0 | 1 | 2 | 3
+
+  // Virtual scroll
+  rowHeight?: number
+
+  // Per-column filters
+  filterable?: boolean
+  filters?: Record<string, { value: string; operator: string }>
+  onFilterChange?: (filters: Record<string, { value: string; operator: string }>) => void
+
+  // Row grouping
+  groupBy?: string
+  aggregations?: Record<string, 'sum' | 'avg' | 'count' | 'min' | 'max'>
+  expandedGroups?: Set<string>
+  onGroupToggle?: (groupKey: string) => void
+
+  // Cell editing
+  editable?: boolean
+  onCellEdit?: (rowIndex: number, columnId: string, value: unknown) => void
+
+  // Server-side
+  serverSide?: boolean
+  totalRows?: number
+  onFetchData?: (params: {
+    page: number
+    pageSize: number
+    sortBy: { column: string; direction: 'asc' | 'desc' }[]
+    filters: Record<string, { value: string; operator: string }>
+    search: string
+  }) => void
+
+  // Auto-size
+  autoSizeColumns?: boolean
 }
 
 // ─── Styles ───────────────────────────────────────────────────────────
@@ -750,6 +791,194 @@ const dataTableStyles = css`
         }
       }
 
+      /* ── Filter popover ──────────────────────────────── */
+      .ui-data-table__filter-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        inline-size: 20px;
+        block-size: 20px;
+        border: none;
+        border-radius: var(--radius-sm, 0.25rem);
+        background: transparent;
+        color: var(--text-tertiary, oklch(55% 0 0));
+        cursor: pointer;
+        padding: 0;
+        margin-inline-start: 2px;
+        transition: color 0.15s, background 0.15s;
+      }
+
+      .ui-data-table__filter-btn:hover,
+      .ui-data-table__filter-btn[data-active] {
+        color: var(--brand, oklch(65% 0.2 270));
+        background: oklch(from var(--brand, oklch(65% 0.2 270)) l c h / 0.1);
+      }
+
+      .ui-data-table__filter-popover {
+        position: absolute;
+        inset-block-start: 100%;
+        inset-inline-start: 0;
+        margin-block-start: var(--space-xs, 0.25rem);
+        min-inline-size: 220px;
+        padding: var(--space-sm, 0.5rem);
+        background: var(--bg-elevated, oklch(22% 0.02 270));
+        border: 1px solid var(--border-default, oklch(100% 0 0 / 0.12));
+        border-radius: var(--radius-md, 0.5rem);
+        box-shadow: var(--shadow-lg, 0 8px 24px oklch(0% 0 0 / 0.3));
+        z-index: 30;
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-xs, 0.25rem);
+      }
+
+      .ui-data-table__filter-popover select,
+      .ui-data-table__filter-popover input {
+        inline-size: 100%;
+        padding-block: var(--space-xs, 0.25rem);
+        padding-inline: var(--space-sm, 0.5rem);
+        border: 1px solid var(--border-default, oklch(100% 0 0 / 0.12));
+        border-radius: var(--radius-sm, 0.25rem);
+        background: var(--bg-surface, oklch(20% 0.02 270));
+        color: var(--text-primary, oklch(90% 0 0));
+        font-size: var(--text-xs, 0.75rem);
+        font-family: inherit;
+      }
+
+      .ui-data-table__filter-actions {
+        display: flex;
+        gap: var(--space-xs, 0.25rem);
+        justify-content: flex-end;
+      }
+
+      .ui-data-table__filter-actions button {
+        padding-block: 2px;
+        padding-inline: var(--space-sm, 0.5rem);
+        border: 1px solid var(--border-default, oklch(100% 0 0 / 0.12));
+        border-radius: var(--radius-sm, 0.25rem);
+        background: transparent;
+        color: var(--text-secondary, oklch(70% 0 0));
+        font-size: var(--text-xs, 0.75rem);
+        font-family: inherit;
+        cursor: pointer;
+      }
+
+      .ui-data-table__filter-actions button:hover {
+        background: oklch(100% 0 0 / 0.06);
+      }
+
+      .ui-data-table__filter-select-list {
+        max-block-size: 150px;
+        overflow-y: auto;
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+      }
+
+      .ui-data-table__filter-select-item {
+        display: flex;
+        align-items: center;
+        gap: var(--space-xs, 0.25rem);
+        padding: 2px var(--space-xs, 0.25rem);
+        font-size: var(--text-xs, 0.75rem);
+        cursor: pointer;
+        border-radius: 2px;
+      }
+
+      .ui-data-table__filter-select-item:hover {
+        background: oklch(100% 0 0 / 0.06);
+      }
+
+      /* ── Cell editing ──────────────────────────────────── */
+      .ui-data-table__td[data-editing] {
+        padding: 0;
+      }
+
+      .ui-data-table__edit-input {
+        inline-size: 100%;
+        block-size: 100%;
+        padding-block: var(--space-sm, 0.5rem);
+        padding-inline: var(--space-md, 0.75rem);
+        border: 2px solid var(--brand, oklch(65% 0.2 270));
+        border-radius: 0;
+        background: var(--bg-elevated, oklch(20% 0.02 270));
+        color: var(--text-primary, oklch(90% 0 0));
+        font-size: inherit;
+        font-family: inherit;
+        outline: none;
+      }
+
+      @keyframes ui-data-table-cell-flash {
+        0% { background: oklch(from var(--brand, oklch(65% 0.2 270)) l c h / 0.2); }
+        100% { background: transparent; }
+      }
+
+      .ui-data-table__td[data-just-edited] {
+        animation: ui-data-table-cell-flash 0.6s var(--ease-out, ease-out);
+      }
+
+      /* ── Group rows ────────────────────────────────────── */
+      .ui-data-table__group-row {
+        background: var(--bg-surface, oklch(22% 0.02 270));
+        font-weight: 600;
+        cursor: pointer;
+      }
+
+      .ui-data-table__group-row:hover {
+        background: oklch(100% 0 0 / 0.05);
+      }
+
+      .ui-data-table__group-cell {
+        padding-block: var(--space-sm, 0.5rem);
+        padding-inline: var(--space-md, 0.75rem);
+        border-block-end: 1px solid var(--border-default, oklch(100% 0 0 / 0.08));
+        display: flex;
+        align-items: center;
+        gap: var(--space-sm, 0.5rem);
+      }
+
+      .ui-data-table__group-chevron {
+        display: inline-flex;
+        transition: transform 0.15s var(--ease-out, ease-out);
+      }
+
+      .ui-data-table__group-chevron[data-expanded] {
+        transform: rotate(90deg);
+      }
+
+      .ui-data-table__group-count {
+        font-size: var(--text-xs, 0.75rem);
+        color: var(--text-tertiary, oklch(55% 0 0));
+        font-weight: 400;
+      }
+
+      .ui-data-table__group-agg {
+        font-size: var(--text-xs, 0.75rem);
+        color: var(--text-secondary, oklch(70% 0 0));
+        font-weight: 400;
+        margin-inline-start: var(--space-sm, 0.5rem);
+      }
+
+      /* ── Improved pinned columns ───────────────────────── */
+      .ui-data-table__th[data-pinned="left"],
+      .ui-data-table__td[data-pinned="left"] {
+        background: var(--bg-elevated, oklch(20% 0.02 270));
+      }
+
+      .ui-data-table__th[data-pinned="right"],
+      .ui-data-table__td[data-pinned="right"] {
+        background: var(--bg-elevated, oklch(20% 0.02 270));
+      }
+
+      .ui-data-table__th[data-pinned-shadow="left"],
+      .ui-data-table__td[data-pinned-shadow="left"] {
+        box-shadow: 4px 0 8px oklch(0% 0 0 / 0.15);
+      }
+
+      .ui-data-table__th[data-pinned-shadow="right"],
+      .ui-data-table__td[data-pinned-shadow="right"] {
+        box-shadow: -4px 0 8px oklch(0% 0 0 / 0.15);
+      }
+
       /* ── Forced colors ───────────────────────────────── */
       @media (forced-colors: active) {
         .ui-data-table__scroll,
@@ -903,23 +1132,30 @@ function compareValues(a: unknown, b: unknown, direction: 'asc' | 'desc'): numbe
 
 // ─── Virtual Scroll Hook ──────────────────────────────────────────────
 
-const ROW_HEIGHT = 40
-const BUFFER_ROWS = 5
+const DEFAULT_ROW_HEIGHT = 40
+const BUFFER_ROWS = 10
 
 function useVirtualScroll(
   enabled: boolean,
   totalCount: number,
-  containerRef: React.RefObject<HTMLDivElement | null>
+  containerRef: React.RefObject<HTMLDivElement | null>,
+  rowHeight: number = DEFAULT_ROW_HEIGHT
 ) {
   const [scrollTop, setScrollTop] = useState(0)
-  const [containerHeight, setContainerHeight] = useState(400)
+  const [containerHeight, setContainerHeight] = useState(600)
+  const rafRef = useRef<number>(0)
 
   useEffect(() => {
     if (!enabled) return
     const container = containerRef.current
     if (!container) return
 
-    const onScroll = () => setScrollTop(container.scrollTop)
+    const onScroll = () => {
+      if (rafRef.current) cancelAnimationFrame(rafRef.current)
+      rafRef.current = requestAnimationFrame(() => {
+        setScrollTop(container.scrollTop)
+      })
+    }
     const observer = new ResizeObserver(entries => {
       for (const entry of entries) {
         setContainerHeight(entry.contentRect.height)
@@ -932,6 +1168,7 @@ function useVirtualScroll(
     return () => {
       container.removeEventListener('scroll', onScroll)
       observer.disconnect()
+      if (rafRef.current) cancelAnimationFrame(rafRef.current)
     }
   }, [enabled, containerRef])
 
@@ -945,13 +1182,120 @@ function useVirtualScroll(
     }
   }
 
-  const totalHeight = totalCount * ROW_HEIGHT
-  const startIndex = Math.max(0, Math.floor(scrollTop / ROW_HEIGHT) - BUFFER_ROWS)
-  const visibleCount = Math.ceil(containerHeight / ROW_HEIGHT) + BUFFER_ROWS * 2
+  const totalHeight = totalCount * rowHeight
+  const startIndex = Math.max(0, Math.floor(scrollTop / rowHeight) - BUFFER_ROWS)
+  const visibleCount = Math.ceil(containerHeight / rowHeight) + BUFFER_ROWS * 2
   const endIndex = Math.min(totalCount, startIndex + visibleCount)
-  const offsetY = startIndex * ROW_HEIGHT
+  const offsetY = startIndex * rowHeight
 
   return { virtualRows: true, totalHeight, offsetY, startIndex, endIndex }
+}
+
+// ─── Filter Helpers ──────────────────────────────────────────────────
+
+type FilterOperator = 'contains' | 'equals' | 'gt' | 'lt' | 'startsWith' | 'endsWith' | 'notContains' | 'isEmpty' | 'isNotEmpty' | 'gte' | 'lte' | 'between' | 'before' | 'after' | 'isOneOf' | 'isNotOneOf'
+
+function applyFilter(value: unknown, filter: { value: string; operator: string }): boolean {
+  const strVal = String(value ?? '').toLowerCase()
+  const filterVal = filter.value.toLowerCase()
+  const op = filter.operator as FilterOperator
+
+  switch (op) {
+    case 'contains': return strVal.includes(filterVal)
+    case 'equals': return strVal === filterVal
+    case 'startsWith': return strVal.startsWith(filterVal)
+    case 'endsWith': return strVal.endsWith(filterVal)
+    case 'notContains': return !strVal.includes(filterVal)
+    case 'isEmpty': return strVal === ''
+    case 'isNotEmpty': return strVal !== ''
+    case 'gt': {
+      const n = Number(value); const f = Number(filter.value)
+      return !isNaN(n) && !isNaN(f) && n > f
+    }
+    case 'lt': {
+      const n = Number(value); const f = Number(filter.value)
+      return !isNaN(n) && !isNaN(f) && n < f
+    }
+    case 'gte': {
+      const n = Number(value); const f = Number(filter.value)
+      return !isNaN(n) && !isNaN(f) && n >= f
+    }
+    case 'lte': {
+      const n = Number(value); const f = Number(filter.value)
+      return !isNaN(n) && !isNaN(f) && n <= f
+    }
+    case 'between': {
+      const [lo, hi] = filter.value.split(',').map(Number)
+      const n = Number(value)
+      return !isNaN(n) && !isNaN(lo) && !isNaN(hi) && n >= lo && n <= hi
+    }
+    case 'before': {
+      const d = new Date(String(value)); const f = new Date(filter.value)
+      return !isNaN(d.getTime()) && !isNaN(f.getTime()) && d < f
+    }
+    case 'after': {
+      const d = new Date(String(value)); const f = new Date(filter.value)
+      return !isNaN(d.getTime()) && !isNaN(f.getTime()) && d > f
+    }
+    case 'isOneOf': {
+      const vals = filter.value.split(',').map(v => v.trim().toLowerCase())
+      return vals.includes(strVal)
+    }
+    case 'isNotOneOf': {
+      const vals = filter.value.split(',').map(v => v.trim().toLowerCase())
+      return !vals.includes(strVal)
+    }
+    default: return strVal.includes(filterVal)
+  }
+}
+
+function getOperatorsForType(type?: 'text' | 'number' | 'select' | 'date'): { value: string; label: string }[] {
+  switch (type) {
+    case 'number':
+      return [
+        { value: 'equals', label: 'Equals' },
+        { value: 'gt', label: 'Greater than' },
+        { value: 'lt', label: 'Less than' },
+        { value: 'gte', label: 'Greater or equal' },
+        { value: 'lte', label: 'Less or equal' },
+        { value: 'between', label: 'Between' },
+      ]
+    case 'date':
+      return [
+        { value: 'equals', label: 'Equals' },
+        { value: 'before', label: 'Before' },
+        { value: 'after', label: 'After' },
+        { value: 'between', label: 'Between' },
+      ]
+    case 'select':
+      return [
+        { value: 'isOneOf', label: 'Is one of' },
+        { value: 'isNotOneOf', label: 'Is not one of' },
+      ]
+    default: // text
+      return [
+        { value: 'contains', label: 'Contains' },
+        { value: 'equals', label: 'Equals' },
+        { value: 'startsWith', label: 'Starts with' },
+        { value: 'endsWith', label: 'Ends with' },
+        { value: 'notContains', label: 'Not contains' },
+        { value: 'isEmpty', label: 'Is empty' },
+        { value: 'isNotEmpty', label: 'Is not empty' },
+      ]
+  }
+}
+
+// ─── Aggregation Helper ──────────────────────────────────────────────
+
+function computeAggregation(values: unknown[], aggType: 'sum' | 'avg' | 'count' | 'min' | 'max'): string {
+  const nums = values.map(Number).filter(n => !isNaN(n))
+  switch (aggType) {
+    case 'count': return String(values.length)
+    case 'sum': return String(nums.reduce((a, b) => a + b, 0))
+    case 'avg': return nums.length ? (nums.reduce((a, b) => a + b, 0) / nums.length).toFixed(1) : '0'
+    case 'min': return nums.length ? String(Math.min(...nums)) : ''
+    case 'max': return nums.length ? String(Math.max(...nums)) : ''
+  }
 }
 
 // ─── Component ────────────────────────────────────────────────────────
@@ -994,6 +1338,26 @@ function DataTableInner<T extends object>(
     responsiveMode = 'scroll',
     toolbar,
     motion: motionProp,
+    // Virtual scroll
+    rowHeight: rowHeightProp,
+    // Per-column filters
+    filterable = false,
+    filters: filtersControlled,
+    onFilterChange: onFilterChangeControlled,
+    // Row grouping
+    groupBy,
+    aggregations,
+    expandedGroups: expandedGroupsControlled,
+    onGroupToggle: onGroupToggleControlled,
+    // Cell editing
+    editable = false,
+    onCellEdit,
+    // Server-side
+    serverSide = false,
+    totalRows: totalRowsProp,
+    onFetchData,
+    // Auto-size
+    autoSizeColumns = false,
     className,
     ...rest
   }: DataTableProps<T>,
@@ -1194,8 +1558,101 @@ function DataTableInner<T extends object>(
   const selectedRows = selectedRowsControlled ?? selectedRowsInternal
   const setSelectedRows = onSelectionChangeControlled ?? setSelectedRowsInternal
 
+  // ─── Per-column filter state ─────────────────────────────────────
+  const [filtersInternal, setFiltersInternal] = useState<Record<string, { value: string; operator: string }>>({})
+  const activeFilters = filtersControlled ?? filtersInternal
+  const setActiveFilters = onFilterChangeControlled ?? setFiltersInternal
+  const [openFilterCol, setOpenFilterCol] = useState<string | null>(null)
+  const filterPopoverRef = useRef<HTMLDivElement | null>(null)
+
+  useEffect(() => {
+    if (!openFilterCol) return
+    const handler = (e: MouseEvent) => {
+      if (filterPopoverRef.current && !filterPopoverRef.current.contains(e.target as Node)) {
+        setOpenFilterCol(null)
+      }
+    }
+    document.addEventListener('mousedown', handler)
+    return () => document.removeEventListener('mousedown', handler)
+  }, [openFilterCol])
+
+  // ─── Cell editing state ────────────────────────────────────────────
+  const [editingCell, setEditingCell] = useState<{ row: number; col: string } | null>(null)
+  const [editValue, setEditValue] = useState<string>('')
+  const [justEditedCell, setJustEditedCell] = useState<{ row: number; col: string } | null>(null)
+
+  const startEditing = useCallback((rowIndex: number, colId: string, currentValue: unknown) => {
+    if (!editable) return
+    const col = columnsProp.find(c => c.id === colId)
+    if (col && col.editable === false) return
+    setEditingCell({ row: rowIndex, col: colId })
+    setEditValue(String(currentValue ?? ''))
+  }, [editable, columnsProp])
+
+  const commitEdit = useCallback(() => {
+    if (!editingCell) return
+    onCellEdit?.(editingCell.row, editingCell.col, editValue)
+    const col = columnsProp.find(c => c.id === editingCell.col)
+    col?.onCellEdit?.(editingCell.row, editValue)
+    setJustEditedCell({ ...editingCell })
+    setEditingCell(null)
+    setTimeout(() => setJustEditedCell(null), 600)
+  }, [editingCell, editValue, onCellEdit, columnsProp])
+
+  const cancelEdit = useCallback(() => {
+    setEditingCell(null)
+  }, [])
+
+  // ─── Row grouping state ──────────────────────────────────────────
+  const [expandedGroupsInternal, setExpandedGroupsInternal] = useState<Set<string>>(new Set())
+  const expandedGroups = expandedGroupsControlled ?? expandedGroupsInternal
+  const toggleGroup = useCallback((groupKey: string) => {
+    if (onGroupToggleControlled) {
+      onGroupToggleControlled(groupKey)
+    } else {
+      setExpandedGroupsInternal(prev => {
+        const next = new Set(prev)
+        if (next.has(groupKey)) next.delete(groupKey)
+        else next.add(groupKey)
+        return next
+      })
+    }
+  }, [onGroupToggleControlled])
+
+  // ─── Auto-size columns ──────────────────────────────────────────
+  const autoSizeRef = useRef(false)
+  useEffect(() => {
+    if (!autoSizeColumns || autoSizeRef.current) return
+    autoSizeRef.current = true
+    // Measure widths using an off-screen element
+    const measure = document.createElement('span')
+    measure.style.cssText = 'position:absolute;visibility:hidden;white-space:nowrap;font:inherit;'
+    document.body.appendChild(measure)
+    const widths: Record<string, number> = {}
+    for (const col of columnsProp) {
+      if (col.autoSize === false) continue
+      // Measure header
+      const headerText = getHeaderText(col.header, col.id)
+      measure.textContent = headerText
+      let maxW = measure.offsetWidth
+      // Measure data cells (sample first 100 rows)
+      const sample = data.slice(0, 100)
+      for (const row of sample) {
+        const val = String(getCellValue(row, col.accessor) ?? '')
+        measure.textContent = val
+        maxW = Math.max(maxW, measure.offsetWidth)
+      }
+      widths[col.id] = maxW + 32 // padding
+    }
+    document.body.removeChild(measure)
+    setColumnWidths(prev => ({ ...prev, ...widths }))
+  }, [autoSizeColumns, columnsProp, data])
+
+  // ─── Data pipeline: filter → column-filter → sort → group → paginate → virtualSlice
+
   // ─── Filter data by search ────────────────────────────────────────
-  const filteredData = useMemo(() => {
+  const searchFilteredData = useMemo(() => {
+    if (serverSide) return data
     if (!searchable || !debouncedSearch) return data
     const q = debouncedSearch.toLowerCase()
     return data.filter(row =>
@@ -1205,10 +1662,28 @@ function DataTableInner<T extends object>(
         return String(val ?? '').toLowerCase().includes(q)
       })
     )
-  }, [data, searchable, debouncedSearch, columnsProp])
+  }, [data, searchable, debouncedSearch, columnsProp, serverSide])
+
+  // ─── Apply per-column filters ──────────────────────────────────────
+  const filteredData = useMemo(() => {
+    if (serverSide) return searchFilteredData
+    const filterKeys = Object.keys(activeFilters)
+    if (filterKeys.length === 0) return searchFilteredData
+    return searchFilteredData.filter(row => {
+      return filterKeys.every(colId => {
+        const col = columnsProp.find(c => c.id === colId)
+        if (!col) return true
+        const filter = activeFilters[colId]
+        if (!filter || (!filter.value && filter.operator !== 'isEmpty' && filter.operator !== 'isNotEmpty')) return true
+        const value = getCellValue(row, col.accessor)
+        return applyFilter(value, filter)
+      })
+    })
+  }, [searchFilteredData, activeFilters, columnsProp, serverSide])
 
   // ─── Sort data ────────────────────────────────────────────────────
   const sortedData = useMemo(() => {
+    if (serverSide) return filteredData
     if (sortBy.length === 0) return filteredData
     return [...filteredData].sort((a, b) => {
       for (const { column, direction } of sortBy) {
@@ -1221,7 +1696,21 @@ function DataTableInner<T extends object>(
       }
       return 0
     })
-  }, [filteredData, sortBy, columnsProp])
+  }, [filteredData, sortBy, columnsProp, serverSide])
+
+  // ─── Group data ────────────────────────────────────────────────────
+  const groupedData = useMemo(() => {
+    if (!groupBy || serverSide) return null
+    const groupCol = columnsProp.find(c => c.id === groupBy)
+    if (!groupCol) return null
+    const groups = new Map<string, { rows: T[]; key: string }>()
+    for (const row of sortedData) {
+      const val = String(getCellValue(row, groupCol.accessor) ?? '')
+      if (!groups.has(val)) groups.set(val, { rows: [], key: val })
+      groups.get(val)!.rows.push(row)
+    }
+    return groups
+  }, [groupBy, sortedData, columnsProp, serverSide])
 
   // ─── Pagination state ─────────────────────────────────────────────
   const [page, setPage] = useState(0)
@@ -1238,12 +1727,13 @@ function DataTableInner<T extends object>(
     setPageSize(pageSizeProp)
   }, [pageSizeProp])
 
-  const effectivePageSize = showAllPages ? sortedData.length : pageSize
+  const dataCount = serverSide ? (totalRowsProp ?? data.length) : sortedData.length
+  const effectivePageSize = showAllPages ? dataCount : pageSize
   const totalPages = paginated
-    ? Math.max(1, Math.ceil(sortedData.length / effectivePageSize))
+    ? Math.max(1, Math.ceil(dataCount / effectivePageSize))
     : 1
 
-  const paginatedData = paginated && !showAllPages
+  const paginatedData = paginated && !showAllPages && !serverSide
     ? sortedData.slice(page * pageSize, (page + 1) * pageSize)
     : sortedData
 
@@ -1396,12 +1886,26 @@ function DataTableInner<T extends object>(
     [sortedData, visibleColumns, onExport]
   )
 
+  // ─── Server-side fetch trigger ───────────────────────────────────
+  useEffect(() => {
+    if (!serverSide || !onFetchData) return
+    onFetchData({
+      page,
+      pageSize,
+      sortBy,
+      filters: activeFilters,
+      search: debouncedSearch,
+    })
+  }, [serverSide, onFetchData, page, pageSize, sortBy, activeFilters, debouncedSearch])
+
   // ─── Virtual scroll ────────────────────────────────────────────────
   const virtualContainerRef = useRef<HTMLDivElement | null>(null)
+  const rowHeight = rowHeightProp ?? DEFAULT_ROW_HEIGHT
   const { totalHeight, offsetY, startIndex, endIndex } = useVirtualScroll(
     virtualScroll && !paginated,
     paginatedData.length,
-    virtualContainerRef
+    virtualContainerRef,
+    rowHeight
   )
 
   const displayData = virtualScroll && !paginated
@@ -1502,11 +2006,59 @@ function DataTableInner<T extends object>(
     return sortBy.findIndex(s => s.column === col.id)
   }
 
+  // ─── Pinned column offsets ────────────────────────────────────────
+  const pinnedOffsets = useMemo(() => {
+    const offsets: Record<string, number> = {}
+    // Left pinned
+    let leftOffset = 0
+    for (const col of visibleColumns) {
+      if (col.pinned === 'left') {
+        offsets[col.id] = leftOffset
+        const w = columnWidths[col.id] ?? (typeof col.width === 'number' ? col.width : 150)
+        leftOffset += w
+      }
+    }
+    // Right pinned (from right edge)
+    let rightOffset = 0
+    const rightCols = [...visibleColumns].reverse()
+    for (const col of rightCols) {
+      if (col.pinned === 'right') {
+        offsets[col.id] = rightOffset
+        const w = columnWidths[col.id] ?? (typeof col.width === 'number' ? col.width : 150)
+        rightOffset += w
+      }
+    }
+    return offsets
+  }, [visibleColumns, columnWidths])
+
+  // Is the last left-pinned or first right-pinned? (for shadow)
+  const lastLeftPinned = useMemo(() => {
+    let last = ''
+    for (const col of visibleColumns) {
+      if (col.pinned === 'left') last = col.id
+    }
+    return last
+  }, [visibleColumns])
+
+  const firstRightPinned = useMemo(() => {
+    for (const col of visibleColumns) {
+      if (col.pinned === 'right') return col.id
+    }
+    return ''
+  }, [visibleColumns])
+
   // ─── Column style ──────────────────────────────────────────────────
   function getColStyle(col: ColumnDef<T>): CSSProperties | undefined {
     const w = columnWidths[col.id] ?? col.width
-    if (!w) return undefined
-    return { inlineSize: typeof w === 'number' ? `${w}px` : w }
+    const style: CSSProperties = {}
+    if (w) style.inlineSize = typeof w === 'number' ? `${w}px` : w
+    if (col.pinned === 'left' && pinnedOffsets[col.id] !== undefined) {
+      style.left = `${pinnedOffsets[col.id]}px`
+    }
+    if (col.pinned === 'right' && pinnedOffsets[col.id] !== undefined) {
+      style.right = `${pinnedOffsets[col.id]}px`
+    }
+    return Object.keys(style).length ? style : undefined
   }
 
   // ─── Should we show the toolbar? ──────────────────────────────────
@@ -1541,13 +2093,89 @@ function DataTableInner<T extends object>(
   // ─── Page info text ───────────────────────────────────────────────
   const pageInfoText = useMemo(() => {
     if (!paginated) return null
-    const total = sortedData.length
+    const total = dataCount
     if (total === 0) return 'No results'
     if (showAllPages) return `Showing all ${total} results`
     const start = page * pageSize + 1
     const end = Math.min((page + 1) * pageSize, total)
     return `Showing ${start}\u2013${end} of ${total} results`
-  }, [paginated, sortedData.length, page, pageSize, showAllPages])
+  }, [paginated, dataCount, page, pageSize, showAllPages])
+
+  // ─── Render helpers ──────────────────────────────────────────────────
+
+  function renderDataRow(row: T, globalIdx: number, isSelected: boolean, _idx: number) {
+    return (
+      <tr
+        key={globalIdx}
+        className="ui-data-table__tr"
+        role="row"
+        aria-selected={selectable ? isSelected : undefined}
+        data-selected={isSelected ? '' : undefined}
+        style={
+          virtualScroll && !paginated
+            ? { height: `${rowHeight}px` }
+            : undefined
+        }
+      >
+        {selectable && (
+          <td
+            className="ui-data-table__td ui-data-table__checkbox-cell"
+            role="gridcell"
+            tabIndex={-1}
+          >
+            <input
+              type="checkbox"
+              className="ui-data-table__checkbox"
+              checked={isSelected}
+              onChange={() => handleRowSelect(globalIdx)}
+              aria-label={`Select row ${globalIdx + 1}`}
+            />
+          </td>
+        )}
+        {visibleColumns.map(col => {
+          const value = getCellValue(row, col.accessor)
+          const isEditing = editingCell?.row === globalIdx && editingCell?.col === col.id
+          const wasJustEdited = justEditedCell?.row === globalIdx && justEditedCell?.col === col.id
+          const isColEditable = editable && col.editable !== false
+          const pinnedShadow = col.id === lastLeftPinned ? 'left' : col.id === firstRightPinned ? 'right' : undefined
+
+          return (
+            <td
+              key={col.id}
+              className="ui-data-table__td"
+              role="gridcell"
+              tabIndex={-1}
+              data-align={col.align || undefined}
+              data-pinned={col.pinned || undefined}
+              data-pinned-shadow={pinnedShadow || undefined}
+              data-label={getHeaderText(col.header, col.id)}
+              data-editing={isEditing ? '' : undefined}
+              data-just-edited={wasJustEdited ? '' : undefined}
+              style={getColStyle(col)}
+              onDoubleClick={isColEditable ? () => startEditing(globalIdx, col.id, value) : undefined}
+            >
+              {isEditing ? (
+                <input
+                  className="ui-data-table__edit-input"
+                  data-testid={`edit-input-${col.id}`}
+                  value={editValue}
+                  onChange={e => setEditValue(e.target.value)}
+                  onKeyDown={e => {
+                    if (e.key === 'Enter') commitEdit()
+                    if (e.key === 'Escape') cancelEdit()
+                  }}
+                  onBlur={commitEdit}
+                  autoFocus
+                />
+              ) : (
+                renderCellContent(col, value, row, globalIdx)
+              )}
+            </td>
+          )
+        })}
+      </tr>
+    )
+  }
 
   // ─── Render ────────────────────────────────────────────────────────
 
@@ -1582,7 +2210,10 @@ function DataTableInner<T extends object>(
           {visibleColumns.map(col => {
             const isColSortable = col.sortable ?? sortable
             const isColResizable = col.resizable ?? resizable
+            const isColFilterable = (filterable || col.filterable) && col.filterable !== false
             const sortIndex = getSortIndex(col)
+            const hasActiveFilter = activeFilters[col.id] && (activeFilters[col.id].value || activeFilters[col.id].operator === 'isEmpty' || activeFilters[col.id].operator === 'isNotEmpty')
+            const pinnedShadow = col.id === lastLeftPinned ? 'left' : col.id === firstRightPinned ? 'right' : undefined
 
             return (
               <th
@@ -1596,13 +2227,19 @@ function DataTableInner<T extends object>(
                 data-sortable={isColSortable ? '' : undefined}
                 data-align={col.align || undefined}
                 data-pinned={col.pinned || undefined}
+                data-pinned-shadow={pinnedShadow || undefined}
                 data-reorderable={reorderable ? '' : undefined}
                 data-dragging={dragColId === col.id ? '' : undefined}
                 data-drag-over={
                   dragOverColId === col.id && dragOverSide ? dragOverSide : undefined
                 }
                 draggable={reorderable}
-                onClick={e => isColSortable && handleSort(col.id, e.shiftKey)}
+                onClick={e => {
+                  // Don't sort if clicking on filter button
+                  if ((e.target as HTMLElement).closest('.ui-data-table__filter-btn') ||
+                      (e.target as HTMLElement).closest('.ui-data-table__filter-popover')) return
+                  if (isColSortable) handleSort(col.id, e.shiftKey)
+                }}
                 onDragStart={e => handleDragStart(col.id, e)}
                 onDragOver={e => handleDragOver(col.id, e)}
                 onDrop={e => handleDrop(col.id, e)}
@@ -1628,7 +2265,112 @@ function DataTableInner<T extends object>(
                       {sortIndex + 1}
                     </span>
                   )}
+                  {isColFilterable && (
+                    <button
+                      type="button"
+                      className="ui-data-table__filter-btn"
+                      data-active={hasActiveFilter ? '' : undefined}
+                      onClick={e => {
+                        e.stopPropagation()
+                        setOpenFilterCol(prev => prev === col.id ? null : col.id)
+                      }}
+                      aria-label={`Filter ${getHeaderText(col.header, col.id)}`}
+                    >
+                      <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
+                        <path d="M1 2h10L7 6.5V10L5 9V6.5L1 2Z" fill="currentColor" />
+                      </svg>
+                    </button>
+                  )}
                 </span>
+                {isColFilterable && openFilterCol === col.id && (
+                  <div
+                    ref={filterPopoverRef}
+                    className="ui-data-table__filter-popover"
+                    data-testid={`filter-popover-${col.id}`}
+                    onClick={e => e.stopPropagation()}
+                  >
+                    {col.filterType === 'select' ? (
+                      <>
+                        <div className="ui-data-table__filter-select-list">
+                          {(col.filterOptions ?? [...new Set(data.map(r => String(getCellValue(r, col.accessor) ?? '')))]).map(opt => {
+                            const selected = (activeFilters[col.id]?.value ?? '').split(',').map(v => v.trim().toLowerCase())
+                            const isChecked = selected.includes(opt.toLowerCase())
+                            return (
+                              <label key={opt} className="ui-data-table__filter-select-item">
+                                <input
+                                  type="checkbox"
+                                  checked={isChecked}
+                                  onChange={() => {
+                                    let vals = selected.filter(v => v !== '')
+                                    if (isChecked) vals = vals.filter(v => v !== opt.toLowerCase())
+                                    else vals.push(opt.toLowerCase())
+                                    setActiveFilters({
+                                      ...activeFilters,
+                                      [col.id]: { value: vals.join(','), operator: 'isOneOf' },
+                                    })
+                                  }}
+                                />
+                                {opt}
+                              </label>
+                            )
+                          })}
+                        </div>
+                        <div className="ui-data-table__filter-actions">
+                          <button type="button" onClick={() => {
+                            const next = { ...activeFilters }
+                            delete next[col.id]
+                            setActiveFilters(next)
+                            setOpenFilterCol(null)
+                          }}>Clear</button>
+                        </div>
+                      </>
+                    ) : (
+                      <>
+                        <select
+                          value={activeFilters[col.id]?.operator ?? getOperatorsForType(col.filterType)[0].value}
+                          onChange={e => {
+                            setActiveFilters({
+                              ...activeFilters,
+                              [col.id]: {
+                                value: activeFilters[col.id]?.value ?? '',
+                                operator: e.target.value,
+                              },
+                            })
+                          }}
+                          data-testid={`filter-operator-${col.id}`}
+                        >
+                          {getOperatorsForType(col.filterType).map(op => (
+                            <option key={op.value} value={op.value}>{op.label}</option>
+                          ))}
+                        </select>
+                        <input
+                          type={col.filterType === 'number' ? 'number' : col.filterType === 'date' ? 'date' : 'text'}
+                          placeholder="Filter value..."
+                          value={activeFilters[col.id]?.value ?? ''}
+                          onChange={e => {
+                            setActiveFilters({
+                              ...activeFilters,
+                              [col.id]: {
+                                value: e.target.value,
+                                operator: activeFilters[col.id]?.operator ?? getOperatorsForType(col.filterType)[0].value,
+                              },
+                            })
+                          }}
+                          data-testid={`filter-input-${col.id}`}
+                        />
+                        <div className="ui-data-table__filter-actions">
+                          <button type="button" onClick={() => {
+                            const next = { ...activeFilters }
+                            delete next[col.id]
+                            setActiveFilters(next)
+                            setOpenFilterCol(null)
+                          }}>Clear</button>
+                          <button type="button" onClick={() => setOpenFilterCol(null)}>Apply</button>
+                        </div>
+                      </>
+                    )}
+                  </div>
+                )}
                 {isColResizable && (
                   <span
                     className="ui-data-table__resize-handle"
@@ -1680,59 +2422,62 @@ function DataTableInner<T extends object>(
               {empty ?? 'No data'}
             </td>
           </tr>
+        ) : groupedData && groupBy ? (
+          // ─── Grouped rendering ───────────────────────────
+          Array.from(groupedData.entries()).flatMap(([groupKey, group]) => {
+            const isExpanded = expandedGroups.has(groupKey)
+            const groupHeader = (
+              <tr
+                key={`group-${groupKey}`}
+                className="ui-data-table__group-row"
+                role="row"
+                onClick={() => toggleGroup(groupKey)}
+                data-testid={`group-row-${groupKey}`}
+              >
+                <td
+                  className="ui-data-table__group-cell"
+                  role="gridcell"
+                  colSpan={visibleColumns.length + (selectable ? 1 : 0)}
+                >
+                  <span
+                    className="ui-data-table__group-chevron"
+                    data-expanded={isExpanded ? '' : undefined}
+                    aria-hidden="true"
+                  >
+                    <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
+                      <path d="M3 1L7 5L3 9" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+                    </svg>
+                  </span>
+                  {groupKey}
+                  <span className="ui-data-table__group-count">({group.rows.length})</span>
+                  {aggregations && visibleColumns.map(col => {
+                    const agg = aggregations[col.id]
+                    if (!agg) return null
+                    const values = group.rows.map(r => getCellValue(r, col.accessor))
+                    return (
+                      <span key={col.id} className="ui-data-table__group-agg" data-testid={`group-agg-${groupKey}-${col.id}`}>
+                        {getHeaderText(col.header, col.id)}: {computeAggregation(values, agg)}
+                      </span>
+                    )
+                  })}
+                </td>
+              </tr>
+            )
+            if (!isExpanded) return [groupHeader]
+            const childRows = group.rows.map((row, idx) => {
+              const globalIdx = sortedData.indexOf(row)
+              const isSelected = selectedRows.has(globalIdx)
+              return renderDataRow(row, globalIdx, isSelected, idx)
+            })
+            return [groupHeader, ...childRows]
+          })
         ) : (
           displayData.map((row, idx) => {
             const baseOffset = virtualScroll && !paginated ? startIndex : 0
-            const pageOffset = paginated && !showAllPages ? page * pageSize : 0
+            const pageOffset = paginated && !showAllPages && !serverSide ? page * pageSize : 0
             const globalIdx = pageOffset + baseOffset + idx
             const isSelected = selectedRows.has(globalIdx)
-
-            return (
-              <tr
-                key={globalIdx}
-                className="ui-data-table__tr"
-                role="row"
-                aria-selected={selectable ? isSelected : undefined}
-                data-selected={isSelected ? '' : undefined}
-                style={
-                  virtualScroll && !paginated
-                    ? { height: `${ROW_HEIGHT}px` }
-                    : undefined
-                }
-              >
-                {selectable && (
-                  <td
-                    className="ui-data-table__td ui-data-table__checkbox-cell"
-                    role="gridcell"
-                    tabIndex={-1}
-                  >
-                    <input
-                      type="checkbox"
-                      className="ui-data-table__checkbox"
-                      checked={isSelected}
-                      onChange={() => handleRowSelect(globalIdx)}
-                      aria-label={`Select row ${globalIdx + 1}`}
-                    />
-                  </td>
-                )}
-                {visibleColumns.map(col => {
-                  const value = getCellValue(row, col.accessor)
-                  return (
-                    <td
-                      key={col.id}
-                      className="ui-data-table__td"
-                      role="gridcell"
-                      tabIndex={-1}
-                      data-align={col.align || undefined}
-                      data-pinned={col.pinned || undefined}
-                      data-label={getHeaderText(col.header, col.id)}
-                    >
-                      {renderCellContent(col, value, row, globalIdx)}
-                    </td>
-                  )
-                })}
-              </tr>
-            )
+            return renderDataRow(row, globalIdx, isSelected, idx)
           })
         )}
       </tbody>
