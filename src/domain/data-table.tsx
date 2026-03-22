@@ -849,6 +849,15 @@ const dataTableStyles = css`
         overflow: visible;
       }
 
+      /* Transparent backdrop to catch clicks outside filter popover */
+      .ui-data-table__filter-backdrop {
+        position: fixed;
+        inset: 0;
+        z-index: 99;
+        background: transparent;
+        -webkit-tap-highlight-color: transparent;
+      }
+
       /* Mobile: filter popover becomes a bottom sheet */
       @media (max-width: 640px) {
         .ui-data-table__filter-popover {
@@ -1600,29 +1609,9 @@ function DataTableInner<T extends object>(
   const [openFilterCol, setOpenFilterCol] = useState<string | null>(null)
   const filterPopoverRef = useRef<HTMLDivElement | null>(null)
 
-  // Close filter popover on click outside — works on both desktop and mobile
-  useEffect(() => {
-    if (!openFilterCol) return
-
-    const handler = (e: Event) => {
-      const target = e.target as Node
-      // Don't close if clicking inside the popover
-      if (filterPopoverRef.current && filterPopoverRef.current.contains(target)) return
-      // Don't close if clicking the filter button itself (it handles toggle)
-      if ((target as HTMLElement).closest?.('.ui-data-table__filter-btn')) return
-      setOpenFilterCol(null)
-    }
-
-    // Delay listener attachment so the opening touch/click doesn't immediately close
-    const timer = setTimeout(() => {
-      document.addEventListener('pointerdown', handler, true)
-    }, 50)
-
-    return () => {
-      clearTimeout(timer)
-      document.removeEventListener('pointerdown', handler, true)
-    }
-  }, [openFilterCol])
+  // Close filter popover — using backdrop overlay instead of document listener
+  // Document-level listeners have timing issues on mobile (pointerdown fires before React onClick)
+  const closeFilter = useCallback(() => setOpenFilterCol(null), [])
 
   // ─── Cell editing state ────────────────────────────────────────────
   const [editingCell, setEditingCell] = useState<{ row: number; col: string } | null>(null)
@@ -2331,6 +2320,13 @@ function DataTableInner<T extends object>(
                   )}
                 </span>
                 {isColFilterable && openFilterCol === col.id && (
+                  <>
+                  {/* Transparent backdrop to catch clicks outside the popover */}
+                  <div
+                    className="ui-data-table__filter-backdrop"
+                    onClick={e => { e.stopPropagation(); closeFilter() }}
+                    onTouchEnd={e => { e.stopPropagation(); closeFilter() }}
+                  />
                   <div
                     ref={filterPopoverRef}
                     className="ui-data-table__filter-popover"
@@ -2418,6 +2414,7 @@ function DataTableInner<T extends object>(
                       </>
                     )}
                   </div>
+                  </>
                 )}
                 {isColResizable && (
                   <span
