@@ -488,8 +488,8 @@ const upstreamDashboardStyles = css`
       .ui-upstream-dashboard__mini-card {
         display: flex;
         flex-direction: column;
-        gap: 0.25rem;
-        padding: 0.5rem 0.75rem;
+        gap: 0.375rem;
+        padding: 0.375rem 0.625rem;
         background: var(--bg-surface, oklch(22% 0.02 270));
         border: 1px solid var(--border-subtle, oklch(100% 0 0 / 0.08));
         border-radius: var(--radius-md, 0.5rem);
@@ -505,6 +505,8 @@ const upstreamDashboardStyles = css`
         display: flex;
         align-items: center;
         gap: 0.375rem;
+        flex-wrap: nowrap;
+        min-width: 0;
       }
 
       .ui-upstream-dashboard__mini-card-status {
@@ -539,24 +541,41 @@ const upstreamDashboardStyles = css`
       }
 
       .ui-upstream-dashboard__mini-card-metrics {
-        display: flex;
-        gap: 0.75rem;
+        display: inline-flex;
+        gap: 0.5rem;
         align-items: baseline;
         font-variant-numeric: tabular-nums;
-        font-weight: 600;
-        font-size: var(--text-sm, 0.875rem);
+        font-weight: 700;
+        font-size: var(--text-xs, 0.75rem);
+        margin-inline-start: auto;
+        flex-shrink: 0;
       }
 
       .ui-upstream-dashboard__mini-card-metrics small {
         font-weight: 400;
-        font-size: 0.75em;
+        font-size: 0.85em;
         color: var(--text-tertiary, oklch(55% 0 0));
-        margin-inline-start: 0.1em;
+        margin-inline-start: 0.05em;
       }
 
-      .ui-upstream-dashboard__mini-card-capacity {
-        font-size: var(--text-xs, 0.75rem);
+      /* Utilization row: bar + capacity text, all on one line */
+      .ui-upstream-dashboard__mini-card-util-row {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+
+      .ui-upstream-dashboard__mini-card-util-row .ui-upstream-dashboard__util-bar-wrap {
+        flex: 1;
+        min-width: 0;
+      }
+
+      .ui-upstream-dashboard__mini-card-util-text {
+        font-size: 0.5625rem;
         color: var(--text-tertiary, oklch(55% 0 0));
+        white-space: nowrap;
+        flex-shrink: 0;
+        font-variant-numeric: tabular-nums;
       }
 
       /* ── Group Card (nested grouping in hero mode) ─────────── */
@@ -1708,6 +1727,16 @@ function MiniCard({
   const ambientStyle = utilizationDisplay === 'ambient' ? ambientTintStyle(utilPct) : undefined
   const clickable = !!onClick
 
+  const capFmt = link.capacity ? formatBitRateSplit(link.capacity) : null
+  const burstFmt = link.burstCapacity ? formatBitRateSplit(link.burstCapacity) : null
+  const showUtil = showUtilization && link.capacity != null && utilizationDisplay !== 'ambient'
+
+  // Build capacity text for end of utilization bar
+  let capText = ''
+  if (showCapacity && capFmt) capText += `${capFmt.value}${capFmt.unit}`
+  if (showBurstCapacity && burstFmt) capText += ` / ${burstFmt.value}${burstFmt.unit}`
+  if (utilPct > 0 && showUtilization) capText += ` · ${utilPct}%`
+
   return (
     <div
       className="ui-upstream-dashboard__mini-card"
@@ -1716,24 +1745,28 @@ function MiniCard({
       onClick={clickable ? () => onClick?.(link) : undefined}
       style={ambientStyle}
     >
+      {/* Line 1: status dot + label + tx/rx metrics — ALL on one line */}
       <div className="ui-upstream-dashboard__mini-card-header">
-        <span className="ui-upstream-dashboard__mini-card-status" data-status={link.status} />
+        <span className="ui-upstream-dashboard__mini-card-status" />
         <span className="ui-upstream-dashboard__mini-card-label">{label ?? `${link.vendor} · ${link.location}`}</span>
-      </div>
-      <div className="ui-upstream-dashboard__mini-card-metrics">
-        <span style={{ color: 'oklch(72% 0.19 155)' }}>↓{inFmt.value}<small>{inFmt.unit}</small></span>
-        <span style={{ color: 'oklch(65% 0.2 270)' }}>↑{outFmt.value}<small>{outFmt.unit}</small></span>
-      </div>
-      {showCapacity && link.capacity != null && (
-        <div className="ui-upstream-dashboard__mini-card-capacity">
-          Cap: {formatBitRateSplit(link.capacity).value} {formatBitRateSplit(link.capacity).unit}
-          {showBurstCapacity && link.burstCapacity != null && ` · Burst: ${formatBitRateSplit(link.burstCapacity).value} ${formatBitRateSplit(link.burstCapacity).unit}`}
+        <div className="ui-upstream-dashboard__mini-card-metrics">
+          <span style={{ color: 'oklch(72% 0.19 155)' }}>↓{inFmt.value}<small>{inFmt.unit}</small></span>
+          <span style={{ color: 'oklch(65% 0.2 270)' }}>↑{outFmt.value}<small>{outFmt.unit}</small></span>
         </div>
-      )}
-      {showUtilization && link.capacity != null && utilizationDisplay !== 'ambient' && (
-        utilizationDisplay === 'meter'
-          ? <UtilMeter percent={utilPct} />
-          : <UtilBar percent={utilPct} capacity={link.capacity} burst={link.burstCapacity} />
+      </div>
+      {/* Line 2: utilization bar + capacity/burst text at end */}
+      {(showUtil || (showCapacity && capFmt)) && (
+        <div className="ui-upstream-dashboard__mini-card-util-row">
+          {showUtil && (
+            <div className="ui-upstream-dashboard__util-bar-wrap">
+              {utilizationDisplay === 'meter'
+                ? <UtilMeter percent={utilPct} />
+                : <UtilBar percent={utilPct} capacity={link.capacity} burst={link.burstCapacity} />
+              }
+            </div>
+          )}
+          {capText && <span className="ui-upstream-dashboard__mini-card-util-text">{capText}</span>}
+        </div>
       )}
     </div>
   )
