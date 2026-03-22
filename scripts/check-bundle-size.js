@@ -7,7 +7,8 @@ const DIST = 'dist/esm'
 // Size budget (gzipped bytes)
 // Full library bundle (85+ components). Tree-shaking reduces individual import sizes dramatically.
 // Average ~1.5KB gzip per component. Consumers typically import <20KB tree-shaken.
-const BUDGET_TOTAL = 160 * 1024 // 160KB full bundle
+// 95+ standard components + 8 enterprise DataTable features + 18 visual effects
+const BUDGET_TOTAL = 200 * 1024 // 200KB full bundle
 
 if (!existsSync(DIST)) {
   console.error(`Error: ${DIST} not found. Run "npm run build" first.`)
