@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { css } from '@ui/core/styles/css-tag'
 import { useStyles } from '@ui/core/styles/use-styles'
 import { UpstreamDashboard, type UpstreamLink } from '@ui/domain/upstream-dashboard'
+import { useToast } from '@ui/domain/toast'
 import { CopyBlock } from '@ui/domain/copy-block'
 import { PropsTable, type PropDef } from '../../components/PropsTable'
 
@@ -36,6 +37,9 @@ const PROPS: PropDef[] = [
   { name: 'showBurstCapacity', type: 'boolean', default: 'false', description: 'Show burstable capacity when available.' },
   { name: 'showUtilization', type: 'boolean', default: 'true', description: 'Show utilization percentage in hero footer and table.' },
   { name: 'utilizationDisplay', type: "'bar' | 'meter' | 'ambient'", default: "'bar'", description: 'How to render utilization. Bar shows a thin progress bar with capacity/burst markers, meter shows an SVG arc gauge, ambient shifts the card background color.' },
+  { name: 'onLinkClick', type: '(link: UpstreamLink) => void', default: '—', description: 'Called when a link card or table row is clicked.' },
+  { name: 'onGroupClick', type: '(groupName: string, links: UpstreamLink[]) => void', default: '—', description: 'Called when a group header is clicked.' },
+  { name: 'onSummaryClick', type: '() => void', default: '—', description: 'Called when the hero card or summary area is clicked.' },
 ]
 
 // ─── Page Styles ──────────────────────────────────────────────────────────────
@@ -418,6 +422,52 @@ const pageStyles = css`
         text-underline-offset: 0.2em;
       }
 
+      /* ── Responsive Preview ──────────────────────── */
+
+      .ud-page__responsive-grid {
+        display: flex;
+        flex-direction: column;
+        gap: 2rem;
+      }
+
+      .ud-page__responsive-item {
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+      }
+
+      .ud-page__responsive-label {
+        font-size: var(--text-sm, 0.875rem);
+        font-weight: 600;
+        color: var(--text-secondary);
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+      }
+
+      .ud-page__responsive-frame {
+        border: 1px dashed var(--border-default);
+        border-radius: var(--radius-md);
+        padding: 1rem;
+        overflow: hidden;
+        background: var(--bg-base);
+        position: relative;
+      }
+
+      .ud-page__click-log {
+        font-family: 'SF Mono', 'Fira Code', 'JetBrains Mono', monospace;
+        font-size: var(--text-xs, 0.75rem);
+        color: var(--text-secondary);
+        padding: 0.75rem;
+        background: oklch(0% 0 0 / 0.2);
+        border: 1px solid var(--border-subtle);
+        border-radius: var(--radius-sm);
+        min-height: 3rem;
+        max-height: 6rem;
+        overflow-y: auto;
+        white-space: pre-wrap;
+        word-break: break-all;
+      }
+
       /* ── Responsive ──────────────────────────────── */
 
       @media (max-width: 768px) {
@@ -451,6 +501,26 @@ export default function UpstreamDashboardPage() {
   const [showBurstCapacity, setShowBurstCapacity] = useState(true)
   const [showUtilization, setShowUtilization] = useState(true)
   const [utilizationDisplay, setUtilizationDisplay] = useState<'bar' | 'meter' | 'ambient'>('bar')
+  const [clickLog, setClickLog] = useState<string[]>([])
+  const toast = useToast()
+
+  const handleLinkClick = (link: UpstreamLink) => {
+    const msg = `Link: ${link.vendor} ${link.location} (${link.status})`
+    setClickLog(prev => [msg, ...prev].slice(0, 10))
+    toast.toast({ title: 'Link clicked', description: msg })
+  }
+
+  const handleGroupClick = (groupName: string, links: UpstreamLink[]) => {
+    const msg = `Group: ${groupName} (${links.length} links)`
+    setClickLog(prev => [msg, ...prev].slice(0, 10))
+    toast.toast({ title: 'Group clicked', description: msg })
+  }
+
+  const handleSummaryClick = () => {
+    const msg = 'Summary/Hero area clicked'
+    setClickLog(prev => [msg, ...prev].slice(0, 10))
+    toast.toast({ title: 'Summary clicked', description: msg })
+  }
 
   // Scroll reveal fallback for browsers without animation-timeline
   useEffect(() => {
@@ -525,6 +595,9 @@ export default function UpstreamDashboardPage() {
               showBurstCapacity={showBurstCapacity}
               showUtilization={showUtilization}
               utilizationDisplay={utilizationDisplay}
+              onLinkClick={handleLinkClick}
+              onGroupClick={handleGroupClick}
+              onSummaryClick={handleSummaryClick}
             />
           </div>
 
@@ -684,7 +757,96 @@ export default function UpstreamDashboardPage() {
         </div>
       </section>
 
-      {/* ── 4. Nested Grouping ──────────────────────────── */}
+      {/* ── 4. Click Interaction ──────────────────────── */}
+      <section className="ud-page__section" id="click-interaction">
+        <h2 className="ud-page__section-title">
+          <a href="#click-interaction">Click Interaction</a>
+        </h2>
+        <p className="ud-page__section-desc">
+          Every interactive element is clickable: hero card, link cards, group headers, and table rows.
+          Click any element below to see a toast notification and log entry.
+        </p>
+
+        <div className="ud-page__click-log">
+          {clickLog.length === 0 ? 'Click any element above or below to see events here...' : clickLog.join('\n')}
+        </div>
+      </section>
+
+      {/* ── 5. Responsive Scaling ────────────────────── */}
+      <section className="ud-page__section" id="responsive">
+        <h2 className="ud-page__section-title">
+          <a href="#responsive">Responsive Scaling</a>
+        </h2>
+        <p className="ud-page__section-desc">
+          The dashboard uses container queries to scale from smartwatch (200px) to video wall (3000px+).
+          Metrics use <code>cqw</code> units for fluid sizing. Below are fixed-width previews.
+        </p>
+
+        <div className="ud-page__responsive-grid">
+          <div className="ud-page__responsive-item">
+            <span className="ud-page__responsive-label">Smartwatch (200px)</span>
+            <div className="ud-page__responsive-frame" style={{ maxWidth: 200 }}>
+              <UpstreamDashboard
+                links={mockLinks.slice(0, 3)}
+                mode="hero"
+                showCapacity={false}
+              />
+            </div>
+          </div>
+
+          <div className="ud-page__responsive-item">
+            <span className="ud-page__responsive-label">Phone (400px)</span>
+            <div className="ud-page__responsive-frame" style={{ maxWidth: 400 }}>
+              <UpstreamDashboard
+                links={mockLinks.slice(0, 4)}
+                mode="hero"
+                groupBy="vendor"
+                showCapacity
+                showUtilization
+                onLinkClick={handleLinkClick}
+                onGroupClick={handleGroupClick}
+                onSummaryClick={handleSummaryClick}
+              />
+            </div>
+          </div>
+
+          <div className="ud-page__responsive-item">
+            <span className="ud-page__responsive-label">Tablet (800px)</span>
+            <div className="ud-page__responsive-frame" style={{ maxWidth: 800 }}>
+              <UpstreamDashboard
+                links={mockLinks.slice(0, 6)}
+                mode="hero"
+                groupBy="vendor"
+                showCapacity
+                showBurstCapacity
+                showUtilization
+                onLinkClick={handleLinkClick}
+                onGroupClick={handleGroupClick}
+                onSummaryClick={handleSummaryClick}
+              />
+            </div>
+          </div>
+
+          <div className="ud-page__responsive-item">
+            <span className="ud-page__responsive-label">Full Width</span>
+            <div className="ud-page__responsive-frame">
+              <UpstreamDashboard
+                links={mockLinks}
+                mode="hero"
+                groupBy="vendor"
+                showCapacity
+                showBurstCapacity
+                showUtilization
+                onLinkClick={handleLinkClick}
+                onGroupClick={handleGroupClick}
+                onSummaryClick={handleSummaryClick}
+              />
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ── 6. Nested Grouping ──────────────────────────── */}
       <section className="ud-page__section" id="nested-grouping">
         <h2 className="ud-page__section-title">
           <a href="#nested-grouping">Nested Grouping</a>
