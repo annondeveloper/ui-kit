@@ -11,6 +11,7 @@ import {
   type ReactNode,
   type CSSProperties,
 } from 'react'
+import { createPortal } from 'react-dom'
 import { css } from '../core/styles/css-tag'
 import { useStyles } from '../core/styles/use-styles'
 import { useMotionLevel } from '../core/motion/use-motion-level'
@@ -419,9 +420,21 @@ const dataTableStyles = css`
         letter-spacing: 0.05em;
         color: var(--text-secondary, oklch(70% 0 0));
         white-space: nowrap;
-        position: relative;
         user-select: none;
         border-block-end: 1px solid var(--border-default, oklch(100% 0 0 / 0.08));
+        /* NO overflow:hidden — it clips filter popovers */
+        overflow: visible;
+      }
+
+      /* Header text truncation via inner span, not th overflow */
+      .ui-data-table__header-content {
+        display: inline-flex;
+        align-items: center;
+        gap: var(--space-xs, 0.25rem);
+        max-inline-size: 100%;
+      }
+
+      .ui-data-table__header-content > span:first-child {
         overflow: hidden;
         text-overflow: ellipsis;
       }
@@ -527,12 +540,7 @@ const dataTableStyles = css`
         margin-inline-start: 2px;
       }
 
-      /* ── Header content wrapper ──────────────────────── */
-      .ui-data-table__header-content {
-        display: inline-flex;
-        align-items: center;
-        gap: var(--space-xs, 0.25rem);
-      }
+      /* Header content wrapper — defined above in th section */
 
       /* ── Resize handle ───────────────────────────────── */
       .ui-data-table__resize-handle {
@@ -826,11 +834,9 @@ const dataTableStyles = css`
         background: oklch(from var(--brand, oklch(65% 0.2 270)) l c h / 0.1);
       }
 
+      /* Filter popover — portaled to document.body, positioned via inline style */
       .ui-data-table__filter-popover {
-        position: absolute;
-        inset-block-start: 100%;
-        inset-inline-start: 0;
-        margin-block-start: var(--space-xs, 0.25rem);
+        position: fixed;
         min-inline-size: 220px;
         max-inline-size: 300px;
         padding: var(--space-sm, 0.5rem);
@@ -849,16 +855,17 @@ const dataTableStyles = css`
         overflow: visible;
       }
 
-      /* Transparent backdrop to catch clicks outside filter popover */
+      /* Transparent backdrop to catch clicks outside filter popover — rendered via portal */
       .ui-data-table__filter-backdrop {
         position: fixed;
         inset: 0;
-        z-index: 99;
+        z-index: 9998;
         background: transparent;
         -webkit-tap-highlight-color: transparent;
       }
 
-      /* Mobile: filter popover becomes a bottom sheet */
+      /* Filter popover — rendered via portal to document.body */
+      /* On mobile: always bottom sheet */
       @media (max-width: 640px) {
         .ui-data-table__filter-popover {
           position: fixed;
@@ -869,9 +876,9 @@ const dataTableStyles = css`
           min-inline-size: auto;
           max-inline-size: 100%;
           border-radius: var(--radius-lg) var(--radius-lg) 0 0;
-          padding: 1rem;
-          z-index: 200;
-          box-shadow: 0 -4px 24px oklch(0% 0 0 / 0.3);
+          padding: 1.25rem;
+          z-index: 9999;
+          box-shadow: 0 -8px 32px oklch(0% 0 0 / 0.4);
         }
       }
 
@@ -1068,6 +1075,114 @@ const dataTableStyles = css`
       0% { opacity: 0.5; }
       50% { opacity: 1; }
       100% { opacity: 0.5; }
+    }
+  }
+`
+
+// Filter popover styles — OUTSIDE @scope because popover is portaled to document.body
+const filterPortalStyles = css`
+  /* Filter backdrop — full screen overlay */
+  .ui-data-table__filter-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 9998;
+    background: transparent;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  /* Filter popover — positioned via inline style */
+  .ui-data-table__filter-popover {
+    position: fixed;
+    z-index: 9999;
+    min-inline-size: 220px;
+    max-inline-size: 300px;
+    padding: 0.75rem;
+    background: var(--bg-elevated, oklch(22% 0.02 270));
+    border: 1px solid var(--border-default, oklch(100% 0 0 / 0.12));
+    border-radius: var(--radius-md, 0.5rem);
+    box-shadow: 0 8px 24px oklch(0% 0 0 / 0.3);
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    font-size: 0.8125rem;
+    color: var(--text-primary, oklch(90% 0 0));
+  }
+
+  .ui-data-table__filter-popover select,
+  .ui-data-table__filter-popover input {
+    inline-size: 100%;
+    padding: 0.375rem 0.5rem;
+    border: 1px solid var(--border-default, oklch(100% 0 0 / 0.12));
+    border-radius: var(--radius-sm, 0.25rem);
+    background: var(--bg-base, oklch(15% 0 0));
+    color: var(--text-primary, oklch(90% 0 0));
+    font-size: 0.8125rem;
+    font-family: inherit;
+    outline: none;
+  }
+
+  .ui-data-table__filter-popover select:focus,
+  .ui-data-table__filter-popover input:focus {
+    border-color: var(--brand, oklch(65% 0.2 270));
+  }
+
+  .ui-data-table__filter-actions {
+    display: flex;
+    gap: 0.375rem;
+    margin-block-start: 0.25rem;
+  }
+
+  .ui-data-table__filter-actions button {
+    flex: 1;
+    padding: 0.375rem 0.625rem;
+    border: 1px solid var(--border-default, oklch(100% 0 0 / 0.12));
+    border-radius: var(--radius-sm, 0.25rem);
+    background: transparent;
+    color: var(--text-secondary, oklch(70% 0 0));
+    font-size: 0.75rem;
+    font-family: inherit;
+    cursor: pointer;
+  }
+
+  .ui-data-table__filter-actions button:last-child {
+    background: var(--brand, oklch(65% 0.2 270));
+    color: oklch(100% 0 0);
+    border-color: var(--brand, oklch(65% 0.2 270));
+  }
+
+  .ui-data-table__filter-select-list {
+    max-block-size: 200px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+
+  .ui-data-table__filter-select-list label {
+    display: flex;
+    align-items: center;
+    gap: 0.375rem;
+    font-size: 0.8125rem;
+    cursor: pointer;
+  }
+
+  /* Mobile: bottom sheet */
+  @media (max-width: 640px) {
+    .ui-data-table__filter-popover {
+      position: fixed !important;
+      top: auto !important;
+      left: 0 !important;
+      right: 0;
+      bottom: 0;
+      min-inline-size: auto;
+      max-inline-size: 100%;
+      border-radius: 0.75rem 0.75rem 0 0;
+      padding: 1.25rem;
+      box-shadow: 0 -8px 32px oklch(0% 0 0 / 0.4);
+    }
+
+    .ui-data-table__filter-backdrop {
+      background: oklch(0% 0 0 / 0.3);
     }
   }
 `
@@ -1408,6 +1523,7 @@ function DataTableInner<T extends object>(
   ref: React.ForwardedRef<HTMLDivElement>
 ) {
   const cls = useStyles('data-table', dataTableStyles)
+  useStyles('data-table-filter-portal', filterPortalStyles)
   const motionLevel = useMotionLevel(motionProp)
 
   // ─── Search state ───────────────────────────────────────────────────
@@ -1607,6 +1723,7 @@ function DataTableInner<T extends object>(
   const activeFilters = filtersControlled ?? filtersInternal
   const setActiveFilters = onFilterChangeControlled ?? setFiltersInternal
   const [openFilterCol, setOpenFilterCol] = useState<string | null>(null)
+  const [filterBtnRect, setFilterBtnRect] = useState<{ top: number; left: number; bottom: number } | null>(null)
   const filterPopoverRef = useRef<HTMLDivElement | null>(null)
 
   // Close filter popover — using backdrop overlay instead of document listener
@@ -2309,6 +2426,8 @@ function DataTableInner<T extends object>(
                       data-active={hasActiveFilter ? '' : undefined}
                       onClick={e => {
                         e.stopPropagation()
+                        const rect = (e.currentTarget as HTMLElement).getBoundingClientRect()
+                        setFilterBtnRect({ top: rect.top, left: rect.left, bottom: rect.bottom })
                         setOpenFilterCol(prev => prev === col.id ? null : col.id)
                       }}
                       aria-label={`Filter ${getHeaderText(col.header, col.id)}`}
@@ -2319,19 +2438,23 @@ function DataTableInner<T extends object>(
                     </button>
                   )}
                 </span>
-                {isColFilterable && openFilterCol === col.id && (
+                {isColFilterable && openFilterCol === col.id && typeof document !== 'undefined' && createPortal(
                   <>
                   {/* Transparent backdrop to catch clicks outside the popover */}
                   <div
                     className="ui-data-table__filter-backdrop"
                     onClick={e => { e.stopPropagation(); closeFilter() }}
-                    onTouchEnd={e => { e.stopPropagation(); closeFilter() }}
+                    onTouchEnd={e => { e.preventDefault(); e.stopPropagation(); closeFilter() }}
                   />
                   <div
                     ref={filterPopoverRef}
                     className="ui-data-table__filter-popover"
                     data-testid={`filter-popover-${col.id}`}
                     onClick={e => e.stopPropagation()}
+                    style={filterBtnRect ? {
+                      top: filterBtnRect.bottom + 4,
+                      left: Math.max(8, filterBtnRect.left),
+                    } : undefined}
                   >
                     {col.filterType === 'select' ? (
                       <>
@@ -2414,7 +2537,8 @@ function DataTableInner<T extends object>(
                       </>
                     )}
                   </div>
-                  </>
+                  </>,
+                  document.body
                 )}
                 {isColResizable && (
                   <span
