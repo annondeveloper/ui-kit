@@ -35,7 +35,7 @@ const PROPS: PropDef[] = [
   { name: 'showCapacity', type: 'boolean', default: 'true', description: 'Show committed capacity in hero footer and table columns.' },
   { name: 'showBurstCapacity', type: 'boolean', default: 'false', description: 'Show burstable capacity when available.' },
   { name: 'showUtilization', type: 'boolean', default: 'true', description: 'Show utilization percentage in hero footer and table.' },
-  { name: 'utilizationDisplay', type: "'bar' | 'meter' | 'ambient'", default: "'bar'", description: 'How to render utilization. Bar shows a thin progress bar, meter shows an SVG arc gauge, ambient shifts the card background color.' },
+  { name: 'utilizationDisplay', type: "'bar' | 'meter' | 'ambient'", default: "'bar'", description: 'How to render utilization. Bar shows a thin progress bar with capacity/burst markers, meter shows an SVG arc gauge, ambient shifts the card background color.' },
 ]
 
 // ─── Page Styles ──────────────────────────────────────────────────────────────
@@ -213,7 +213,7 @@ const pageStyles = css`
         border-radius: var(--radius-md);
         background: var(--bg-base);
         position: relative;
-        overflow: hidden;
+        overflow: visible;
       }
 
       /* Subtle dot grid */
@@ -448,7 +448,7 @@ export default function UpstreamDashboardPage() {
   const [showSummary, setShowSummary] = useState(false)
   const [title, setTitle] = useState('Network Operations Center')
   const [showCapacity, setShowCapacity] = useState(true)
-  const [showBurstCapacity, setShowBurstCapacity] = useState(false)
+  const [showBurstCapacity, setShowBurstCapacity] = useState(true)
   const [showUtilization, setShowUtilization] = useState(true)
   const [utilizationDisplay, setUtilizationDisplay] = useState<'bar' | 'meter' | 'ambient'>('bar')
 
@@ -491,9 +491,9 @@ export default function UpstreamDashboardPage() {
         <h1 className="ud-page__title">UpstreamDashboard</h1>
         <p className="ud-page__desc">
           A metrics-dominant NOC dashboard. Three visualization modes: hero (massive aggregated
-          metrics with trendline background), compact (dense card grid), and table (ultra-dense
-          tabular). Built for operators who need to see traffic, direction, health, trend, and
-          capacity utilization in one second.
+          metrics with trendline background), compact (dense card grid), and table (aggregated
+          metrics header + ultra-dense tabular). Nested group cards with utilization bars,
+          capacity markers, and burst ceiling indicators.
         </p>
         <div className="ud-page__import-row">
           <code className="ud-page__import-code">
@@ -509,7 +509,7 @@ export default function UpstreamDashboardPage() {
         </h2>
         <p className="ud-page__section-desc">
           10 upstream links across 5 transit vendors. Switch between hero, compact, and table
-          modes. Toggle grouping and summary to explore all combinations.
+          modes. Toggle grouping to see nested group cards with aggregated metrics.
         </p>
 
         <div className="ud-page__playground">
@@ -640,16 +640,21 @@ export default function UpstreamDashboardPage() {
         </h2>
         <p className="ud-page__section-desc">
           Hero mode dominates with massive aggregated metrics and a trendline background.
-          Compact mode packs dense cards. Table mode gives you ultra-dense rows with inline sparklines.
+          Compact mode packs dense cards. Table mode shows aggregated metrics at the top
+          followed by ultra-dense rows with inline sparklines.
         </p>
 
         <div className="ud-page__modes-grid">
           <div className="ud-page__mode-item">
-            <span className="ud-page__mode-label">Hero Mode</span>
+            <span className="ud-page__mode-label">Hero Mode (grouped by vendor)</span>
             <div className="ud-page__preview">
               <UpstreamDashboard
                 links={mockLinks}
                 mode="hero"
+                groupBy="vendor"
+                showCapacity
+                showBurstCapacity
+                showUtilization
               />
             </div>
           </div>
@@ -665,24 +670,84 @@ export default function UpstreamDashboardPage() {
           </div>
 
           <div className="ud-page__mode-item">
-            <span className="ud-page__mode-label">Table Mode</span>
+            <span className="ud-page__mode-label">Table Mode (with aggregated metrics)</span>
             <div className="ud-page__preview">
               <UpstreamDashboard
                 links={mockLinks}
                 mode="table"
+                showCapacity
+                showBurstCapacity
+                showUtilization
               />
             </div>
           </div>
         </div>
       </section>
 
-      {/* ── 4. Data Format ────────────────────────────── */}
+      {/* ── 4. Nested Grouping ──────────────────────────── */}
+      <section className="ud-page__section" id="nested-grouping">
+        <h2 className="ud-page__section-title">
+          <a href="#nested-grouping">Nested Grouping</a>
+        </h2>
+        <p className="ud-page__section-desc">
+          Hero mode respects groupBy. When grouped by vendor, each vendor gets a card with
+          aggregated metrics, utilization bar with burst markers, and nested location mini-cards.
+          When grouped by location, the nesting reverses.
+        </p>
+
+        <div className="ud-page__modes-grid">
+          <div className="ud-page__mode-item">
+            <span className="ud-page__mode-label">Grouped by Vendor</span>
+            <div className="ud-page__preview">
+              <UpstreamDashboard
+                links={mockLinks.slice(0, 6)}
+                mode="hero"
+                groupBy="vendor"
+                showCapacity
+                showBurstCapacity
+                showUtilization
+              />
+            </div>
+          </div>
+
+          <div className="ud-page__mode-item">
+            <span className="ud-page__mode-label">Grouped by Location</span>
+            <div className="ud-page__preview">
+              <UpstreamDashboard
+                links={mockLinks.slice(0, 6)}
+                mode="hero"
+                groupBy="location"
+                showCapacity
+                showBurstCapacity
+                showUtilization
+              />
+            </div>
+          </div>
+
+          <div className="ud-page__mode-item">
+            <span className="ud-page__mode-label">No grouping (flat mini cards)</span>
+            <div className="ud-page__preview">
+              <UpstreamDashboard
+                links={mockLinks.slice(0, 4)}
+                mode="hero"
+                groupBy="none"
+                showCapacity
+                showBurstCapacity
+                showUtilization
+              />
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ── 5. Data Format ────────────────────────────── */}
       <section className="ud-page__section" id="data-format">
         <h2 className="ud-page__section-title">
           <a href="#data-format">Data Format</a>
         </h2>
         <p className="ud-page__section-desc">
-          The dashboard is driven by a simple JSON array. Here's the complete interface and a sample payload.
+          The dashboard is driven by a simple JSON array. Here's the complete interface and a sample payload
+          including burstCapacity for burst billing support.
         </p>
         <CopyBlock
           code={`interface UpstreamLink {
@@ -705,7 +770,7 @@ export default function UpstreamDashboardPage() {
   inbound: 1_000_000_000,     // 1 GB/s = 8 Gbps
   outbound: 625_000_000,      // 625 MB/s = 5 Gbps
   capacity: 1_250_000_000,    // 10 Gbps committed
-  burstCapacity: 2_500_000_000, // 20 Gbps burst
+  burstCapacity: 2_500_000_000, // 20 Gbps burst ceiling
   status: 'ok',
   trend: [7.2, 7.5, 7.8, 8.0, 8.1, 7.9, 8.0]
 }`}
@@ -713,7 +778,7 @@ export default function UpstreamDashboardPage() {
         />
       </section>
 
-      {/* ── 5. Grouping Modes ─────────────────────────── */}
+      {/* ── 6. Grouping Modes ─────────────────────────── */}
       <section className="ud-page__section" id="grouping">
         <h2 className="ud-page__section-title">
           <a href="#grouping">Grouping in Compact Mode</a>
@@ -748,7 +813,7 @@ export default function UpstreamDashboardPage() {
         </div>
       </section>
 
-      {/* ── 6. Props API ──────────────────────────────── */}
+      {/* ── 7. Props API ──────────────────────────────── */}
       <section className="ud-page__section" id="props">
         <h2 className="ud-page__section-title">
           <a href="#props">Props API</a>
@@ -759,7 +824,7 @@ export default function UpstreamDashboardPage() {
         <PropsTable props={PROPS} />
       </section>
 
-      {/* ── 7. Accessibility ──────────────────────────── */}
+      {/* ── 8. Accessibility ──────────────────────────── */}
       <section className="ud-page__section" id="accessibility">
         <h2 className="ud-page__section-title">
           <a href="#accessibility">Accessibility</a>
@@ -804,7 +869,7 @@ export default function UpstreamDashboardPage() {
         </ul>
       </section>
 
-      {/* ── 8. Source ────────────────────────────────── */}
+      {/* ── 9. Source ────────────────────────────────── */}
       <section className="ud-page__section" id="source">
         <h2 className="ud-page__section-title">
           <a href="#source">Source</a>

@@ -80,6 +80,11 @@ function computeUtilization(links: UpstreamLink[]): number | null {
   return Math.min(100, Math.round((totalTraffic / totalCapacity) * 100))
 }
 
+function formatTraffic(bytesPerSecond: number): string {
+  const fmt = formatBitRateSplit(bytesPerSecond)
+  return `${fmt.value} ${fmt.unit}`
+}
+
 // ─── Styles ─────────────────────────────────────────────────────────────────
 
 const upstreamDashboardStyles = css`
@@ -237,8 +242,8 @@ const upstreamDashboardStyles = css`
         background: var(--bg-elevated, oklch(20% 0.02 270));
         border: 1px solid var(--border-default, oklch(100% 0 0 / 0.1));
         border-radius: var(--radius-lg, 0.75rem);
-        overflow: hidden;
-        min-height: 160px;
+        overflow: visible;
+        min-height: 200px;
         display: flex;
         flex-direction: column;
         justify-content: center;
@@ -276,6 +281,8 @@ const upstreamDashboardStyles = css`
         inset: 0;
         z-index: 0;
         pointer-events: none;
+        overflow: hidden;
+        border-radius: inherit;
       }
 
       .ui-upstream-dashboard__hero-trendline svg {
@@ -342,20 +349,87 @@ const upstreamDashboardStyles = css`
         letter-spacing: 0.06em;
       }
 
-      /* Thin utilization bar */
+      /* ── Table top metrics (smaller hero-style) ─────────────── */
+      .ui-upstream-dashboard__table-top-metrics {
+        display: flex;
+        justify-content: center;
+        align-items: baseline;
+        gap: clamp(1.5rem, 4vw, 4rem);
+        flex-wrap: wrap;
+        padding: clamp(1rem, 3vw, 2rem);
+        background: var(--bg-elevated, oklch(20% 0.02 270));
+        border: 1px solid var(--border-default, oklch(100% 0 0 / 0.1));
+        border-radius: var(--radius-lg, 0.75rem);
+        position: relative;
+        overflow: hidden;
+      }
+
+      .ui-upstream-dashboard__table-top-metrics::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        border-radius: inherit;
+        background: radial-gradient(
+          ellipse at 30% 0%,
+          oklch(from var(--aurora-1, oklch(70% 0.15 270)) l c h / 0.04) 0%,
+          transparent 60%
+        );
+        pointer-events: none;
+      }
+
+      .ui-upstream-dashboard__table-top-metrics > * {
+        position: relative;
+        z-index: 1;
+      }
+
+      .ui-upstream-dashboard__table-top-value {
+        font-size: clamp(1.5rem, 5vw, 3rem);
+        font-weight: 900;
+        letter-spacing: -0.04em;
+        line-height: 1;
+        font-variant-numeric: tabular-nums;
+        color: var(--text-primary, oklch(90% 0 0));
+        display: flex;
+        align-items: baseline;
+      }
+
+      .ui-upstream-dashboard__table-top-unit {
+        font-size: 0.35em;
+        font-weight: 500;
+        color: var(--text-tertiary, oklch(55% 0 0));
+        margin-inline-start: 0.125em;
+      }
+
+      .ui-upstream-dashboard__table-top-direction {
+        font-size: 0.5em;
+        margin-inline-end: 0.25em;
+      }
+
+      .ui-upstream-dashboard__table-top-direction--in { color: oklch(72% 0.19 155); }
+      .ui-upstream-dashboard__table-top-direction--out { color: oklch(65% 0.2 270); }
+
+      .ui-upstream-dashboard__table-top-label {
+        font-size: var(--text-xs, 0.75rem);
+        color: var(--text-secondary, oklch(70% 0 0));
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+      }
+
+      /* ── Utilization Bar (with burst markers) ──────────────────── */
       .ui-upstream-dashboard__util-bar {
         position: relative;
         z-index: 1;
-        height: 3px;
+        height: 4px;
         border-radius: 2px;
-        background: oklch(100% 0 0 / 0.06);
-        overflow: hidden;
+        background: var(--bg-base, oklch(100% 0 0 / 0.06));
+        overflow: visible;
       }
 
       .ui-upstream-dashboard__util-fill {
         height: 100%;
         border-radius: 2px;
-        transition: width 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+        transition: width 0.3s cubic-bezier(0.16, 1, 0.3, 1);
       }
 
       .ui-upstream-dashboard__util-fill[data-level="ok"] {
@@ -366,6 +440,23 @@ const upstreamDashboardStyles = css`
       }
       .ui-upstream-dashboard__util-fill[data-level="critical"] {
         background: oklch(62% 0.22 25);
+      }
+
+      .ui-upstream-dashboard__util-burst-marker {
+        position: absolute;
+        top: -2px;
+        width: 2px;
+        height: 8px;
+        background: var(--text-tertiary, oklch(55% 0 0));
+        border-radius: 1px;
+      }
+
+      .ui-upstream-dashboard__util-label {
+        position: absolute;
+        right: 0;
+        top: -14px;
+        font-size: 0.625rem;
+        color: var(--text-tertiary, oklch(55% 0 0));
       }
 
       /* Hero footer — total / capacity / pct */
@@ -386,7 +477,130 @@ const upstreamDashboardStyles = css`
         gap: 0.25rem;
       }
 
-      /* Mini cards below hero */
+      /* ── Mini Card ─────────────────────────────────────────── */
+      .ui-upstream-dashboard__mini-card {
+        display: flex;
+        flex-direction: column;
+        gap: 0.25rem;
+        padding: 0.5rem 0.75rem;
+        background: var(--bg-surface, oklch(22% 0.02 270));
+        border: 1px solid var(--border-subtle, oklch(100% 0 0 / 0.08));
+        border-radius: var(--radius-md, 0.5rem);
+        font-size: var(--text-sm, 0.875rem);
+      }
+
+      .ui-upstream-dashboard__mini-card[data-status="ok"] { border-inline-start: 3px solid oklch(72% 0.19 155); }
+      .ui-upstream-dashboard__mini-card[data-status="warning"] { border-inline-start: 3px solid oklch(80% 0.18 85); }
+      .ui-upstream-dashboard__mini-card[data-status="critical"] { border-inline-start: 3px solid oklch(62% 0.22 25); }
+      .ui-upstream-dashboard__mini-card[data-status="unknown"] { border-inline-start: 3px solid oklch(60% 0 0); }
+
+      .ui-upstream-dashboard__mini-card-header {
+        display: flex;
+        align-items: center;
+        gap: 0.375rem;
+      }
+
+      .ui-upstream-dashboard__mini-card-status {
+        flex-shrink: 0;
+        inline-size: 0.375rem;
+        block-size: 0.375rem;
+        border-radius: 50%;
+        background: oklch(60% 0 0);
+      }
+
+      .ui-upstream-dashboard__mini-card[data-status="ok"] .ui-upstream-dashboard__mini-card-status {
+        background: oklch(72% 0.19 155);
+        box-shadow: 0 0 4px oklch(72% 0.19 155 / 0.5);
+      }
+      .ui-upstream-dashboard__mini-card[data-status="warning"] .ui-upstream-dashboard__mini-card-status {
+        background: oklch(80% 0.18 85);
+        box-shadow: 0 0 4px oklch(80% 0.18 85 / 0.5);
+      }
+      .ui-upstream-dashboard__mini-card[data-status="critical"] .ui-upstream-dashboard__mini-card-status {
+        background: oklch(62% 0.22 25);
+        box-shadow: 0 0 4px oklch(62% 0.22 25 / 0.5);
+        animation: ui-ud-pulse 1.5s ease-in-out infinite;
+      }
+
+      .ui-upstream-dashboard__mini-card-label {
+        font-weight: 600;
+        color: var(--text-primary, oklch(90% 0 0));
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        font-size: var(--text-xs, 0.75rem);
+      }
+
+      .ui-upstream-dashboard__mini-card-metrics {
+        display: flex;
+        gap: 0.75rem;
+        align-items: baseline;
+        font-variant-numeric: tabular-nums;
+        font-weight: 600;
+        font-size: var(--text-sm, 0.875rem);
+      }
+
+      .ui-upstream-dashboard__mini-card-metrics small {
+        font-weight: 400;
+        font-size: 0.75em;
+        color: var(--text-tertiary, oklch(55% 0 0));
+        margin-inline-start: 0.1em;
+      }
+
+      .ui-upstream-dashboard__mini-card-capacity {
+        font-size: var(--text-xs, 0.75rem);
+        color: var(--text-tertiary, oklch(55% 0 0));
+      }
+
+      /* ── Group Card (nested grouping in hero mode) ─────────── */
+      .ui-upstream-dashboard__group-card {
+        background: var(--bg-elevated, oklch(20% 0.02 270));
+        border: 1px solid var(--border-default, oklch(100% 0 0 / 0.1));
+        border-radius: var(--radius-lg, 0.75rem);
+        padding: 1rem 1.25rem;
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+      }
+
+      .ui-upstream-dashboard__group-card-header {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        flex-wrap: wrap;
+      }
+
+      .ui-upstream-dashboard__group-card-name {
+        font-weight: 700;
+        font-size: var(--text-base, 1rem);
+        color: var(--text-primary, oklch(90% 0 0));
+      }
+
+      .ui-upstream-dashboard__group-card-metrics {
+        display: flex;
+        gap: 0.5rem;
+        font-size: var(--text-sm, 0.875rem);
+        font-weight: 600;
+        font-variant-numeric: tabular-nums;
+      }
+
+      .ui-upstream-dashboard__group-card-cap {
+        font-size: var(--text-sm, 0.875rem);
+        color: var(--text-secondary, oklch(70% 0 0));
+      }
+
+      .ui-upstream-dashboard__group-card-util {
+        margin-inline-start: auto;
+        min-inline-size: 80px;
+      }
+
+      .ui-upstream-dashboard__group-card-children {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 0.5rem;
+      }
+
+      /* Mini cards below hero (flat layout) */
       .ui-upstream-dashboard__hero-mini-grid {
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -394,6 +608,15 @@ const upstreamDashboardStyles = css`
         margin-block-start: 0.5rem;
       }
 
+      /* Hero group cards grid */
+      .ui-upstream-dashboard__hero-groups-grid {
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+        margin-block-start: 0.5rem;
+      }
+
+      /* Legacy hero mini (kept for backwards compat, but now we use MiniCard) */
       .ui-upstream-dashboard__hero-mini {
         display: flex;
         align-items: center;
@@ -998,7 +1221,9 @@ const upstreamDashboardStyles = css`
         .ui-upstream-dashboard__summary,
         .ui-upstream-dashboard__link,
         .ui-upstream-dashboard__compact-card,
-        .ui-upstream-dashboard__hero-card {
+        .ui-upstream-dashboard__hero-card,
+        .ui-upstream-dashboard__mini-card,
+        .ui-upstream-dashboard__group-card {
           border: 2px solid ButtonText;
         }
         .ui-upstream-dashboard__summary::before,
@@ -1013,13 +1238,18 @@ const upstreamDashboardStyles = css`
         .ui-upstream-dashboard__compact-card[data-status="ok"],
         .ui-upstream-dashboard__compact-card[data-status="warning"],
         .ui-upstream-dashboard__compact-card[data-status="critical"],
-        .ui-upstream-dashboard__compact-card[data-status="unknown"] {
+        .ui-upstream-dashboard__compact-card[data-status="unknown"],
+        .ui-upstream-dashboard__mini-card[data-status="ok"],
+        .ui-upstream-dashboard__mini-card[data-status="warning"],
+        .ui-upstream-dashboard__mini-card[data-status="critical"],
+        .ui-upstream-dashboard__mini-card[data-status="unknown"] {
           border-inline-start: 3px solid Highlight;
         }
         .ui-upstream-dashboard__status-dot,
         .ui-upstream-dashboard__compact-dot,
         .ui-upstream-dashboard__table-status-dot,
-        .ui-upstream-dashboard__hero-mini-dot {
+        .ui-upstream-dashboard__hero-mini-dot,
+        .ui-upstream-dashboard__mini-card-status {
           background: Highlight;
         }
         .ui-upstream-dashboard__group-header {
@@ -1035,7 +1265,9 @@ const upstreamDashboardStyles = css`
         .ui-upstream-dashboard__summary,
         .ui-upstream-dashboard__link,
         .ui-upstream-dashboard__compact-card,
-        .ui-upstream-dashboard__hero-card {
+        .ui-upstream-dashboard__hero-card,
+        .ui-upstream-dashboard__mini-card,
+        .ui-upstream-dashboard__group-card {
           box-shadow: none;
           border: 1px solid;
           break-inside: avoid;
@@ -1058,7 +1290,8 @@ const upstreamDashboardStyles = css`
         .ui-upstream-dashboard__status-dot,
         .ui-upstream-dashboard__compact-dot,
         .ui-upstream-dashboard__table-status-dot,
-        .ui-upstream-dashboard__hero-mini-dot {
+        .ui-upstream-dashboard__hero-mini-dot,
+        .ui-upstream-dashboard__mini-card-status {
           animation: none;
         }
         .ui-upstream-dashboard__link,
@@ -1183,7 +1416,7 @@ function HeroTrendlineBg({ data }: { data: number[] }) {
   )
 }
 
-// ─── Utilization Bar ────────────────────────────────────────────────────────
+// ─── Utilization Helpers ────────────────────────────────────────────────────
 
 function utilizationLevel(pct: number): 'ok' | 'warning' | 'critical' {
   if (pct > 80) return 'critical'
@@ -1191,17 +1424,32 @@ function utilizationLevel(pct: number): 'ok' | 'warning' | 'critical' {
   return 'ok'
 }
 
-function UtilBar({ pct, className = 'ui-upstream-dashboard__util-bar' }: { pct: number; className?: string }) {
-  const level = utilizationLevel(pct)
+function utilColor(pct: number): string {
+  if (pct > 80) return 'oklch(62% 0.22 25)'
+  if (pct > 60) return 'oklch(80% 0.18 85)'
+  return 'oklch(72% 0.19 155)'
+}
+
+// ─── UtilBar with capacity + burst markers ──────────────────────────────────
+
+function UtilBar({ percent, capacity, burst }: { percent: number; capacity?: number; burst?: number }) {
+  const color = utilColor(percent)
+  const burstPct = burst && capacity ? Math.round((capacity / burst) * 100) : 100
+
   return (
-    <div className={className}>
+    <div className="ui-upstream-dashboard__util-bar">
       <div
-        className={className === 'ui-upstream-dashboard__util-bar'
-          ? 'ui-upstream-dashboard__util-fill'
-          : className.replace('-bar', '-fill')}
-        data-level={level}
-        style={{ width: `${pct}%`, background: level === 'critical' ? 'oklch(62% 0.22 25)' : level === 'warning' ? 'oklch(80% 0.18 85)' : 'oklch(72% 0.19 155)' }}
+        className="ui-upstream-dashboard__util-fill"
+        style={{ width: `${Math.min(percent, 100)}%`, background: color }}
       />
+      {burst && capacity && burst > capacity && (
+        <div
+          className="ui-upstream-dashboard__util-burst-marker"
+          style={{ left: `${burstPct}%` }}
+          title="Committed capacity"
+        />
+      )}
+      <span className="ui-upstream-dashboard__util-label">{percent}%</span>
     </div>
   )
 }
@@ -1227,6 +1475,116 @@ function ambientTintStyle(utilPct: number | null): React.CSSProperties | undefin
   if (utilPct < 70) return { background: 'oklch(80% 0.18 85 / 0.03)' }
   if (utilPct < 90) return { background: 'oklch(80% 0.18 85 / 0.05)' }
   return { background: 'oklch(62% 0.22 25 / 0.05)' }
+}
+
+// ─── MiniCard Sub-component ─────────────────────────────────────────────────
+
+function MiniCard({
+  link,
+  label,
+  showCapacity,
+  showBurstCapacity,
+  showUtilization,
+  utilizationDisplay,
+}: {
+  link: UpstreamLink
+  label?: string
+  showCapacity?: boolean
+  showBurstCapacity?: boolean
+  showUtilization?: boolean
+  utilizationDisplay?: 'bar' | 'meter' | 'ambient'
+}) {
+  const inFmt = formatBitRateSplit(link.inbound)
+  const outFmt = formatBitRateSplit(link.outbound)
+  const utilPct = link.capacity ? Math.round(((link.inbound + link.outbound) / link.capacity) * 100) : 0
+  const ambientStyle = utilizationDisplay === 'ambient' ? ambientTintStyle(utilPct) : undefined
+
+  return (
+    <div
+      className="ui-upstream-dashboard__mini-card"
+      data-status={link.status}
+      style={ambientStyle}
+    >
+      <div className="ui-upstream-dashboard__mini-card-header">
+        <span className="ui-upstream-dashboard__mini-card-status" data-status={link.status} />
+        <span className="ui-upstream-dashboard__mini-card-label">{label ?? `${link.vendor} · ${link.location}`}</span>
+      </div>
+      <div className="ui-upstream-dashboard__mini-card-metrics">
+        <span style={{ color: 'oklch(72% 0.19 155)' }}>↓{inFmt.value}<small>{inFmt.unit}</small></span>
+        <span style={{ color: 'oklch(65% 0.2 270)' }}>↑{outFmt.value}<small>{outFmt.unit}</small></span>
+      </div>
+      {showCapacity && link.capacity != null && (
+        <div className="ui-upstream-dashboard__mini-card-capacity">
+          Cap: {formatBitRateSplit(link.capacity).value} {formatBitRateSplit(link.capacity).unit}
+          {showBurstCapacity && link.burstCapacity != null && ` · Burst: ${formatBitRateSplit(link.burstCapacity).value} ${formatBitRateSplit(link.burstCapacity).unit}`}
+        </div>
+      )}
+      {showUtilization && link.capacity != null && utilizationDisplay !== 'ambient' && (
+        utilizationDisplay === 'meter'
+          ? <UtilMeter percent={utilPct} />
+          : <UtilBar percent={utilPct} capacity={link.capacity} burst={link.burstCapacity} />
+      )}
+    </div>
+  )
+}
+
+// ─── GroupCard Sub-component (nested grouping in hero mode) ──────────────────
+
+function GroupCard({
+  groupName,
+  links,
+  showCapacity,
+  showBurstCapacity,
+  showUtilization,
+  utilizationDisplay,
+  childLabelKey,
+}: {
+  groupName: string
+  links: UpstreamLink[]
+  showCapacity?: boolean
+  showBurstCapacity?: boolean
+  showUtilization?: boolean
+  utilizationDisplay?: 'bar' | 'meter' | 'ambient'
+  childLabelKey: 'location' | 'vendor'
+}) {
+  const totalIn = links.reduce((sum, l) => sum + l.inbound, 0)
+  const totalOut = links.reduce((sum, l) => sum + l.outbound, 0)
+  const totalCap = links.reduce((sum, l) => sum + (l.capacity ?? 0), 0)
+  const totalBurst = links.reduce((sum, l) => sum + (l.burstCapacity ?? 0), 0)
+  const utilPct = totalCap > 0 ? Math.round(((totalIn + totalOut) / totalCap) * 100) : 0
+
+  return (
+    <div className="ui-upstream-dashboard__group-card">
+      <div className="ui-upstream-dashboard__group-card-header">
+        <span className="ui-upstream-dashboard__group-card-name">{groupName}</span>
+        <span className="ui-upstream-dashboard__group-card-metrics">
+          <span style={{ color: 'oklch(72% 0.19 155)' }}>↓{formatTraffic(totalIn)}</span>
+          <span style={{ color: 'oklch(65% 0.2 270)' }}>↑{formatTraffic(totalOut)}</span>
+        </span>
+        {showCapacity && totalCap > 0 && (
+          <span className="ui-upstream-dashboard__group-card-cap">Cap: {formatTraffic(totalCap)}</span>
+        )}
+        {showUtilization && totalCap > 0 && (
+          <span className="ui-upstream-dashboard__group-card-util">
+            <UtilBar percent={utilPct} capacity={totalCap} burst={totalBurst > 0 ? totalBurst : undefined} />
+          </span>
+        )}
+      </div>
+      <div className="ui-upstream-dashboard__group-card-children">
+        {links.map(link => (
+          <MiniCard
+            key={link.id}
+            link={link}
+            label={link[childLabelKey]}
+            showCapacity={showCapacity}
+            showBurstCapacity={showBurstCapacity}
+            showUtilization={showUtilization}
+            utilizationDisplay={utilizationDisplay}
+          />
+        ))}
+      </div>
+    </div>
+  )
 }
 
 // ─── Summary Card ───────────────────────────────────────────────────────────
@@ -1326,12 +1684,14 @@ function SummaryCard({
 
 function HeroView({
   links,
+  groupBy = 'none',
   showCapacity = true,
   showBurstCapacity = false,
   showUtilization = true,
   utilizationDisplay = 'bar',
 }: {
   links: UpstreamLink[]
+  groupBy?: 'vendor' | 'location' | 'none'
   showCapacity?: boolean
   showBurstCapacity?: boolean
   showUtilization?: boolean
@@ -1367,102 +1727,110 @@ function HeroView({
     return result
   }, [links])
 
-  // Group by vendor for mini cards
-  const vendorGroups = useMemo(() => {
+  // Build groups based on groupBy
+  const groups = useMemo(() => {
+    if (groupBy === 'none') return null
     const map = new Map<string, UpstreamLink[]>()
     for (const link of links) {
-      const arr = map.get(link.vendor) || []
+      const key = groupBy === 'vendor' ? link.vendor : link.location
+      const arr = map.get(key) || []
       arr.push(link)
-      map.set(link.vendor, arr)
+      map.set(key, arr)
     }
-    return Array.from(map.entries()).map(([vendor, vendorLinks]) => {
-      const worstStatus = vendorLinks.reduce<UpstreamLink['status']>((worst, l) => {
-        const priority = { critical: 3, warning: 2, unknown: 1, ok: 0 } as const
-        return priority[l.status] > priority[worst] ? l.status : worst
-      }, 'ok')
-      return {
-        vendor,
-        inbound: vendorLinks.reduce((s, l) => s + l.inbound, 0),
-        outbound: vendorLinks.reduce((s, l) => s + l.outbound, 0),
-        status: worstStatus,
-      }
-    })
-  }, [links])
+    return Array.from(map.entries())
+  }, [links, groupBy])
 
   const ambientStyle = utilizationDisplay === 'ambient' ? ambientTintStyle(utilPct) : undefined
 
   return (
-    <div className="ui-upstream-dashboard__hero-card" data-testid="hero-card" style={ambientStyle}>
-      {aggregatedTrend && <HeroTrendlineBg data={aggregatedTrend} />}
+    <>
+      <div className="ui-upstream-dashboard__hero-card" data-testid="hero-card" style={ambientStyle}>
+        {aggregatedTrend && <HeroTrendlineBg data={aggregatedTrend} />}
 
-      <div className="ui-upstream-dashboard__hero-metrics">
-        <div className="ui-upstream-dashboard__hero-metric">
-          <span className="ui-upstream-dashboard__hero-value">
-            <span className="ui-upstream-dashboard__hero-direction ui-upstream-dashboard__hero-direction--in" aria-hidden="true">↓</span>
-            {inFmt.value}
-            <span className="ui-upstream-dashboard__hero-unit">{inFmt.unit}</span>
-          </span>
-          <span className="ui-upstream-dashboard__hero-label">Inbound</span>
+        <div className="ui-upstream-dashboard__hero-metrics">
+          <div className="ui-upstream-dashboard__hero-metric">
+            <span className="ui-upstream-dashboard__hero-value">
+              <span className="ui-upstream-dashboard__hero-direction ui-upstream-dashboard__hero-direction--in" aria-hidden="true">↓</span>
+              {inFmt.value}
+              <span className="ui-upstream-dashboard__hero-unit">{inFmt.unit}</span>
+            </span>
+            <span className="ui-upstream-dashboard__hero-label">Inbound</span>
+          </div>
+          <div className="ui-upstream-dashboard__hero-metric">
+            <span className="ui-upstream-dashboard__hero-value">
+              <span className="ui-upstream-dashboard__hero-direction ui-upstream-dashboard__hero-direction--out" aria-hidden="true">↑</span>
+              {outFmt.value}
+              <span className="ui-upstream-dashboard__hero-unit">{outFmt.unit}</span>
+            </span>
+            <span className="ui-upstream-dashboard__hero-label">Outbound</span>
+          </div>
         </div>
-        <div className="ui-upstream-dashboard__hero-metric">
-          <span className="ui-upstream-dashboard__hero-value">
-            <span className="ui-upstream-dashboard__hero-direction ui-upstream-dashboard__hero-direction--out" aria-hidden="true">↑</span>
-            {outFmt.value}
-            <span className="ui-upstream-dashboard__hero-unit">{outFmt.unit}</span>
+
+        {utilPct !== null && showUtilization && utilizationDisplay === 'bar' && (
+          <UtilBar percent={utilPct} capacity={totalCapacity} burst={totalBurstCapacity > 0 ? totalBurstCapacity : undefined} />
+        )}
+        {utilPct !== null && showUtilization && utilizationDisplay === 'meter' && (
+          <div style={{ display: 'flex', justifyContent: 'center', position: 'relative', zIndex: 1 }}>
+            <UtilMeter percent={utilPct} />
+          </div>
+        )}
+
+        <div className="ui-upstream-dashboard__hero-footer">
+          <span className="ui-upstream-dashboard__hero-footer-item">
+            Total: {totalFmt.value} {totalFmt.unit}
           </span>
-          <span className="ui-upstream-dashboard__hero-label">Outbound</span>
+          {showCapacity && capFmt && (
+            <span className="ui-upstream-dashboard__hero-footer-item">
+              Capacity: {capFmt.value} {capFmt.unit}
+            </span>
+          )}
+          {showBurstCapacity && burstCapFmt && (
+            <span className="ui-upstream-dashboard__hero-footer-item">
+              Burst: {burstCapFmt.value} {burstCapFmt.unit}
+            </span>
+          )}
+          {showUtilization && utilPct !== null && (
+            <span className="ui-upstream-dashboard__hero-footer-item">
+              {utilPct}% used
+            </span>
+          )}
         </div>
       </div>
 
-      {utilPct !== null && utilizationDisplay === 'bar' && <UtilBar pct={utilPct} />}
-      {utilPct !== null && utilizationDisplay === 'meter' && (
-        <div style={{ display: 'flex', justifyContent: 'center', position: 'relative', zIndex: 1 }}>
-          <UtilMeter percent={utilPct} />
+      {/* Grouped cards below the hero */}
+      {groups && (
+        <div className="ui-upstream-dashboard__hero-groups-grid">
+          {groups.map(([key, groupLinks]) => (
+            <GroupCard
+              key={key}
+              groupName={key}
+              links={groupLinks}
+              showCapacity={showCapacity}
+              showBurstCapacity={showBurstCapacity}
+              showUtilization={showUtilization}
+              utilizationDisplay={utilizationDisplay}
+              childLabelKey={groupBy === 'vendor' ? 'location' : 'vendor'}
+            />
+          ))}
         </div>
       )}
 
-      <div className="ui-upstream-dashboard__hero-footer">
-        <span className="ui-upstream-dashboard__hero-footer-item">
-          Total: {totalFmt.value} {totalFmt.unit}
-        </span>
-        {showCapacity && capFmt && (
-          <span className="ui-upstream-dashboard__hero-footer-item">
-            Capacity: {capFmt.value} {capFmt.unit}
-          </span>
-        )}
-        {showBurstCapacity && burstCapFmt && (
-          <span className="ui-upstream-dashboard__hero-footer-item">
-            Burst: {burstCapFmt.value} {burstCapFmt.unit}
-          </span>
-        )}
-        {showUtilization && utilPct !== null && (
-          <span className="ui-upstream-dashboard__hero-footer-item">
-            {utilPct}% used
-          </span>
-        )}
-      </div>
-
-      {vendorGroups.length > 0 && (
+      {/* Flat mini cards when no grouping */}
+      {!groups && (
         <div className="ui-upstream-dashboard__hero-mini-grid">
-          {vendorGroups.map(g => {
-            const gInFmt = formatBitRateSplit(g.inbound)
-            const gOutFmt = formatBitRateSplit(g.outbound)
-            return (
-              <div key={g.vendor} className="ui-upstream-dashboard__hero-mini" data-status={g.status}>
-                <span className="ui-upstream-dashboard__hero-mini-dot" />
-                <span className="ui-upstream-dashboard__hero-mini-vendor">{g.vendor}</span>
-                <span className="ui-upstream-dashboard__hero-mini-traffic">
-                  <span style={{ color: 'oklch(72% 0.19 155)' }}>↓{gInFmt.value}</span>
-                  {' '}
-                  <span style={{ color: 'oklch(65% 0.2 270)' }}>↑{gOutFmt.value}</span>
-                  {' '}{gInFmt.unit}
-                </span>
-              </div>
-            )
-          })}
+          {links.map(link => (
+            <MiniCard
+              key={link.id}
+              link={link}
+              showCapacity={showCapacity}
+              showBurstCapacity={showBurstCapacity}
+              showUtilization={showUtilization}
+              utilizationDisplay={utilizationDisplay}
+            />
+          ))}
         </div>
       )}
-    </div>
+    </>
   )
 }
 
@@ -1608,6 +1976,12 @@ function TableView({
   showBurstCapacity?: boolean
   showUtilization?: boolean
 }) {
+  // Aggregated metrics at top
+  const totalInbound = links.reduce((s, l) => s + l.inbound, 0)
+  const totalOutbound = links.reduce((s, l) => s + l.outbound, 0)
+  const inFmtTop = formatBitRateSplit(totalInbound)
+  const outFmtTop = formatBitRateSplit(totalOutbound)
+
   // Sort by group key if grouping
   const sortedLinks = useMemo(() => {
     if (groupBy === 'none') return links
@@ -1619,105 +1993,127 @@ function TableView({
   }, [links, groupBy])
 
   return (
-    <table className="ui-upstream-dashboard__table" data-testid="table-view">
-      <thead>
-        <tr>
-          <th>Vendor</th>
-          <th>Location</th>
-          <th>↓ Inbound</th>
-          <th>↑ Outbound</th>
-          {showCapacity && <th>Capacity</th>}
-          {showBurstCapacity && <th>Burst</th>}
-          {showUtilization && <th>Util</th>}
-          <th>Trend</th>
-          <th>Status</th>
-        </tr>
-      </thead>
-      <tbody>
-        {sortedLinks.map(link => {
-          const inFmt = formatBitRateSplit(link.inbound)
-          const outFmt = formatBitRateSplit(link.outbound)
-          const utilPct = link.capacity
-            ? Math.min(100, Math.round(((link.inbound + link.outbound) / link.capacity) * 100))
-            : null
-          const capFmt = link.capacity ? formatBitRateSplit(link.capacity) : null
-          const burstFmt = link.burstCapacity ? formatBitRateSplit(link.burstCapacity) : null
+    <>
+      {/* Aggregated metrics at top */}
+      <div className="ui-upstream-dashboard__table-top-metrics">
+        <div className="ui-upstream-dashboard__hero-metric">
+          <span className="ui-upstream-dashboard__table-top-value">
+            <span className="ui-upstream-dashboard__table-top-direction ui-upstream-dashboard__table-top-direction--in" aria-hidden="true">↓</span>
+            {inFmtTop.value}
+            <span className="ui-upstream-dashboard__table-top-unit">{inFmtTop.unit}</span>
+          </span>
+          <span className="ui-upstream-dashboard__table-top-label">Inbound</span>
+        </div>
+        <div className="ui-upstream-dashboard__hero-metric">
+          <span className="ui-upstream-dashboard__table-top-value">
+            <span className="ui-upstream-dashboard__table-top-direction ui-upstream-dashboard__table-top-direction--out" aria-hidden="true">↑</span>
+            {outFmtTop.value}
+            <span className="ui-upstream-dashboard__table-top-unit">{outFmtTop.unit}</span>
+          </span>
+          <span className="ui-upstream-dashboard__table-top-label">Outbound</span>
+        </div>
+      </div>
 
-          return (
-            <tr key={link.id} data-status={link.status}>
-              <td>{link.vendor}</td>
-              <td>{link.location}</td>
-              <td>
-                <span className="ui-upstream-dashboard__table-rate">
-                  {inFmt.value}
-                  <span className="ui-upstream-dashboard__table-rate-unit">{inFmt.unit}</span>
-                </span>
-              </td>
-              <td>
-                <span className="ui-upstream-dashboard__table-rate">
-                  {outFmt.value}
-                  <span className="ui-upstream-dashboard__table-rate-unit">{outFmt.unit}</span>
-                </span>
-              </td>
-              {showCapacity && (
+      <table className="ui-upstream-dashboard__table" data-testid="table-view">
+        <thead>
+          <tr>
+            <th>Vendor</th>
+            <th>Location</th>
+            <th>↓ Inbound</th>
+            <th>↑ Outbound</th>
+            {showCapacity && <th>Capacity</th>}
+            {showBurstCapacity && <th>Burst</th>}
+            {showUtilization && <th>Util</th>}
+            <th>Trend</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          {sortedLinks.map(link => {
+            const inFmt = formatBitRateSplit(link.inbound)
+            const outFmt = formatBitRateSplit(link.outbound)
+            const utilPct = link.capacity
+              ? Math.min(100, Math.round(((link.inbound + link.outbound) / link.capacity) * 100))
+              : null
+            const capFmt = link.capacity ? formatBitRateSplit(link.capacity) : null
+            const burstFmt = link.burstCapacity ? formatBitRateSplit(link.burstCapacity) : null
+
+            return (
+              <tr key={link.id} data-status={link.status}>
+                <td>{link.vendor}</td>
+                <td>{link.location}</td>
                 <td>
-                  {capFmt ? (
-                    <span className="ui-upstream-dashboard__table-rate">
-                      {capFmt.value}
-                      <span className="ui-upstream-dashboard__table-rate-unit">{capFmt.unit}</span>
-                    </span>
-                  ) : <span>—</span>}
+                  <span className="ui-upstream-dashboard__table-rate">
+                    {inFmt.value}
+                    <span className="ui-upstream-dashboard__table-rate-unit">{inFmt.unit}</span>
+                  </span>
                 </td>
-              )}
-              {showBurstCapacity && (
                 <td>
-                  {burstFmt ? (
-                    <span className="ui-upstream-dashboard__table-rate">
-                      {burstFmt.value}
-                      <span className="ui-upstream-dashboard__table-rate-unit">{burstFmt.unit}</span>
-                    </span>
-                  ) : <span>—</span>}
+                  <span className="ui-upstream-dashboard__table-rate">
+                    {outFmt.value}
+                    <span className="ui-upstream-dashboard__table-rate-unit">{outFmt.unit}</span>
+                  </span>
                 </td>
-              )}
-              {showUtilization && (
-                <td>
-                  {utilPct !== null ? (
-                    <div className="ui-upstream-dashboard__table-util">
-                      <div className="ui-upstream-dashboard__table-util-bar">
-                        <div
-                          className="ui-upstream-dashboard__table-util-fill"
-                          style={{
-                            width: `${utilPct}%`,
-                            background: utilPct > 80 ? 'oklch(62% 0.22 25)' : utilPct > 60 ? 'oklch(80% 0.18 85)' : 'oklch(72% 0.19 155)',
-                          }}
-                        />
+                {showCapacity && (
+                  <td>
+                    {capFmt ? (
+                      <span className="ui-upstream-dashboard__table-rate">
+                        {capFmt.value}
+                        <span className="ui-upstream-dashboard__table-rate-unit">{capFmt.unit}</span>
+                      </span>
+                    ) : <span>—</span>}
+                  </td>
+                )}
+                {showBurstCapacity && (
+                  <td>
+                    {burstFmt ? (
+                      <span className="ui-upstream-dashboard__table-rate">
+                        {burstFmt.value}
+                        <span className="ui-upstream-dashboard__table-rate-unit">{burstFmt.unit}</span>
+                      </span>
+                    ) : <span>—</span>}
+                  </td>
+                )}
+                {showUtilization && (
+                  <td>
+                    {utilPct !== null ? (
+                      <div className="ui-upstream-dashboard__table-util">
+                        <div className="ui-upstream-dashboard__table-util-bar">
+                          <div
+                            className="ui-upstream-dashboard__table-util-fill"
+                            style={{
+                              width: `${utilPct}%`,
+                              background: utilPct > 80 ? 'oklch(62% 0.22 25)' : utilPct > 60 ? 'oklch(80% 0.18 85)' : 'oklch(72% 0.19 155)',
+                            }}
+                          />
+                        </div>
+                        <span>{utilPct}%</span>
                       </div>
-                      <span>{utilPct}%</span>
-                    </div>
+                    ) : (
+                      <span>—</span>
+                    )}
+                  </td>
+                )}
+                <td>
+                  {link.trend && link.trend.length >= 2 ? (
+                    <span className="ui-upstream-dashboard__table-sparkline">
+                      <InlineSparkline data={link.trend} w={60} h={20} />
+                    </span>
                   ) : (
                     <span>—</span>
                   )}
                 </td>
-              )}
-              <td>
-                {link.trend && link.trend.length >= 2 ? (
-                  <span className="ui-upstream-dashboard__table-sparkline">
-                    <InlineSparkline data={link.trend} w={60} h={20} />
+                <td>
+                  <span className="ui-upstream-dashboard__table-status">
+                    <span className="ui-upstream-dashboard__table-status-dot" data-status={link.status} role="status" aria-label={`Status: ${link.status}`} />
                   </span>
-                ) : (
-                  <span>—</span>
-                )}
-              </td>
-              <td>
-                <span className="ui-upstream-dashboard__table-status">
-                  <span className="ui-upstream-dashboard__table-status-dot" data-status={link.status} role="status" aria-label={`Status: ${link.status}`} />
-                </span>
-              </td>
-            </tr>
-          )
-        })}
-      </tbody>
-    </table>
+                </td>
+              </tr>
+            )
+          })}
+        </tbody>
+      </table>
+    </>
   )
 }
 
@@ -1888,6 +2284,7 @@ function UpstreamDashboardInner({
       {!isEmpty && effectiveMode === 'hero' && (
         <HeroView
           links={links}
+          groupBy={groupBy}
           showCapacity={showCapacity}
           showBurstCapacity={showBurstCapacity}
           showUtilization={showUtilization}

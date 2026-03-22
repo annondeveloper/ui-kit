@@ -603,7 +603,7 @@ describe('UpstreamDashboard', () => {
       const { container } = render(
         <UpstreamDashboard links={linksWithCapacity} mode="hero" />
       )
-      const minis = container.querySelectorAll('.ui-upstream-dashboard__hero-mini')
+      const minis = container.querySelectorAll('.ui-upstream-dashboard__mini-card')
       expect(minis.length).toBe(3) // Cloudflare, AWS, GCP
     })
 
@@ -742,11 +742,14 @@ describe('UpstreamDashboard', () => {
     })
 
     it('renders table header columns', () => {
-      render(<UpstreamDashboard links={linksWithCapacity} mode="table" />)
+      const { container } = render(<UpstreamDashboard links={linksWithCapacity} mode="table" />)
       expect(screen.getByText('Vendor')).toBeInTheDocument()
       expect(screen.getByText('Location')).toBeInTheDocument()
-      expect(screen.getByText(/Inbound/)).toBeInTheDocument()
-      expect(screen.getByText(/Outbound/)).toBeInTheDocument()
+      // Table has both top metrics (Inbound/Outbound labels) and th headers
+      const thInbound = container.querySelector('.ui-upstream-dashboard__table thead th:nth-child(3)')
+      expect(thInbound?.textContent).toMatch(/Inbound/)
+      const thOutbound = container.querySelector('.ui-upstream-dashboard__table thead th:nth-child(4)')
+      expect(thOutbound?.textContent).toMatch(/Outbound/)
       expect(screen.getByText('Util')).toBeInTheDocument()
       expect(screen.getByText('Trend')).toBeInTheDocument()
       expect(screen.getByText('Status')).toBeInTheDocument()
