@@ -27,9 +27,9 @@ const mockLinks: UpstreamLink[] = [
 const PROPS: PropDef[] = [
   { name: 'links', type: 'UpstreamLink[]', required: true, description: 'Array of upstream link objects that drive the entire dashboard.' },
   { name: 'title', type: 'ReactNode', default: '—', description: 'Dashboard title rendered as an h2.' },
+  { name: 'mode', type: "'hero' | 'compact' | 'table'", default: "'hero'", description: 'Visualization mode. Hero shows aggregated metrics, compact shows dense grid, table shows tabular rows.' },
   { name: 'showSummary', type: 'boolean', default: 'false', description: 'Show aggregated summary card with total inbound/outbound traffic at the top.' },
   { name: 'groupBy', type: "'vendor' | 'location' | 'none'", default: "'none'", description: 'Group upstream links by vendor name or geographic location.' },
-  { name: 'compact', type: 'boolean', default: 'false', description: 'Compact mode — smaller padding, reduced font sizes, hidden sparklines.' },
   { name: 'lastUpdated', type: 'number | Date', default: '—', description: 'Timestamp shown in the summary footer as relative time (e.g. "5s ago").' },
   { name: 'motion', type: '0 | 1 | 2 | 3', default: '3', description: 'Motion level override. 0 disables all animation.' },
 ]
@@ -328,6 +328,28 @@ const pageStyles = css`
         box-shadow: 0 0 0 4px var(--brand-subtle);
       }
 
+      /* ── Mode compare grid ──────────────────────────── */
+
+      .ud-page__modes-grid {
+        display: flex;
+        flex-direction: column;
+        gap: 2rem;
+      }
+
+      .ud-page__mode-item {
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+      }
+
+      .ud-page__mode-label {
+        font-size: var(--text-sm, 0.875rem);
+        font-weight: 600;
+        color: var(--text-secondary);
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+      }
+
       /* ── Grouping compare ──────────────────────────── */
 
       .ud-page__grouping-grid {
@@ -348,42 +370,6 @@ const pageStyles = css`
         color: var(--text-secondary);
         text-transform: uppercase;
         letter-spacing: 0.05em;
-      }
-
-      /* ── Responsive preview ─────────────────────────── */
-
-      .ud-page__responsive-stack {
-        display: flex;
-        flex-direction: column;
-        gap: 2rem;
-      }
-
-      .ud-page__responsive-item {
-        display: flex;
-        flex-direction: column;
-        gap: 0.75rem;
-      }
-
-      .ud-page__responsive-label {
-        font-size: var(--text-sm, 0.875rem);
-        font-weight: 600;
-        color: var(--text-secondary);
-      }
-
-      .ud-page__responsive-frame {
-        border: 1px solid var(--border-default);
-        border-radius: var(--radius-md);
-        overflow: hidden;
-        position: relative;
-      }
-
-      .ud-page__responsive-frame::before {
-        content: '';
-        position: absolute;
-        inset: 0;
-        background-image: radial-gradient(oklch(100% 0 0 / 0.03) 1px, transparent 1px);
-        background-size: 24px 24px;
-        pointer-events: none;
       }
 
       /* ── A11y list ──────────────────────────────────── */
@@ -453,9 +439,9 @@ const pageStyles = css`
 export default function UpstreamDashboardPage() {
   useStyles('ud-page', pageStyles)
 
-  const [groupBy, setGroupBy] = useState<'none' | 'vendor' | 'location'>('vendor')
-  const [showSummary, setShowSummary] = useState(true)
-  const [compact, setCompact] = useState(false)
+  const [mode, setMode] = useState<'hero' | 'compact' | 'table'>('hero')
+  const [groupBy, setGroupBy] = useState<'none' | 'vendor' | 'location'>('none')
+  const [showSummary, setShowSummary] = useState(false)
   const [title, setTitle] = useState('Network Operations Center')
 
   // Scroll reveal fallback for browsers without animation-timeline
@@ -496,10 +482,10 @@ export default function UpstreamDashboardPage() {
       <div className="ud-page__hero">
         <h1 className="ud-page__title">UpstreamDashboard</h1>
         <p className="ud-page__desc">
-          A JSON-driven Network Operations Center dashboard. Pass an array of upstream
-          link objects and get a complete NOC view with summary cards, traffic metrics,
-          sparkline trends, status indicators, and vendor/location grouping. Fully responsive
-          from smartwatch to video wall via container queries.
+          A metrics-dominant NOC dashboard. Three visualization modes: hero (massive aggregated
+          metrics with trendline background), compact (dense card grid), and table (ultra-dense
+          tabular). Built for operators who need to see traffic, direction, health, trend, and
+          capacity utilization in one second.
         </p>
         <div className="ud-page__import-row">
           <code className="ud-page__import-code">
@@ -514,8 +500,8 @@ export default function UpstreamDashboardPage() {
           <a href="#live-demo">Live Demo</a>
         </h2>
         <p className="ud-page__section-desc">
-          A full working NOC dashboard with 10 upstream links across 5 transit vendors.
-          Use the controls to toggle grouping, summary, and compact mode in real time.
+          10 upstream links across 5 transit vendors. Switch between hero, compact, and table
+          modes. Toggle grouping and summary to explore all combinations.
         </p>
 
         <div className="ud-page__playground">
@@ -523,14 +509,30 @@ export default function UpstreamDashboardPage() {
             <UpstreamDashboard
               links={mockLinks}
               title={title}
+              mode={mode}
               showSummary={showSummary}
               groupBy={groupBy}
-              compact={compact}
               lastUpdated={Date.now() - 5000}
             />
           </div>
 
           <div className="ud-page__controls">
+            <div className="ud-page__control-group">
+              <span className="ud-page__control-label">Mode</span>
+              <div className="ud-page__control-options">
+                {(['hero', 'compact', 'table'] as const).map(v => (
+                  <button
+                    key={v}
+                    type="button"
+                    className={`ud-page__option-btn${mode === v ? ' ud-page__option-btn--active' : ''}`}
+                    onClick={() => setMode(v)}
+                  >
+                    {v}
+                  </button>
+                ))}
+              </div>
+            </div>
+
             <div className="ud-page__control-group">
               <span className="ud-page__control-label">Group By</span>
               <div className="ud-page__control-options">
@@ -561,19 +563,6 @@ export default function UpstreamDashboardPage() {
             </div>
 
             <div className="ud-page__control-group">
-              <div className="ud-page__toggle-row">
-                <label className="ud-page__toggle-label">
-                  <input
-                    type="checkbox"
-                    checked={compact}
-                    onChange={e => setCompact(e.target.checked)}
-                  />
-                  Compact
-                </label>
-              </div>
-            </div>
-
-            <div className="ud-page__control-group">
               <span className="ud-page__control-label">Title</span>
               <input
                 type="text"
@@ -586,7 +575,50 @@ export default function UpstreamDashboardPage() {
         </div>
       </section>
 
-      {/* ── 3. JSON Payload ────────────────────────────── */}
+      {/* ── 3. Three Modes Side by Side ───────────────────── */}
+      <section className="ud-page__section" id="modes">
+        <h2 className="ud-page__section-title">
+          <a href="#modes">Three Visualization Modes</a>
+        </h2>
+        <p className="ud-page__section-desc">
+          Hero mode dominates with massive aggregated metrics and a trendline background.
+          Compact mode packs dense cards. Table mode gives you ultra-dense rows with inline sparklines.
+        </p>
+
+        <div className="ud-page__modes-grid">
+          <div className="ud-page__mode-item">
+            <span className="ud-page__mode-label">Hero Mode</span>
+            <div className="ud-page__preview">
+              <UpstreamDashboard
+                links={mockLinks}
+                mode="hero"
+              />
+            </div>
+          </div>
+
+          <div className="ud-page__mode-item">
+            <span className="ud-page__mode-label">Compact Mode</span>
+            <div className="ud-page__preview">
+              <UpstreamDashboard
+                links={mockLinks.slice(0, 6)}
+                mode="compact"
+              />
+            </div>
+          </div>
+
+          <div className="ud-page__mode-item">
+            <span className="ud-page__mode-label">Table Mode</span>
+            <div className="ud-page__preview">
+              <UpstreamDashboard
+                links={mockLinks}
+                mode="table"
+              />
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ── 4. JSON Payload ────────────────────────────── */}
       <section className="ud-page__section" id="json-payload">
         <h2 className="ud-page__section-title">
           <a href="#json-payload">JSON Payload</a>
@@ -611,6 +643,7 @@ export default function UpstreamDashboardPage() {
 <UpstreamDashboard
   links={data}
   title="Network Operations"
+  mode="hero"
   showSummary
   groupBy="vendor"
 />`}
@@ -618,24 +651,24 @@ export default function UpstreamDashboardPage() {
         />
       </section>
 
-      {/* ── 4. Grouping Modes ─────────────────────────── */}
+      {/* ── 5. Grouping Modes ─────────────────────────── */}
       <section className="ud-page__section" id="grouping">
         <h2 className="ud-page__section-title">
-          <a href="#grouping">Grouping Modes</a>
+          <a href="#grouping">Grouping in Compact Mode</a>
         </h2>
         <p className="ud-page__section-desc">
-          Links can be displayed flat (none), grouped by transit vendor, or grouped by
-          geographic location. Each group header shows aggregate traffic and is collapsible.
+          Compact and table modes support grouping by vendor or location.
+          Each group header shows aggregate traffic and is collapsible.
         </p>
 
         <div className="ud-page__grouping-grid">
           <div className="ud-page__grouping-item">
-            <span className="ud-page__grouping-label">None (flat grid)</span>
+            <span className="ud-page__grouping-label">No grouping</span>
             <div className="ud-page__preview">
               <UpstreamDashboard
                 links={mockLinks.slice(0, 4)}
+                mode="compact"
                 groupBy="none"
-                compact
               />
             </div>
           </div>
@@ -645,55 +678,9 @@ export default function UpstreamDashboardPage() {
             <div className="ud-page__preview">
               <UpstreamDashboard
                 links={mockLinks.slice(0, 4)}
+                mode="compact"
                 groupBy="vendor"
-                compact
               />
-            </div>
-          </div>
-
-          <div className="ud-page__grouping-item">
-            <span className="ud-page__grouping-label">Grouped by Location</span>
-            <div className="ud-page__preview">
-              <UpstreamDashboard
-                links={mockLinks.slice(0, 4)}
-                groupBy="location"
-                compact
-              />
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ── 5. Responsive Preview ──────────────────────── */}
-      <section className="ud-page__section" id="responsive">
-        <h2 className="ud-page__section-title">
-          <a href="#responsive">Responsive — Smartwatch to Video Wall</a>
-        </h2>
-        <p className="ud-page__section-desc">
-          The dashboard uses container queries to adapt from a 200px smartwatch to multi-thousand-pixel
-          video walls. Summary cards reflow, link grids adjust column count, and compact mode
-          strips sparklines for tight spaces.
-        </p>
-
-        <div className="ud-page__responsive-stack">
-          <div className="ud-page__responsive-item">
-            <span className="ud-page__responsive-label">Desktop (full width)</span>
-            <div className="ud-page__responsive-frame">
-              <UpstreamDashboard links={mockLinks.slice(0, 4)} showSummary groupBy="vendor" />
-            </div>
-          </div>
-
-          <div className="ud-page__responsive-item">
-            <span className="ud-page__responsive-label">Phone (360px)</span>
-            <div className="ud-page__responsive-frame" style={{ maxWidth: 360 }}>
-              <UpstreamDashboard links={mockLinks.slice(0, 3)} showSummary compact />
-            </div>
-          </div>
-
-          <div className="ud-page__responsive-item">
-            <span className="ud-page__responsive-label">Smartwatch (200px)</span>
-            <div className="ud-page__responsive-frame" style={{ maxWidth: 200 }}>
-              <UpstreamDashboard links={mockLinks.slice(0, 2)} showSummary compact />
             </div>
           </div>
         </div>
@@ -730,7 +717,7 @@ export default function UpstreamDashboardPage() {
           </li>
           <li className="ud-page__a11y-item">
             <span className="ud-page__a11y-icon" aria-hidden="true">&#10003;</span>
-            Each link card uses <code>role="group"</code> with a descriptive <code>aria-label</code> including vendor and location.
+            Each link/compact card uses <code>role="group"</code> with a descriptive <code>aria-label</code>.
           </li>
           <li className="ud-page__a11y-item">
             <span className="ud-page__a11y-icon" aria-hidden="true">&#10003;</span>

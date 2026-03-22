@@ -121,7 +121,7 @@ describe('UpstreamDashboard', () => {
     })
   })
 
-  // ─── Rendering ────────────────────────────────────────────────────────
+  // ─── Rendering (legacy mode — no mode prop) ─────────────────────────
 
   describe('rendering', () => {
     it('renders with scope class', () => {
@@ -357,7 +357,7 @@ describe('UpstreamDashboard', () => {
     })
   })
 
-  // ─── Compact Mode ────────────────────────────────────────────────────
+  // ─── Compact Mode (legacy prop) ────────────────────────────────────
 
   describe('compact mode', () => {
     it('applies compact data attribute', () => {
@@ -540,6 +540,304 @@ describe('UpstreamDashboard', () => {
       // If ErrorBoundary catches, it renders fallback. We just verify no crash.
       const { container } = render(<UpstreamDashboard links={sampleLinks} />)
       expect(container.querySelector('.ui-upstream-dashboard')).toBeInTheDocument()
+    })
+  })
+
+  // ═══════════════════════════════════════════════════════════════════════
+  // NEW TESTS — Three Visualization Modes
+  // ═══════════════════════════════════════════════════════════════════════
+
+  describe('mode="hero"', () => {
+    const linksWithCapacity = sampleLinks.map(l => ({
+      ...l,
+      capacity: 500000000, // 4 Gbps
+      trend: [10, 20, 30, 40, 50],
+    }))
+
+    it('renders hero card', () => {
+      const { container } = render(
+        <UpstreamDashboard links={linksWithCapacity} mode="hero" />
+      )
+      expect(screen.getByTestId('hero-card')).toBeInTheDocument()
+    })
+
+    it('sets data-mode="hero"', () => {
+      const { container } = render(
+        <UpstreamDashboard links={linksWithCapacity} mode="hero" />
+      )
+      expect(container.querySelector('[data-mode="hero"]')).toBeInTheDocument()
+    })
+
+    it('renders aggregated inbound and outbound metrics', () => {
+      render(<UpstreamDashboard links={linksWithCapacity} mode="hero" />)
+      // Total inbound = 437.5M bytes/s = 3.50 Gbps
+      expect(screen.getByText('3.50')).toBeInTheDocument()
+      expect(screen.getByText('Inbound')).toBeInTheDocument()
+      expect(screen.getByText('Outbound')).toBeInTheDocument()
+    })
+
+    it('renders utilization bar', () => {
+      const { container } = render(
+        <UpstreamDashboard links={linksWithCapacity} mode="hero" />
+      )
+      expect(container.querySelector('.ui-upstream-dashboard__util-bar')).toBeInTheDocument()
+      expect(container.querySelector('.ui-upstream-dashboard__util-fill')).toBeInTheDocument()
+    })
+
+    it('renders trendline background when trend data provided', () => {
+      const { container } = render(
+        <UpstreamDashboard links={linksWithCapacity} mode="hero" />
+      )
+      expect(container.querySelector('.ui-upstream-dashboard__hero-trendline')).toBeInTheDocument()
+    })
+
+    it('does not render trendline background without trend data', () => {
+      const noTrend = sampleLinks.map(l => ({ ...l, capacity: 500000000 }))
+      const { container } = render(
+        <UpstreamDashboard links={noTrend} mode="hero" />
+      )
+      expect(container.querySelector('.ui-upstream-dashboard__hero-trendline')).not.toBeInTheDocument()
+    })
+
+    it('renders mini vendor cards', () => {
+      const { container } = render(
+        <UpstreamDashboard links={linksWithCapacity} mode="hero" />
+      )
+      const minis = container.querySelectorAll('.ui-upstream-dashboard__hero-mini')
+      expect(minis.length).toBe(3) // Cloudflare, AWS, GCP
+    })
+
+    it('renders total/capacity/used in footer', () => {
+      render(<UpstreamDashboard links={linksWithCapacity} mode="hero" />)
+      expect(screen.getByText(/used/)).toBeInTheDocument()
+      expect(screen.getByText(/Capacity:/)).toBeInTheDocument()
+      expect(screen.getByText(/Total:/)).toBeInTheDocument()
+    })
+
+    it('does not render legacy link cards in hero mode', () => {
+      const { container } = render(
+        <UpstreamDashboard links={linksWithCapacity} mode="hero" />
+      )
+      expect(container.querySelector('.ui-upstream-dashboard__link')).not.toBeInTheDocument()
+      expect(container.querySelector('.ui-upstream-dashboard__grid')).not.toBeInTheDocument()
+    })
+
+    it('has no axe violations', async () => {
+      const { container } = render(
+        <UpstreamDashboard links={linksWithCapacity} mode="hero" title="Hero NOC" showSummary />
+      )
+      const results = await axe(container)
+      expect(results).toHaveNoViolations()
+    })
+  })
+
+  describe('mode="compact"', () => {
+    const linksWithCapacity = sampleLinks.map(l => ({
+      ...l,
+      capacity: 500000000,
+      trend: [10, 20, 30],
+    }))
+
+    it('renders compact cards grid', () => {
+      const { container } = render(
+        <UpstreamDashboard links={linksWithCapacity} mode="compact" />
+      )
+      expect(screen.getByTestId('compact-grid')).toBeInTheDocument()
+    })
+
+    it('sets data-mode="compact"', () => {
+      const { container } = render(
+        <UpstreamDashboard links={linksWithCapacity} mode="compact" />
+      )
+      expect(container.querySelector('[data-mode="compact"]')).toBeInTheDocument()
+    })
+
+    it('renders one compact card per link', () => {
+      const { container } = render(
+        <UpstreamDashboard links={linksWithCapacity} mode="compact" />
+      )
+      const cards = container.querySelectorAll('.ui-upstream-dashboard__compact-card')
+      expect(cards.length).toBe(3)
+    })
+
+    it('compact cards show vendor and location', () => {
+      render(<UpstreamDashboard links={linksWithCapacity} mode="compact" />)
+      expect(screen.getByText('Cloudflare')).toBeInTheDocument()
+      expect(screen.getByText('us-east-1')).toBeInTheDocument()
+    })
+
+    it('compact cards have status border', () => {
+      const { container } = render(
+        <UpstreamDashboard links={linksWithCapacity} mode="compact" />
+      )
+      expect(container.querySelector('.ui-upstream-dashboard__compact-card[data-status="ok"]')).toBeInTheDocument()
+      expect(container.querySelector('.ui-upstream-dashboard__compact-card[data-status="warning"]')).toBeInTheDocument()
+      expect(container.querySelector('.ui-upstream-dashboard__compact-card[data-status="critical"]')).toBeInTheDocument()
+    })
+
+    it('compact cards have role=group with aria-label', () => {
+      const { container } = render(
+        <UpstreamDashboard links={[makeLink({ id: 'a', vendor: 'Telia', location: 'Frankfurt' })]} mode="compact" />
+      )
+      expect(screen.getByLabelText('Telia Frankfurt')).toBeInTheDocument()
+    })
+
+    it('compact cards render inline sparkline when trend data exists', () => {
+      const { container } = render(
+        <UpstreamDashboard links={linksWithCapacity} mode="compact" />
+      )
+      expect(container.querySelector('.ui-upstream-dashboard__compact-sparkline')).toBeInTheDocument()
+    })
+
+    it('compact cards render utilization percentage', () => {
+      render(<UpstreamDashboard links={linksWithCapacity} mode="compact" />)
+      // Each link has capacity, so utilization should be shown
+      const pcts = screen.getAllByText(/%/)
+      expect(pcts.length).toBeGreaterThanOrEqual(3)
+    })
+
+    it('does not render legacy link cards in compact mode', () => {
+      const { container } = render(
+        <UpstreamDashboard links={linksWithCapacity} mode="compact" />
+      )
+      expect(container.querySelector('.ui-upstream-dashboard__link')).not.toBeInTheDocument()
+    })
+
+    it('groups by vendor in compact mode', () => {
+      const { container } = render(
+        <UpstreamDashboard links={linksWithCapacity} mode="compact" groupBy="vendor" />
+      )
+      const groups = container.querySelectorAll('.ui-upstream-dashboard__group')
+      expect(groups.length).toBe(3) // Cloudflare, AWS, GCP
+    })
+
+    it('has no axe violations', async () => {
+      const { container } = render(
+        <UpstreamDashboard links={linksWithCapacity} mode="compact" title="Compact NOC" showSummary />
+      )
+      const results = await axe(container)
+      expect(results).toHaveNoViolations()
+    })
+  })
+
+  describe('mode="table"', () => {
+    const linksWithCapacity = sampleLinks.map(l => ({
+      ...l,
+      capacity: 500000000,
+      trend: [10, 20, 30],
+    }))
+
+    it('renders table', () => {
+      const { container } = render(
+        <UpstreamDashboard links={linksWithCapacity} mode="table" />
+      )
+      expect(screen.getByTestId('table-view')).toBeInTheDocument()
+    })
+
+    it('sets data-mode="table"', () => {
+      const { container } = render(
+        <UpstreamDashboard links={linksWithCapacity} mode="table" />
+      )
+      expect(container.querySelector('[data-mode="table"]')).toBeInTheDocument()
+    })
+
+    it('renders table header columns', () => {
+      render(<UpstreamDashboard links={linksWithCapacity} mode="table" />)
+      expect(screen.getByText('Vendor')).toBeInTheDocument()
+      expect(screen.getByText('Location')).toBeInTheDocument()
+      expect(screen.getByText(/Inbound/)).toBeInTheDocument()
+      expect(screen.getByText(/Outbound/)).toBeInTheDocument()
+      expect(screen.getByText('Util')).toBeInTheDocument()
+      expect(screen.getByText('Trend')).toBeInTheDocument()
+      expect(screen.getByText('Status')).toBeInTheDocument()
+    })
+
+    it('renders one row per link', () => {
+      const { container } = render(
+        <UpstreamDashboard links={linksWithCapacity} mode="table" />
+      )
+      const rows = container.querySelectorAll('.ui-upstream-dashboard__table tbody tr')
+      expect(rows.length).toBe(3)
+    })
+
+    it('renders vendor and location in table cells', () => {
+      render(<UpstreamDashboard links={linksWithCapacity} mode="table" />)
+      expect(screen.getByText('Cloudflare')).toBeInTheDocument()
+      expect(screen.getByText('us-east-1')).toBeInTheDocument()
+      expect(screen.getByText('AWS')).toBeInTheDocument()
+      expect(screen.getByText('eu-west-1')).toBeInTheDocument()
+    })
+
+    it('renders inline utilization bars', () => {
+      const { container } = render(
+        <UpstreamDashboard links={linksWithCapacity} mode="table" />
+      )
+      const utilBars = container.querySelectorAll('.ui-upstream-dashboard__table-util-bar')
+      expect(utilBars.length).toBe(3)
+    })
+
+    it('renders inline sparklines in table', () => {
+      const { container } = render(
+        <UpstreamDashboard links={linksWithCapacity} mode="table" />
+      )
+      const sparklines = container.querySelectorAll('.ui-upstream-dashboard__table-sparkline svg')
+      expect(sparklines.length).toBe(3)
+    })
+
+    it('renders status dots in table', () => {
+      const { container } = render(
+        <UpstreamDashboard links={linksWithCapacity} mode="table" />
+      )
+      const dots = container.querySelectorAll('.ui-upstream-dashboard__table-status-dot')
+      expect(dots.length).toBe(3)
+      expect(container.querySelector('.ui-upstream-dashboard__table-status-dot[data-status="ok"]')).toBeInTheDocument()
+      expect(container.querySelector('.ui-upstream-dashboard__table-status-dot[data-status="warning"]')).toBeInTheDocument()
+      expect(container.querySelector('.ui-upstream-dashboard__table-status-dot[data-status="critical"]')).toBeInTheDocument()
+    })
+
+    it('does not render legacy link cards in table mode', () => {
+      const { container } = render(
+        <UpstreamDashboard links={linksWithCapacity} mode="table" />
+      )
+      expect(container.querySelector('.ui-upstream-dashboard__link')).not.toBeInTheDocument()
+    })
+
+    it('renders em-dash for missing capacity', () => {
+      const noCapLinks = sampleLinks.map(l => ({ ...l, trend: [10, 20, 30] }))
+      render(<UpstreamDashboard links={noCapLinks} mode="table" />)
+      // Should render "—" for util column
+      const dashes = screen.getAllByText('—')
+      expect(dashes.length).toBeGreaterThanOrEqual(3)
+    })
+
+    it('has no axe violations', async () => {
+      const { container } = render(
+        <UpstreamDashboard links={linksWithCapacity} mode="table" title="Table NOC" showSummary />
+      )
+      const results = await axe(container)
+      expect(results).toHaveNoViolations()
+    })
+  })
+
+  // ─── Mode interactions ─────────────────────────────────────────────────
+
+  describe('mode interactions', () => {
+    it('compact prop maps to compact mode when mode is not set', () => {
+      const { container } = render(
+        <UpstreamDashboard links={sampleLinks} compact />
+      )
+      // compact prop without mode should still set data-compact for backwards compat
+      expect(container.querySelector('[data-compact]')).toBeInTheDocument()
+    })
+
+    it('showSummary works with all modes', () => {
+      for (const mode of ['hero', 'compact', 'table'] as const) {
+        cleanup()
+        const { container } = render(
+          <UpstreamDashboard links={sampleLinks} mode={mode} showSummary />
+        )
+        expect(container.querySelector('.ui-upstream-dashboard__summary')).toBeInTheDocument()
+      }
     })
   })
 })

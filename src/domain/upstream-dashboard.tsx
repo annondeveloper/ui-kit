@@ -31,16 +31,18 @@ export interface UpstreamDashboardProps extends Omit<HTMLAttributes<HTMLDivEleme
   links: UpstreamLink[]
   /** Dashboard title */
   title?: ReactNode
-  /** Show aggregated summary card at top */
+  /** Visualization mode */
+  mode?: 'hero' | 'compact' | 'table'
+  /** Show aggregated summary at top */
   showSummary?: boolean
-  /** Group links by vendor or location */
+  /** Group links */
   groupBy?: 'vendor' | 'location' | 'none'
-  /** Compact mode for smaller screens */
-  compact?: boolean
-  /** Refresh interval indicator */
+  /** Last updated timestamp */
   lastUpdated?: number | Date
   /** Motion level */
   motion?: 0 | 1 | 2 | 3
+  /** @deprecated Use mode='compact' instead */
+  compact?: boolean
 }
 
 // ─── Helpers ────────────────────────────────────────────────────────────────
@@ -60,6 +62,13 @@ export function formatRelativeTime(timestamp: number): string {
   if (diff < 3600) return `${Math.floor(diff / 60)}m ago`
   if (diff < 86400) return `${Math.floor(diff / 3600)}h ago`
   return `${Math.floor(diff / 86400)}d ago`
+}
+
+function computeUtilization(links: UpstreamLink[]): number | null {
+  const totalTraffic = links.reduce((s, l) => s + l.inbound + l.outbound, 0)
+  const totalCapacity = links.reduce((s, l) => s + (l.capacity ?? 0), 0)
+  if (totalCapacity <= 0) return null
+  return Math.min(100, Math.round((totalTraffic / totalCapacity) * 100))
 }
 
 // ─── Styles ─────────────────────────────────────────────────────────────────
@@ -98,7 +107,6 @@ const upstreamDashboardStyles = css`
         overflow: hidden;
       }
 
-      /* Aurora glow on summary */
       .ui-upstream-dashboard__summary::before {
         content: '';
         position: absolute;
@@ -210,14 +218,484 @@ const upstreamDashboardStyles = css`
         50% { opacity: 0.5; }
       }
 
-      /* ── Link Grid ────────────────────────────────────────────── */
+      /* ═══════════════════════════════════════════════════════════
+         HERO MODE — the metric IS the card
+         ═══════════════════════════════════════════════════════════ */
+
+      .ui-upstream-dashboard__hero-card {
+        position: relative;
+        padding: clamp(1.5rem, 4vw, 3rem);
+        background: var(--bg-elevated, oklch(20% 0.02 270));
+        border: 1px solid var(--border-default, oklch(100% 0 0 / 0.1));
+        border-radius: var(--radius-lg, 0.75rem);
+        overflow: hidden;
+        min-height: 160px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        gap: 0.75rem;
+      }
+
+      /* Aurora glow on hero */
+      .ui-upstream-dashboard__hero-card::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        border-radius: inherit;
+        background: radial-gradient(
+          ellipse at 30% 0%,
+          oklch(from var(--aurora-1, oklch(70% 0.15 270)) l c h / 0.06) 0%,
+          transparent 60%
+        ),
+        radial-gradient(
+          ellipse at 70% 100%,
+          oklch(from var(--aurora-2, oklch(70% 0.15 330)) l c h / 0.04) 0%,
+          transparent 50%
+        );
+        pointer-events: none;
+        z-index: 0;
+      }
+
+      .ui-upstream-dashboard__hero-card > * {
+        position: relative;
+        z-index: 1;
+      }
+
+      /* Trendline background — fills entire hero card */
+      .ui-upstream-dashboard__hero-trendline {
+        position: absolute;
+        inset: 0;
+        z-index: 0;
+        pointer-events: none;
+      }
+
+      .ui-upstream-dashboard__hero-trendline svg {
+        display: block;
+        width: 100%;
+        height: 100%;
+      }
+
+      /* Massive metrics row */
+      .ui-upstream-dashboard__hero-metrics {
+        display: flex;
+        justify-content: center;
+        align-items: baseline;
+        gap: clamp(2rem, 8vw, 6rem);
+        flex-wrap: wrap;
+        position: relative;
+        z-index: 1;
+      }
+
+      .ui-upstream-dashboard__hero-metric {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.125rem;
+      }
+
+      .ui-upstream-dashboard__hero-value {
+        font-size: clamp(2.5rem, 8vw, 5rem);
+        font-weight: 900;
+        letter-spacing: -0.04em;
+        line-height: 1;
+        font-variant-numeric: tabular-nums;
+        color: var(--text-primary, oklch(90% 0 0));
+        display: flex;
+        align-items: baseline;
+      }
+
+      .ui-upstream-dashboard__hero-direction {
+        font-size: 0.5em;
+        margin-inline-end: 0.25em;
+      }
+
+      .ui-upstream-dashboard__hero-direction--in { color: oklch(72% 0.19 155); }
+      .ui-upstream-dashboard__hero-direction--out { color: oklch(65% 0.2 270); }
+
+      .ui-upstream-dashboard__hero-unit {
+        font-size: 0.35em;
+        font-weight: 500;
+        color: var(--text-tertiary, oklch(55% 0 0));
+        margin-inline-start: 0.125em;
+      }
+
+      .ui-upstream-dashboard__hero-label {
+        font-size: var(--text-sm, 0.875rem);
+        color: var(--text-secondary, oklch(70% 0 0));
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+      }
+
+      /* Thin utilization bar */
+      .ui-upstream-dashboard__util-bar {
+        position: relative;
+        z-index: 1;
+        height: 3px;
+        border-radius: 2px;
+        background: oklch(100% 0 0 / 0.06);
+        overflow: hidden;
+      }
+
+      .ui-upstream-dashboard__util-fill {
+        height: 100%;
+        border-radius: 2px;
+        transition: width 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+      }
+
+      .ui-upstream-dashboard__util-fill[data-level="ok"] {
+        background: oklch(72% 0.19 155);
+      }
+      .ui-upstream-dashboard__util-fill[data-level="warning"] {
+        background: oklch(80% 0.18 85);
+      }
+      .ui-upstream-dashboard__util-fill[data-level="critical"] {
+        background: oklch(62% 0.22 25);
+      }
+
+      /* Hero footer — total / capacity / pct */
+      .ui-upstream-dashboard__hero-footer {
+        display: flex;
+        justify-content: center;
+        gap: 1.5rem;
+        flex-wrap: wrap;
+        font-size: var(--text-sm, 0.875rem);
+        color: var(--text-secondary, oklch(70% 0 0));
+        position: relative;
+        z-index: 1;
+      }
+
+      .ui-upstream-dashboard__hero-footer-item {
+        display: flex;
+        align-items: center;
+        gap: 0.25rem;
+      }
+
+      /* Mini cards below hero */
+      .ui-upstream-dashboard__hero-mini-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 0.5rem;
+        margin-block-start: 0.5rem;
+      }
+
+      .ui-upstream-dashboard__hero-mini {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.5rem 0.75rem;
+        background: var(--bg-surface, oklch(22% 0.02 270));
+        border: 1px solid var(--border-subtle, oklch(100% 0 0 / 0.08));
+        border-radius: var(--radius-md, 0.5rem);
+        font-size: var(--text-sm, 0.875rem);
+        overflow: hidden;
+      }
+
+      .ui-upstream-dashboard__hero-mini-dot {
+        flex-shrink: 0;
+        inline-size: 0.375rem;
+        block-size: 0.375rem;
+        border-radius: 50%;
+        background: oklch(60% 0 0);
+      }
+
+      .ui-upstream-dashboard__hero-mini[data-status="ok"] .ui-upstream-dashboard__hero-mini-dot {
+        background: oklch(72% 0.19 155);
+        box-shadow: 0 0 4px oklch(72% 0.19 155 / 0.5);
+      }
+      .ui-upstream-dashboard__hero-mini[data-status="warning"] .ui-upstream-dashboard__hero-mini-dot {
+        background: oklch(80% 0.18 85);
+        box-shadow: 0 0 4px oklch(80% 0.18 85 / 0.5);
+      }
+      .ui-upstream-dashboard__hero-mini[data-status="critical"] .ui-upstream-dashboard__hero-mini-dot {
+        background: oklch(62% 0.22 25);
+        box-shadow: 0 0 4px oklch(62% 0.22 25 / 0.5);
+        animation: ui-ud-pulse 1.5s ease-in-out infinite;
+      }
+
+      .ui-upstream-dashboard__hero-mini-vendor {
+        font-weight: 600;
+        color: var(--text-primary, oklch(90% 0 0));
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      .ui-upstream-dashboard__hero-mini-traffic {
+        margin-inline-start: auto;
+        font-variant-numeric: tabular-nums;
+        white-space: nowrap;
+        color: var(--text-secondary, oklch(70% 0 0));
+        font-weight: 500;
+      }
+
+      /* ═══════════════════════════════════════════════════════════
+         COMPACT MODE — dense grid of small cards
+         ═══════════════════════════════════════════════════════════ */
+
+      .ui-upstream-dashboard__compact-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 0.75rem;
+        container-type: inline-size;
+      }
+
+      @container (max-width: 300px) {
+        .ui-upstream-dashboard__compact-grid { grid-template-columns: 1fr; }
+      }
+
+      @container (min-width: 3000px) {
+        .ui-upstream-dashboard__compact-grid { grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); }
+      }
+
+      .ui-upstream-dashboard__compact-card {
+        background: var(--bg-surface, oklch(22% 0.02 270));
+        border: 1px solid var(--border-subtle, oklch(100% 0 0 / 0.08));
+        border-radius: var(--radius-md, 0.5rem);
+        padding: 0.75rem 1rem;
+        position: relative;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        gap: 0.25rem;
+        transition: box-shadow 0.2s ease-out, transform 0.2s ease-out;
+      }
+
+      :scope[data-motion="0"] .ui-upstream-dashboard__compact-card {
+        transition: none;
+      }
+
+      @media (hover: hover) {
+        .ui-upstream-dashboard__compact-card:hover {
+          transform: translateY(-1px);
+          box-shadow: 0 4px 12px oklch(0% 0 0 / 0.2);
+        }
+        :scope[data-motion="0"] .ui-upstream-dashboard__compact-card:hover {
+          transform: none;
+        }
+      }
+
+      /* Status-colored left border */
+      .ui-upstream-dashboard__compact-card[data-status="ok"] { border-inline-start: 3px solid oklch(72% 0.19 155); }
+      .ui-upstream-dashboard__compact-card[data-status="warning"] { border-inline-start: 3px solid oklch(80% 0.18 85); }
+      .ui-upstream-dashboard__compact-card[data-status="critical"] { border-inline-start: 3px solid oklch(62% 0.22 25); }
+      .ui-upstream-dashboard__compact-card[data-status="unknown"] { border-inline-start: 3px solid oklch(60% 0 0); }
+
+      .ui-upstream-dashboard__compact-header {
+        display: flex;
+        align-items: center;
+        gap: 0.375rem;
+        font-size: var(--text-xs, 0.75rem);
+        color: var(--text-secondary, oklch(70% 0 0));
+      }
+
+      .ui-upstream-dashboard__compact-dot {
+        flex-shrink: 0;
+        inline-size: 0.375rem;
+        block-size: 0.375rem;
+        border-radius: 50%;
+      }
+
+      .ui-upstream-dashboard__compact-card[data-status="ok"] .ui-upstream-dashboard__compact-dot {
+        background: oklch(72% 0.19 155);
+        box-shadow: 0 0 4px oklch(72% 0.19 155 / 0.5);
+      }
+      .ui-upstream-dashboard__compact-card[data-status="warning"] .ui-upstream-dashboard__compact-dot {
+        background: oklch(80% 0.18 85);
+        box-shadow: 0 0 4px oklch(80% 0.18 85 / 0.5);
+      }
+      .ui-upstream-dashboard__compact-card[data-status="critical"] .ui-upstream-dashboard__compact-dot {
+        background: oklch(62% 0.22 25);
+        box-shadow: 0 0 4px oklch(62% 0.22 25 / 0.5);
+        animation: ui-ud-pulse 1.5s ease-in-out infinite;
+      }
+      .ui-upstream-dashboard__compact-card[data-status="unknown"] .ui-upstream-dashboard__compact-dot {
+        background: oklch(60% 0 0);
+      }
+
+      .ui-upstream-dashboard__compact-metrics {
+        display: flex;
+        gap: 1rem;
+        align-items: baseline;
+      }
+
+      .ui-upstream-dashboard__compact-value {
+        font-size: clamp(1.125rem, 3vw, 1.5rem);
+        font-weight: 800;
+        font-variant-numeric: tabular-nums;
+        letter-spacing: -0.02em;
+        color: var(--text-primary, oklch(90% 0 0));
+        display: flex;
+        align-items: baseline;
+      }
+
+      .ui-upstream-dashboard__compact-value-unit {
+        font-size: 0.55em;
+        font-weight: 500;
+        color: var(--text-tertiary, oklch(55% 0 0));
+        margin-inline-start: 0.2em;
+      }
+
+      .ui-upstream-dashboard__compact-direction {
+        font-size: 0.7em;
+        margin-inline-end: 0.15em;
+      }
+
+      .ui-upstream-dashboard__compact-direction--in { color: oklch(72% 0.19 155); }
+      .ui-upstream-dashboard__compact-direction--out { color: oklch(65% 0.2 270); }
+
+      /* Compact footer: mini trendline + util bar */
+      .ui-upstream-dashboard__compact-footer {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 0.6875rem;
+        color: var(--text-tertiary, oklch(55% 0 0));
+      }
+
+      .ui-upstream-dashboard__compact-sparkline svg {
+        display: block;
+        width: 60px;
+        height: 16px;
+      }
+
+      .ui-upstream-dashboard__compact-util {
+        display: flex;
+        align-items: center;
+        gap: 0.25rem;
+        flex: 1;
+      }
+
+      .ui-upstream-dashboard__compact-util-bar {
+        flex: 1;
+        height: 2px;
+        border-radius: 1px;
+        background: oklch(100% 0 0 / 0.06);
+        overflow: hidden;
+      }
+
+      .ui-upstream-dashboard__compact-util-fill {
+        height: 100%;
+        border-radius: 1px;
+      }
+
+      /* ═══════════════════════════════════════════════════════════
+         TABLE MODE — ultra-dense tabular format
+         ═══════════════════════════════════════════════════════════ */
+
+      .ui-upstream-dashboard__table {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0;
+        font-size: var(--text-sm, 0.875rem);
+      }
+
+      .ui-upstream-dashboard__table thead th {
+        padding: 0.5rem 0.75rem;
+        text-align: start;
+        font-weight: 600;
+        font-size: var(--text-xs, 0.75rem);
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        color: var(--text-tertiary, oklch(55% 0 0));
+        border-block-end: 1px solid var(--border-subtle, oklch(100% 0 0 / 0.08));
+        white-space: nowrap;
+      }
+
+      .ui-upstream-dashboard__table tbody tr {
+        transition: background 0.12s ease-out;
+      }
+
+      @media (hover: hover) {
+        .ui-upstream-dashboard__table tbody tr:hover {
+          background: oklch(100% 0 0 / 0.03);
+        }
+      }
+
+      .ui-upstream-dashboard__table td {
+        padding: 0.5rem 0.75rem;
+        border-block-end: 1px solid oklch(100% 0 0 / 0.04);
+        font-variant-numeric: tabular-nums;
+        white-space: nowrap;
+        vertical-align: middle;
+      }
+
+      .ui-upstream-dashboard__table-rate {
+        font-weight: 700;
+        color: var(--text-primary, oklch(90% 0 0));
+      }
+
+      .ui-upstream-dashboard__table-rate-unit {
+        font-weight: 400;
+        color: var(--text-tertiary, oklch(55% 0 0));
+        margin-inline-start: 0.25em;
+      }
+
+      .ui-upstream-dashboard__table-util {
+        display: flex;
+        align-items: center;
+        gap: 0.375rem;
+      }
+
+      .ui-upstream-dashboard__table-util-bar {
+        width: 60px;
+        height: 3px;
+        border-radius: 2px;
+        background: oklch(100% 0 0 / 0.06);
+        overflow: hidden;
+      }
+
+      .ui-upstream-dashboard__table-util-fill {
+        height: 100%;
+        border-radius: 2px;
+      }
+
+      .ui-upstream-dashboard__table-sparkline svg {
+        display: block;
+        width: 60px;
+        height: 20px;
+      }
+
+      .ui-upstream-dashboard__table-status {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .ui-upstream-dashboard__table-status-dot {
+        inline-size: 0.5rem;
+        block-size: 0.5rem;
+        border-radius: 50%;
+      }
+
+      .ui-upstream-dashboard__table-status-dot[data-status="ok"] {
+        background: oklch(72% 0.19 155);
+        box-shadow: 0 0 4px oklch(72% 0.19 155 / 0.5);
+      }
+      .ui-upstream-dashboard__table-status-dot[data-status="warning"] {
+        background: oklch(80% 0.18 85);
+        box-shadow: 0 0 4px oklch(80% 0.18 85 / 0.5);
+      }
+      .ui-upstream-dashboard__table-status-dot[data-status="critical"] {
+        background: oklch(62% 0.22 25);
+        box-shadow: 0 0 4px oklch(62% 0.22 25 / 0.5);
+        animation: ui-ud-pulse 1.5s ease-in-out infinite;
+      }
+      .ui-upstream-dashboard__table-status-dot[data-status="unknown"] {
+        background: oklch(60% 0 0);
+      }
+
+      /* ═══════════════════════════════════════════════════════════
+         LEGACY — link grid (used when mode not specified and
+         no compact prop, for backwards compatibility)
+         ═══════════════════════════════════════════════════════════ */
+
       .ui-upstream-dashboard__grid {
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(min(280px, 100%), 1fr));
         gap: var(--space-md, 1rem);
       }
 
-      /* ── Individual Link Card ─────────────────────────────────── */
       .ui-upstream-dashboard__link {
         position: relative;
         display: flex;
@@ -228,15 +706,13 @@ const upstreamDashboardStyles = css`
         background: var(--bg-surface, oklch(22% 0.02 270));
         border: 1px solid var(--border-subtle, oklch(100% 0 0 / 0.08));
         overflow: hidden;
-        transition: box-shadow 0.2s var(--ease-out, ease-out),
-                    transform 0.2s var(--ease-out, ease-out);
+        transition: box-shadow 0.2s ease-out, transform 0.2s ease-out;
       }
 
       :scope[data-motion="0"] .ui-upstream-dashboard__link {
         transition: none;
       }
 
-      /* Aurora glow on link cards */
       .ui-upstream-dashboard__link::before {
         content: '';
         position: absolute;
@@ -261,21 +737,11 @@ const upstreamDashboardStyles = css`
         z-index: 1;
       }
 
-      /* Status accent border */
-      .ui-upstream-dashboard__link[data-status="ok"] {
-        border-inline-start: 3px solid oklch(72% 0.19 155);
-      }
-      .ui-upstream-dashboard__link[data-status="warning"] {
-        border-inline-start: 3px solid oklch(80% 0.18 85);
-      }
-      .ui-upstream-dashboard__link[data-status="critical"] {
-        border-inline-start: 3px solid oklch(62% 0.22 25);
-      }
-      .ui-upstream-dashboard__link[data-status="unknown"] {
-        border-inline-start: 3px solid oklch(60% 0 0);
-      }
+      .ui-upstream-dashboard__link[data-status="ok"] { border-inline-start: 3px solid oklch(72% 0.19 155); }
+      .ui-upstream-dashboard__link[data-status="warning"] { border-inline-start: 3px solid oklch(80% 0.18 85); }
+      .ui-upstream-dashboard__link[data-status="critical"] { border-inline-start: 3px solid oklch(62% 0.22 25); }
+      .ui-upstream-dashboard__link[data-status="unknown"] { border-inline-start: 3px solid oklch(60% 0 0); }
 
-      /* Hover lift */
       @media (hover: hover) {
         .ui-upstream-dashboard__link:hover {
           transform: translateY(-1px);
@@ -369,7 +835,6 @@ const upstreamDashboardStyles = css`
         color: var(--text-secondary, oklch(70% 0 0));
       }
 
-      /* Sparkline */
       .ui-upstream-dashboard__sparkline {
         margin-block-start: var(--space-2xs, 0.125rem);
       }
@@ -399,7 +864,7 @@ const upstreamDashboardStyles = css`
         text-align: start;
         inline-size: 100%;
         border-radius: var(--radius-sm, 0.375rem);
-        transition: background 0.15s var(--ease-out, ease-out);
+        transition: background 0.15s ease-out;
       }
 
       .ui-upstream-dashboard__group-header:hover {
@@ -415,7 +880,7 @@ const upstreamDashboardStyles = css`
         flex-shrink: 0;
         display: inline-flex;
         align-items: center;
-        transition: transform 0.2s var(--ease-out, ease-out);
+        transition: transform 0.2s ease-out;
       }
 
       .ui-upstream-dashboard__group[data-collapsed] .ui-upstream-dashboard__group-chevron {
@@ -439,8 +904,7 @@ const upstreamDashboardStyles = css`
 
       .ui-upstream-dashboard__group-content {
         overflow: hidden;
-        transition: max-height 0.3s var(--ease-out, ease-out),
-                    opacity 0.2s var(--ease-out, ease-out);
+        transition: max-height 0.3s ease-out, opacity 0.2s ease-out;
       }
 
       .ui-upstream-dashboard__group[data-collapsed] .ui-upstream-dashboard__group-content {
@@ -465,49 +929,34 @@ const upstreamDashboardStyles = css`
         text-align: center;
       }
 
-      /* ── Compact Mode ─────────────────────────────────────────── */
+      /* ── Compact legacy ───────────────────────────────────────── */
       :scope[data-compact] .ui-upstream-dashboard__summary {
         padding: var(--space-md, 1rem);
       }
-
       :scope[data-compact] .ui-upstream-dashboard__metric-value {
         font-size: clamp(1.125rem, 3vw, 1.5rem);
       }
-
       :scope[data-compact] .ui-upstream-dashboard__link {
         padding: var(--space-sm, 0.5rem);
         gap: var(--space-xs, 0.25rem);
       }
-
       :scope[data-compact] .ui-upstream-dashboard__link-rate {
         font-size: var(--text-base, 1rem);
       }
-
       :scope[data-compact] .ui-upstream-dashboard__sparkline {
         display: none;
       }
 
       /* ── Container Queries ────────────────────────────────────── */
-
-      /* Smartwatch: summary only */
       @container (max-width: 249px) {
         .ui-upstream-dashboard__grid,
-        .ui-upstream-dashboard__group {
-          display: none;
-        }
-        .ui-upstream-dashboard__summary {
-          grid-template-columns: 1fr;
-        }
+        .ui-upstream-dashboard__group { display: none; }
+        .ui-upstream-dashboard__summary { grid-template-columns: 1fr; }
       }
 
-      /* Phone: single column */
       @container (min-width: 250px) and (max-width: 599px) {
-        .ui-upstream-dashboard__grid {
-          grid-template-columns: 1fr;
-        }
-        .ui-upstream-dashboard__summary {
-          grid-template-columns: 1fr;
-        }
+        .ui-upstream-dashboard__grid { grid-template-columns: 1fr; }
+        .ui-upstream-dashboard__summary { grid-template-columns: 1fr; }
         .ui-upstream-dashboard__metric {
           flex-direction: row;
           align-items: baseline;
@@ -515,50 +964,47 @@ const upstreamDashboardStyles = css`
         }
       }
 
-      /* Tablet: 2 columns */
       @container (min-width: 600px) and (max-width: 1199px) {
-        .ui-upstream-dashboard__grid {
-          grid-template-columns: repeat(2, 1fr);
-        }
+        .ui-upstream-dashboard__grid { grid-template-columns: repeat(2, 1fr); }
       }
 
-      /* Desktop: 3-4 columns */
       @container (min-width: 1200px) and (max-width: 2999px) {
-        .ui-upstream-dashboard__grid {
-          grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-        }
+        .ui-upstream-dashboard__grid { grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); }
       }
 
-      /* Video wall: 6+ columns with enlarged metrics */
       @container (min-width: 3000px) {
-        .ui-upstream-dashboard__grid {
-          grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
-        }
-        .ui-upstream-dashboard__link-rate {
-          font-size: clamp(2rem, 5vw, 3.5rem);
-        }
-        .ui-upstream-dashboard__metric-value {
-          font-size: clamp(2.5rem, 6vw, 4rem);
-        }
+        .ui-upstream-dashboard__grid { grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); }
+        .ui-upstream-dashboard__link-rate { font-size: clamp(2rem, 5vw, 3.5rem); }
+        .ui-upstream-dashboard__metric-value { font-size: clamp(2.5rem, 6vw, 4rem); }
       }
 
       /* ── Forced Colors ────────────────────────────────────────── */
       @media (forced-colors: active) {
         .ui-upstream-dashboard__summary,
-        .ui-upstream-dashboard__link {
+        .ui-upstream-dashboard__link,
+        .ui-upstream-dashboard__compact-card,
+        .ui-upstream-dashboard__hero-card {
           border: 2px solid ButtonText;
         }
         .ui-upstream-dashboard__summary::before,
-        .ui-upstream-dashboard__link::before {
+        .ui-upstream-dashboard__link::before,
+        .ui-upstream-dashboard__hero-card::before {
           display: none;
         }
         .ui-upstream-dashboard__link[data-status="ok"],
         .ui-upstream-dashboard__link[data-status="warning"],
         .ui-upstream-dashboard__link[data-status="critical"],
-        .ui-upstream-dashboard__link[data-status="unknown"] {
+        .ui-upstream-dashboard__link[data-status="unknown"],
+        .ui-upstream-dashboard__compact-card[data-status="ok"],
+        .ui-upstream-dashboard__compact-card[data-status="warning"],
+        .ui-upstream-dashboard__compact-card[data-status="critical"],
+        .ui-upstream-dashboard__compact-card[data-status="unknown"] {
           border-inline-start: 3px solid Highlight;
         }
-        .ui-upstream-dashboard__status-dot {
+        .ui-upstream-dashboard__status-dot,
+        .ui-upstream-dashboard__compact-dot,
+        .ui-upstream-dashboard__table-status-dot,
+        .ui-upstream-dashboard__hero-mini-dot {
           background: Highlight;
         }
         .ui-upstream-dashboard__group-header {
@@ -572,13 +1018,16 @@ const upstreamDashboardStyles = css`
       /* ── Print ─────────────────────────────────────────────────── */
       @media print {
         .ui-upstream-dashboard__summary,
-        .ui-upstream-dashboard__link {
+        .ui-upstream-dashboard__link,
+        .ui-upstream-dashboard__compact-card,
+        .ui-upstream-dashboard__hero-card {
           box-shadow: none;
           border: 1px solid;
           break-inside: avoid;
         }
         .ui-upstream-dashboard__summary::before,
-        .ui-upstream-dashboard__link::before {
+        .ui-upstream-dashboard__link::before,
+        .ui-upstream-dashboard__hero-card::before {
           display: none;
         }
         .ui-upstream-dashboard__group[data-collapsed] .ui-upstream-dashboard__group-content {
@@ -591,10 +1040,14 @@ const upstreamDashboardStyles = css`
       /* ── Reduced Motion ────────────────────────────────────────── */
       @media (prefers-reduced-motion: reduce) {
         .ui-upstream-dashboard__arrow svg,
-        .ui-upstream-dashboard__status-dot {
+        .ui-upstream-dashboard__status-dot,
+        .ui-upstream-dashboard__compact-dot,
+        .ui-upstream-dashboard__table-status-dot,
+        .ui-upstream-dashboard__hero-mini-dot {
           animation: none;
         }
         .ui-upstream-dashboard__link,
+        .ui-upstream-dashboard__compact-card,
         .ui-upstream-dashboard__group-content,
         .ui-upstream-dashboard__group-chevron {
           transition: none;
@@ -604,7 +1057,7 @@ const upstreamDashboardStyles = css`
   }
 `
 
-// ─── Sub-components ─────────────────────────────────────────────────────────
+// ─── SVG Sub-components ──────────────────────────────────────────────────────
 
 function InboundArrow() {
   return (
@@ -634,14 +1087,12 @@ function ChevronDown() {
   )
 }
 
-function TrendSparkline({ data, id }: { data: number[]; id: string }) {
-  if (data.length < 2) return null
+// ─── Sparkline Renderers ────────────────────────────────────────────────────
+
+function buildSparklinePath(data: number[], w: number, h: number, padding = 1): { line: string; area: string } {
   const min = Math.min(...data)
   const max = Math.max(...data)
   const range = max - min || 1
-  const w = 100
-  const h = 24
-  const padding = 1
 
   const points = data.map((v, i) => ({
     x: (i / (data.length - 1)) * w,
@@ -656,7 +1107,15 @@ function TrendSparkline({ data, id }: { data: number[]; id: string }) {
     d += ` Q ${cpx} ${prev.y}, ${curr.x} ${curr.y}`
   }
 
-  const areaD = `${d} L ${points[points.length - 1].x} ${h} L ${points[0].x} ${h} Z`
+  const area = `${d} L ${points[points.length - 1].x} ${h} L ${points[0].x} ${h} Z`
+  return { line: d, area }
+}
+
+function TrendSparkline({ data, id }: { data: number[]; id: string }) {
+  if (data.length < 2) return null
+  const w = 100
+  const h = 24
+  const { line, area } = buildSparklinePath(data, w, h)
   const gradientId = `ud-sparkline-${id}`
 
   return (
@@ -668,9 +1127,66 @@ function TrendSparkline({ data, id }: { data: number[]; id: string }) {
             <stop offset="100%" stopColor="oklch(65% 0.2 270)" stopOpacity="0" />
           </linearGradient>
         </defs>
-        <path d={areaD} fill={`url(#${gradientId})`} />
-        <path d={d} fill="none" stroke="oklch(65% 0.2 270)" strokeWidth="1.5" />
+        <path d={area} fill={`url(#${gradientId})`} />
+        <path d={line} fill="none" stroke="oklch(65% 0.2 270)" strokeWidth="1.5" />
       </svg>
+    </div>
+  )
+}
+
+function InlineSparkline({ data, w = 60, h = 16 }: { data: number[]; w?: number; h?: number }) {
+  if (data.length < 2) return null
+  const { line, area } = buildSparklinePath(data, w, h)
+
+  return (
+    <svg viewBox={`0 0 ${w} ${h}`} preserveAspectRatio="none" aria-hidden="true">
+      <path d={area} fill="oklch(65% 0.2 270 / 0.15)" />
+      <path d={line} fill="none" stroke="oklch(65% 0.2 270)" strokeWidth="1" />
+    </svg>
+  )
+}
+
+function HeroTrendlineBg({ data }: { data: number[] }) {
+  if (data.length < 2) return null
+  const w = 200
+  const h = 60
+  const { line, area } = buildSparklinePath(data, w, h, 2)
+
+  return (
+    <div className="ui-upstream-dashboard__hero-trendline" aria-hidden="true">
+      <svg viewBox={`0 0 ${w} ${h}`} preserveAspectRatio="none">
+        <defs>
+          <linearGradient id="hero-trend-fill" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor="oklch(65% 0.2 270)" stopOpacity="0.12" />
+            <stop offset="100%" stopColor="oklch(65% 0.2 270)" stopOpacity="0" />
+          </linearGradient>
+        </defs>
+        <path d={area} fill="url(#hero-trend-fill)" />
+        <path d={line} fill="none" stroke="oklch(65% 0.2 270)" strokeWidth="1.5" strokeOpacity="0.15" />
+      </svg>
+    </div>
+  )
+}
+
+// ─── Utilization Bar ────────────────────────────────────────────────────────
+
+function utilizationLevel(pct: number): 'ok' | 'warning' | 'critical' {
+  if (pct > 80) return 'critical'
+  if (pct > 60) return 'warning'
+  return 'ok'
+}
+
+function UtilBar({ pct, className = 'ui-upstream-dashboard__util-bar' }: { pct: number; className?: string }) {
+  const level = utilizationLevel(pct)
+  return (
+    <div className={className}>
+      <div
+        className={className === 'ui-upstream-dashboard__util-bar'
+          ? 'ui-upstream-dashboard__util-fill'
+          : className.replace('-bar', '-fill')}
+        data-level={level}
+        style={{ width: `${pct}%`, background: level === 'critical' ? 'oklch(62% 0.22 25)' : level === 'warning' ? 'oklch(80% 0.18 85)' : 'oklch(72% 0.19 155)' }}
+      />
     </div>
   )
 }
@@ -768,7 +1284,339 @@ function SummaryCard({
   )
 }
 
-// ─── Individual Link Card ───────────────────────────────────────────────────
+// ─── Hero Mode ──────────────────────────────────────────────────────────────
+
+function HeroView({ links }: { links: UpstreamLink[] }) {
+  const totalInbound = links.reduce((s, l) => s + l.inbound, 0)
+  const totalOutbound = links.reduce((s, l) => s + l.outbound, 0)
+  const totalTraffic = totalInbound + totalOutbound
+  const totalCapacity = links.reduce((s, l) => s + (l.capacity ?? 0), 0)
+
+  const inFmt = formatBitRateSplit(totalInbound)
+  const outFmt = formatBitRateSplit(totalOutbound)
+  const totalFmt = formatBitRateSplit(totalTraffic)
+  const capFmt = totalCapacity > 0 ? formatBitRateSplit(totalCapacity) : null
+  const utilPct = computeUtilization(links)
+
+  // Aggregate trend data from all links
+  const aggregatedTrend = useMemo(() => {
+    const trendsWithData = links.filter(l => l.trend && l.trend.length >= 2)
+    if (trendsWithData.length === 0) return null
+    const maxLen = Math.max(...trendsWithData.map(l => l.trend!.length))
+    const result: number[] = []
+    for (let i = 0; i < maxLen; i++) {
+      let sum = 0
+      for (const l of trendsWithData) {
+        const idx = Math.min(i, l.trend!.length - 1)
+        sum += l.trend![idx]
+      }
+      result.push(sum)
+    }
+    return result
+  }, [links])
+
+  // Group by vendor for mini cards
+  const vendorGroups = useMemo(() => {
+    const map = new Map<string, UpstreamLink[]>()
+    for (const link of links) {
+      const arr = map.get(link.vendor) || []
+      arr.push(link)
+      map.set(link.vendor, arr)
+    }
+    return Array.from(map.entries()).map(([vendor, vendorLinks]) => {
+      const worstStatus = vendorLinks.reduce<UpstreamLink['status']>((worst, l) => {
+        const priority = { critical: 3, warning: 2, unknown: 1, ok: 0 } as const
+        return priority[l.status] > priority[worst] ? l.status : worst
+      }, 'ok')
+      return {
+        vendor,
+        inbound: vendorLinks.reduce((s, l) => s + l.inbound, 0),
+        outbound: vendorLinks.reduce((s, l) => s + l.outbound, 0),
+        status: worstStatus,
+      }
+    })
+  }, [links])
+
+  return (
+    <div className="ui-upstream-dashboard__hero-card" data-testid="hero-card">
+      {aggregatedTrend && <HeroTrendlineBg data={aggregatedTrend} />}
+
+      <div className="ui-upstream-dashboard__hero-metrics">
+        <div className="ui-upstream-dashboard__hero-metric">
+          <span className="ui-upstream-dashboard__hero-value">
+            <span className="ui-upstream-dashboard__hero-direction ui-upstream-dashboard__hero-direction--in" aria-hidden="true">↓</span>
+            {inFmt.value}
+            <span className="ui-upstream-dashboard__hero-unit">{inFmt.unit}</span>
+          </span>
+          <span className="ui-upstream-dashboard__hero-label">Inbound</span>
+        </div>
+        <div className="ui-upstream-dashboard__hero-metric">
+          <span className="ui-upstream-dashboard__hero-value">
+            <span className="ui-upstream-dashboard__hero-direction ui-upstream-dashboard__hero-direction--out" aria-hidden="true">↑</span>
+            {outFmt.value}
+            <span className="ui-upstream-dashboard__hero-unit">{outFmt.unit}</span>
+          </span>
+          <span className="ui-upstream-dashboard__hero-label">Outbound</span>
+        </div>
+      </div>
+
+      {utilPct !== null && <UtilBar pct={utilPct} />}
+
+      <div className="ui-upstream-dashboard__hero-footer">
+        <span className="ui-upstream-dashboard__hero-footer-item">
+          Total: {totalFmt.value} {totalFmt.unit}
+        </span>
+        {capFmt && (
+          <span className="ui-upstream-dashboard__hero-footer-item">
+            Capacity: {capFmt.value} {capFmt.unit}
+          </span>
+        )}
+        {utilPct !== null && (
+          <span className="ui-upstream-dashboard__hero-footer-item">
+            {utilPct}% used
+          </span>
+        )}
+      </div>
+
+      {vendorGroups.length > 0 && (
+        <div className="ui-upstream-dashboard__hero-mini-grid">
+          {vendorGroups.map(g => {
+            const gInFmt = formatBitRateSplit(g.inbound)
+            const gOutFmt = formatBitRateSplit(g.outbound)
+            return (
+              <div key={g.vendor} className="ui-upstream-dashboard__hero-mini" data-status={g.status}>
+                <span className="ui-upstream-dashboard__hero-mini-dot" />
+                <span className="ui-upstream-dashboard__hero-mini-vendor">{g.vendor}</span>
+                <span className="ui-upstream-dashboard__hero-mini-traffic">
+                  ↓{gInFmt.value} ↑{gOutFmt.value} {gInFmt.unit}
+                </span>
+              </div>
+            )
+          })}
+        </div>
+      )}
+    </div>
+  )
+}
+
+// ─── Compact Mode ───────────────────────────────────────────────────────────
+
+function CompactCard({ link }: { link: UpstreamLink }) {
+  const inFmt = formatBitRateSplit(link.inbound)
+  const outFmt = formatBitRateSplit(link.outbound)
+  const utilPct = link.capacity ? Math.min(100, Math.round(((link.inbound + link.outbound) / link.capacity) * 100)) : null
+
+  return (
+    <div
+      className="ui-upstream-dashboard__compact-card"
+      data-status={link.status}
+      role="group"
+      aria-label={`${link.vendor} ${link.location}`}
+    >
+      <div className="ui-upstream-dashboard__compact-header">
+        <span className="ui-upstream-dashboard__compact-dot" />
+        <span>{link.vendor}</span>
+        <span aria-hidden="true">·</span>
+        <span>{link.location}</span>
+      </div>
+
+      <div className="ui-upstream-dashboard__compact-metrics">
+        <span className="ui-upstream-dashboard__compact-value">
+          <span className="ui-upstream-dashboard__compact-direction ui-upstream-dashboard__compact-direction--in" aria-hidden="true">↓</span>
+          {inFmt.value}
+          <span className="ui-upstream-dashboard__compact-value-unit">{inFmt.unit}</span>
+        </span>
+        <span className="ui-upstream-dashboard__compact-value">
+          <span className="ui-upstream-dashboard__compact-direction ui-upstream-dashboard__compact-direction--out" aria-hidden="true">↑</span>
+          {outFmt.value}
+          <span className="ui-upstream-dashboard__compact-value-unit">{outFmt.unit}</span>
+        </span>
+      </div>
+
+      <div className="ui-upstream-dashboard__compact-footer">
+        {link.trend && link.trend.length >= 2 && (
+          <span className="ui-upstream-dashboard__compact-sparkline">
+            <InlineSparkline data={link.trend} />
+          </span>
+        )}
+        {utilPct !== null && (
+          <span className="ui-upstream-dashboard__compact-util">
+            <span className="ui-upstream-dashboard__compact-util-bar">
+              <span
+                className="ui-upstream-dashboard__compact-util-fill"
+                style={{
+                  display: 'block',
+                  width: `${utilPct}%`,
+                  height: '100%',
+                  borderRadius: 1,
+                  background: utilPct > 80 ? 'oklch(62% 0.22 25)' : utilPct > 60 ? 'oklch(80% 0.18 85)' : 'oklch(72% 0.19 155)',
+                }}
+              />
+            </span>
+            <span>{utilPct}%</span>
+          </span>
+        )}
+      </div>
+    </div>
+  )
+}
+
+function CompactView({ links, groupBy }: { links: UpstreamLink[]; groupBy: 'vendor' | 'location' | 'none' }) {
+  if (groupBy !== 'none') {
+    const map = new Map<string, UpstreamLink[]>()
+    for (const link of links) {
+      const key = groupBy === 'vendor' ? link.vendor : link.location
+      const arr = map.get(key) || []
+      arr.push(link)
+      map.set(key, arr)
+    }
+
+    return (
+      <>
+        {Array.from(map.entries()).map(([key, groupLinks]) => (
+          <CompactGroup key={key} groupKey={key} links={groupLinks} />
+        ))}
+      </>
+    )
+  }
+
+  return (
+    <div className="ui-upstream-dashboard__compact-grid" data-testid="compact-grid">
+      {links.map(link => (
+        <CompactCard key={link.id} link={link} />
+      ))}
+    </div>
+  )
+}
+
+function CompactGroup({ groupKey, links }: { groupKey: string; links: UpstreamLink[] }) {
+  const [collapsed, setCollapsed] = useState(false)
+  const totalIn = links.reduce((s, l) => s + l.inbound, 0)
+  const totalOut = links.reduce((s, l) => s + l.outbound, 0)
+  const inFmt = formatBitRateSplit(totalIn)
+  const outFmt = formatBitRateSplit(totalOut)
+
+  return (
+    <section
+      className="ui-upstream-dashboard__group"
+      {...(collapsed && { 'data-collapsed': '' })}
+    >
+      <button
+        type="button"
+        className="ui-upstream-dashboard__group-header"
+        onClick={() => setCollapsed(c => !c)}
+        aria-expanded={!collapsed}
+      >
+        <span className="ui-upstream-dashboard__group-chevron">
+          <ChevronDown />
+        </span>
+        <h3 className="ui-upstream-dashboard__group-title">{groupKey}</h3>
+        <span className="ui-upstream-dashboard__group-summary">
+          {inFmt.value} {inFmt.unit} in / {outFmt.value} {outFmt.unit} out
+        </span>
+      </button>
+      <div className="ui-upstream-dashboard__group-content">
+        <div className="ui-upstream-dashboard__compact-grid">
+          {links.map(link => (
+            <CompactCard key={link.id} link={link} />
+          ))}
+        </div>
+      </div>
+    </section>
+  )
+}
+
+// ─── Table Mode ─────────────────────────────────────────────────────────────
+
+function TableView({ links, groupBy }: { links: UpstreamLink[]; groupBy: 'vendor' | 'location' | 'none' }) {
+  // Sort by group key if grouping
+  const sortedLinks = useMemo(() => {
+    if (groupBy === 'none') return links
+    return [...links].sort((a, b) => {
+      const keyA = groupBy === 'vendor' ? a.vendor : a.location
+      const keyB = groupBy === 'vendor' ? b.vendor : b.location
+      return keyA.localeCompare(keyB)
+    })
+  }, [links, groupBy])
+
+  return (
+    <table className="ui-upstream-dashboard__table" data-testid="table-view">
+      <thead>
+        <tr>
+          <th>Vendor</th>
+          <th>Location</th>
+          <th>↓ Inbound</th>
+          <th>↑ Outbound</th>
+          <th>Util</th>
+          <th>Trend</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        {sortedLinks.map(link => {
+          const inFmt = formatBitRateSplit(link.inbound)
+          const outFmt = formatBitRateSplit(link.outbound)
+          const utilPct = link.capacity
+            ? Math.min(100, Math.round(((link.inbound + link.outbound) / link.capacity) * 100))
+            : null
+
+          return (
+            <tr key={link.id} data-status={link.status}>
+              <td>{link.vendor}</td>
+              <td>{link.location}</td>
+              <td>
+                <span className="ui-upstream-dashboard__table-rate">
+                  {inFmt.value}
+                  <span className="ui-upstream-dashboard__table-rate-unit">{inFmt.unit}</span>
+                </span>
+              </td>
+              <td>
+                <span className="ui-upstream-dashboard__table-rate">
+                  {outFmt.value}
+                  <span className="ui-upstream-dashboard__table-rate-unit">{outFmt.unit}</span>
+                </span>
+              </td>
+              <td>
+                {utilPct !== null ? (
+                  <div className="ui-upstream-dashboard__table-util">
+                    <div className="ui-upstream-dashboard__table-util-bar">
+                      <div
+                        className="ui-upstream-dashboard__table-util-fill"
+                        style={{
+                          width: `${utilPct}%`,
+                          background: utilPct > 80 ? 'oklch(62% 0.22 25)' : utilPct > 60 ? 'oklch(80% 0.18 85)' : 'oklch(72% 0.19 155)',
+                        }}
+                      />
+                    </div>
+                    <span>{utilPct}%</span>
+                  </div>
+                ) : (
+                  <span>—</span>
+                )}
+              </td>
+              <td>
+                {link.trend && link.trend.length >= 2 ? (
+                  <span className="ui-upstream-dashboard__table-sparkline">
+                    <InlineSparkline data={link.trend} w={60} h={20} />
+                  </span>
+                ) : (
+                  <span>—</span>
+                )}
+              </td>
+              <td>
+                <span className="ui-upstream-dashboard__table-status">
+                  <span className="ui-upstream-dashboard__table-status-dot" data-status={link.status} role="status" aria-label={`Status: ${link.status}`} />
+                </span>
+              </td>
+            </tr>
+          )
+        })}
+      </tbody>
+    </table>
+  )
+}
+
+// ─── Legacy Link Card (for backwards compat when mode is unset) ─────────────
 
 function LinkCard({ link, compact }: { link: UpstreamLink; compact?: boolean }) {
   const inFmt = formatBitRateSplit(link.inbound)
@@ -816,7 +1664,7 @@ function LinkCard({ link, compact }: { link: UpstreamLink; compact?: boolean }) 
   )
 }
 
-// ─── Link Group ─────────────────────────────────────────────────────────────
+// ─── Legacy Link Group ──────────────────────────────────────────────────────
 
 function LinkGroup({
   groupKey,
@@ -865,11 +1713,12 @@ function LinkGroup({
   )
 }
 
-// ─── Component ──────────────────────────────────────────────────────────────
+// ─── Main Component ─────────────────────────────────────────────────────────
 
 function UpstreamDashboardInner({
   links,
   title,
+  mode,
   showSummary = false,
   groupBy = 'none',
   compact = false,
@@ -880,6 +1729,9 @@ function UpstreamDashboardInner({
 }: UpstreamDashboardProps) {
   useStyles('upstream-dashboard', upstreamDashboardStyles)
   const motionLevel = useMotionLevel(motionProp)
+
+  // Resolve effective mode: explicit mode prop > compact legacy prop > default hero
+  const effectiveMode = mode ?? (compact ? 'compact' : undefined)
 
   const groups = useMemo(() => {
     if (groupBy === 'none') return null
@@ -904,7 +1756,8 @@ function UpstreamDashboardInner({
     <div
       className={cn('ui-upstream-dashboard', className)}
       data-motion={motionLevel}
-      {...(compact && { 'data-compact': '' })}
+      data-mode={effectiveMode}
+      {...(compact && !mode && { 'data-compact': '' })}
       role="region"
       aria-label={typeof title === 'string' ? title : 'Upstream Dashboard'}
       {...rest}
@@ -923,11 +1776,24 @@ function UpstreamDashboardInner({
         </div>
       )}
 
-      {!isEmpty && groups ? (
+      {!isEmpty && effectiveMode === 'hero' && (
+        <HeroView links={links} />
+      )}
+
+      {!isEmpty && effectiveMode === 'compact' && (
+        <CompactView links={links} groupBy={groupBy} />
+      )}
+
+      {!isEmpty && effectiveMode === 'table' && (
+        <TableView links={links} groupBy={groupBy} />
+      )}
+
+      {/* Legacy mode — no mode prop and no compact prop */}
+      {!isEmpty && !effectiveMode && groups ? (
         groups.map(g => (
           <LinkGroup key={g.key} groupKey={g.key} links={g.links} compact={compact} />
         ))
-      ) : !isEmpty ? (
+      ) : !isEmpty && !effectiveMode && !groups ? (
         <div className="ui-upstream-dashboard__grid">
           {links.map(link => (
             <LinkCard key={link.id} link={link} compact={compact} />
