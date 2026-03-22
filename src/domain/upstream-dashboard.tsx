@@ -533,11 +533,20 @@ const upstreamDashboardStyles = css`
 
       .ui-upstream-dashboard__mini-card-label {
         font-weight: 600;
-        color: var(--text-primary, oklch(90% 0 0));
-        white-space: nowrap;
+        color: var(--text-primary);
+        font-size: var(--text-xs, 0.75rem);
+        min-width: 0;
         overflow: hidden;
         text-overflow: ellipsis;
-        font-size: var(--text-xs, 0.75rem);
+        white-space: nowrap;
+      }
+
+      /* On narrow containers, allow wrapping */
+      @container upstream (max-width: 400px) {
+        .ui-upstream-dashboard__mini-card-label {
+          white-space: normal;
+          overflow: visible;
+        }
       }
 
       .ui-upstream-dashboard__mini-card-metrics {
@@ -843,6 +852,53 @@ const upstreamDashboardStyles = css`
         border-radius: 1px;
       }
 
+      /* ── Compact Summary (aggregated metrics at top of compact mode) ── */
+      .ui-upstream-dashboard__compact-summary {
+        padding: 1.5rem;
+        background: var(--bg-elevated, oklch(20% 0.02 270));
+        border: 1px solid var(--border-default, oklch(100% 0 0 / 0.1));
+        border-radius: var(--radius-lg, 0.75rem);
+        margin-block-end: 1rem;
+        text-align: center;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .ui-upstream-dashboard__compact-summary::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        border-radius: inherit;
+        background: radial-gradient(
+          ellipse at 30% 0%,
+          oklch(from var(--aurora-1, oklch(70% 0.15 270)) l c h / 0.04) 0%,
+          transparent 60%
+        );
+        pointer-events: none;
+      }
+
+      .ui-upstream-dashboard__compact-summary > * {
+        position: relative;
+        z-index: 1;
+      }
+
+      .ui-upstream-dashboard__compact-summary .ui-upstream-dashboard__table-top-value {
+        font-size: clamp(1.5rem, 5cqw, 3rem);
+      }
+
+      .ui-upstream-dashboard__compact-summary[data-clickable] {
+        cursor: pointer;
+        transition: box-shadow 0.15s, border-color 0.15s;
+      }
+      .ui-upstream-dashboard__compact-summary[data-clickable]:hover {
+        box-shadow: 0 4px 16px oklch(0% 0 0 / 0.2);
+        border-color: var(--border-strong, oklch(100% 0 0 / 0.2));
+      }
+      .ui-upstream-dashboard__compact-summary[data-clickable]:focus-visible {
+        outline: 2px solid var(--focus-ring, oklch(65% 0.2 270));
+        outline-offset: 2px;
+      }
+
       /* ═══════════════════════════════════════════════════════════
          TABLE MODE — ultra-dense tabular format
          ═══════════════════════════════════════════════════════════ */
@@ -912,6 +968,13 @@ const upstreamDashboardStyles = css`
       .ui-upstream-dashboard__table-util-fill {
         height: 100%;
         border-radius: 2px;
+      }
+
+      .ui-upstream-dashboard__table-scroll {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: thin;
+        scrollbar-color: var(--border-default, oklch(100% 0 0 / 0.1)) transparent;
       }
 
       .ui-upstream-dashboard__table-sparkline svg {
@@ -2174,7 +2237,52 @@ function CompactCard({ link, onClick }: { link: UpstreamLink; onClick?: (link: U
   )
 }
 
-function CompactView({ links, groupBy, onLinkClick, onGroupClick }: { links: UpstreamLink[]; groupBy: 'vendor' | 'location' | 'none'; onLinkClick?: (link: UpstreamLink) => void; onGroupClick?: (groupName: string, links: UpstreamLink[]) => void }) {
+function CompactView({ links, groupBy, onLinkClick, onGroupClick, onSummaryClick }: { links: UpstreamLink[]; groupBy: 'vendor' | 'location' | 'none'; onLinkClick?: (link: UpstreamLink) => void; onGroupClick?: (groupName: string, links: UpstreamLink[]) => void; onSummaryClick?: () => void }) {
+  const totalInbound = links.reduce((s, l) => s + l.inbound, 0)
+  const totalOutbound = links.reduce((s, l) => s + l.outbound, 0)
+  const totalTraffic = totalInbound + totalOutbound
+  const totalCapacity = links.reduce((s, l) => s + (l.capacity ?? 0), 0)
+  const inFmtTop = formatBitRateSplit(totalInbound)
+  const outFmtTop = formatBitRateSplit(totalOutbound)
+  const totalFmt = formatBitRateSplit(totalTraffic)
+  const utilPct = totalCapacity > 0 ? Math.min(100, Math.round((totalTraffic / totalCapacity) * 100)) : null
+
+  const summaryMetrics = (
+    <div
+      className="ui-upstream-dashboard__compact-summary"
+      {...(onSummaryClick && { 'data-clickable': '', tabIndex: 0, role: 'button', onClick: onSummaryClick, onKeyDown: (e: React.KeyboardEvent) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onSummaryClick() } } })}
+    >
+      <div className="ui-upstream-dashboard__hero-metrics">
+        <div className="ui-upstream-dashboard__hero-metric">
+          <span className="ui-upstream-dashboard__table-top-value">
+            <span className="ui-upstream-dashboard__table-top-direction ui-upstream-dashboard__table-top-direction--in" aria-hidden="true">↓</span>
+            {inFmtTop.value}
+            <span className="ui-upstream-dashboard__table-top-unit">{inFmtTop.unit}</span>
+          </span>
+          <span className="ui-upstream-dashboard__table-top-label">Inbound</span>
+        </div>
+        <div className="ui-upstream-dashboard__hero-metric">
+          <span className="ui-upstream-dashboard__table-top-value">
+            <span className="ui-upstream-dashboard__table-top-direction ui-upstream-dashboard__table-top-direction--out" aria-hidden="true">↑</span>
+            {outFmtTop.value}
+            <span className="ui-upstream-dashboard__table-top-unit">{outFmtTop.unit}</span>
+          </span>
+          <span className="ui-upstream-dashboard__table-top-label">Outbound</span>
+        </div>
+      </div>
+      <div className="ui-upstream-dashboard__hero-footer">
+        <span className="ui-upstream-dashboard__hero-footer-item">
+          Total: {totalFmt.value} {totalFmt.unit}
+        </span>
+        {utilPct !== null && (
+          <span className="ui-upstream-dashboard__hero-footer-item">
+            {utilPct}% used
+          </span>
+        )}
+      </div>
+    </div>
+  )
+
   if (groupBy !== 'none') {
     const map = new Map<string, UpstreamLink[]>()
     for (const link of links) {
@@ -2186,6 +2294,7 @@ function CompactView({ links, groupBy, onLinkClick, onGroupClick }: { links: Ups
 
     return (
       <>
+        {summaryMetrics}
         {Array.from(map.entries()).map(([key, groupLinks]) => (
           <CompactGroup key={key} groupKey={key} links={groupLinks} onLinkClick={onLinkClick} onGroupClick={onGroupClick} />
         ))}
@@ -2194,11 +2303,14 @@ function CompactView({ links, groupBy, onLinkClick, onGroupClick }: { links: Ups
   }
 
   return (
-    <div className="ui-upstream-dashboard__compact-grid" data-testid="compact-grid">
-      {links.map(link => (
-        <CompactCard key={link.id} link={link} onClick={onLinkClick} />
-      ))}
-    </div>
+    <>
+      {summaryMetrics}
+      <div className="ui-upstream-dashboard__compact-grid" data-testid="compact-grid">
+        {links.map(link => (
+          <CompactCard key={link.id} link={link} onClick={onLinkClick} />
+        ))}
+      </div>
+    </>
   )
 }
 
@@ -2299,7 +2411,7 @@ function TableView({
         </div>
       </div>
 
-      <div className="ui-upstream-dashboard__table-wrapper">
+      <div className="ui-upstream-dashboard__table-scroll" style={{ overflowX: 'auto', WebkitOverflowScrolling: 'touch' as any }}>
       <table className="ui-upstream-dashboard__table" data-testid="table-view">
         <thead>
           <tr>
@@ -2596,7 +2708,7 @@ function UpstreamDashboardInner({
       )}
 
       {!isEmpty && effectiveMode === 'compact' && (
-        <CompactView links={links} groupBy={groupBy} onLinkClick={onLinkClick} onGroupClick={onGroupClick} />
+        <CompactView links={links} groupBy={groupBy} onLinkClick={onLinkClick} onGroupClick={onGroupClick} onSummaryClick={onSummaryClick} />
       )}
 
       {!isEmpty && effectiveMode === 'table' && (
