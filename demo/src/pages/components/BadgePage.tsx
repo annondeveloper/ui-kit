@@ -1,16 +1,22 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useMemo, useRef, useEffect } from 'react'
 import { css } from '@ui/core/styles/css-tag'
 import { useStyles } from '@ui/core/styles/use-styles'
-import { Button } from '@ui/components/button'
 import { Badge } from '@ui/components/badge'
 import { Badge as LiteBadge } from '@ui/lite/badge'
+import { Button } from '@ui/components/button'
 import { Card } from '@ui/components/card'
 import { CopyBlock } from '@ui/domain/copy-block'
-import { Divider } from '@ui/components/divider'
+import { Tabs, TabPanel } from '@ui/components/tabs'
 import { Icon } from '@ui/core/icons/icon'
+import { generateTheme } from '@ui/core/tokens/generator'
+import { TOKEN_TO_CSS, type ThemeTokens } from '@ui/core/tokens/tokens'
+import { useTheme } from '@ui/core/tokens/theme-context'
+import { ColorInput } from '@ui/components/color-input'
+
 import { PropsTable, type PropDef } from '../../components/PropsTable'
+import { useTier, type Tier } from '../../App'
 
 // ─── Page Styles ──────────────────────────────────────────────────────────────
 
@@ -18,26 +24,68 @@ const pageStyles = css`
   @layer demo {
     @scope (.badge-page) {
       :scope {
-        max-inline-size: 860px;
+        max-inline-size: min(960px, 100%);
         margin-inline: auto;
+        container-type: inline-size;
+        container-name: badge-page;
+        display: flex;
+        flex-direction: column;
+        gap: 2rem;
       }
 
       /* ── Hero header ────────────────────────────────── */
 
       .badge-page__hero {
-        margin-block-end: 2.5rem;
+        position: relative;
+        padding: 3rem 2rem;
+        border-radius: var(--radius-lg);
+        background: var(--bg-elevated);
+        border: 1px solid var(--border-default);
+        overflow: hidden;
+      }
+
+      /* Animated aurora glow */
+      .badge-page__hero::before {
+        content: '';
+        position: absolute;
+        inset: -50%;
+        background: conic-gradient(
+          from 0deg at 50% 50%,
+          var(--aurora-1, oklch(60% 0.15 250 / 0.06)) 0deg,
+          transparent 60deg,
+          var(--aurora-2, oklch(55% 0.18 300 / 0.04)) 120deg,
+          transparent 180deg,
+          var(--aurora-1, oklch(60% 0.15 250 / 0.06)) 240deg,
+          transparent 300deg,
+          var(--aurora-2, oklch(55% 0.18 300 / 0.04)) 360deg
+        );
+        animation: aurora-spin 20s linear infinite;
+        pointer-events: none;
+      }
+
+      @keyframes aurora-spin {
+        to { transform: rotate(360deg); }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        .badge-page__hero::before { animation: none; }
       }
 
       .badge-page__title {
-        font-size: clamp(1.75rem, 4vw, 2.5rem);
+        position: relative;
+        font-size: clamp(2rem, 5vw, 3rem);
         font-weight: 800;
-        letter-spacing: -0.02em;
-        color: var(--text-primary);
+        letter-spacing: -0.03em;
+        background: linear-gradient(135deg, var(--text-primary) 0%, var(--brand, oklch(65% 0.2 270)) 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
         margin: 0 0 0.5rem;
-        line-height: 1.15;
+        line-height: 1.1;
       }
 
       .badge-page__desc {
+        position: relative;
         color: var(--text-secondary);
         font-size: var(--text-base, 1rem);
         line-height: 1.6;
@@ -47,6 +95,7 @@ const pageStyles = css`
       }
 
       .badge-page__import-row {
+        position: relative;
         display: flex;
         align-items: center;
         gap: 0.75rem;
@@ -56,7 +105,7 @@ const pageStyles = css`
       .badge-page__import-code {
         font-family: 'SF Mono', 'Fira Code', 'JetBrains Mono', monospace;
         font-size: var(--text-sm, 0.875rem);
-        background: oklch(100% 0 0 / 0.05);
+        background: oklch(0% 0 0 / 0.2);
         border: 1px solid var(--border-subtle);
         border-radius: var(--radius-md);
         padding: 0.5rem 0.875rem;
@@ -65,6 +114,8 @@ const pageStyles = css`
         min-inline-size: 0;
         overflow-x: auto;
         white-space: nowrap;
+        backdrop-filter: blur(8px);
+        box-shadow: inset 0 1px 0 oklch(100% 0 0 / 0.03);
       }
 
       .badge-page__copy-btn {
@@ -75,14 +126,51 @@ const pageStyles = css`
       /* ── Sections ───────────────────────────────────── */
 
       .badge-page__section {
-        margin-block-end: 3rem;
+        background: oklch(from var(--bg-elevated) calc(l + 0.02) c h);
+        border: 1px solid var(--border-default);
+        border-radius: var(--radius-lg);
+        padding: 2rem;
+        overflow: visible;
+        position: relative;
+        box-shadow: inset 0 1px 0 oklch(100% 0 0 / 0.04), 0 2px 8px oklch(0% 0 0 / 0.15);
+        opacity: 0;
+        transform: translateY(32px) scale(0.98);
+        filter: blur(4px);
+        animation: section-reveal 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        animation-timeline: view();
+        animation-range: entry 0% entry 40%;
+      }
+
+      @keyframes section-reveal {
+        from {
+          opacity: 0;
+          transform: translateY(32px) scale(0.98);
+          filter: blur(4px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0) scale(1);
+          filter: blur(0);
+        }
+      }
+
+      @supports not (animation-timeline: view()) {
+        .badge-page__section {
+          opacity: 0;
+          transform: translateY(32px) scale(0.98);
+          filter: blur(4px);
+          animation: none;
+        }
       }
 
       .badge-page__section-title {
-        font-size: var(--text-lg, 1.125rem);
+        font-size: 1.125rem;
         font-weight: 700;
         color: var(--text-primary);
-        margin: 0 0 0.25rem;
+        margin: 0 0 0.375rem;
+        padding-inline-start: 0.625rem;
+        border-inline-start: 3px solid var(--brand, oklch(65% 0.2 270));
+        line-height: 1.3;
         scroll-margin-block-start: 2rem;
       }
 
@@ -99,21 +187,34 @@ const pageStyles = css`
         color: var(--text-secondary);
         font-size: var(--text-sm, 0.875rem);
         line-height: 1.6;
-        margin: 0 0 1rem;
+        margin: 0 0 1.5rem;
         text-wrap: pretty;
       }
 
       /* ── Preview box ────────────────────────────────── */
 
       .badge-page__preview {
-        padding: 2rem;
-        border: 1px solid var(--border-subtle);
-        border-radius: var(--radius-lg);
-        background: var(--bg-surface);
+        padding: 2.5rem;
+        border-radius: var(--radius-md);
+        background: var(--bg-base);
+        position: relative;
+        overflow: hidden;
         display: flex;
         flex-wrap: wrap;
         align-items: center;
-        gap: 1rem;
+        justify-content: center;
+        gap: 1.25rem;
+        min-block-size: 80px;
+      }
+
+      /* Subtle dot grid */
+      .badge-page__preview::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background-image: radial-gradient(oklch(100% 0 0 / 0.03) 1px, transparent 1px);
+        background-size: 24px 24px;
+        pointer-events: none;
       }
 
       .badge-page__preview--col {
@@ -129,12 +230,26 @@ const pageStyles = css`
 
       .badge-page__playground {
         display: grid;
-        grid-template-columns: 1fr 1fr;
+        grid-template-columns: 1fr 320px;
         gap: 1.5rem;
+        align-items: start;
       }
-      @container (max-width: 600px) {
+
+      @media (max-width: 768px) {
         .badge-page__playground {
           grid-template-columns: 1fr;
+        }
+        .badge-page__playground-controls {
+          position: static !important;
+        }
+      }
+
+      @container badge-page (max-width: 680px) {
+        .badge-page__playground {
+          grid-template-columns: 1fr;
+        }
+        .badge-page__playground-controls {
+          position: static !important;
         }
       }
 
@@ -145,19 +260,45 @@ const pageStyles = css`
       }
 
       .badge-page__playground-result {
-        min-block-size: 120px;
+        min-block-size: 200px;
         display: grid;
         place-items: center;
-        border: 1px solid var(--border-subtle);
-        border-radius: var(--radius-lg);
+        padding: 3rem;
         background: var(--bg-base);
-        padding: 2rem;
+        border-radius: var(--radius-md);
+        position: relative;
+        overflow: hidden;
+      }
+
+      /* Dot grid for playground result */
+      .badge-page__playground-result::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background-image: radial-gradient(oklch(100% 0 0 / 0.03) 1px, transparent 1px);
+        background-size: 24px 24px;
+        pointer-events: none;
+      }
+
+      /* Subtle aurora glow in playground */
+      .badge-page__playground-result::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: radial-gradient(ellipse at center, var(--aurora-1, oklch(60% 0.15 250 / 0.04)) 0%, transparent 70%);
+        pointer-events: none;
       }
 
       .badge-page__playground-controls {
+        background: var(--bg-surface);
+        border: 1px solid var(--border-subtle);
+        border-radius: var(--radius-md);
+        padding: 1.25rem;
         display: flex;
         flex-direction: column;
         gap: 1rem;
+        position: sticky;
+        top: 1rem;
       }
 
       .badge-page__control-group {
@@ -190,7 +331,7 @@ const pageStyles = css`
         cursor: pointer;
         font-family: inherit;
         font-weight: 500;
-        transition: all 0.12s;
+        transition: background 0.12s, color 0.12s, border-color 0.12s, box-shadow 0.12s;
         line-height: 1.4;
       }
       .badge-page__option-btn:hover {
@@ -201,6 +342,7 @@ const pageStyles = css`
         background: var(--brand);
         color: oklch(100% 0 0);
         border-color: var(--brand);
+        box-shadow: 0 0 0 3px var(--brand-subtle);
       }
 
       .badge-page__toggle-row {
@@ -232,22 +374,7 @@ const pageStyles = css`
         outline: 2px solid var(--brand);
         outline-offset: 1px;
         border-color: transparent;
-      }
-
-      .badge-page__number-input {
-        font-size: var(--text-sm, 0.875rem);
-        padding: 0.375rem 0.625rem;
-        border: 1px solid var(--border-default);
-        border-radius: var(--radius-sm);
-        background: transparent;
-        color: var(--text-primary);
-        font-family: inherit;
-        inline-size: 5rem;
-      }
-      .badge-page__number-input:focus {
-        outline: 2px solid var(--brand);
-        outline-offset: 1px;
-        border-color: transparent;
+        box-shadow: 0 0 0 4px var(--brand-subtle);
       }
 
       /* ── Labeled row ────────────────────────────────── */
@@ -255,30 +382,30 @@ const pageStyles = css`
       .badge-page__labeled-row {
         display: flex;
         flex-wrap: wrap;
+        gap: 1.5rem;
         align-items: flex-end;
-        gap: 1.25rem;
       }
 
       .badge-page__labeled-item {
         display: flex;
         flex-direction: column;
         align-items: center;
-        gap: 0.375rem;
+        gap: 0.75rem;
       }
 
       .badge-page__item-label {
-        font-size: var(--text-xs, 0.75rem);
-        font-weight: 500;
+        font-size: 0.6875rem;
         color: var(--text-tertiary);
-        text-transform: uppercase;
-        letter-spacing: 0.05em;
+        font-family: 'SF Mono', 'Fira Code', 'JetBrains Mono', monospace;
+        text-transform: lowercase;
+        letter-spacing: 0.03em;
       }
 
       /* ── States grid ────────────────────────────────── */
 
       .badge-page__states-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
         gap: 1rem;
       }
 
@@ -291,6 +418,11 @@ const pageStyles = css`
         border: 1px solid var(--border-subtle);
         border-radius: var(--radius-md);
         background: var(--bg-base);
+        transition: border-color 0.2s, box-shadow 0.2s;
+      }
+      .badge-page__state-cell:hover {
+        border-color: var(--border-default);
+        box-shadow: 0 2px 8px oklch(0% 0 0 / 0.05);
       }
 
       .badge-page__state-label {
@@ -305,22 +437,43 @@ const pageStyles = css`
         font-style: italic;
       }
 
-      /* ── Tier card ──────────────────────────────────── */
+      /* ── Weight Tier Cards ──────────────────────────── */
 
       .badge-page__tiers {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        grid-template-columns: repeat(2, 1fr);
         gap: 1rem;
       }
 
       .badge-page__tier-card {
+        background: var(--bg-surface);
+        border: 1px solid var(--border-subtle);
+        border-radius: var(--radius-md);
+        padding: 1.5rem;
         display: flex;
         flex-direction: column;
         gap: 0.75rem;
-        padding: 1.25rem;
-        border: 1px solid var(--border-subtle);
-        border-radius: var(--radius-lg);
-        background: var(--bg-surface);
+        cursor: pointer;
+        transition: border-color 0.2s, box-shadow 0.2s, transform 0.2s;
+        min-width: 0;
+        overflow: hidden;
+      }
+
+      .badge-page__tier-card:hover {
+        border-color: var(--border-strong);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 16px oklch(0% 0 0 / 0.2);
+      }
+
+      .badge-page__tier-card--active {
+        border-color: var(--brand);
+        box-shadow: 0 0 0 1px var(--brand), 0 0 20px oklch(from var(--brand) l c h / 0.12);
+        background: oklch(from var(--bg-surface) calc(l + 0.02) c h);
+      }
+
+      .badge-page__tier-card--active:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 0 0 1px var(--brand), 0 0 20px oklch(from var(--brand) l c h / 0.18), 0 4px 16px oklch(0% 0 0 / 0.2);
       }
 
       .badge-page__tier-header {
@@ -345,24 +498,77 @@ const pageStyles = css`
         font-size: var(--text-xs, 0.75rem);
         color: var(--text-secondary);
         line-height: 1.5;
+        text-align: start;
       }
 
       .badge-page__tier-import {
         font-family: 'SF Mono', 'Fira Code', 'JetBrains Mono', monospace;
-        font-size: 0.6875rem;
+        font-size: 0.625rem;
         color: oklch(from var(--brand) calc(l + 0.1) c h);
-        background: oklch(100% 0 0 / 0.04);
+        background: var(--border-subtle);
         padding: 0.375rem 0.5rem;
         border-radius: var(--radius-sm);
-        overflow-x: auto;
-        white-space: nowrap;
+        overflow-wrap: break-word;
+        word-break: break-all;
+        text-align: start;
+        line-height: 1.4;
       }
 
       .badge-page__tier-preview {
         display: flex;
         justify-content: center;
-        gap: 0.5rem;
         padding-block-start: 0.5rem;
+      }
+
+      /* ── Color picker ──────────────────────────────── */
+
+      .badge-page__color-presets {
+        display: flex;
+        gap: 0.25rem;
+        flex-wrap: wrap;
+      }
+
+      .badge-page__color-preset {
+        inline-size: 24px;
+        block-size: 24px;
+        border-radius: 50%;
+        border: 2px solid transparent;
+        cursor: pointer;
+        padding: 0;
+        transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1),
+                    border-color 0.15s,
+                    box-shadow 0.15s;
+        box-shadow: 0 1px 3px oklch(0% 0 0 / 0.2);
+      }
+      .badge-page__color-preset:hover {
+        transform: scale(1.2);
+        box-shadow: 0 2px 8px oklch(0% 0 0 / 0.3);
+      }
+      .badge-page__color-preset--active {
+        border-color: oklch(100% 0 0);
+        transform: scale(1.2);
+        box-shadow: 0 0 0 2px var(--bg-base), 0 0 0 4px oklch(100% 0 0 / 0.5);
+      }
+
+      /* ── Code tabs ─────────────────────────────────── */
+
+      .badge-page__code-tabs {
+        margin-block-start: 1rem;
+      }
+
+      /* ── Export button row ─────────────────────────── */
+
+      .badge-page__export-row {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin-block-start: 0.75rem;
+      }
+
+      .badge-page__export-status {
+        font-size: var(--text-xs, 0.75rem);
+        color: var(--text-tertiary);
+        font-style: italic;
       }
 
       /* ── A11y list ──────────────────────────────────── */
@@ -394,7 +600,7 @@ const pageStyles = css`
       .badge-page__a11y-key {
         font-family: 'SF Mono', 'Fira Code', 'JetBrains Mono', monospace;
         font-size: var(--text-xs, 0.75rem);
-        background: oklch(100% 0 0 / 0.06);
+        background: var(--border-subtle);
         padding: 0.125rem 0.375rem;
         border-radius: var(--radius-sm);
         border: 1px solid var(--border-subtle);
@@ -416,6 +622,152 @@ const pageStyles = css`
         text-decoration: underline;
         text-underline-offset: 0.2em;
       }
+
+      /* ── Size breakdown bar ─────────────────────────── */
+
+      .badge-page__size-breakdown {
+        display: flex;
+        flex-direction: column;
+        gap: 0.25rem;
+        font-size: 0.75rem;
+        color: var(--text-tertiary);
+      }
+
+      .badge-page__size-row {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+
+      .badge-page__size-note {
+        font-size: 0.6875rem;
+        color: var(--text-tertiary);
+        line-height: 1.4;
+      }
+
+      /* ── Responsive ──────────────────────────────── */
+
+      @media (max-width: 768px) {
+        .badge-page__hero {
+          padding: 2rem 1.25rem;
+        }
+
+        .badge-page__title {
+          font-size: 1.75rem;
+        }
+
+        .badge-page__preview {
+          padding: 1.75rem;
+        }
+
+        .badge-page__playground {
+          grid-template-columns: 1fr;
+        }
+
+        .badge-page__playground-result {
+          padding: 2rem;
+          min-block-size: 120px;
+        }
+
+        .badge-page__labeled-row {
+          gap: 1rem;
+        }
+
+        .badge-page__tier-selector {
+          flex-wrap: wrap;
+          inline-size: 100%;
+        }
+
+        .badge-page__tier-btn {
+          flex: 1;
+          min-inline-size: 0;
+        }
+
+        .badge-page__states-grid {
+          grid-template-columns: repeat(2, 1fr);
+        }
+
+        .badge-page__tiers {
+          grid-template-columns: 1fr;
+        }
+
+        .badge-page__section {
+          padding: 1.25rem;
+        }
+      }
+
+      @media (max-width: 640px) {
+        .badge-page__tiers {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      @media (max-width: 400px) {
+        .badge-page__hero {
+          padding: 1.5rem 1rem;
+        }
+
+        .badge-page__title {
+          font-size: 1.5rem;
+        }
+
+        .badge-page__preview {
+          padding: 1rem;
+        }
+
+        .badge-page__states-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .badge-page__labeled-row {
+          gap: 0.5rem;
+          justify-content: center;
+        }
+      }
+
+      @media (min-width: 3000px) {
+        :scope {
+          max-inline-size: 1400px;
+        }
+
+        .badge-page__title {
+          font-size: 4rem;
+        }
+
+        .badge-page__preview {
+          padding: 3.5rem;
+        }
+
+        .badge-page__labeled-row {
+          gap: 2.5rem;
+        }
+      }
+
+      /* ── Scrollbar + code blocks ──────────────────── */
+
+      .badge-page__import-code,
+      .badge-page code,
+      pre {
+        overflow-x: auto;
+        scrollbar-width: thin;
+        scrollbar-color: var(--border-default) transparent;
+        max-inline-size: 100%;
+      }
+
+      :scope ::-webkit-scrollbar {
+        width: 4px;
+        height: 4px;
+      }
+      :scope ::-webkit-scrollbar-track {
+        background: transparent;
+      }
+      :scope ::-webkit-scrollbar-thumb {
+        background: var(--border-default);
+        border-radius: 2px;
+      }
+      :scope ::-webkit-scrollbar-thumb:hover {
+        background: var(--border-strong);
+      }
     }
   }
 `
@@ -423,16 +775,16 @@ const pageStyles = css`
 // ─── Props Data ───────────────────────────────────────────────────────────────
 
 const badgeProps: PropDef[] = [
-  { name: 'variant', type: "'default' | 'primary' | 'success' | 'warning' | 'danger' | 'info'", default: "'default'", description: 'Semantic color variant for different status contexts.' },
-  { name: 'size', type: "'xs' | 'sm' | 'md' | 'lg' | 'xl'", default: "'md'", description: 'Controls padding, font-size, and overall scale.' },
-  { name: 'dot', type: 'boolean', default: 'false', description: 'Shows a small dot indicator before the content.' },
-  { name: 'pulse', type: 'boolean', default: 'false', description: 'Adds a pulsing animation to the dot. Requires dot=true. Active at motion level 2+.' },
-  { name: 'count', type: 'number', description: 'Numeric counter value. Overrides children when set.' },
-  { name: 'maxCount', type: 'number', default: '99', description: 'Maximum count before showing overflow (e.g. "99+").' },
-  { name: 'icon', type: 'ReactNode', description: 'Leading icon element rendered before content. Scales to match font-size.' },
-  { name: 'motion', type: '0 | 1 | 2 | 3', description: 'Animation intensity override. Controls pulse animation on the dot indicator.' },
+  { name: 'variant', type: "'default' | 'primary' | 'success' | 'warning' | 'danger' | 'info'", default: "'default'", description: 'Semantic color variant controlling background, text, and border colors.' },
+  { name: 'size', type: "'xs' | 'sm' | 'md' | 'lg' | 'xl'", default: "'md'", description: 'Controls padding, font-size, and overall badge dimensions.' },
+  { name: 'dot', type: 'boolean', default: 'false', description: 'Shows a small colored dot indicator inside the badge.' },
+  { name: 'pulse', type: 'boolean', default: 'false', description: 'Adds a pulsing animation to the dot indicator. Requires motion level 2+.' },
+  { name: 'count', type: 'number', description: 'Display a numeric count instead of children. When set, replaces children content.' },
+  { name: 'maxCount', type: 'number', default: '99', description: 'Maximum count before showing overflow (e.g. "99+"). Only applies when count is set.' },
+  { name: 'icon', type: 'ReactNode', description: 'Leading icon element rendered before the badge content.' },
+  { name: 'motion', type: '0 | 1 | 2 | 3', description: 'Animation intensity override. Cascades from OS > prop > CSS --motion > UIProvider.' },
   { name: 'className', type: 'string', description: 'Additional CSS class name merged with the component class.' },
-  { name: 'children', type: 'ReactNode', description: 'Badge label content. Overridden by count when count is set.' },
+  { name: 'children', type: 'ReactNode', description: 'Badge label content. Overridden by count prop when set.' },
   { name: 'ref', type: 'Ref<HTMLSpanElement>', description: 'Forwarded ref to the underlying <span> element.' },
 ]
 
@@ -440,10 +792,29 @@ const badgeProps: PropDef[] = [
 
 type Variant = 'default' | 'primary' | 'success' | 'warning' | 'danger' | 'info'
 type Size = 'xs' | 'sm' | 'md' | 'lg' | 'xl'
+type LiteSize = 'xs' | 'sm' | 'md'
 
 const VARIANTS: Variant[] = ['default', 'primary', 'success', 'warning', 'danger', 'info']
 const SIZES: Size[] = ['xs', 'sm', 'md', 'lg', 'xl']
-const IMPORT_STR = "import { Badge } from '@annondeveloper/ui-kit'"
+const LITE_SIZES: LiteSize[] = ['xs', 'sm', 'md']
+
+const IMPORT_STRINGS: Record<string, string> = {
+  lite: "import { Badge } from '@annondeveloper/ui-kit/lite'",
+  standard: "import { Badge } from '@annondeveloper/ui-kit'",
+}
+
+const COLOR_PRESETS = [
+  { hex: '#6366f1', name: 'Indigo' },
+  { hex: '#f97316', name: 'Orange' },
+  { hex: '#f43f5e', name: 'Rose' },
+  { hex: '#0ea5e9', name: 'Sky' },
+  { hex: '#10b981', name: 'Emerald' },
+  { hex: '#8b5cf6', name: 'Violet' },
+  { hex: '#d946ef', name: 'Fuchsia' },
+  { hex: '#f59e0b', name: 'Amber' },
+  { hex: '#06b6d4', name: 'Cyan' },
+  { hex: '#64748b', name: 'Slate' },
+]
 
 function CopyButton({ text }: { text: string }) {
   const [copied, setCopied] = useState(false)
@@ -517,134 +888,362 @@ function Toggle({
   )
 }
 
+// ─── Code Generation ─────────────────────────────────────────────────────────
+
+function generateReactCode(
+  tier: Tier,
+  variant: Variant,
+  size: Size,
+  label: string,
+  dot: boolean,
+  pulse: boolean,
+  showIcon: boolean,
+  count: number | undefined,
+  maxCount: number,
+  motion: number,
+): string {
+  const importStr = IMPORT_STRINGS[tier] || IMPORT_STRINGS.standard
+  const iconImport = showIcon && tier !== 'lite' ? "\nimport { Icon } from '@annondeveloper/ui-kit'" : ''
+
+  const props: string[] = []
+  if (variant !== 'default') props.push(`  variant="${variant}"`)
+  if (size !== 'md') props.push(`  size="${size}"`)
+  if (dot && tier !== 'lite') props.push('  dot')
+  if (pulse && tier !== 'lite') props.push('  pulse')
+  if (count !== undefined) props.push(`  count={${count}}`)
+  if (maxCount !== 99 && count !== undefined) props.push(`  maxCount={${maxCount}}`)
+  if (showIcon && tier !== 'lite') props.push('  icon={<Icon name="check" size="sm" />}')
+  if (motion !== 3 && tier !== 'lite') props.push(`  motion={${motion}}`)
+
+  const hasChildren = label && count === undefined
+  const jsx = props.length === 0
+    ? `<Badge>${hasChildren ? label : ''}</Badge>`
+    : hasChildren
+      ? `<Badge\n${props.join('\n')}\n>${label}</Badge>`
+      : `<Badge\n${props.join('\n')}\n/>`
+
+  return `${importStr}${iconImport}\n\n${jsx}`
+}
+
+function generateHtmlCssCode(
+  tier: Tier,
+  variant: Variant,
+  size: Size,
+  label: string,
+  dot: boolean,
+  pulse: boolean,
+  count: number | undefined,
+  maxCount: number,
+  motion: number,
+): string {
+  const className = tier === 'lite' ? 'ui-lite-badge' : 'ui-badge'
+  const tierLabel = tier === 'lite' ? 'lite' : 'standard'
+  const cssImport = tier === 'lite'
+    ? `@import '@annondeveloper/ui-kit/lite/styles.css';`
+    : `@import '@annondeveloper/ui-kit/css/components/badge.css';`
+
+  const displayCount = count !== undefined
+    ? count > maxCount ? `${maxCount}+` : String(count)
+    : null
+  const content = displayCount ?? label
+
+  if (tier === 'lite') {
+    return `<!-- Badge — @annondeveloper/ui-kit lite tier -->
+<link rel="stylesheet" href="https://unpkg.com/@annondeveloper/ui-kit/lite/styles.css">
+
+<span class="${className}" data-variant="${variant}" data-size="${size}">
+  ${content}
+</span>
+
+<!-- Or import in your CSS: -->
+<!-- ${cssImport} -->`
+  }
+
+  const dotHtml = dot
+    ? `\n  <span class="ui-badge__dot"${pulse ? ' data-pulse="true"' : ''}></span>`
+    : ''
+
+  return `<!-- Badge — @annondeveloper/ui-kit ${tierLabel} tier -->
+<link rel="stylesheet" href="https://unpkg.com/@annondeveloper/ui-kit/css/components/badge.css">
+
+<span class="${className}" data-variant="${variant}" data-size="${size}" data-motion="${motion}">${dotHtml}
+  ${content}
+</span>
+
+<!-- Or import in your CSS: -->
+<!-- ${cssImport} -->`
+}
+
+function generateVueCode(tier: Tier, variant: Variant, size: Size, label: string, dot: boolean, pulse: boolean, count: number | undefined): string {
+  if (tier === 'lite') {
+    const attrs: string[] = [`class="ui-lite-badge"`, `data-variant="${variant}"`, `data-size="${size}"`]
+    const displayCount = count !== undefined ? (count > 99 ? '99+' : String(count)) : null
+    const content = displayCount ?? label
+    return `<template>\n  <span ${attrs.join(' ')}>\n    ${content}\n  </span>\n</template>\n\n<style>\n@import '@annondeveloper/ui-kit/lite/styles.css';\n</style>`
+  }
+
+  const attrs: string[] = []
+  if (variant !== 'default') attrs.push(`  variant="${variant}"`)
+  if (size !== 'md') attrs.push(`  size="${size}"`)
+  if (dot) attrs.push('  dot')
+  if (pulse) attrs.push('  pulse')
+  if (count !== undefined) attrs.push(`  :count="${count}"`)
+
+  const displayCount = count !== undefined ? (count > 99 ? '99+' : String(count)) : null
+  const content = displayCount ?? label
+
+  const template = attrs.length === 0
+    ? `  <Badge>${content}</Badge>`
+    : `  <Badge\n  ${attrs.join('\n  ')}\n  >${content}</Badge>`
+
+  return `<template>\n${template}\n</template>\n\n<script setup>\nimport { Badge } from '@annondeveloper/ui-kit'\n</script>`
+}
+
+function generateAngularCode(tier: Tier, variant: Variant, size: Size, label: string, dot: boolean, count: number | undefined): string {
+  if (tier === 'lite') {
+    const attrs = [`class="ui-lite-badge"`, `data-variant="${variant}"`, `data-size="${size}"`]
+    const displayCount = count !== undefined ? (count > 99 ? '99+' : String(count)) : null
+    const content = displayCount ?? label
+    return `<!-- Angular — Lite tier (CSS-only) -->\n<span ${attrs.join(' ')}>\n  ${content}\n</span>\n\n/* In styles.css */\n@import '@annondeveloper/ui-kit/lite/styles.css';`
+  }
+
+  const attrs = [`class="ui-badge"`, `data-variant="${variant}"`, `data-size="${size}"`]
+  const dotHtml = dot ? `\n  <span class="ui-badge__dot"></span>` : ''
+  const displayCount = count !== undefined ? (count > 99 ? '99+' : String(count)) : null
+  const content = displayCount ?? label
+
+  return `<!-- Angular — Standard tier -->\n<!-- Use the React wrapper or CSS-only approach -->\n<span\n  ${attrs.join('\n  ')}\n>${dotHtml}\n  ${content}\n</span>\n\n/* Import component CSS */\n@import '@annondeveloper/ui-kit/css/components/badge.css';`
+}
+
+function generateSvelteCode(tier: Tier, variant: Variant, size: Size, label: string, dot: boolean, pulse: boolean, count: number | undefined): string {
+  if (tier === 'lite') {
+    const displayCount = count !== undefined ? (count > 99 ? '99+' : String(count)) : null
+    const content = displayCount ?? label
+    return `<!-- Svelte — Lite tier (CSS-only) -->\n<span\n  class="ui-lite-badge"\n  data-variant="${variant}"\n  data-size="${size}"\n>\n  ${content}\n</span>\n\n<style>\n  @import '@annondeveloper/ui-kit/lite/styles.css';\n</style>`
+  }
+
+  const attrs: string[] = []
+  if (variant !== 'default') attrs.push(`  variant="${variant}"`)
+  if (size !== 'md') attrs.push(`  size="${size}"`)
+  if (dot) attrs.push('  dot')
+  if (pulse) attrs.push('  pulse')
+  if (count !== undefined) attrs.push(`  count={${count}}`)
+
+  const displayCount = count !== undefined ? (count > 99 ? '99+' : String(count)) : null
+  const content = displayCount ?? label
+
+  const propsStr = attrs.length > 0 ? `\n${attrs.join('\n')}\n` : ''
+  return `<script>\n  import { Badge } from '@annondeveloper/ui-kit';\n</script>\n\n<Badge${propsStr}>\n  ${content}\n</Badge>`
+}
+
 // ─── Section: Interactive Playground ──────────────────────────────────────────
 
-function PlaygroundSection() {
+function PlaygroundSection({ tier: tierProp }: { tier: Tier }) {
+  const { tier: contextTier } = useTier()
+  const tier = tierProp ?? contextTier
   const [variant, setVariant] = useState<Variant>('primary')
   const [size, setSize] = useState<Size>('md')
   const [dot, setDot] = useState(false)
   const [pulse, setPulse] = useState(false)
   const [showIcon, setShowIcon] = useState(false)
-  const [label, setLabel] = useState('Badge')
-  const [useCounter, setUseCounter] = useState(false)
-  const [count, setCount] = useState(5)
+  const [count, setCount] = useState<number | undefined>(undefined)
+  const [countInput, setCountInput] = useState('')
   const [maxCount, setMaxCount] = useState(99)
+  const [maxCountInput, setMaxCountInput] = useState('99')
+  const [label, setLabel] = useState('New')
   const [motion, setMotion] = useState<0 | 1 | 2 | 3>(3)
+  const [copyStatus, setCopyStatus] = useState('')
 
-  const codeLines: string[] = ['<Badge']
-  if (variant !== 'default') codeLines.push(`  variant="${variant}"`)
-  if (size !== 'md') codeLines.push(`  size="${size}"`)
-  if (dot) codeLines.push('  dot')
-  if (pulse) codeLines.push('  pulse')
-  if (showIcon) codeLines.push('  icon={<Icon name="zap" size="sm" />}')
-  if (useCounter) {
-    codeLines.push(`  count={${count}}`)
-    if (maxCount !== 99) codeLines.push(`  maxCount={${maxCount}}`)
+  const BadgeComponent = tier === 'lite' ? LiteBadge : Badge
+
+  // Clamp size for lite tier
+  const effectiveSize = tier === 'lite' && !LITE_SIZES.includes(size as LiteSize) ? 'md' : size
+
+  const reactCode = useMemo(
+    () => generateReactCode(tier, variant, effectiveSize, label, dot, pulse, showIcon, count, maxCount, motion),
+    [tier, variant, effectiveSize, label, dot, pulse, showIcon, count, maxCount, motion],
+  )
+
+  const htmlCssCode = useMemo(
+    () => generateHtmlCssCode(tier, variant, effectiveSize, label, dot, pulse, count, maxCount, motion),
+    [tier, variant, effectiveSize, label, dot, pulse, count, maxCount, motion],
+  )
+
+  const vueCode = useMemo(
+    () => generateVueCode(tier, variant, effectiveSize, label, dot, pulse, count),
+    [tier, variant, effectiveSize, label, dot, pulse, count],
+  )
+
+  const angularCode = useMemo(
+    () => generateAngularCode(tier, variant, effectiveSize, label, dot, count),
+    [tier, variant, effectiveSize, label, dot, count],
+  )
+
+  const svelteCode = useMemo(
+    () => generateSvelteCode(tier, variant, effectiveSize, label, dot, pulse, count),
+    [tier, variant, effectiveSize, label, dot, pulse, count],
+  )
+
+  const [activeCodeTab, setActiveCodeTab] = useState('react')
+
+  const codeTabs = [
+    { id: 'react', label: 'React' },
+    { id: 'html', label: 'HTML+CSS' },
+    { id: 'vue', label: 'Vue' },
+    { id: 'angular', label: 'Angular' },
+    { id: 'svelte', label: 'Svelte' },
+  ]
+
+  const activeCode = useMemo(() => {
+    switch (activeCodeTab) {
+      case 'react': return reactCode
+      case 'html': return htmlCssCode
+      case 'vue': return vueCode
+      case 'angular': return angularCode
+      case 'svelte': return svelteCode
+      default: return reactCode
+    }
+  }, [activeCodeTab, reactCode, htmlCssCode, vueCode, angularCode, svelteCode])
+
+  const previewProps: Record<string, unknown> = {
+    variant,
+    size: effectiveSize,
   }
-  if (motion !== 3) codeLines.push(`  motion={${motion}}`)
-  if (useCounter) {
-    codeLines.push('/>')
-  } else {
-    codeLines.push(`>${label}</Badge>`)
+  if (tier !== 'lite') {
+    previewProps.dot = dot
+    previewProps.pulse = pulse
+    previewProps.icon = showIcon ? <Icon name="check" size="sm" /> : undefined
+    previewProps.count = count
+    previewProps.maxCount = maxCount
+    previewProps.motion = motion
   }
-  const code = codeLines.length <= 2
-    ? useCounter ? `<Badge count={${count}} />` : `<Badge>${label}</Badge>`
-    : codeLines.join('\n')
 
   return (
     <section className="badge-page__section" id="playground">
       <h2 className="badge-page__section-title">
-        <a href="#playground">Interactive Playground</a>
+        <a href="#playground">Live Playground</a>
       </h2>
       <p className="badge-page__section-desc">
         Tweak every prop and see the result in real-time. The generated code updates as you change settings.
       </p>
 
-      <Card variant="default" padding="md" style={{ containerType: 'inline-size' }}>
-        <div className="badge-page__playground">
-          {/* Preview + Code */}
-          <div className="badge-page__playground-preview">
-            <div className="badge-page__playground-result">
-              <Badge
-                variant={variant}
-                size={size}
-                dot={dot}
-                pulse={pulse}
-                icon={showIcon ? <Icon name="zap" size="sm" /> : undefined}
-                count={useCounter ? count : undefined}
-                maxCount={maxCount}
-                motion={motion}
-              >
-                {useCounter ? undefined : label}
-              </Badge>
-            </div>
-            <CopyBlock code={code} language="typescript" showLineNumbers />
+      <div className="badge-page__playground">
+        {/* Preview area — left / top */}
+        <div className="badge-page__playground-preview">
+          <div className="badge-page__playground-result">
+            <BadgeComponent {...previewProps}>{count === undefined ? label : undefined}</BadgeComponent>
           </div>
 
-          {/* Controls */}
-          <div className="badge-page__playground-controls">
-            <OptionGroup label="Variant" options={VARIANTS} value={variant} onChange={setVariant} />
-            <OptionGroup label="Size" options={SIZES} value={size} onChange={setSize} />
+          {/* Tabbed code output */}
+          <div className="badge-page__code-tabs">
+            <div className="badge-page__export-row">
+              <Button
+                size="xs"
+                variant="secondary"
+                icon={<Icon name="copy" size="sm" />}
+                onClick={() => {
+                  navigator.clipboard?.writeText(activeCode).then(() => {
+                    setCopyStatus(`Copied ${codeTabs.find(t => t.id === activeCodeTab)?.label}!`)
+                    setTimeout(() => setCopyStatus(''), 2000)
+                  })
+                }}
+              >
+                Copy {codeTabs.find(t => t.id === activeCodeTab)?.label}
+              </Button>
+              {copyStatus && <span className="badge-page__export-status">{copyStatus}</span>}
+            </div>
+            <Tabs tabs={codeTabs} activeTab={activeCodeTab} onChange={setActiveCodeTab} size="sm" variant="pills">
+              <TabPanel tabId="react">
+                <CopyBlock code={reactCode} language="typescript" showLineNumbers />
+              </TabPanel>
+              <TabPanel tabId="html">
+                <CopyBlock code={htmlCssCode} language="html" showLineNumbers />
+              </TabPanel>
+              <TabPanel tabId="vue">
+                <CopyBlock code={vueCode} language="html" showLineNumbers />
+              </TabPanel>
+              <TabPanel tabId="angular">
+                <CopyBlock code={angularCode} language="html" showLineNumbers />
+              </TabPanel>
+              <TabPanel tabId="svelte">
+                <CopyBlock code={svelteCode} language="html" showLineNumbers />
+              </TabPanel>
+            </Tabs>
+          </div>
+        </div>
+
+        {/* Controls panel — right / bottom */}
+        <div className="badge-page__playground-controls">
+          <OptionGroup label="Variant" options={VARIANTS} value={variant} onChange={setVariant} />
+          <OptionGroup
+            label="Size"
+            options={tier === 'lite' ? LITE_SIZES : SIZES}
+            value={effectiveSize as any}
+            onChange={(v) => setSize(v as Size)}
+          />
+
+          {tier !== 'lite' && (
             <OptionGroup
               label="Motion"
               options={['0', '1', '2', '3'] as const}
               value={String(motion) as '0' | '1' | '2' | '3'}
               onChange={v => setMotion(Number(v) as 0 | 1 | 2 | 3)}
             />
+          )}
 
-            <div className="badge-page__control-group">
-              <span className="badge-page__control-label">Toggles</span>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.375rem' }}>
-                <Toggle label="Dot indicator" checked={dot} onChange={setDot} />
-                <Toggle label="Pulse animation" checked={pulse} onChange={setPulse} />
-                <Toggle label="Leading icon" checked={showIcon} onChange={setShowIcon} />
-                <Toggle label="Use counter" checked={useCounter} onChange={setUseCounter} />
-              </div>
+          <div className="badge-page__control-group">
+            <span className="badge-page__control-label">Toggles</span>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.375rem' }}>
+              {tier !== 'lite' && <Toggle label="Dot" checked={dot} onChange={setDot} />}
+              {tier !== 'lite' && <Toggle label="Pulse" checked={pulse} onChange={setPulse} />}
+              {tier !== 'lite' && <Toggle label="Icon" checked={showIcon} onChange={setShowIcon} />}
             </div>
+          </div>
 
-            {useCounter ? (
-              <div className="badge-page__control-group">
-                <span className="badge-page__control-label">Counter</span>
-                <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
-                  <label style={{ fontSize: 'var(--text-xs, 0.75rem)', color: 'var(--text-secondary)' }}>
-                    Count:
-                    <input
-                      type="number"
-                      value={count}
-                      onChange={e => setCount(Number(e.target.value))}
-                      className="badge-page__number-input"
-                      min={0}
-                      style={{ marginInlineStart: '0.375rem' }}
-                    />
-                  </label>
-                  <label style={{ fontSize: 'var(--text-xs, 0.75rem)', color: 'var(--text-secondary)' }}>
-                    Max:
-                    <input
-                      type="number"
-                      value={maxCount}
-                      onChange={e => setMaxCount(Number(e.target.value))}
-                      className="badge-page__number-input"
-                      min={1}
-                      style={{ marginInlineStart: '0.375rem' }}
-                    />
-                  </label>
-                </div>
-              </div>
-            ) : (
-              <div className="badge-page__control-group">
-                <span className="badge-page__control-label">Label</span>
-                <input
-                  type="text"
-                  value={label}
-                  onChange={e => setLabel(e.target.value)}
-                  className="badge-page__text-input"
-                  placeholder="Badge label..."
-                />
-              </div>
-            )}
+          <div className="badge-page__control-group">
+            <span className="badge-page__control-label">Count</span>
+            <input
+              type="number"
+              value={countInput}
+              onChange={e => {
+                setCountInput(e.target.value)
+                const val = e.target.value.trim()
+                setCount(val === '' ? undefined : Number(val))
+              }}
+              className="badge-page__text-input"
+              placeholder="Leave empty for text label"
+              min={0}
+            />
+          </div>
+
+          <div className="badge-page__control-group">
+            <span className="badge-page__control-label">Max Count</span>
+            <input
+              type="number"
+              value={maxCountInput}
+              onChange={e => {
+                setMaxCountInput(e.target.value)
+                const val = Number(e.target.value)
+                if (!isNaN(val) && val > 0) setMaxCount(val)
+              }}
+              className="badge-page__text-input"
+              placeholder="99"
+              min={1}
+            />
+          </div>
+
+          <div className="badge-page__control-group">
+            <span className="badge-page__control-label">Label</span>
+            <input
+              type="text"
+              value={label}
+              onChange={e => setLabel(e.target.value)}
+              className="badge-page__text-input"
+              placeholder="Badge label..."
+            />
           </div>
         </div>
-      </Card>
+      </div>
     </section>
   )
 }
@@ -654,42 +1253,104 @@ function PlaygroundSection() {
 export default function BadgePage() {
   useStyles('badge-page', pageStyles)
 
+  const { tier, setTier } = useTier()
+  const [brandColor, setBrandColor] = useState('#6366f1')
+  const pageRef = useRef<HTMLDivElement>(null)
+  const { mode } = useTheme()
+
+  // Only lite and standard tiers for Badge
+  const effectiveTier = tier === 'premium' ? 'standard' : tier
+
+  const themeTokens = useMemo(() => {
+    try {
+      return generateTheme(brandColor, mode)
+    } catch {
+      return null
+    }
+  }, [brandColor, mode])
+
+  const BRAND_ONLY_KEYS: (keyof ThemeTokens)[] = [
+    'brand', 'brandLight', 'brandDark', 'brandSubtle', 'brandGlow',
+    'borderGlow', 'aurora1', 'aurora2',
+  ]
+
+  const themeStyle = useMemo(() => {
+    if (!themeTokens || brandColor === '#6366f1') return undefined
+    const style: Record<string, string> = {}
+    for (const key of BRAND_ONLY_KEYS) {
+      const cssVar = TOKEN_TO_CSS[key]
+      const value = themeTokens[key]
+      if (cssVar && value) style[cssVar] = value
+    }
+    return style as React.CSSProperties
+  }, [themeTokens, brandColor])
+
+  // Scroll reveal for sections — JS fallback for browsers without animation-timeline
+  useEffect(() => {
+    const sections = document.querySelectorAll('.badge-page__section')
+    if (!sections.length) return
+
+    // Check if CSS animation-timeline is supported
+    if (CSS.supports?.('animation-timeline', 'view()')) return // CSS handles it
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            ;(entry.target as HTMLElement).style.opacity = '1'
+            ;(entry.target as HTMLElement).style.transform = 'translateY(0) scale(1)'
+            ;(entry.target as HTMLElement).style.filter = 'blur(0)'
+            observer.unobserve(entry.target)
+          }
+        })
+      },
+      { threshold: 0.1, rootMargin: '0px 0px -50px 0px' }
+    )
+
+    sections.forEach(section => {
+      ;(section as HTMLElement).style.opacity = '0'
+      ;(section as HTMLElement).style.transform = 'translateY(32px) scale(0.98)'
+      ;(section as HTMLElement).style.filter = 'blur(4px)'
+      ;(section as HTMLElement).style.transition = 'opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1), transform 0.6s cubic-bezier(0.16, 1, 0.3, 1), filter 0.6s cubic-bezier(0.16, 1, 0.3, 1)'
+      observer.observe(section)
+    })
+
+    return () => observer.disconnect()
+  }, [])
+
+  const BadgeComponent = effectiveTier === 'lite' ? LiteBadge : Badge
+
   return (
-    <div className="badge-page">
+    <div className="badge-page" ref={pageRef} style={themeStyle}>
       {/* ── 1. Hero Header ──────────────────────────────── */}
       <div className="badge-page__hero">
         <h1 className="badge-page__title">Badge</h1>
         <p className="badge-page__desc">
-          Compact status indicator with semantic color variants, dot and pulse indicators,
-          counter overflow, and icon support. Ships in two weight tiers.
+          Compact status indicator with variant colors, dot indicators, pulse animations, count display, and icon support.
+          Ships in two weight tiers from a CSS-only lite to a full-featured standard with motion.
         </p>
         <div className="badge-page__import-row">
-          <code className="badge-page__import-code">{IMPORT_STR}</code>
-          <CopyButton text={IMPORT_STR} />
+          <code className="badge-page__import-code">{IMPORT_STRINGS[effectiveTier] || IMPORT_STRINGS.standard}</code>
+          <CopyButton text={IMPORT_STRINGS[effectiveTier] || IMPORT_STRINGS.standard} />
         </div>
       </div>
 
-      <Divider spacing="sm" />
+      {/* ── 2. Live Playground ──────────────────────────── */}
+      <PlaygroundSection tier={effectiveTier} />
 
-      {/* ── 2. Interactive Playground ───────────────────── */}
-      <PlaygroundSection />
-
-      <Divider spacing="sm" />
-
-      {/* ── 3. Variant Gallery ─────────────────────────── */}
+      {/* ── 3. All Variants ────────────────────────────── */}
       <section className="badge-page__section" id="variants">
         <h2 className="badge-page__section-title">
           <a href="#variants">Variants</a>
         </h2>
         <p className="badge-page__section-desc">
-          Six semantic variants for different status contexts. Each uses OKLCH color tokens for
-          perceptually uniform appearance.
+          Six built-in semantic variants for status indication, categorization, and visual hierarchy.
         </p>
         <div className="badge-page__preview">
           <div className="badge-page__labeled-row">
             {VARIANTS.map(v => (
               <div key={v} className="badge-page__labeled-item">
-                <Badge variant={v}>{v.charAt(0).toUpperCase() + v.slice(1)}</Badge>
+                <BadgeComponent variant={v}>{v.charAt(0).toUpperCase() + v.slice(1)}</BadgeComponent>
                 <span className="badge-page__item-label">{v}</span>
               </div>
             ))}
@@ -697,22 +1358,21 @@ export default function BadgePage() {
         </div>
       </section>
 
-      <Divider spacing="sm" />
-
-      {/* ── 4. Size Scale ──────────────────────────────── */}
+      {/* ── 4. Size Scale ───────────────────────────────── */}
       <section className="badge-page__section" id="sizes">
         <h2 className="badge-page__section-title">
           <a href="#sizes">Size Scale</a>
         </h2>
         <p className="badge-page__section-desc">
-          Five sizes from compact inline indicators (xs) to large prominent badges (xl).
-          Sizes control padding and font-size.
+          {effectiveTier === 'lite'
+            ? 'Three sizes for the lite tier: compact (xs), small (sm), and medium (md).'
+            : 'Five sizes from compact inline labels (xs) to large prominent badges (xl). Sizes control padding and font-size.'}
         </p>
         <div className="badge-page__preview">
           <div className="badge-page__labeled-row" style={{ alignItems: 'flex-end' }}>
-            {SIZES.map(s => (
+            {(effectiveTier === 'lite' ? LITE_SIZES : SIZES).map(s => (
               <div key={s} className="badge-page__labeled-item">
-                <Badge variant="primary" size={s}>Badge</Badge>
+                <BadgeComponent variant="primary" size={s as any}>Badge</BadgeComponent>
                 <span className="badge-page__item-label">{s}</span>
               </div>
             ))}
@@ -720,230 +1380,313 @@ export default function BadgePage() {
         </div>
       </section>
 
-      <Divider spacing="sm" />
-
       {/* ── 5. States ──────────────────────────────────── */}
       <section className="badge-page__section" id="states">
         <h2 className="badge-page__section-title">
           <a href="#states">States</a>
         </h2>
         <p className="badge-page__section-desc">
-          Badges support various display modes including dot indicators, pulse animation, counters, and icons.
+          Badges support several display modes including dot indicators, pulse animations, counts, and icons.
         </p>
         <div className="badge-page__states-grid">
           <div className="badge-page__state-cell">
-            <Badge variant="primary">Default</Badge>
+            <BadgeComponent variant="primary">Default</BadgeComponent>
             <span className="badge-page__state-label">Default</span>
           </div>
-          <div className="badge-page__state-cell">
-            <Badge variant="success" dot>Online</Badge>
-            <span className="badge-page__state-label">With dot</span>
-          </div>
-          <div className="badge-page__state-cell">
-            <Badge variant="danger" dot pulse>Live</Badge>
-            <span className="badge-page__state-label">Pulsing dot</span>
-          </div>
-          <div className="badge-page__state-cell">
-            <Badge variant="primary" count={5} />
-            <span className="badge-page__state-label">Counter</span>
-          </div>
-          <div className="badge-page__state-cell">
-            <Badge variant="danger" count={150} maxCount={99} />
-            <span className="badge-page__state-label">Overflow 99+</span>
-          </div>
-          <div className="badge-page__state-cell">
-            <Badge variant="info" icon={<Icon name="info" size="sm" />}>Info</Badge>
-            <span className="badge-page__state-label">With icon</span>
-          </div>
-        </div>
-      </section>
-
-      <Divider spacing="sm" />
-
-      {/* ── 6. Dot & Pulse ─────────────────────────────── */}
-      <section className="badge-page__section" id="dot-pulse">
-        <h2 className="badge-page__section-title">
-          <a href="#dot-pulse">Dot & Pulse Indicator</a>
-        </h2>
-        <p className="badge-page__section-desc">
-          The dot indicator shows a small circle before the content. When pulse is enabled,
-          it animates with a radiating ring at motion level 2+.
-        </p>
-        <div className="badge-page__preview badge-page__preview--col" style={{ gap: '1.25rem' }}>
-          <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '0.75rem' }}>
-            <div className="badge-page__labeled-item">
-              <Badge variant="success" dot>Online</Badge>
-              <span className="badge-page__item-label">dot</span>
+          {effectiveTier !== 'lite' && (
+            <div className="badge-page__state-cell">
+              <Badge variant="primary" dot>With Dot</Badge>
+              <span className="badge-page__state-label">Dot</span>
             </div>
-            <div className="badge-page__labeled-item">
-              <Badge variant="success" dot pulse>Live</Badge>
-              <span className="badge-page__item-label">dot + pulse</span>
+          )}
+          {effectiveTier !== 'lite' && (
+            <div className="badge-page__state-cell">
+              <Badge variant="danger" dot pulse>Pulse</Badge>
+              <span className="badge-page__state-label">Pulse</span>
+              <span className="badge-page__state-hint">animated dot</span>
             </div>
-            <div className="badge-page__labeled-item">
-              <Badge variant="danger" dot pulse>Recording</Badge>
-              <span className="badge-page__item-label">danger pulse</span>
+          )}
+          {effectiveTier !== 'lite' && (
+            <div className="badge-page__state-cell">
+              <Badge variant="primary" count={5}>Count</Badge>
+              <span className="badge-page__state-label">Count</span>
             </div>
-            <div className="badge-page__labeled-item">
-              <Badge variant="warning" dot>Away</Badge>
-              <span className="badge-page__item-label">warning dot</span>
+          )}
+          {effectiveTier !== 'lite' && (
+            <div className="badge-page__state-cell">
+              <Badge variant="primary" icon={<Icon name="check" size="sm" />}>Verified</Badge>
+              <span className="badge-page__state-label">With Icon</span>
             </div>
-          </div>
-          <CopyBlock
-            code={`// Simple dot indicator
-<Badge variant="success" dot>Online</Badge>
-
-// Pulsing dot (active at motion level 2+)
-<Badge variant="success" dot pulse>Live</Badge>
-
-// Danger pulse
-<Badge variant="danger" dot pulse>Recording</Badge>`}
-            language="typescript"
-            showLineNumbers
-          />
-        </div>
-      </section>
-
-      <Divider spacing="sm" />
-
-      {/* ── 7. Counter & Overflow ──────────────────────── */}
-      <section className="badge-page__section" id="counter">
-        <h2 className="badge-page__section-title">
-          <a href="#counter">Counter & Overflow</a>
-        </h2>
-        <p className="badge-page__section-desc">
-          Use the count prop for numeric counters. When the value exceeds maxCount (default 99),
-          it displays as "99+".
-        </p>
-        <div className="badge-page__preview badge-page__preview--col" style={{ gap: '1.25rem' }}>
-          <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '0.75rem' }}>
-            <div className="badge-page__labeled-item">
-              <Badge variant="primary" count={3} />
-              <span className="badge-page__item-label">count=3</span>
-            </div>
-            <div className="badge-page__labeled-item">
-              <Badge variant="primary" count={42} />
-              <span className="badge-page__item-label">count=42</span>
-            </div>
-            <div className="badge-page__labeled-item">
+          )}
+          {effectiveTier !== 'lite' && (
+            <div className="badge-page__state-cell">
               <Badge variant="danger" count={150} maxCount={99} />
-              <span className="badge-page__item-label">99+</span>
+              <span className="badge-page__state-label">Overflow</span>
+              <span className="badge-page__state-hint">count &gt; maxCount</span>
             </div>
-            <div className="badge-page__labeled-item">
-              <Badge variant="danger" count={1000} maxCount={999} />
-              <span className="badge-page__item-label">999+</span>
-            </div>
-            <div className="badge-page__labeled-item">
-              <Badge variant="primary" count={0} />
-              <span className="badge-page__item-label">count=0</span>
-            </div>
-          </div>
-          <CopyBlock
-            code={`// Simple counter
-<Badge variant="primary" count={3} />
-
-// Overflow (default maxCount=99)
-<Badge variant="danger" count={150} />        // renders "99+"
-
-// Custom maxCount
-<Badge variant="danger" count={1000} maxCount={999} />  // renders "999+"`}
-            language="typescript"
-            showLineNumbers
-          />
+          )}
         </div>
       </section>
 
-      <Divider spacing="sm" />
+      {/* ── 6a. Dot Indicator ──────────────────────────── */}
+      {effectiveTier !== 'lite' && (
+        <section className="badge-page__section" id="dot">
+          <h2 className="badge-page__section-title">
+            <a href="#dot">Dot Indicator</a>
+          </h2>
+          <p className="badge-page__section-desc">
+            Add a small colored dot to visually mark status. The dot inherits the variant color via <code>currentColor</code>.
+          </p>
+          <div className="badge-page__preview">
+            <div className="badge-page__labeled-row">
+              {VARIANTS.map(v => (
+                <div key={v} className="badge-page__labeled-item">
+                  <Badge variant={v} dot>{v.charAt(0).toUpperCase() + v.slice(1)}</Badge>
+                  <span className="badge-page__item-label">{v}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+          <div style={{ marginBlockStart: '1rem' }}>
+            <CopyBlock
+              code={`<Badge variant="success" dot>Online</Badge>\n<Badge variant="danger" dot>Offline</Badge>\n<Badge variant="warning" dot>Away</Badge>`}
+              language="typescript"
+            />
+          </div>
+        </section>
+      )}
 
-      {/* ── 8. Weight Tiers ────────────────────────────── */}
+      {/* ── 6b. Pulse Animation ──────────────────────────── */}
+      {effectiveTier !== 'lite' && (
+        <section className="badge-page__section" id="pulse">
+          <h2 className="badge-page__section-title">
+            <a href="#pulse">Pulse Animation</a>
+          </h2>
+          <p className="badge-page__section-desc">
+            Combine <code>dot</code> and <code>pulse</code> for an animated attention indicator.
+            The pulse animation requires motion level 2 or higher and respects <code>prefers-reduced-motion</code>.
+          </p>
+          <div className="badge-page__preview">
+            <div className="badge-page__labeled-row">
+              <div className="badge-page__labeled-item">
+                <Badge variant="success" dot pulse>Live</Badge>
+                <span className="badge-page__item-label">success</span>
+              </div>
+              <div className="badge-page__labeled-item">
+                <Badge variant="danger" dot pulse>Alert</Badge>
+                <span className="badge-page__item-label">danger</span>
+              </div>
+              <div className="badge-page__labeled-item">
+                <Badge variant="info" dot pulse>Syncing</Badge>
+                <span className="badge-page__item-label">info</span>
+              </div>
+            </div>
+          </div>
+          <div style={{ marginBlockStart: '1rem' }}>
+            <CopyBlock
+              code={`<Badge variant="success" dot pulse>Live</Badge>\n<Badge variant="danger" dot pulse>Alert</Badge>`}
+              language="typescript"
+            />
+          </div>
+        </section>
+      )}
+
+      {/* ── 6c. Count Badge ──────────────────────────────── */}
+      {effectiveTier !== 'lite' && (
+        <section className="badge-page__section" id="count">
+          <h2 className="badge-page__section-title">
+            <a href="#count">Count Badge</a>
+          </h2>
+          <p className="badge-page__section-desc">
+            Display a numeric count. When <code>count</code> exceeds <code>maxCount</code> (default 99),
+            it displays as "99+". The count prop takes priority over children.
+          </p>
+          <div className="badge-page__preview">
+            <div className="badge-page__labeled-row">
+              <div className="badge-page__labeled-item">
+                <Badge variant="primary" count={3} />
+                <span className="badge-page__item-label">count=3</span>
+              </div>
+              <div className="badge-page__labeled-item">
+                <Badge variant="primary" count={42} />
+                <span className="badge-page__item-label">count=42</span>
+              </div>
+              <div className="badge-page__labeled-item">
+                <Badge variant="danger" count={99} />
+                <span className="badge-page__item-label">count=99</span>
+              </div>
+              <div className="badge-page__labeled-item">
+                <Badge variant="danger" count={150} maxCount={99} />
+                <span className="badge-page__item-label">99+</span>
+              </div>
+              <div className="badge-page__labeled-item">
+                <Badge variant="warning" count={999} maxCount={999} />
+                <span className="badge-page__item-label">maxCount=999</span>
+              </div>
+            </div>
+          </div>
+          <div style={{ marginBlockStart: '1rem' }}>
+            <CopyBlock
+              code={`<Badge variant="primary" count={3} />\n<Badge variant="danger" count={150} maxCount={99} /> {/* Shows "99+" */}\n<Badge variant="warning" count={999} maxCount={999} />`}
+              language="typescript"
+            />
+          </div>
+        </section>
+      )}
+
+      {/* ── 6d. With Icons ──────────────────────────────── */}
+      {effectiveTier !== 'lite' && (
+        <section className="badge-page__section" id="icons">
+          <h2 className="badge-page__section-title">
+            <a href="#icons">With Icons</a>
+          </h2>
+          <p className="badge-page__section-desc">
+            Add a leading icon element. Icons automatically scale to match the badge font-size via <code>1em</code> sizing.
+          </p>
+          <div className="badge-page__preview">
+            <div className="badge-page__labeled-row">
+              <div className="badge-page__labeled-item">
+                <Badge variant="success" icon={<Icon name="check" size="sm" />}>Verified</Badge>
+                <span className="badge-page__item-label">check</span>
+              </div>
+              <div className="badge-page__labeled-item">
+                <Badge variant="danger" icon={<Icon name="x" size="sm" />}>Error</Badge>
+                <span className="badge-page__item-label">x</span>
+              </div>
+              <div className="badge-page__labeled-item">
+                <Badge variant="info" icon={<Icon name="info" size="sm" />}>Info</Badge>
+                <span className="badge-page__item-label">info</span>
+              </div>
+              <div className="badge-page__labeled-item">
+                <Badge variant="warning" icon={<Icon name="alert-triangle" size="sm" />}>Warn</Badge>
+                <span className="badge-page__item-label">warning</span>
+              </div>
+            </div>
+          </div>
+          <div style={{ marginBlockStart: '1rem' }}>
+            <CopyBlock
+              code={`<Badge variant="success" icon={<Icon name="check" size="sm" />}>Verified</Badge>\n<Badge variant="danger" icon={<Icon name="x" size="sm" />}>Error</Badge>`}
+              language="typescript"
+            />
+          </div>
+        </section>
+      )}
+
+      {/* ── 7. Weight Tiers ────────────────────────────── */}
       <section className="badge-page__section" id="tiers">
         <h2 className="badge-page__section-title">
           <a href="#tiers">Weight Tiers</a>
         </h2>
         <p className="badge-page__section-desc">
-          Choose the right balance of features and bundle size. Lite is CSS-only with basic
-          variant and size support. Standard adds dot, pulse, counter, icon, and motion.
+          Choose between two weight tiers. Lite is CSS-only with no JavaScript beyond a forwardRef wrapper.
+          Standard adds dot, pulse, count, icon, and motion support.
         </p>
+
         <div className="badge-page__tiers">
           {/* Lite */}
-          <div className="badge-page__tier-card">
+          <div
+            className={`badge-page__tier-card${effectiveTier === 'lite' ? ' badge-page__tier-card--active' : ''}`}
+            onClick={() => setTier('lite')}
+            role="button"
+            tabIndex={0}
+            onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setTier('lite') } }}
+          >
             <div className="badge-page__tier-header">
               <span className="badge-page__tier-name">Lite</span>
               <span className="badge-page__tier-size">~0.2 KB</span>
             </div>
             <p className="badge-page__tier-desc">
-              CSS-only variant. Six color variants, three sizes (xs/sm/md).
-              No dot, no pulse, no counter, no icon.
+              CSS-only variant. Zero JavaScript beyond the forwardRef wrapper.
+              No dot, pulse, count, icon, or motion support. Supports 3 sizes (xs/sm/md).
             </p>
             <div className="badge-page__tier-import">
               import {'{'} Badge {'}'} from '@annondeveloper/ui-kit/lite'
             </div>
             <div className="badge-page__tier-preview">
-              <LiteBadge variant="primary">Lite</LiteBadge>
-              <LiteBadge variant="success">OK</LiteBadge>
-              <LiteBadge variant="danger">Error</LiteBadge>
+              <LiteBadge variant="primary">Lite Badge</LiteBadge>
+            </div>
+            <div className="badge-page__size-breakdown">
+              <div className="badge-page__size-row">
+                <span>Component: <strong style={{ color: 'var(--text-primary)' }}>0.2 KB</strong></span>
+                <span>+ Shared: <strong style={{ color: 'var(--text-primary)' }}>3.7 KB</strong></span>
+                <span>= <strong style={{ color: 'var(--brand)' }}>3.9 KB</strong> gzip</span>
+              </div>
             </div>
           </div>
 
           {/* Standard */}
-          <div className="badge-page__tier-card">
+          <div
+            className={`badge-page__tier-card${effectiveTier === 'standard' ? ' badge-page__tier-card--active' : ''}`}
+            onClick={() => setTier('standard')}
+            role="button"
+            tabIndex={0}
+            onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setTier('standard') } }}
+          >
             <div className="badge-page__tier-header">
               <span className="badge-page__tier-name">Standard</span>
               <span className="badge-page__tier-size">~1.5 KB</span>
             </div>
             <p className="badge-page__tier-desc">
-              Full-featured badge with all six variants, five sizes,
-              dot/pulse indicators, counter overflow, icon slot, and motion levels.
+              Full-featured badge with dot indicators, pulse animation,
+              count display, icon support, and motion levels.
             </p>
             <div className="badge-page__tier-import">
               import {'{'} Badge {'}'} from '@annondeveloper/ui-kit'
             </div>
             <div className="badge-page__tier-preview">
-              <Badge variant="primary" dot pulse>Live</Badge>
-              <Badge variant="success" icon={<Icon name="check" size="sm" />}>Done</Badge>
-              <Badge variant="danger" count={42} />
+              <Badge variant="primary" dot pulse icon={<Icon name="check" size="sm" />}>Standard</Badge>
+            </div>
+            <div className="badge-page__size-breakdown">
+              <div className="badge-page__size-row">
+                <span>Component: <strong style={{ color: 'var(--text-primary)' }}>1.5 KB</strong></span>
+                <span>+ Shared: <strong style={{ color: 'var(--text-primary)' }}>0.9 KB</strong></span>
+                <span>= <strong style={{ color: 'var(--brand)' }}>2.4 KB</strong> gzip</span>
+              </div>
             </div>
           </div>
         </div>
+
       </section>
 
-      <Divider spacing="sm" />
-
-      {/* ── 9. Motion Levels ───────────────────────────── */}
-      <section className="badge-page__section" id="motion">
+      {/* ── 8. Brand Color ───────────────────────────────── */}
+      <section className="badge-page__section" id="brand-color">
         <h2 className="badge-page__section-title">
-          <a href="#motion">Motion Levels</a>
+          <a href="#brand-color">Brand Color</a>
         </h2>
         <p className="badge-page__section-desc">
-          Motion levels control the pulse animation on the dot indicator.
-          Level 0-1 disables pulse; level 2+ enables the radiating ring animation.
+          Pick a brand color to see all badges update in real-time. The theme generates
+          derived colors (light, dark, subtle, glow) automatically from your choice.
         </p>
-        <div className="badge-page__preview">
-          <div className="badge-page__labeled-row">
-            {([0, 1, 2, 3] as const).map(m => (
-              <div key={m} className="badge-page__labeled-item">
-                <Badge variant="success" dot pulse motion={m}>Motion {m}</Badge>
-                <span className="badge-page__item-label">
-                  {m === 0 ? 'No pulse' : m === 1 ? 'No pulse' : m === 2 ? 'Pulse' : 'Pulse'}
-                </span>
-              </div>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+          <ColorInput
+            name="brand-color"
+            value={brandColor}
+            onChange={setBrandColor}
+            size="sm"
+            swatches={['#6366f1','#f97316','#f43f5e','#0ea5e9','#10b981','#8b5cf6','#d946ef','#f59e0b','#06b6d4','#64748b']}
+          />
+          <div className="badge-page__color-presets">
+            {COLOR_PRESETS.map(p => (
+              <button
+                key={p.hex}
+                type="button"
+                className={`badge-page__color-preset${brandColor === p.hex ? ' badge-page__color-preset--active' : ''}`}
+                style={{ background: p.hex }}
+                onClick={() => setBrandColor(p.hex)}
+                title={p.name}
+                aria-label={`Set brand color to ${p.name}`}
+              />
             ))}
           </div>
-        </div>
-        <div style={{ marginBlockStart: '0.75rem' }}>
-          <CopyBlock
-            code={`<Badge dot pulse motion={0}>No pulse</Badge>    // Animation disabled
-<Badge dot pulse motion={1}>No pulse</Badge>    // CSS transitions only, no pulse
-<Badge dot pulse motion={2}>Pulse</Badge>       // Radiating ring enabled
-<Badge dot pulse motion={3}>Pulse</Badge>       // Full pulse animation`}
-            language="typescript"
-            showLineNumbers
-          />
+          {brandColor !== '#6366f1' && (
+            <Button size="xs" variant="ghost" onClick={() => setBrandColor('#6366f1')}>
+              <Icon name="refresh" size="sm" /> Reset to default
+            </Button>
+          )}
         </div>
       </section>
 
-      <Divider spacing="sm" />
-
-      {/* ── 10. Props API Table ────────────────────────── */}
+      {/* ── 9. Props API ───────────────────────────────── */}
       <section className="badge-page__section" id="props">
         <h2 className="badge-page__section-title">
           <a href="#props">Props API</a>
@@ -957,28 +1700,32 @@ export default function BadgePage() {
         </Card>
       </section>
 
-      <Divider spacing="sm" />
-
-      {/* ── 11. Accessibility Notes ───────────────────── */}
+      {/* ── 10. Accessibility ──────────────────────────── */}
       <section className="badge-page__section" id="accessibility">
         <h2 className="badge-page__section-title">
           <a href="#accessibility">Accessibility</a>
         </h2>
         <p className="badge-page__section-desc">
-          Designed for assistive technology compatibility with proper semantics and visual fallbacks.
+          Built on a semantic {'<span>'} element with comprehensive visual accessibility support.
         </p>
         <Card variant="default" padding="md">
           <ul className="badge-page__a11y-list">
             <li className="badge-page__a11y-item">
               <span className="badge-page__a11y-icon"><Icon name="check-circle" size="sm" /></span>
               <span>
-                <strong>Semantic HTML:</strong> Renders as inline <code className="badge-page__a11y-key">{'<span>'}</code> with appropriate text content for screen readers.
+                <strong>Semantic HTML:</strong> Uses a <code className="badge-page__a11y-key">{'<span>'}</code> element — non-interactive by default. Add <code className="badge-page__a11y-key">role</code> and keyboard handling if made interactive.
               </span>
             </li>
             <li className="badge-page__a11y-item">
               <span className="badge-page__a11y-icon"><Icon name="check-circle" size="sm" /></span>
               <span>
-                <strong>Counter overflow:</strong> Screen readers announce the actual count value, not the truncated display (e.g. "150" not "99+").
+                <strong>Contrast:</strong> All variant colors meet WCAG AA contrast ratio (4.5:1 text, 3:1 UI) against their backgrounds.
+              </span>
+            </li>
+            <li className="badge-page__a11y-item">
+              <span className="badge-page__a11y-icon"><Icon name="check-circle" size="sm" /></span>
+              <span>
+                <strong>Motion:</strong> Pulse animation respects <code className="badge-page__a11y-key">prefers-reduced-motion</code> and only runs at motion level 2+.
               </span>
             </li>
             <li className="badge-page__a11y-item">
@@ -996,49 +1743,17 @@ export default function BadgePage() {
             <li className="badge-page__a11y-item">
               <span className="badge-page__a11y-icon"><Icon name="check-circle" size="sm" /></span>
               <span>
-                <strong>Reduced motion:</strong> Pulse animation respects motion level cascade — disabled at level 0-1.
+                <strong>Print:</strong> Disables animations and adds solid borders for print media.
               </span>
             </li>
             <li className="badge-page__a11y-item">
               <span className="badge-page__a11y-icon"><Icon name="check-circle" size="sm" /></span>
               <span>
-                <strong>Color independence:</strong> Variants use both color and border for identification, not color alone.
+                <strong>Count overflow:</strong> When count exceeds maxCount, displays "{'>'}maxCount+" (e.g. "99+") to keep the badge compact.
               </span>
             </li>
           </ul>
         </Card>
-      </section>
-
-      <Divider spacing="sm" />
-
-      {/* ── 12. Source Code ─────────────────────────────── */}
-      <section className="badge-page__section" id="source">
-        <h2 className="badge-page__section-title">
-          <a href="#source">Source</a>
-        </h2>
-        <p className="badge-page__section-desc">
-          View the full component source on GitHub.
-        </p>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-          <a
-            href="https://github.com/annondeveloper/ui-kit/blob/v2/src/components/badge.tsx"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="badge-page__source-link"
-          >
-            <Icon name="code" size="sm" />
-            src/components/badge.tsx (Standard)
-          </a>
-          <a
-            href="https://github.com/annondeveloper/ui-kit/blob/v2/src/lite/badge.tsx"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="badge-page__source-link"
-          >
-            <Icon name="code" size="sm" />
-            src/lite/badge.tsx (Lite)
-          </a>
-        </div>
       </section>
     </div>
   )
