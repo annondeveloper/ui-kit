@@ -797,8 +797,8 @@ const dataTableStyles = css`
         display: inline-flex;
         align-items: center;
         justify-content: center;
-        inline-size: 20px;
-        block-size: 20px;
+        inline-size: 24px;
+        block-size: 24px;
         border: none;
         border-radius: var(--radius-sm, 0.25rem);
         background: transparent;
@@ -807,6 +807,17 @@ const dataTableStyles = css`
         padding: 0;
         margin-inline-start: 2px;
         transition: color 0.15s, background 0.15s;
+        -webkit-tap-highlight-color: transparent;
+        position: relative;
+      }
+
+      /* Expanded touch target on mobile */
+      @media (pointer: coarse) {
+        .ui-data-table__filter-btn::before {
+          content: '';
+          position: absolute;
+          inset: -8px;
+        }
       }
 
       .ui-data-table__filter-btn:hover,
@@ -836,6 +847,23 @@ const dataTableStyles = css`
       /* When filter popover is open, prevent table from clipping it */
       :scope[data-filter-open] .ui-data-table__table-wrapper {
         overflow: visible;
+      }
+
+      /* Mobile: filter popover becomes a bottom sheet */
+      @media (max-width: 640px) {
+        .ui-data-table__filter-popover {
+          position: fixed;
+          inset-block-end: 0;
+          inset-block-start: auto;
+          inset-inline: 0;
+          margin: 0;
+          min-inline-size: auto;
+          max-inline-size: 100%;
+          border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+          padding: 1rem;
+          z-index: 200;
+          box-shadow: 0 -4px 24px oklch(0% 0 0 / 0.3);
+        }
       }
 
       .ui-data-table__filter-popover select,
@@ -1572,15 +1600,28 @@ function DataTableInner<T extends object>(
   const [openFilterCol, setOpenFilterCol] = useState<string | null>(null)
   const filterPopoverRef = useRef<HTMLDivElement | null>(null)
 
+  // Close filter popover on click outside — works on both desktop and mobile
   useEffect(() => {
     if (!openFilterCol) return
-    const handler = (e: MouseEvent) => {
-      if (filterPopoverRef.current && !filterPopoverRef.current.contains(e.target as Node)) {
-        setOpenFilterCol(null)
-      }
+
+    const handler = (e: Event) => {
+      const target = e.target as Node
+      // Don't close if clicking inside the popover
+      if (filterPopoverRef.current && filterPopoverRef.current.contains(target)) return
+      // Don't close if clicking the filter button itself (it handles toggle)
+      if ((target as HTMLElement).closest?.('.ui-data-table__filter-btn')) return
+      setOpenFilterCol(null)
     }
-    document.addEventListener('mousedown', handler)
-    return () => document.removeEventListener('mousedown', handler)
+
+    // Delay listener attachment so the opening touch/click doesn't immediately close
+    const timer = setTimeout(() => {
+      document.addEventListener('pointerdown', handler, true)
+    }, 50)
+
+    return () => {
+      clearTimeout(timer)
+      document.removeEventListener('pointerdown', handler, true)
+    }
   }, [openFilterCol])
 
   // ─── Cell editing state ────────────────────────────────────────────
