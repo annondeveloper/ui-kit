@@ -2102,14 +2102,39 @@ function HeroView({
           </div>
         </div>
 
-        {utilPct !== null && showUtilization && utilizationDisplay === 'bar' && (
-          <UtilBar percent={utilPct} capacity={totalCapacity} burst={totalBurstCapacity > 0 ? totalBurstCapacity : undefined} />
-        )}
-        {utilPct !== null && showUtilization && utilizationDisplay === 'meter' && (
-          <div style={{ display: 'flex', justifyContent: 'center', position: 'relative', zIndex: 1 }}>
-            <UtilMeter percent={utilPct} />
-          </div>
-        )}
+        {/* Utilization section — always prominent */}
+        <div className="ui-upstream-dashboard__hero-util-section" style={{ position: 'relative', zIndex: 1 }}>
+          {/* Tx/Rx split utilization bars */}
+          {totalCapacity > 0 && (
+            <div style={{ display: 'flex', gap: '1rem', alignItems: 'center', marginBlockEnd: '0.5rem' }}>
+              <div style={{ flex: 1 }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.625rem', color: 'var(--text-tertiary)', marginBlockEnd: '0.25rem' }}>
+                  <span style={{ color: 'oklch(72% 0.19 155)' }}>↓ Rx: {inFmt.value} {inFmt.unit}</span>
+                  <span>{Math.round((totalInbound / totalCapacity) * 100)}%</span>
+                </div>
+                <div style={{ height: 4, borderRadius: 2, background: 'var(--bg-base)', overflow: 'hidden' }}>
+                  <div style={{ height: '100%', borderRadius: 2, width: `${Math.min(100, Math.round((totalInbound / totalCapacity) * 100))}%`, background: 'oklch(72% 0.19 155)', transition: 'width 0.3s' }} />
+                </div>
+              </div>
+              <div style={{ flex: 1 }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.625rem', color: 'var(--text-tertiary)', marginBlockEnd: '0.25rem' }}>
+                  <span style={{ color: 'oklch(65% 0.2 270)' }}>↑ Tx: {outFmt.value} {outFmt.unit}</span>
+                  <span>{Math.round((totalOutbound / totalCapacity) * 100)}%</span>
+                </div>
+                <div style={{ height: 4, borderRadius: 2, background: 'var(--bg-base)', overflow: 'hidden' }}>
+                  <div style={{ height: '100%', borderRadius: 2, width: `${Math.min(100, Math.round((totalOutbound / totalCapacity) * 100))}%`, background: 'oklch(65% 0.2 270)', transition: 'width 0.3s' }} />
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Combined utilization bar with burst marker */}
+          {utilPct !== null && showUtilization && utilizationDisplay !== 'ambient' && (
+            utilizationDisplay === 'meter'
+              ? <div style={{ display: 'flex', justifyContent: 'center' }}><UtilMeter percent={utilPct} /></div>
+              : <UtilBar percent={utilPct} capacity={totalCapacity} burst={totalBurstCapacity > 0 ? totalBurstCapacity : undefined} />
+          )}
+        </div>
 
         <div className="ui-upstream-dashboard__hero-footer">
           <span className="ui-upstream-dashboard__hero-footer-item">
