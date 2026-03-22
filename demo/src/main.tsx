@@ -23,6 +23,7 @@ const DataTablePage = lazy(() => import('./pages/components/DataTablePage'))
 const MetricCardPage = lazy(() => import('./pages/components/MetricCardPage'))
 const CardPage = lazy(() => import('./pages/components/CardPage'))
 const BadgePage = lazy(() => import('./pages/components/BadgePage'))
+const UpstreamDashboardPage = lazy(() => import('./pages/components/UpstreamDashboardPage'))
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
@@ -47,6 +48,7 @@ createRoot(document.getElementById('root')!).render(
             <Route path="components/metric-card" element={<Suspense><MetricCardPage /></Suspense>} />
             <Route path="components/card" element={<Suspense><CardPage /></Suspense>} />
             <Route path="components/badge" element={<Suspense><BadgePage /></Suspense>} />
+            <Route path="components/upstream-dashboard" element={<Suspense><UpstreamDashboardPage /></Suspense>} />
             <Route path="docs" element={<Suspense><DocsPage /></Suspense>} />
           </Route>
         </Routes>
