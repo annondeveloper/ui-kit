@@ -409,6 +409,7 @@ const dataTableStyles = css`
 
       /* ── Header cells ────────────────────────────────── */
       .ui-data-table__th {
+        position: relative;
         padding-block: var(--space-sm, 0.5rem);
         padding-inline: var(--space-md, 0.75rem);
         text-align: start;
@@ -820,15 +821,21 @@ const dataTableStyles = css`
         inset-inline-start: 0;
         margin-block-start: var(--space-xs, 0.25rem);
         min-inline-size: 220px;
+        max-inline-size: 300px;
         padding: var(--space-sm, 0.5rem);
         background: var(--bg-elevated, oklch(22% 0.02 270));
         border: 1px solid var(--border-default, oklch(100% 0 0 / 0.12));
         border-radius: var(--radius-md, 0.5rem);
         box-shadow: var(--shadow-lg, 0 8px 24px oklch(0% 0 0 / 0.3));
-        z-index: 30;
+        z-index: 100;
         display: flex;
         flex-direction: column;
         gap: var(--space-xs, 0.25rem);
+      }
+
+      /* When filter popover is open, prevent table from clipping it */
+      :scope[data-filter-open] .ui-data-table__table-wrapper {
+        overflow: visible;
       }
 
       .ui-data-table__filter-popover select,
@@ -2494,6 +2501,7 @@ function DataTableInner<T extends object>(
       {...(striped ? { 'data-striped': '' } : {})}
       {...(compact ? { 'data-compact': '' } : {})}
       {...(bordered ? { 'data-bordered': '' } : {})}
+      {...(openFilterCol ? { 'data-filter-open': '' } : {})}
       {...rest}
     >
       {/* ── Toolbar ────────────────────────────────────────────────── */}
