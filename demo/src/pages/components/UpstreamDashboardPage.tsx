@@ -10,16 +10,16 @@ import { PropsTable, type PropDef } from '../../components/PropsTable'
 // ─── Mock Data — Realistic ISP/NOC ─────────────────────────────────────────
 
 const mockLinks: UpstreamLink[] = [
-  { id: '1', vendor: 'Telia Carrier', location: 'Frankfurt', inbound: 12.5e9, outbound: 8.3e9, capacity: 100e9, status: 'ok', trend: [10, 11, 12, 11.5, 12.5, 13, 12] },
-  { id: '2', vendor: 'Telia Carrier', location: 'Amsterdam', inbound: 8.7e9, outbound: 6.1e9, capacity: 100e9, status: 'ok', trend: [8, 7.5, 8, 8.5, 9, 8.7] },
-  { id: '3', vendor: 'Lumen', location: 'London', inbound: 15.2e9, outbound: 11.8e9, capacity: 100e9, status: 'warning', trend: [12, 13, 14, 15, 15.2] },
-  { id: '4', vendor: 'Lumen', location: 'New York', inbound: 22.1e9, outbound: 18.4e9, capacity: 100e9, status: 'ok', trend: [18, 19, 20, 21, 22] },
-  { id: '5', vendor: 'Cogent', location: 'Paris', inbound: 5.6e9, outbound: 3.2e9, capacity: 40e9, status: 'ok', trend: [4, 5, 5.5, 5.6] },
-  { id: '6', vendor: 'Cogent', location: 'Chicago', inbound: 9.8e9, outbound: 7.1e9, capacity: 40e9, status: 'critical', trend: [6, 7, 8, 9, 9.8] },
-  { id: '7', vendor: 'GTT', location: 'Singapore', inbound: 3.4e9, outbound: 2.1e9, capacity: 40e9, status: 'ok', trend: [3, 3.2, 3.4] },
-  { id: '8', vendor: 'GTT', location: 'Tokyo', inbound: 4.7e9, outbound: 3.9e9, capacity: 40e9, status: 'ok', trend: [4, 4.2, 4.5, 4.7] },
-  { id: '9', vendor: 'Zayo', location: 'Los Angeles', inbound: 18.9e9, outbound: 14.2e9, capacity: 100e9, status: 'warning', trend: [15, 16, 17, 18, 18.9] },
-  { id: '10', vendor: 'Zayo', location: 'Dallas', inbound: 7.3e9, outbound: 5.8e9, capacity: 100e9, status: 'ok', trend: [6, 6.5, 7, 7.3] },
+  { id: '1', vendor: 'Telia Carrier', location: 'Frankfurt', inbound: 12.5e9, outbound: 8.3e9, capacity: 100e9, burstCapacity: 150e9, status: 'ok', trend: [10, 11, 12, 11.5, 12.5, 13, 12] },
+  { id: '2', vendor: 'Telia Carrier', location: 'Amsterdam', inbound: 8.7e9, outbound: 6.1e9, capacity: 100e9, burstCapacity: 150e9, status: 'ok', trend: [8, 7.5, 8, 8.5, 9, 8.7] },
+  { id: '3', vendor: 'Lumen', location: 'London', inbound: 15.2e9, outbound: 11.8e9, capacity: 100e9, burstCapacity: 200e9, status: 'warning', trend: [12, 13, 14, 15, 15.2] },
+  { id: '4', vendor: 'Lumen', location: 'New York', inbound: 22.1e9, outbound: 18.4e9, capacity: 100e9, burstCapacity: 200e9, status: 'ok', trend: [18, 19, 20, 21, 22] },
+  { id: '5', vendor: 'Cogent', location: 'Paris', inbound: 5.6e9, outbound: 3.2e9, capacity: 40e9, burstCapacity: 60e9, status: 'ok', trend: [4, 5, 5.5, 5.6] },
+  { id: '6', vendor: 'Cogent', location: 'Chicago', inbound: 9.8e9, outbound: 7.1e9, capacity: 40e9, burstCapacity: 80e9, status: 'critical', trend: [6, 7, 8, 9, 9.8] },
+  { id: '7', vendor: 'GTT', location: 'Singapore', inbound: 3.4e9, outbound: 2.1e9, capacity: 40e9, burstCapacity: 60e9, status: 'ok', trend: [3, 3.2, 3.4] },
+  { id: '8', vendor: 'GTT', location: 'Tokyo', inbound: 4.7e9, outbound: 3.9e9, capacity: 40e9, burstCapacity: 60e9, status: 'ok', trend: [4, 4.2, 4.5, 4.7] },
+  { id: '9', vendor: 'Zayo', location: 'Los Angeles', inbound: 18.9e9, outbound: 14.2e9, capacity: 100e9, burstCapacity: 150e9, status: 'warning', trend: [15, 16, 17, 18, 18.9] },
+  { id: '10', vendor: 'Zayo', location: 'Dallas', inbound: 7.3e9, outbound: 5.8e9, capacity: 100e9, burstCapacity: 200e9, status: 'ok', trend: [6, 6.5, 7, 7.3] },
 ]
 
 // ─── Props Definition ──────────────────────────────────────────────────────
@@ -32,6 +32,10 @@ const PROPS: PropDef[] = [
   { name: 'groupBy', type: "'vendor' | 'location' | 'none'", default: "'none'", description: 'Group upstream links by vendor name or geographic location.' },
   { name: 'lastUpdated', type: 'number | Date', default: '—', description: 'Timestamp shown in the summary footer as relative time (e.g. "5s ago").' },
   { name: 'motion', type: '0 | 1 | 2 | 3', default: '3', description: 'Motion level override. 0 disables all animation.' },
+  { name: 'showCapacity', type: 'boolean', default: 'true', description: 'Show committed capacity in hero footer and table columns.' },
+  { name: 'showBurstCapacity', type: 'boolean', default: 'false', description: 'Show burstable capacity when available.' },
+  { name: 'showUtilization', type: 'boolean', default: 'true', description: 'Show utilization percentage in hero footer and table.' },
+  { name: 'utilizationDisplay', type: "'bar' | 'meter' | 'ambient'", default: "'bar'", description: 'How to render utilization. Bar shows a thin progress bar, meter shows an SVG arc gauge, ambient shifts the card background color.' },
 ]
 
 // ─── Page Styles ──────────────────────────────────────────────────────────────
@@ -443,6 +447,10 @@ export default function UpstreamDashboardPage() {
   const [groupBy, setGroupBy] = useState<'none' | 'vendor' | 'location'>('none')
   const [showSummary, setShowSummary] = useState(false)
   const [title, setTitle] = useState('Network Operations Center')
+  const [showCapacity, setShowCapacity] = useState(true)
+  const [showBurstCapacity, setShowBurstCapacity] = useState(false)
+  const [showUtilization, setShowUtilization] = useState(true)
+  const [utilizationDisplay, setUtilizationDisplay] = useState<'bar' | 'meter' | 'ambient'>('bar')
 
   // Scroll reveal fallback for browsers without animation-timeline
   useEffect(() => {
@@ -513,6 +521,10 @@ export default function UpstreamDashboardPage() {
               showSummary={showSummary}
               groupBy={groupBy}
               lastUpdated={Date.now() - 5000}
+              showCapacity={showCapacity}
+              showBurstCapacity={showBurstCapacity}
+              showUtilization={showUtilization}
+              utilizationDisplay={utilizationDisplay}
             />
           </div>
 
@@ -559,6 +571,52 @@ export default function UpstreamDashboardPage() {
                   />
                   Show Summary
                 </label>
+              </div>
+              <div className="ud-page__toggle-row">
+                <label className="ud-page__toggle-label">
+                  <input
+                    type="checkbox"
+                    checked={showCapacity}
+                    onChange={e => setShowCapacity(e.target.checked)}
+                  />
+                  Show Capacity
+                </label>
+              </div>
+              <div className="ud-page__toggle-row">
+                <label className="ud-page__toggle-label">
+                  <input
+                    type="checkbox"
+                    checked={showBurstCapacity}
+                    onChange={e => setShowBurstCapacity(e.target.checked)}
+                  />
+                  Show Burst Capacity
+                </label>
+              </div>
+              <div className="ud-page__toggle-row">
+                <label className="ud-page__toggle-label">
+                  <input
+                    type="checkbox"
+                    checked={showUtilization}
+                    onChange={e => setShowUtilization(e.target.checked)}
+                  />
+                  Show Utilization
+                </label>
+              </div>
+            </div>
+
+            <div className="ud-page__control-group">
+              <span className="ud-page__control-label">Utilization Display</span>
+              <div className="ud-page__control-options">
+                {(['bar', 'meter', 'ambient'] as const).map(v => (
+                  <button
+                    key={v}
+                    type="button"
+                    className={`ud-page__option-btn${utilizationDisplay === v ? ' ud-page__option-btn--active' : ''}`}
+                    onClick={() => setUtilizationDisplay(v)}
+                  >
+                    {v}
+                  </button>
+                ))}
               </div>
             </div>
 
@@ -618,35 +676,39 @@ export default function UpstreamDashboardPage() {
         </div>
       </section>
 
-      {/* ── 4. JSON Payload ────────────────────────────── */}
-      <section className="ud-page__section" id="json-payload">
+      {/* ── 4. Data Format ────────────────────────────── */}
+      <section className="ud-page__section" id="data-format">
         <h2 className="ud-page__section-title">
-          <a href="#json-payload">JSON Payload</a>
+          <a href="#data-format">Data Format</a>
         </h2>
         <p className="ud-page__section-desc">
-          The dashboard is entirely driven by JSON. Pass an array of UpstreamLink objects
-          and the component handles layout, grouping, aggregation, and status visualization.
+          The dashboard is driven by a simple JSON array. Here's the complete interface and a sample payload.
         </p>
         <CopyBlock
           code={`interface UpstreamLink {
   id: string
   vendor: string
   location: string
-  inbound: number       // bytes per second
-  outbound: number      // bytes per second
-  capacity?: number     // max capacity bps
+  inbound: number        // bytes per second
+  outbound: number       // bytes per second
+  capacity?: number      // committed capacity (bytes/sec)
+  burstCapacity?: number // burstable max (bytes/sec)
   status: 'ok' | 'warning' | 'critical' | 'unknown'
-  trend?: number[]      // sparkline data points
+  trend?: number[]       // historical data points
 }
 
-// Usage:
-<UpstreamDashboard
-  links={data}
-  title="Network Operations"
-  mode="hero"
-  showSummary
-  groupBy="vendor"
-/>`}
+// Example: 10 Gbps link with 80% inbound utilization
+{
+  id: 'link-01',
+  vendor: 'Telia Carrier',
+  location: 'Frankfurt, DE',
+  inbound: 1_000_000_000,     // 1 GB/s = 8 Gbps
+  outbound: 625_000_000,      // 625 MB/s = 5 Gbps
+  capacity: 1_250_000_000,    // 10 Gbps committed
+  burstCapacity: 2_500_000_000, // 20 Gbps burst
+  status: 'ok',
+  trend: [7.2, 7.5, 7.8, 8.0, 8.1, 7.9, 8.0]
+}`}
           language="typescript"
         />
       </section>

@@ -22,6 +22,7 @@ export interface UpstreamLink {
   inbound: number       // bytes per second
   outbound: number      // bytes per second
   capacity?: number     // max capacity in bytes per second
+  burstCapacity?: number // burstable capacity in bytes per second
   status: 'ok' | 'warning' | 'critical' | 'unknown'
   trend?: number[]      // historical data points
 }
@@ -41,6 +42,14 @@ export interface UpstreamDashboardProps extends Omit<HTMLAttributes<HTMLDivEleme
   lastUpdated?: number | Date
   /** Motion level */
   motion?: 0 | 1 | 2 | 3
+  /** Show capacity info */
+  showCapacity?: boolean
+  /** Show burstable capacity */
+  showBurstCapacity?: boolean
+  /** Show utilization percentage */
+  showUtilization?: boolean
+  /** How to display utilization: 'bar' (default), 'meter' (arc gauge), 'ambient' (bg color shift) */
+  utilizationDisplay?: 'bar' | 'meter' | 'ambient'
   /** @deprecated Use mode='compact' instead */
   compact?: boolean
 }
@@ -275,15 +284,21 @@ const upstreamDashboardStyles = css`
         height: 100%;
       }
 
-      /* Massive metrics row */
+      /* Massive metrics row — side by side on desktop */
       .ui-upstream-dashboard__hero-metrics {
         display: flex;
         justify-content: center;
         align-items: baseline;
-        gap: clamp(2rem, 8vw, 6rem);
+        gap: clamp(2rem, 6vw, 6rem);
         flex-wrap: wrap;
         position: relative;
         z-index: 1;
+      }
+
+      @container (min-width: 500px) {
+        .ui-upstream-dashboard__hero-metrics {
+          flex-wrap: nowrap;
+        }
       }
 
       .ui-upstream-dashboard__hero-metric {
@@ -1191,6 +1206,29 @@ function UtilBar({ pct, className = 'ui-upstream-dashboard__util-bar' }: { pct: 
   )
 }
 
+function UtilMeter({ percent }: { percent: number }) {
+  const color = percent > 80 ? 'var(--status-critical, oklch(62% 0.22 25))' : percent > 60 ? 'var(--status-warning, oklch(80% 0.18 85))' : 'var(--status-ok, oklch(72% 0.19 155))'
+  const angle = (percent / 100) * 180
+  const rad = (angle * Math.PI) / 180
+  const x = 20 + 18 * Math.cos(Math.PI - rad)
+  const y = 20 - 18 * Math.sin(Math.PI - rad)
+  const largeArc = angle > 180 ? 1 : 0
+  return (
+    <svg width="40" height="24" viewBox="0 0 40 24" aria-hidden="true">
+      <path d="M 2 22 A 18 18 0 0 1 38 22" fill="none" stroke="var(--border-default, oklch(100% 0 0 / 0.1))" strokeWidth="3" />
+      <path d={`M 2 22 A 18 18 0 ${largeArc} 1 ${x} ${y}`} fill="none" stroke={color} strokeWidth="3" strokeLinecap="round" />
+      <text x="20" y="20" textAnchor="middle" fill="var(--text-primary, oklch(90% 0 0))" fontSize="8" fontWeight="700">{percent}%</text>
+    </svg>
+  )
+}
+
+function ambientTintStyle(utilPct: number | null): React.CSSProperties | undefined {
+  if (utilPct === null || utilPct < 40) return undefined
+  if (utilPct < 70) return { background: 'oklch(80% 0.18 85 / 0.03)' }
+  if (utilPct < 90) return { background: 'oklch(80% 0.18 85 / 0.05)' }
+  return { background: 'oklch(62% 0.22 25 / 0.05)' }
+}
+
 // ─── Summary Card ───────────────────────────────────────────────────────────
 
 function SummaryCard({
@@ -1286,16 +1324,30 @@ function SummaryCard({
 
 // ─── Hero Mode ──────────────────────────────────────────────────────────────
 
-function HeroView({ links }: { links: UpstreamLink[] }) {
+function HeroView({
+  links,
+  showCapacity = true,
+  showBurstCapacity = false,
+  showUtilization = true,
+  utilizationDisplay = 'bar',
+}: {
+  links: UpstreamLink[]
+  showCapacity?: boolean
+  showBurstCapacity?: boolean
+  showUtilization?: boolean
+  utilizationDisplay?: 'bar' | 'meter' | 'ambient'
+}) {
   const totalInbound = links.reduce((s, l) => s + l.inbound, 0)
   const totalOutbound = links.reduce((s, l) => s + l.outbound, 0)
   const totalTraffic = totalInbound + totalOutbound
   const totalCapacity = links.reduce((s, l) => s + (l.capacity ?? 0), 0)
+  const totalBurstCapacity = links.reduce((s, l) => s + (l.burstCapacity ?? 0), 0)
 
   const inFmt = formatBitRateSplit(totalInbound)
   const outFmt = formatBitRateSplit(totalOutbound)
   const totalFmt = formatBitRateSplit(totalTraffic)
   const capFmt = totalCapacity > 0 ? formatBitRateSplit(totalCapacity) : null
+  const burstCapFmt = totalBurstCapacity > 0 ? formatBitRateSplit(totalBurstCapacity) : null
   const utilPct = computeUtilization(links)
 
   // Aggregate trend data from all links
@@ -1337,8 +1389,10 @@ function HeroView({ links }: { links: UpstreamLink[] }) {
     })
   }, [links])
 
+  const ambientStyle = utilizationDisplay === 'ambient' ? ambientTintStyle(utilPct) : undefined
+
   return (
-    <div className="ui-upstream-dashboard__hero-card" data-testid="hero-card">
+    <div className="ui-upstream-dashboard__hero-card" data-testid="hero-card" style={ambientStyle}>
       {aggregatedTrend && <HeroTrendlineBg data={aggregatedTrend} />}
 
       <div className="ui-upstream-dashboard__hero-metrics">
@@ -1360,18 +1414,28 @@ function HeroView({ links }: { links: UpstreamLink[] }) {
         </div>
       </div>
 
-      {utilPct !== null && <UtilBar pct={utilPct} />}
+      {utilPct !== null && utilizationDisplay === 'bar' && <UtilBar pct={utilPct} />}
+      {utilPct !== null && utilizationDisplay === 'meter' && (
+        <div style={{ display: 'flex', justifyContent: 'center', position: 'relative', zIndex: 1 }}>
+          <UtilMeter percent={utilPct} />
+        </div>
+      )}
 
       <div className="ui-upstream-dashboard__hero-footer">
         <span className="ui-upstream-dashboard__hero-footer-item">
           Total: {totalFmt.value} {totalFmt.unit}
         </span>
-        {capFmt && (
+        {showCapacity && capFmt && (
           <span className="ui-upstream-dashboard__hero-footer-item">
             Capacity: {capFmt.value} {capFmt.unit}
           </span>
         )}
-        {utilPct !== null && (
+        {showBurstCapacity && burstCapFmt && (
+          <span className="ui-upstream-dashboard__hero-footer-item">
+            Burst: {burstCapFmt.value} {burstCapFmt.unit}
+          </span>
+        )}
+        {showUtilization && utilPct !== null && (
           <span className="ui-upstream-dashboard__hero-footer-item">
             {utilPct}% used
           </span>
@@ -1388,7 +1452,10 @@ function HeroView({ links }: { links: UpstreamLink[] }) {
                 <span className="ui-upstream-dashboard__hero-mini-dot" />
                 <span className="ui-upstream-dashboard__hero-mini-vendor">{g.vendor}</span>
                 <span className="ui-upstream-dashboard__hero-mini-traffic">
-                  ↓{gInFmt.value} ↑{gOutFmt.value} {gInFmt.unit}
+                  <span style={{ color: 'oklch(72% 0.19 155)' }}>↓{gInFmt.value}</span>
+                  {' '}
+                  <span style={{ color: 'oklch(65% 0.2 270)' }}>↑{gOutFmt.value}</span>
+                  {' '}{gInFmt.unit}
                 </span>
               </div>
             )
@@ -1528,7 +1595,19 @@ function CompactGroup({ groupKey, links }: { groupKey: string; links: UpstreamLi
 
 // ─── Table Mode ─────────────────────────────────────────────────────────────
 
-function TableView({ links, groupBy }: { links: UpstreamLink[]; groupBy: 'vendor' | 'location' | 'none' }) {
+function TableView({
+  links,
+  groupBy,
+  showCapacity = true,
+  showBurstCapacity = false,
+  showUtilization = true,
+}: {
+  links: UpstreamLink[]
+  groupBy: 'vendor' | 'location' | 'none'
+  showCapacity?: boolean
+  showBurstCapacity?: boolean
+  showUtilization?: boolean
+}) {
   // Sort by group key if grouping
   const sortedLinks = useMemo(() => {
     if (groupBy === 'none') return links
@@ -1547,7 +1626,9 @@ function TableView({ links, groupBy }: { links: UpstreamLink[]; groupBy: 'vendor
           <th>Location</th>
           <th>↓ Inbound</th>
           <th>↑ Outbound</th>
-          <th>Util</th>
+          {showCapacity && <th>Capacity</th>}
+          {showBurstCapacity && <th>Burst</th>}
+          {showUtilization && <th>Util</th>}
           <th>Trend</th>
           <th>Status</th>
         </tr>
@@ -1559,6 +1640,8 @@ function TableView({ links, groupBy }: { links: UpstreamLink[]; groupBy: 'vendor
           const utilPct = link.capacity
             ? Math.min(100, Math.round(((link.inbound + link.outbound) / link.capacity) * 100))
             : null
+          const capFmt = link.capacity ? formatBitRateSplit(link.capacity) : null
+          const burstFmt = link.burstCapacity ? formatBitRateSplit(link.burstCapacity) : null
 
           return (
             <tr key={link.id} data-status={link.status}>
@@ -1576,24 +1659,46 @@ function TableView({ links, groupBy }: { links: UpstreamLink[]; groupBy: 'vendor
                   <span className="ui-upstream-dashboard__table-rate-unit">{outFmt.unit}</span>
                 </span>
               </td>
-              <td>
-                {utilPct !== null ? (
-                  <div className="ui-upstream-dashboard__table-util">
-                    <div className="ui-upstream-dashboard__table-util-bar">
-                      <div
-                        className="ui-upstream-dashboard__table-util-fill"
-                        style={{
-                          width: `${utilPct}%`,
-                          background: utilPct > 80 ? 'oklch(62% 0.22 25)' : utilPct > 60 ? 'oklch(80% 0.18 85)' : 'oklch(72% 0.19 155)',
-                        }}
-                      />
+              {showCapacity && (
+                <td>
+                  {capFmt ? (
+                    <span className="ui-upstream-dashboard__table-rate">
+                      {capFmt.value}
+                      <span className="ui-upstream-dashboard__table-rate-unit">{capFmt.unit}</span>
+                    </span>
+                  ) : <span>—</span>}
+                </td>
+              )}
+              {showBurstCapacity && (
+                <td>
+                  {burstFmt ? (
+                    <span className="ui-upstream-dashboard__table-rate">
+                      {burstFmt.value}
+                      <span className="ui-upstream-dashboard__table-rate-unit">{burstFmt.unit}</span>
+                    </span>
+                  ) : <span>—</span>}
+                </td>
+              )}
+              {showUtilization && (
+                <td>
+                  {utilPct !== null ? (
+                    <div className="ui-upstream-dashboard__table-util">
+                      <div className="ui-upstream-dashboard__table-util-bar">
+                        <div
+                          className="ui-upstream-dashboard__table-util-fill"
+                          style={{
+                            width: `${utilPct}%`,
+                            background: utilPct > 80 ? 'oklch(62% 0.22 25)' : utilPct > 60 ? 'oklch(80% 0.18 85)' : 'oklch(72% 0.19 155)',
+                          }}
+                        />
+                      </div>
+                      <span>{utilPct}%</span>
                     </div>
-                    <span>{utilPct}%</span>
-                  </div>
-                ) : (
-                  <span>—</span>
-                )}
-              </td>
+                  ) : (
+                    <span>—</span>
+                  )}
+                </td>
+              )}
               <td>
                 {link.trend && link.trend.length >= 2 ? (
                   <span className="ui-upstream-dashboard__table-sparkline">
@@ -1724,6 +1829,10 @@ function UpstreamDashboardInner({
   compact = false,
   lastUpdated,
   motion: motionProp,
+  showCapacity = true,
+  showBurstCapacity = false,
+  showUtilization = true,
+  utilizationDisplay = 'bar',
   className,
   ...rest
 }: UpstreamDashboardProps) {
@@ -1777,7 +1886,13 @@ function UpstreamDashboardInner({
       )}
 
       {!isEmpty && effectiveMode === 'hero' && (
-        <HeroView links={links} />
+        <HeroView
+          links={links}
+          showCapacity={showCapacity}
+          showBurstCapacity={showBurstCapacity}
+          showUtilization={showUtilization}
+          utilizationDisplay={utilizationDisplay}
+        />
       )}
 
       {!isEmpty && effectiveMode === 'compact' && (
@@ -1785,7 +1900,13 @@ function UpstreamDashboardInner({
       )}
 
       {!isEmpty && effectiveMode === 'table' && (
-        <TableView links={links} groupBy={groupBy} />
+        <TableView
+          links={links}
+          groupBy={groupBy}
+          showCapacity={showCapacity}
+          showBurstCapacity={showBurstCapacity}
+          showUtilization={showUtilization}
+        />
       )}
 
       {/* Legacy mode — no mode prop and no compact prop */}
