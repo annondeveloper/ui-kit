@@ -1158,12 +1158,22 @@ const filterPortalStyles = css`
     gap: 0.25rem;
   }
 
-  .ui-data-table__filter-select-list label {
+  .ui-data-table__filter-select-list label,
+  .ui-data-table__filter-select-item {
     display: flex;
     align-items: center;
-    gap: 0.375rem;
+    gap: 0.5rem;
     font-size: 0.8125rem;
     cursor: pointer;
+    padding: 0.25rem 0;
+    text-align: start;
+  }
+
+  .ui-data-table__filter-select-item input[type="checkbox"] {
+    flex-shrink: 0;
+    width: 16px;
+    height: 16px;
+    accent-color: var(--brand, oklch(65% 0.2 270));
   }
 
   /* Mobile: bottom sheet */
