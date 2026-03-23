@@ -283,20 +283,6 @@ const dialogStyles = css`
           min-block-size: 44px;
           min-inline-size: 44px;
         }
-
-        /* Mobile: sm/md become full-width bottom sheet */
-        dialog[data-size="sm"],
-        dialog[data-size="md"] {
-          max-inline-size: 100%;
-          inline-size: 100%;
-          margin-block-end: 0;
-          inset-block-end: 0;
-          inset-block-start: auto;
-          border-end-start-radius: 0;
-          border-end-end-radius: 0;
-          border-start-start-radius: var(--radius-xl, 1rem);
-          border-start-end-radius: var(--radius-xl, 1rem);
-        }
       }
 
       /* ── Forced colors ── */
@@ -351,6 +337,30 @@ const dialogStyles = css`
           -webkit-backdrop-filter: none;
         }
       }
+    }
+  }
+
+  /* ── Unlayered: centering + mobile bottom sheet ──
+     Must be outside @layer to beat the UA stylesheet specificity */
+  .ui-dialog dialog[open] {
+    position: fixed;
+    inset: 0;
+    margin: auto;
+  }
+
+  /* Mobile: sm/md become bottom sheet */
+  @media (pointer: coarse) {
+    .ui-dialog dialog[open][data-size="sm"],
+    .ui-dialog dialog[open][data-size="md"] {
+      inset-block-start: auto;
+      inset-block-end: 0;
+      margin-block-end: 0;
+      max-inline-size: 100%;
+      inline-size: 100%;
+      border-end-start-radius: 0;
+      border-end-end-radius: 0;
+      border-start-start-radius: var(--radius-xl, 1rem);
+      border-start-end-radius: var(--radius-xl, 1rem);
     }
   }
 `
@@ -438,7 +448,6 @@ export function Dialog({
     <div className={cn('ui-dialog', className)}>
       <dialog
         ref={dialogRef}
-        style={{ margin: 'auto' }}
         data-size={size}
         data-motion={motionLevel}
         aria-labelledby={title ? titleId : undefined}

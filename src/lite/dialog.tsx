@@ -24,7 +24,6 @@ export const Dialog = forwardRef<HTMLDialogElement, LiteDialogProps>(
       <dialog
         ref={dialogRef}
         className={`ui-lite-dialog${className ? ` ${className}` : ''}`}
-        style={{ margin: 'auto' }}
         data-size={size}
         onClose={onClose}
         {...rest}
