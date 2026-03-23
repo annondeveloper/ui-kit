@@ -340,27 +340,22 @@ const dialogStyles = css`
     }
   }
 
-  /* ── Unlayered: centering + mobile bottom sheet ──
-     Must be outside @layer to beat the UA stylesheet specificity */
+  /* ── Unlayered: centering ──
+     Must be outside @layer to beat the UA stylesheet specificity.
+     position:fixed + inset:0 + margin:auto centers on all devices. */
   .ui-dialog dialog[open] {
     position: fixed;
     inset: 0;
     margin: auto;
+    /* Safe area for notched/rounded screens */
+    padding-block-end: env(safe-area-inset-bottom, 0);
   }
 
-  /* Mobile: sm/md become bottom sheet */
-  @media (pointer: coarse) {
-    .ui-dialog dialog[open][data-size="sm"],
-    .ui-dialog dialog[open][data-size="md"] {
-      inset-block-start: auto;
-      inset-block-end: 0;
-      margin-block-end: 0;
-      max-inline-size: 100%;
-      inline-size: 100%;
-      border-end-start-radius: 0;
-      border-end-end-radius: 0;
-      border-start-start-radius: var(--radius-xl, 1rem);
-      border-start-end-radius: var(--radius-xl, 1rem);
+  /* Mobile: ensure dialog fits within viewport with padding */
+  @media (max-width: 640px) {
+    .ui-dialog dialog[open]:not([data-size="full"]) {
+      max-inline-size: calc(100% - 1.5rem);
+      max-block-size: calc(100dvh - 3rem);
     }
   }
 `
