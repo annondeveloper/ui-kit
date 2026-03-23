@@ -340,18 +340,41 @@ const dialogStyles = css`
     }
   }
 
-  /* ── Unlayered: centering ──
-     Must be outside @layer to beat the UA stylesheet specificity.
-     position:fixed + inset:0 + margin:auto centers on all devices. */
+  /* ── Unlayered: must beat UA stylesheet ──
+     @layer styles lose to unlayered UA defaults (background-color:Canvas,
+     color:CanvasText, position). These critical rules must be unlayered. */
+  .ui-dialog dialog {
+    border: 1px solid oklch(100% 0 0 / 0.08);
+    border-radius: 1rem;
+    padding: 0;
+    color: var(--text-primary, oklch(90% 0 0));
+    background: var(--bg-elevated, oklch(22% 0.01 270));
+    box-shadow:
+      0 24px 80px oklch(0% 0 0 / 0.4),
+      0 8px 32px oklch(0% 0 0 / 0.2),
+      inset 0 1px 0 oklch(100% 0 0 / 0.06);
+  }
+
   .ui-dialog dialog[open] {
     position: fixed;
     inset: 0;
     margin: auto;
-    /* Safe area for notched/rounded screens */
+    display: flex;
+    flex-direction: column;
     padding-block-end: env(safe-area-inset-bottom, 0);
   }
 
-  /* Mobile: ensure dialog fits within viewport with padding */
+  .ui-dialog dialog:not([open]) {
+    display: none;
+  }
+
+  .ui-dialog dialog::backdrop {
+    background: oklch(0% 0 0 / 0.55);
+    backdrop-filter: blur(12px) saturate(1.2);
+    -webkit-backdrop-filter: blur(12px) saturate(1.2);
+  }
+
+  /* Mobile: ensure dialog fits within viewport */
   @media (max-width: 640px) {
     .ui-dialog dialog[open]:not([data-size="full"]) {
       max-inline-size: calc(100% - 1.5rem);

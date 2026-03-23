@@ -510,7 +510,8 @@ details[open] > .ui-lite-accordion__trigger::after { transform: rotate(90deg); }
 .ui-lite-dialog__close { background: none; border: none; font-size: 1.25rem; cursor: pointer; color: var(--text-secondary, oklch(70% 0 0)); padding: 0.25rem; border-radius: 9999px; }
 .ui-lite-dialog__close:hover { background: oklch(100% 0 0 / 0.08); }
 .ui-lite-dialog__body { padding: 1.25rem; overflow-y: auto; flex: 1; min-height: 0; }
-.ui-lite-dialog[open] { position: fixed; inset: 0; margin: auto; padding-block-end: env(safe-area-inset-bottom, 0); }
+.ui-lite-dialog[open] { position: fixed; inset: 0; margin: auto; padding-block-end: env(safe-area-inset-bottom, 0); background: var(--bg-elevated, oklch(16% 0.02 275)); color: var(--text-primary, oklch(97% 0 0)); }
+.ui-lite-dialog::backdrop { background: oklch(0% 0 0 / 0.55); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); }
 @media (max-width: 640px) { .ui-lite-dialog[open] { max-width: calc(100% - 1.5rem); max-height: calc(100dvh - 3rem); } }
 .ui-lite-dialog__footer { display: flex; justify-content: flex-end; gap: 0.5rem; padding: 0.75rem 1.25rem; border-block-start: 1px solid var(--border-subtle, oklch(100% 0 0 / 0.06)); flex-shrink: 0; }
 
