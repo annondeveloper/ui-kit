@@ -12,24 +12,62 @@ const premiumDialogStyles = css`
       :scope {
         display: contents;
       }
-      /* Spring scale entrance overrides */
+
+      /* Spring scale entrance — dramatic overshoot */
       :scope dialog[open] {
-        animation: ui-premium-dialog-enter 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+        animation: ui-premium-dialog-enter 0.55s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
       }
       @keyframes ui-premium-dialog-enter {
         from {
           opacity: 0;
-          transform: scale(0.9) translateY(12px);
+          transform: scale(0.85) translateY(20px);
+          filter: blur(4px);
         }
-        60% {
+        50% {
           opacity: 1;
-          transform: scale(1.02) translateY(-2px);
+          filter: blur(0);
+        }
+        70% {
+          transform: scale(1.02) translateY(-3px);
         }
         to {
           opacity: 1;
           transform: scale(1) translateY(0);
+          filter: blur(0);
         }
       }
+
+      /* Aurora shimmer along top edge */
+      :scope dialog[open]::before {
+        background: linear-gradient(
+          90deg,
+          transparent 0%,
+          oklch(from var(--brand, oklch(65% 0.2 270)) calc(l + 0.2) c h / 0.7) 15%,
+          oklch(70% 0.18 300 / 0.5) 35%,
+          oklch(from var(--brand, oklch(65% 0.2 270)) calc(l + 0.25) c h / 0.9) 50%,
+          oklch(70% 0.18 200 / 0.5) 65%,
+          oklch(from var(--brand, oklch(65% 0.2 270)) calc(l + 0.2) c h / 0.7) 85%,
+          transparent 100%
+        );
+        block-size: 2px;
+        animation: ui-premium-shimmer 3s ease-in-out infinite alternate;
+      }
+      @keyframes ui-premium-shimmer {
+        from { opacity: 0.6; }
+        to { opacity: 1; }
+      }
+
+      /* Enhanced aurora glow */
+      :scope dialog[open] {
+        box-shadow:
+          0 24px 80px oklch(0% 0 0 / 0.5),
+          0 8px 32px oklch(0% 0 0 / 0.3),
+          0 0 0 1px oklch(from var(--brand, oklch(65% 0.2 270)) l c h / 0.12),
+          0 0 80px -16px oklch(from var(--brand, oklch(65% 0.2 270)) l c h / 0.18),
+          0 0 120px -24px oklch(from var(--brand, oklch(65% 0.2 270)) calc(l - 0.1) c h / 0.1),
+          inset 0 1px 0 oklch(100% 0 0 / 0.08);
+      }
+
       /* Backdrop particles container */
       .ui-premium-dialog__particles {
         position: fixed;
@@ -43,16 +81,26 @@ const premiumDialogStyles = css`
         inline-size: 3px;
         block-size: 3px;
         border-radius: var(--radius-full, 9999px);
-        background: oklch(70% 0.12 270 / 0.4);
-        animation: ui-premium-particle-float 4s ease-in-out infinite;
+        background: oklch(from var(--brand, oklch(65% 0.2 270)) calc(l + 0.1) c h / 0.5);
+        animation: ui-premium-particle-float 5s ease-in-out infinite;
       }
       @keyframes ui-premium-particle-float {
-        0%, 100% { transform: translateY(0) scale(1); opacity: 0.4; }
-        50% { transform: translateY(-20px) scale(1.2); opacity: 0.8; }
+        0%, 100% { transform: translateY(0) scale(1); opacity: 0.3; }
+        50% { transform: translateY(-30px) scale(1.5); opacity: 0.7; }
       }
+
       /* Motion 0: no animation */
       :scope[data-motion="0"] dialog[open] {
         animation: none;
+      }
+      :scope[data-motion="0"] dialog[open]::before {
+        animation: none;
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        :scope dialog[open] { animation: none; }
+        :scope dialog[open]::before { animation: none; }
+        .ui-premium-dialog__particle { animation: none; }
       }
     }
   }
