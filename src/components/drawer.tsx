@@ -7,6 +7,7 @@ import {
   type HTMLAttributes,
   type ReactNode,
 } from 'react'
+import { createPortal } from 'react-dom'
 import { css } from '../core/styles/css-tag'
 import { useStyles } from '../core/styles/use-styles'
 import { useMotionLevel } from '../core/motion/use-motion-level'
@@ -238,7 +239,7 @@ export const Drawer = forwardRef<HTMLDivElement, DrawerProps>(
 
     if (!open) return null
 
-    return (
+    return createPortal(
       <div
         ref={ref}
         className={cn('ui-drawer', className)}
@@ -262,7 +263,8 @@ export const Drawer = forwardRef<HTMLDivElement, DrawerProps>(
             {children}
           </div>
         </div>
-      </div>
+      </div>,
+      document.body
     )
   }
 )

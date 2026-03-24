@@ -77,15 +77,68 @@ const metricCardStyles = css`
         z-index: 1;
       }
 
-      /* Status accent */
+      /* Status accent — ambient glow beneath card */
       :scope[data-status="ok"] {
         border-inline-start: 3px solid oklch(72% 0.19 155);
+        box-shadow:
+          0 8px 32px oklch(72% 0.19 155 / 0.12),
+          0 2px 8px oklch(72% 0.19 155 / 0.08);
       }
       :scope[data-status="warning"] {
         border-inline-start: 3px solid oklch(80% 0.18 85);
+        box-shadow:
+          0 8px 32px oklch(80% 0.18 85 / 0.12),
+          0 2px 8px oklch(80% 0.18 85 / 0.08);
       }
       :scope[data-status="critical"] {
         border-inline-start: 3px solid oklch(62% 0.22 25);
+        box-shadow:
+          0 8px 32px oklch(62% 0.22 25 / 0.15),
+          0 2px 8px oklch(62% 0.22 25 / 0.1);
+      }
+
+      /* Pulsing status dot */
+      .ui-metric-card__status-dot {
+        position: absolute;
+        inset-block-start: 0.75rem;
+        inset-inline-end: 0.75rem;
+        inline-size: 8px;
+        block-size: 8px;
+        border-radius: 9999px;
+        z-index: 2;
+      }
+      .ui-metric-card__status-dot[data-status="ok"] {
+        background: oklch(72% 0.19 155);
+      }
+      .ui-metric-card__status-dot[data-status="warning"] {
+        background: oklch(80% 0.18 85);
+      }
+      .ui-metric-card__status-dot[data-status="critical"] {
+        background: oklch(62% 0.22 25);
+      }
+
+      /* Pulse ring on dot — motion 2+ */
+      :scope:not([data-motion="0"]):not([data-motion="1"]) .ui-metric-card__status-dot::after {
+        content: '';
+        position: absolute;
+        inset: -3px;
+        border-radius: 9999px;
+        border: 2px solid currentColor;
+        color: inherit;
+        opacity: 0;
+        animation: ui-metric-status-pulse 2s ease-out infinite;
+      }
+      .ui-metric-card__status-dot[data-status="ok"]::after { color: oklch(72% 0.19 155); }
+      .ui-metric-card__status-dot[data-status="warning"]::after { color: oklch(80% 0.18 85); }
+      .ui-metric-card__status-dot[data-status="critical"]::after { color: oklch(62% 0.22 25); }
+
+      @keyframes ui-metric-status-pulse {
+        0% { transform: scale(1); opacity: 0.6; }
+        100% { transform: scale(2.5); opacity: 0; }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        .ui-metric-card__status-dot::after { animation: none; }
       }
 
       /* Header row */
@@ -360,6 +413,13 @@ function MetricCardInner({
       aria-label={typeof title === 'string' ? title : undefined}
       {...rest}
     >
+      {status && (
+        <span
+          className="ui-metric-card__status-dot"
+          data-status={status}
+          aria-hidden="true"
+        />
+      )}
       <div className="ui-metric-card__header">
         {icon && <span className="ui-metric-card__icon">{icon}</span>}
         <h3 className="ui-metric-card__title">{title}</h3>

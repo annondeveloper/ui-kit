@@ -18,7 +18,7 @@ describe('Drawer', () => {
       const { container } = render(
         <Drawer open onClose={() => {}}>Content</Drawer>
       )
-      expect(container.querySelector('.ui-drawer')).toBeInTheDocument()
+      expect(document.querySelector('.ui-drawer')).toBeInTheDocument()
     })
 
     it('renders children when open', () => {
@@ -45,7 +45,7 @@ describe('Drawer', () => {
           Content
         </Drawer>
       )
-      expect(container.querySelector('.ui-drawer')).toHaveClass('custom-drawer')
+      expect(document.querySelector('.ui-drawer')).toHaveClass('custom-drawer')
     })
 
     it('spreads additional HTML attributes', () => {
@@ -65,7 +65,7 @@ describe('Drawer', () => {
       const { container } = render(
         <Drawer open onClose={() => {}}>Content</Drawer>
       )
-      expect(container.querySelector('dialog')).not.toBeInTheDocument()
+      expect(document.querySelector('dialog')).not.toBeInTheDocument()
     })
   })
 
@@ -113,7 +113,7 @@ describe('Drawer', () => {
       const { container } = render(
         <Drawer open onClose={() => {}}>Content</Drawer>
       )
-      const panel = container.querySelector('.ui-drawer__panel')
+      const panel = document.querySelector('.ui-drawer__panel')
       expect(panel).toHaveAttribute('data-side', 'left')
     })
 
@@ -123,7 +123,7 @@ describe('Drawer', () => {
         const { container } = render(
           <Drawer open onClose={() => {}} side={side}>Content</Drawer>
         )
-        const panel = container.querySelector('.ui-drawer__panel')
+        const panel = document.querySelector('.ui-drawer__panel')
         expect(panel).toHaveAttribute('data-side', side)
       }
     )
@@ -136,7 +136,7 @@ describe('Drawer', () => {
       const { container } = render(
         <Drawer open onClose={() => {}}>Content</Drawer>
       )
-      const panel = container.querySelector('.ui-drawer__panel')
+      const panel = document.querySelector('.ui-drawer__panel')
       expect(panel).toHaveAttribute('data-size', 'md')
     })
 
@@ -146,7 +146,7 @@ describe('Drawer', () => {
         const { container } = render(
           <Drawer open onClose={() => {}} size={size}>Content</Drawer>
         )
-        const panel = container.querySelector('.ui-drawer__panel')
+        const panel = document.querySelector('.ui-drawer__panel')
         expect(panel).toHaveAttribute('data-size', size)
       }
     )
@@ -159,14 +159,14 @@ describe('Drawer', () => {
       const { container } = render(
         <Drawer open onClose={() => {}}>Content</Drawer>
       )
-      expect(container.querySelector('.ui-drawer__overlay')).toBeInTheDocument()
+      expect(document.querySelector('.ui-drawer__overlay')).toBeInTheDocument()
     })
 
     it('hides overlay when overlay=false', () => {
       const { container } = render(
         <Drawer open onClose={() => {}} overlay={false}>Content</Drawer>
       )
-      expect(container.querySelector('.ui-drawer__overlay')).not.toBeInTheDocument()
+      expect(document.querySelector('.ui-drawer__overlay')).not.toBeInTheDocument()
     })
 
     it('calls onClose when clicking overlay', () => {
@@ -174,7 +174,7 @@ describe('Drawer', () => {
       const { container } = render(
         <Drawer open onClose={onClose}>Content</Drawer>
       )
-      fireEvent.click(container.querySelector('.ui-drawer__overlay')!)
+      fireEvent.click(document.querySelector('.ui-drawer__overlay')!)
       expect(onClose).toHaveBeenCalledTimes(1)
     })
   })
@@ -212,7 +212,7 @@ describe('Drawer', () => {
         </Drawer>
       )
       // Verify no dialog element
-      expect(container.querySelector('dialog')).not.toBeInTheDocument()
+      expect(document.querySelector('dialog')).not.toBeInTheDocument()
     })
   })
 
@@ -223,7 +223,7 @@ describe('Drawer', () => {
       const { container } = render(
         <Drawer open onClose={() => {}} motion={0}>Content</Drawer>
       )
-      const panel = container.querySelector('.ui-drawer__panel')
+      const panel = document.querySelector('.ui-drawer__panel')
       expect(panel).toHaveAttribute('data-motion', '0')
     })
 
@@ -231,7 +231,7 @@ describe('Drawer', () => {
       const { container } = render(
         <Drawer open onClose={() => {}} motion={2}>Content</Drawer>
       )
-      const panel = container.querySelector('.ui-drawer__panel')
+      const panel = document.querySelector('.ui-drawer__panel')
       expect(panel).toHaveAttribute('data-motion', '2')
     })
   })
@@ -293,7 +293,7 @@ describe('Drawer', () => {
         <Drawer open onClose={() => {}}>Content</Drawer>
       )
       // Non-modal drawer should not have role=dialog
-      const panel = container.querySelector('.ui-drawer__panel')
+      const panel = document.querySelector('.ui-drawer__panel')
       expect(panel).toBeInTheDocument()
     })
   })
