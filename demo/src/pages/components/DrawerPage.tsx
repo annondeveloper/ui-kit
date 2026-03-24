@@ -4,6 +4,7 @@ import { useState, useMemo, useRef, useEffect } from 'react'
 import { css } from '@ui/core/styles/css-tag'
 import { useStyles } from '@ui/core/styles/use-styles'
 import { Drawer } from '@ui/components/drawer'
+import { Drawer as PremiumDrawer } from '@ui/premium/drawer'
 import { Button } from '@ui/components/button'
 import { Card } from '@ui/components/card'
 import { CopyBlock } from '@ui/domain/copy-block'
@@ -14,7 +15,7 @@ import { TOKEN_TO_CSS, type ThemeTokens } from '@ui/core/tokens/tokens'
 import { useTheme } from '@ui/core/tokens/theme-context'
 import { ColorInput } from '@ui/components/color-input'
 import { PropsTable, type PropDef } from '../../components/PropsTable'
-import { useTier } from '../../App'
+import { useTier, type Tier } from '../../App'
 
 // ─── Page Styles ──────────────────────────────────────────────────────────────
 
@@ -729,6 +730,12 @@ const COLOR_PRESETS = [
   { hex: '#64748b', name: 'Slate' },
 ]
 
+const IMPORT_STRINGS: Record<Tier, string> = {
+  lite: "import { Drawer } from '@annondeveloper/ui-kit'",
+  standard: "import { Drawer } from '@annondeveloper/ui-kit'",
+  premium: "import { Drawer } from '@annondeveloper/ui-kit/premium'",
+}
+
 function CopyButton({ text }: { text: string }) {
   const [copied, setCopied] = useState(false)
   return (
@@ -804,12 +811,14 @@ function Toggle({
 // ─── Code Generation ─────────────────────────────────────────────────────────
 
 function generateReactCode(
+  tier: Tier,
   side: Side,
   size: DrawerSize,
   showHeader: boolean,
   showClose: boolean,
   showOverlay: boolean,
 ): string {
+  const importStr = IMPORT_STRINGS[tier]
   const props: string[] = []
   props.push('  open={open}')
   props.push('  onClose={() => setOpen(false)}')
@@ -825,7 +834,7 @@ function generateReactCode(
     : ''
   const bodyContent = `\n      <p>Drawer content goes here.</p>`
 
-  return `import { Drawer } from '@annondeveloper/ui-kit'
+  return `${importStr}
 import { useState } from 'react'
 
 function MyComponent() {
@@ -932,7 +941,9 @@ function generateSvelteCode(side: Side, size: DrawerSize): string {
 
 // ─── Section: Interactive Playground ──────────────────────────────────────────
 
-function PlaygroundSection() {
+function PlaygroundSection({ tier: tierProp }: { tier: Tier }) {
+  const { tier: contextTier } = useTier()
+  const tier = tierProp ?? contextTier
   const [side, setSide] = useState<Side>('left')
   const [size, setSize] = useState<DrawerSize>('md')
   const [showHeader, setShowHeader] = useState(true)
@@ -942,9 +953,11 @@ function PlaygroundSection() {
   const [copyStatus, setCopyStatus] = useState('')
   const [activeCodeTab, setActiveCodeTab] = useState('react')
 
+  const DrawerComponent = tier === 'premium' ? PremiumDrawer : Drawer
+
   const reactCode = useMemo(
-    () => generateReactCode(side, size, showHeader, showClose, showOverlay),
-    [side, size, showHeader, showClose, showOverlay],
+    () => generateReactCode(tier, side, size, showHeader, showClose, showOverlay),
+    [tier, side, size, showHeader, showClose, showOverlay],
   )
 
   const htmlCssCode = useMemo(
@@ -1002,7 +1015,7 @@ function PlaygroundSection() {
             <Button variant="primary" onClick={() => setPlaygroundOpen(true)}>
               Open Drawer
             </Button>
-            <Drawer
+            <DrawerComponent
               open={playgroundOpen}
               onClose={() => setPlaygroundOpen(false)}
               side={side}
@@ -1025,7 +1038,7 @@ function PlaygroundSection() {
                   Close Drawer
                 </Button>
               )}
-            </Drawer>
+            </DrawerComponent>
           </div>
 
           {/* Tabbed code output */}
@@ -1094,6 +1107,8 @@ export default function DrawerPage() {
   const [brandColor, setBrandColor] = useState('#6366f1')
   const pageRef = useRef<HTMLDivElement>(null)
   const { mode } = useTheme()
+
+  const DrawerComponent = tier === 'premium' ? PremiumDrawer : Drawer
 
   // Individual open states for each demo
   const [sideLeftOpen, setSideLeftOpen] = useState(false)
@@ -1169,13 +1184,13 @@ export default function DrawerPage() {
           with four size presets, overlay backdrop, and keyboard dismiss via Escape.
         </p>
         <div className="drawer-page__import-row">
-          <code className="drawer-page__import-code">import {'{'} Drawer {'}'} from '@annondeveloper/ui-kit'</code>
-          <CopyButton text="import { Drawer } from '@annondeveloper/ui-kit'" />
+          <code className="drawer-page__import-code">{IMPORT_STRINGS[tier]}</code>
+          <CopyButton text={IMPORT_STRINGS[tier]} />
         </div>
       </div>
 
       {/* ── 2. Live Playground ──────────────────────────── */}
-      <PlaygroundSection />
+      <PlaygroundSection tier={tier} />
 
       {/* ── 3. Side Variants ─────────────────────────────── */}
       <section className="drawer-page__section" id="sides">
@@ -1202,7 +1217,7 @@ export default function DrawerPage() {
             </div>
           </div>
         </div>
-        <Drawer open={sideLeftOpen} onClose={() => setSideLeftOpen(false)} side="left">
+        <DrawerComponent open={sideLeftOpen} onClose={() => setSideLeftOpen(false)} side="left">
           <h2 style={{ margin: '0 0 1rem', fontSize: '1.125rem', fontWeight: 700 }}>Left Drawer</h2>
           <p style={{ margin: 0, color: 'var(--text-secondary)', lineHeight: 1.6 }}>
             This drawer slides in from the left edge. Commonly used for navigation menus.
@@ -1215,8 +1230,8 @@ export default function DrawerPage() {
           >
             Close
           </Button>
-        </Drawer>
-        <Drawer open={sideRightOpen} onClose={() => setSideRightOpen(false)} side="right">
+        </DrawerComponent>
+        <DrawerComponent open={sideRightOpen} onClose={() => setSideRightOpen(false)} side="right">
           <h2 style={{ margin: '0 0 1rem', fontSize: '1.125rem', fontWeight: 700 }}>Right Drawer</h2>
           <p style={{ margin: 0, color: 'var(--text-secondary)', lineHeight: 1.6 }}>
             This drawer slides in from the right edge. Ideal for detail panels and settings.
@@ -1229,7 +1244,7 @@ export default function DrawerPage() {
           >
             Close
           </Button>
-        </Drawer>
+        </DrawerComponent>
       </section>
 
       {/* ── 4. Features ──────────────────────────────────── */}
@@ -1265,7 +1280,7 @@ export default function DrawerPage() {
         </div>
 
         {/* With Header drawer */}
-        <Drawer open={featureHeaderOpen} onClose={() => setFeatureHeaderOpen(false)} side="right">
+        <DrawerComponent open={featureHeaderOpen} onClose={() => setFeatureHeaderOpen(false)} side="right">
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBlockEnd: '1.5rem', paddingBlockEnd: '1rem', borderBlockEnd: '1px solid var(--border-subtle)' }}>
             <h2 style={{ margin: 0, fontSize: '1.125rem', fontWeight: 700 }}>Settings</h2>
             <Button
@@ -1279,10 +1294,10 @@ export default function DrawerPage() {
           <p style={{ margin: 0, color: 'var(--text-secondary)', lineHeight: 1.6 }}>
             This drawer has a structured header with a title and close button.
           </p>
-        </Drawer>
+        </DrawerComponent>
 
         {/* With Footer drawer */}
-        <Drawer open={featureFooterOpen} onClose={() => setFeatureFooterOpen(false)} side="right">
+        <DrawerComponent open={featureFooterOpen} onClose={() => setFeatureFooterOpen(false)} side="right">
           <h2 style={{ margin: '0 0 1rem', fontSize: '1.125rem', fontWeight: 700 }}>Confirm Action</h2>
           <p style={{ margin: 0, color: 'var(--text-secondary)', lineHeight: 1.6, flex: 1 }}>
             This drawer has a footer with action buttons pinned to the bottom.
@@ -1295,10 +1310,10 @@ export default function DrawerPage() {
               Save Changes
             </Button>
           </div>
-        </Drawer>
+        </DrawerComponent>
 
         {/* No overlay drawer */}
-        <Drawer open={featureOverlayOpen} onClose={() => setFeatureOverlayOpen(false)} side="right" overlay={false}>
+        <DrawerComponent open={featureOverlayOpen} onClose={() => setFeatureOverlayOpen(false)} side="right" overlay={false}>
           <h2 style={{ margin: '0 0 1rem', fontSize: '1.125rem', fontWeight: 700 }}>No Overlay</h2>
           <p style={{ margin: 0, color: 'var(--text-secondary)', lineHeight: 1.6 }}>
             This drawer has no overlay backdrop. The page content behind remains fully interactive.
@@ -1312,7 +1327,7 @@ export default function DrawerPage() {
           >
             Close
           </Button>
-        </Drawer>
+        </DrawerComponent>
       </section>
 
       {/* ── 5. Weight Tiers ────────────────────────────── */}
@@ -1321,8 +1336,8 @@ export default function DrawerPage() {
           <a href="#tiers">Weight Tiers</a>
         </h2>
         <p className="drawer-page__section-desc">
-          Drawer ships as Standard tier only. All three tier cards map to the same component — choose Standard
-          for the full-featured drawer with motion, overlay, and keyboard dismiss.
+          Drawer ships in two weight tiers. Lite maps to Standard (no CSS-only variant exists).
+          Premium adds spring entrance with overshoot, aurora glow edge, layered shadows, and backdrop particles.
         </p>
 
         <div className="drawer-page__tiers">
@@ -1392,20 +1407,20 @@ export default function DrawerPage() {
           >
             <div className="drawer-page__tier-header">
               <span className="drawer-page__tier-name">Premium</span>
-              <span className="drawer-page__tier-size">= Standard</span>
+              <span className="drawer-page__tier-size">~4.2 KB</span>
             </div>
             <p className="drawer-page__tier-desc">
-              Maps to Standard. A premium drawer with enhanced physics animations
-              may be added in a future release.
+              Spring entrance with overshoot per side, aurora glow along the visible edge,
+              layered box-shadows, and floating backdrop particles at motion level 3.
             </p>
             <div className="drawer-page__tier-import">
-              import {'{'} Drawer {'}'} from '@annondeveloper/ui-kit'
+              import {'{'} Drawer {'}'} from '@annondeveloper/ui-kit/premium'
             </div>
             <div className="drawer-page__size-breakdown">
               <div className="drawer-page__size-row">
-                <span>Component: <strong style={{ color: 'var(--text-primary)' }}>2.1 KB</strong></span>
+                <span>Component: <strong style={{ color: 'var(--text-primary)' }}>3.3 KB</strong></span>
                 <span>+ Shared: <strong style={{ color: 'var(--text-primary)' }}>0.9 KB</strong></span>
-                <span>= <strong style={{ color: 'var(--brand)' }}>3.0 KB</strong> gzip</span>
+                <span>= <strong style={{ color: 'var(--brand)' }}>4.2 KB</strong> gzip</span>
               </div>
             </div>
           </div>
@@ -1537,6 +1552,15 @@ export default function DrawerPage() {
           >
             <Icon name="code" size="sm" />
             src/components/drawer.tsx (Standard)
+          </a>
+          <a
+            href="https://github.com/annondeveloper/ui-kit/blob/v2/src/premium/drawer.tsx"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="drawer-page__source-link"
+          >
+            <Icon name="code" size="sm" />
+            src/premium/drawer.tsx (Premium)
           </a>
         </div>
       </section>

@@ -5,6 +5,7 @@ import { css } from '@ui/core/styles/css-tag'
 import { useStyles } from '@ui/core/styles/use-styles'
 import { Alert } from '@ui/components/alert'
 import { Alert as LiteAlert } from '@ui/lite/alert'
+import { Alert as PremiumAlert } from '@ui/premium/alert'
 import { Button } from '@ui/components/button'
 import { Card } from '@ui/components/card'
 import { CopyBlock } from '@ui/domain/copy-block'
@@ -730,7 +731,7 @@ const VARIANTS: Variant[] = ['info', 'success', 'warning', 'error']
 const IMPORT_STRINGS: Record<Tier, string> = {
   lite: "import { Alert } from '@annondeveloper/ui-kit/lite'",
   standard: "import { Alert } from '@annondeveloper/ui-kit'",
-  premium: "import { Alert } from '@annondeveloper/ui-kit'",
+  premium: "import { Alert } from '@annondeveloper/ui-kit/premium'",
 }
 
 const COLOR_PRESETS = [
@@ -822,9 +823,11 @@ function Toggle({
 
 function generateHtmlExport(tier: Tier, variant: Variant, message: string, showTitle: boolean, title: string): string {
   const className = tier === 'lite' ? 'ui-lite-alert' : 'ui-alert'
-  const tierLabel = tier === 'lite' ? 'lite' : 'standard'
+  const tierLabel = tier === 'lite' ? 'lite' : tier === 'premium' ? 'premium' : 'standard'
   const cssImport = tier === 'lite'
     ? `@import '@annondeveloper/ui-kit/lite/styles.css';`
+    : tier === 'premium'
+    ? `@import '@annondeveloper/ui-kit/css/components/alert.css';\n@import '@annondeveloper/ui-kit/css/premium/alert.css';`
     : `@import '@annondeveloper/ui-kit/css/components/alert.css';`
 
   const titleHtml = showTitle ? `\n  <div class="${className}__title">${title}</div>` : ''
@@ -902,7 +905,7 @@ function generateVueCode(tier: Tier, variant: Variant, message: string, showTitl
 </template>
 
 <script setup>
-import { Alert } from '@annondeveloper/ui-kit'
+import { Alert } from '${tier === 'premium' ? '@annondeveloper/ui-kit/premium' : '@annondeveloper/ui-kit'}'
 </script>`
 }
 
@@ -930,7 +933,7 @@ function generateAngularCode(tier: Tier, variant: Variant, message: string, show
 </div>
 
 /* Import component CSS */
-@import '@annondeveloper/ui-kit/css/components/alert.css';`
+@import '@annondeveloper/ui-kit/css/components/alert.css';${tier === 'premium' ? `\n@import '@annondeveloper/ui-kit/css/premium/alert.css';` : ''}`
 }
 
 function generateSvelteCode(tier: Tier, variant: Variant, message: string, showTitle: boolean, title: string): string {
@@ -953,7 +956,7 @@ function generateSvelteCode(tier: Tier, variant: Variant, message: string, showT
   if (showTitle) attrs.push(`  title="${title}"`)
 
   return `<script>
-  import { Alert } from '@annondeveloper/ui-kit';
+  import { Alert } from '${tier === 'premium' ? '@annondeveloper/ui-kit/premium' : '@annondeveloper/ui-kit'}';
 </script>
 
 <Alert
@@ -1050,6 +1053,18 @@ function PlaygroundSection({ tier: tierProp }: { tier: Tier }) {
               <LiteAlert variant={variant} style={{ inlineSize: '100%', position: 'relative', zIndex: 1 }}>
                 {message}
               </LiteAlert>
+            ) : tier === 'premium' ? (
+              <PremiumAlert
+                variant={variant}
+                title={showTitle ? title : undefined}
+                dismissible={dismissible}
+                onDismiss={() => setDismissed(true)}
+                icon={showIcon ? undefined : null as unknown as undefined}
+                action={showAction ? { label: 'Learn more', onClick: () => {} } : undefined}
+                style={{ inlineSize: '100%', position: 'relative', zIndex: 1 }}
+              >
+                {message}
+              </PremiumAlert>
             ) : (
               <Alert
                 variant={variant}
@@ -1213,9 +1228,6 @@ export default function AlertPage() {
     return () => observer.disconnect()
   }, [])
 
-  // Effective tier: premium maps to standard for Alert (no premium tier)
-  const effectiveTier = tier === 'premium' ? 'standard' : tier
-
   return (
     <div className="alert-page" ref={pageRef} style={themeStyle}>
       {/* ── 1. Hero Header ──────────────────────────────── */}
@@ -1224,16 +1236,16 @@ export default function AlertPage() {
         <p className="alert-page__desc">
           Contextual feedback messages for user actions. Supports four semantic variants,
           dismissible state, custom icons, action links, and entry animation.
-          Ships in two weight tiers from 0.2KB lite to 2KB standard.
+          Ships in three weight tiers from 0.2KB lite to premium with spring entrance and ambient glow.
         </p>
         <div className="alert-page__import-row">
-          <code className="alert-page__import-code">{IMPORT_STRINGS[effectiveTier]}</code>
-          <CopyButton text={IMPORT_STRINGS[effectiveTier]} />
+          <code className="alert-page__import-code">{IMPORT_STRINGS[tier]}</code>
+          <CopyButton text={IMPORT_STRINGS[tier]} />
         </div>
       </div>
 
       {/* ── 2. Live Playground ──────────────────────────── */}
-      <PlaygroundSection tier={effectiveTier} />
+      <PlaygroundSection tier={tier} />
 
       {/* ── 3. Variants ──────────────────────────────────── */}
       <section className="alert-page__section" id="variants">
@@ -1245,12 +1257,19 @@ export default function AlertPage() {
           warning, and error/danger.
         </p>
         <div className="alert-page__preview alert-page__preview--col">
-          {effectiveTier === 'lite' ? (
+          {tier === 'lite' ? (
             <>
               <LiteAlert variant="info">This is an informational message.</LiteAlert>
               <LiteAlert variant="success">Operation completed successfully!</LiteAlert>
               <LiteAlert variant="warning">Please review before continuing.</LiteAlert>
               <LiteAlert variant="error">Something went wrong. Please try again.</LiteAlert>
+            </>
+          ) : tier === 'premium' ? (
+            <>
+              <PremiumAlert variant="info">This is an informational message.</PremiumAlert>
+              <PremiumAlert variant="success">Operation completed successfully!</PremiumAlert>
+              <PremiumAlert variant="warning">Please review before continuing.</PremiumAlert>
+              <PremiumAlert variant="error">Something went wrong. Please try again.</PremiumAlert>
             </>
           ) : (
             <>
@@ -1270,10 +1289,10 @@ export default function AlertPage() {
         </h2>
         <p className="alert-page__section-desc">
           Standard tier alerts support dismissible state, custom icons, titles, and inline action links.
-          {effectiveTier === 'lite' && ' Switch to Standard tier to see these features.'}
+          {tier === 'lite' && ' Switch to Standard tier to see these features.'}
         </p>
 
-        {effectiveTier !== 'lite' ? (
+        {tier !== 'lite' ? (
           <div className="alert-page__preview alert-page__preview--col" style={{ gap: '1rem' }}>
             {/* Dismissible */}
             <DismissibleDemo />
@@ -1299,7 +1318,7 @@ export default function AlertPage() {
           </div>
         )}
 
-        {effectiveTier !== 'lite' && (
+        {tier !== 'lite' && (
           <div style={{ marginBlockStart: '1rem' }}>
             <CopyBlock
               code={`{/* Dismissible */}
@@ -1328,14 +1347,14 @@ export default function AlertPage() {
           <a href="#tiers">Weight Tiers</a>
         </h2>
         <p className="alert-page__section-desc">
-          Choose the right balance of features and bundle size. Alert ships in two tiers.
-          Premium maps to Standard (no separate premium tier for Alert).
+          Choose the right balance of features and bundle size. Alert ships in three tiers
+          from CSS-only lite to premium with spring animations and ambient glow effects.
         </p>
 
         <div className="alert-page__tiers">
           {/* Lite */}
           <div
-            className={`alert-page__tier-card${effectiveTier === 'lite' ? ' alert-page__tier-card--active' : ''}`}
+            className={`alert-page__tier-card${tier === 'lite' ? ' alert-page__tier-card--active' : ''}`}
             onClick={() => setTier('lite')}
             role="button"
             tabIndex={0}
@@ -1366,7 +1385,7 @@ export default function AlertPage() {
 
           {/* Standard */}
           <div
-            className={`alert-page__tier-card${effectiveTier === 'standard' ? ' alert-page__tier-card--active' : ''}`}
+            className={`alert-page__tier-card${tier === 'standard' ? ' alert-page__tier-card--active' : ''}`}
             onClick={() => setTier('standard')}
             role="button"
             tabIndex={0}
@@ -1395,7 +1414,7 @@ export default function AlertPage() {
             </div>
           </div>
 
-          {/* Premium (maps to Standard) */}
+          {/* Premium */}
           <div
             className={`alert-page__tier-card${tier === 'premium' ? ' alert-page__tier-card--active' : ''}`}
             onClick={() => setTier('premium')}
@@ -1405,21 +1424,23 @@ export default function AlertPage() {
           >
             <div className="alert-page__tier-header">
               <span className="alert-page__tier-name">Premium</span>
-              <span className="alert-page__tier-size">= Standard</span>
+              <span className="alert-page__tier-size">~2.5 KB</span>
             </div>
             <p className="alert-page__tier-desc">
-              No separate premium tier for Alert. Selecting Premium uses
-              the Standard component with all its features.
+              Spring-scale entrance with blur-in, animated aurora shimmer line,
+              per-variant ambient glow, and smooth dismiss animation. Four motion levels.
             </p>
             <div className="alert-page__tier-import">
-              import {'{'} Alert {'}'} from '@annondeveloper/ui-kit'
+              import {'{'} Alert {'}'} from '@annondeveloper/ui-kit/premium'
             </div>
             <div className="alert-page__tier-preview">
-              <Alert variant="info" title="Same as Standard" style={{ fontSize: '0.75rem' }}>Premium = Standard</Alert>
+              <PremiumAlert variant="info" title="Premium" style={{ fontSize: '0.75rem' }}>Spring entrance + ambient glow</PremiumAlert>
             </div>
             <div className="alert-page__size-breakdown">
               <div className="alert-page__size-row">
-                <span>Same as Standard: <strong style={{ color: 'var(--brand)' }}>2.9 KB</strong> gzip</span>
+                <span>Component: <strong style={{ color: 'var(--text-primary)' }}>2.5 KB</strong></span>
+                <span>+ Shared: <strong style={{ color: 'var(--text-primary)' }}>0.9 KB</strong></span>
+                <span>= <strong style={{ color: 'var(--brand)' }}>3.4 KB</strong> gzip</span>
               </div>
             </div>
           </div>
@@ -1562,6 +1583,15 @@ export default function AlertPage() {
           >
             <Icon name="code" size="sm" />
             src/lite/alert.tsx (Lite)
+          </a>
+          <a
+            href="https://github.com/annondeveloper/ui-kit/blob/v2/src/premium/alert.tsx"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="alert-page__source-link"
+          >
+            <Icon name="code" size="sm" />
+            src/premium/alert.tsx (Premium)
           </a>
         </div>
       </section>

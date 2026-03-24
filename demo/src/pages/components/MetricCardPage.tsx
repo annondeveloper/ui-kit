@@ -602,6 +602,87 @@ const pageStyles = css`
         padding-block-start: 0.5rem;
       }
 
+      /* ── Weight Tier cards ────────────────────────── */
+
+      .metric-card-page__tiers {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 1rem;
+        max-inline-size: 420px;
+      }
+
+      .metric-card-page__tier-card {
+        background: var(--bg-surface);
+        border: 1px solid var(--brand);
+        border-radius: var(--radius-md);
+        padding: 1.5rem;
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+        box-shadow: 0 0 0 1px var(--brand), 0 0 20px oklch(from var(--brand) l c h / 0.12);
+        background: oklch(from var(--bg-surface) calc(l + 0.02) c h);
+        min-width: 0;
+        overflow: hidden;
+      }
+
+      .metric-card-page__tier-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+
+      .metric-card-page__tier-name {
+        font-size: var(--text-sm, 0.875rem);
+        font-weight: 700;
+        color: var(--text-primary);
+      }
+
+      .metric-card-page__tier-size {
+        font-size: var(--text-xs, 0.75rem);
+        color: var(--text-tertiary);
+        font-family: 'SF Mono', 'Fira Code', 'JetBrains Mono', monospace;
+      }
+
+      .metric-card-page__tier-desc {
+        font-size: var(--text-xs, 0.75rem);
+        color: var(--text-secondary);
+        line-height: 1.5;
+        text-align: start;
+      }
+
+      .metric-card-page__tier-import {
+        font-family: 'SF Mono', 'Fira Code', 'JetBrains Mono', monospace;
+        font-size: 0.625rem;
+        color: oklch(from var(--brand) calc(l + 0.1) c h);
+        background: var(--border-subtle);
+        padding: 0.375rem 0.5rem;
+        border-radius: var(--radius-sm);
+        overflow-wrap: break-word;
+        word-break: break-all;
+        text-align: start;
+        line-height: 1.4;
+      }
+
+      .metric-card-page__tier-preview {
+        display: flex;
+        justify-content: center;
+        padding-block-start: 0.5rem;
+      }
+
+      .metric-card-page__size-breakdown {
+        display: flex;
+        flex-direction: column;
+        gap: 0.25rem;
+        font-size: 0.75rem;
+        color: var(--text-tertiary);
+      }
+
+      .metric-card-page__size-row {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+
       /* ── Responsive ──────────────────────────────── */
 
       @media (max-width: 768px) {
@@ -1614,7 +1695,50 @@ export default function MetricCardPage() {
         </div>
       </section>
 
-      {/* ── 7. Brand Color ───────────────────────────────── */}
+      {/* ── 7. Weight Tiers ────────────────────────────── */}
+      <section className="metric-card-page__section" id="tiers">
+        <h2 className="metric-card-page__section-title">
+          <a href="#tiers">Weight Tiers</a>
+        </h2>
+        <p className="metric-card-page__section-desc">
+          MetricCard is a domain component — it ships as a single Standard tier with status glow,
+          sparkline, trend indicators, and container queries built in.
+        </p>
+
+        <div className="metric-card-page__tiers">
+          <div className="metric-card-page__tier-card">
+            <div className="metric-card-page__tier-header">
+              <span className="metric-card-page__tier-name">Standard</span>
+              <span className="metric-card-page__tier-size">~3 KB</span>
+            </div>
+            <p className="metric-card-page__tier-desc">
+              Domain component with status glow, pulsing dot, sparkline, trend indicators, container queries.
+            </p>
+            <div className="metric-card-page__tier-import">
+              import {'{'} MetricCard {'}'} from '@annondeveloper/ui-kit'
+            </div>
+            <div className="metric-card-page__tier-preview">
+              <MetricCard
+                title="Revenue"
+                value="$48.2K"
+                trend="up"
+                status="ok"
+                change={{ value: 12.5, period: 'last month' }}
+                sparkline={[30, 45, 38, 52, 48, 60, 55, 72]}
+              />
+            </div>
+            <div className="metric-card-page__size-breakdown">
+              <div className="metric-card-page__size-row">
+                <span>Component: <strong style={{ color: 'var(--text-primary)' }}>2.8 KB</strong></span>
+                <span>+ Shared: <strong style={{ color: 'var(--text-primary)' }}>0.9 KB</strong></span>
+                <span>= <strong style={{ color: 'var(--brand)' }}>3.7 KB</strong> gzip</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ── 8. Brand Color ───────────────────────────────── */}
       <section className="metric-card-page__section" id="brand-color">
         <h2 className="metric-card-page__section-title">
           <a href="#brand-color">Brand Color</a>
@@ -1652,7 +1776,7 @@ export default function MetricCardPage() {
         </div>
       </section>
 
-      {/* ── 8. Props API ───────────────────────────────── */}
+      {/* ── 9. Props API ───────────────────────────────── */}
       <section className="metric-card-page__section" id="props">
         <h2 className="metric-card-page__section-title">
           <a href="#props">Props API</a>
@@ -1666,7 +1790,7 @@ export default function MetricCardPage() {
         </Card>
       </section>
 
-      {/* ── 9. Accessibility ──────────────────────────── */}
+      {/* ── 10. Accessibility ──────────────────────────── */}
       <section className="metric-card-page__section" id="accessibility">
         <h2 className="metric-card-page__section-title">
           <a href="#accessibility">Accessibility</a>
@@ -1734,7 +1858,7 @@ export default function MetricCardPage() {
         </Card>
       </section>
 
-      {/* ── 10. Source ──────────────────────────────────── */}
+      {/* ── 11. Source ──────────────────────────────────── */}
       <section className="metric-card-page__section" id="source">
         <h2 className="metric-card-page__section-title">
           <a href="#source">Source</a>
