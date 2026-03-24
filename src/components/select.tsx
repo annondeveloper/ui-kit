@@ -10,6 +10,7 @@ import {
   type KeyboardEvent,
   type ReactNode,
 } from 'react'
+import { createPortal } from 'react-dom'
 import { css } from '../core/styles/css-tag'
 import { useStyles } from '../core/styles/use-styles'
 import { useMotionLevel } from '../core/motion/use-motion-level'
@@ -506,6 +507,7 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(
     // ── Position (JS fallback) ────────────────────────────────────────
     const position = useAnchorPosition(triggerRef, popoverRef, {
       placement: 'bottom',
+      align: 'start',
       offset: 4,
       enabled: isOpen,
     })
@@ -792,8 +794,8 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(
           <Icon name="chevron-down" size="sm" className="ui-select__chevron" />
         </button>
 
-        {/* Dropdown */}
-        {isOpen && (
+        {/* Dropdown — portaled to body to escape ancestor transforms */}
+        {isOpen && createPortal(
           <div
             ref={popoverRef}
             className="ui-select__dropdown"
@@ -807,6 +809,7 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(
               position: 'fixed',
               left: `${position.x}px`,
               top: `${position.y}px`,
+              minInlineSize: position.width > 0 ? `${position.width}px` : undefined,
             }}
           >
             {searchable && (
@@ -863,7 +866,8 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(
                 <div className="ui-select__empty">No options found</div>
               )}
             </div>
-          </div>
+          </div>,
+          document.body
         )}
 
         {resolvedError && (

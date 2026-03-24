@@ -440,7 +440,7 @@ const pageStyles = css`
 
       .select-page__tiers {
         display: grid;
-        grid-template-columns: repeat(2, 1fr);
+        grid-template-columns: repeat(3, 1fr);
         gap: 1rem;
       }
 
@@ -1490,10 +1490,11 @@ export default function SelectPage() {
   useStyles('select-page', pageStyles)
 
   const { tier, setTier } = useTier()
+  const effectiveTier = tier === 'premium' ? 'standard' : tier
   const [brandColor, setBrandColor] = useState('#6366f1')
   const pageRef = useRef<HTMLDivElement>(null)
   const { mode } = useTheme()
-  const isLite = tier === 'lite'
+  const isLite = effectiveTier === 'lite'
 
   // Demo state for feature demos
   const [searchableValue, setSearchableValue] = useState<string>('')
@@ -1579,7 +1580,7 @@ export default function SelectPage() {
       </div>
 
       {/* ── 2. Live Playground ──────────────────────────── */}
-      <PlaygroundSection tier={tier} />
+      <PlaygroundSection tier={effectiveTier} />
 
       {/* ── 3. Variants ─────────────────────────────────── */}
       <section className="select-page__section" id="variants">
@@ -1895,6 +1896,35 @@ export default function SelectPage() {
                 <span>+ Shared: <strong style={{ color: 'var(--text-primary)' }}>0.9 KB</strong></span>
                 <span>= <strong style={{ color: 'var(--brand)' }}>4.9 KB</strong> gzip</span>
               </div>
+            </div>
+          </div>
+
+          {/* Premium — maps to Standard for Select */}
+          <div
+            className={`select-page__tier-card${tier === 'premium' ? ' select-page__tier-card--active' : ''}`}
+            onClick={() => setTier('premium')}
+            role="button"
+            tabIndex={0}
+            onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setTier('premium') } }}
+          >
+            <div className="select-page__tier-header">
+              <span className="select-page__tier-name">Premium</span>
+              <span className="select-page__tier-size">~4 KB</span>
+            </div>
+            <p className="select-page__tier-desc">
+              Same as Standard — Select does not have a separate premium tier.
+              Selecting Premium uses the Standard implementation.
+            </p>
+            <div className="select-page__tier-import">
+              import {'{'} Select {'}'} from '@annondeveloper/ui-kit'
+            </div>
+            <div className="select-page__tier-preview">
+              <Select
+                name="tier-premium-demo"
+                options={COUNTRY_OPTIONS}
+                placeholder="Select..."
+                searchable
+              />
             </div>
           </div>
         </div>

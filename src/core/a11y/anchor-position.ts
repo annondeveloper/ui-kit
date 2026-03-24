@@ -3,6 +3,7 @@ import { useEffect, useState, type RefObject } from 'react'
 export interface AnchorPositionResult {
   x: number
   y: number
+  width: number
   placement: 'top' | 'bottom' | 'left' | 'right'
 }
 
@@ -11,17 +12,16 @@ export function useAnchorPosition(
   floatingRef: RefObject<Element | null>,
   config: {
     placement?: 'top' | 'bottom' | 'left' | 'right'
+    align?: 'center' | 'start' | 'end'
     offset?: number
     enabled?: boolean
   } = {}
 ): AnchorPositionResult {
-  const { placement = 'bottom', offset = 8, enabled = true } = config
-  const [position, setPosition] = useState<AnchorPositionResult>({ x: 0, y: 0, placement })
+  const { placement = 'bottom', align = 'center', offset = 8, enabled = true } = config
+  const [position, setPosition] = useState<AnchorPositionResult>({ x: 0, y: 0, width: 0, placement })
 
   useEffect(() => {
     if (!enabled) return
-    // Check if CSS anchor positioning is supported
-    if (typeof CSS !== 'undefined' && CSS.supports?.('anchor-name', '--a')) return // CSS handles it
 
     const trigger = triggerRef.current
     const floating = floatingRef.current
@@ -33,9 +33,15 @@ export function useAnchorPosition(
 
       let x = 0, y = 0, finalPlacement = placement
 
+      const alignX = () => {
+        if (align === 'start') return triggerRect.left
+        if (align === 'end') return triggerRect.right - floatingRect.width
+        return triggerRect.left + (triggerRect.width - floatingRect.width) / 2
+      }
+
       switch (placement) {
         case 'bottom':
-          x = triggerRect.left + (triggerRect.width - floatingRect.width) / 2
+          x = alignX()
           y = triggerRect.bottom + offset
           // Flip if off screen
           if (y + floatingRect.height > window.innerHeight) {
@@ -44,7 +50,7 @@ export function useAnchorPosition(
           }
           break
         case 'top':
-          x = triggerRect.left + (triggerRect.width - floatingRect.width) / 2
+          x = alignX()
           y = triggerRect.top - floatingRect.height - offset
           if (y < 0) {
             y = triggerRect.bottom + offset
@@ -64,7 +70,7 @@ export function useAnchorPosition(
       // Clamp to viewport
       x = Math.max(8, Math.min(x, window.innerWidth - floatingRect.width - 8))
 
-      setPosition({ x, y, placement: finalPlacement })
+      setPosition({ x, y, width: triggerRect.width, placement: finalPlacement })
     }
 
     update()
@@ -79,7 +85,7 @@ export function useAnchorPosition(
       window.removeEventListener('scroll', update)
       window.removeEventListener('resize', update)
     }
-  }, [triggerRef, floatingRef, placement, offset, enabled])
+  }, [triggerRef, floatingRef, placement, align, offset, enabled])
 
   return position
 }
