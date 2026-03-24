@@ -5,6 +5,7 @@ import { css } from '@ui/core/styles/css-tag'
 import { useStyles } from '@ui/core/styles/use-styles'
 import { Select, type SelectOption } from '@ui/components/select'
 import { Select as LiteSelect } from '@ui/lite/select'
+import { Select as PremiumSelect } from '@ui/premium/select'
 import { Card } from '@ui/components/card'
 import { CopyBlock } from '@ui/domain/copy-block'
 import { Tabs, TabPanel } from '@ui/components/tabs'
@@ -913,6 +914,7 @@ const LITE_SIZES: LiteSize[] = ['sm', 'md', 'lg']
 const IMPORT_STRINGS: Record<string, string> = {
   lite: "import { Select } from '@annondeveloper/ui-kit/lite'",
   standard: "import { Select } from '@annondeveloper/ui-kit'",
+  premium: "import { Select } from '@annondeveloper/ui-kit/premium'",
 }
 
 const COLOR_PRESETS = [
@@ -1270,6 +1272,7 @@ function PlaygroundSection({ tier: tierProp }: { tier: Tier }) {
   const { tier: contextTier } = useTier()
   const tier = tierProp ?? contextTier
   const isLite = tier === 'lite'
+  const SelectComponent = tier === 'premium' ? PremiumSelect : Select
 
   const [size, setSize] = useState<string>('md')
   const [searchable, setSearchable] = useState(false)
@@ -1362,7 +1365,7 @@ function PlaygroundSection({ tier: tierProp }: { tier: Tier }) {
                 disabled={disabled}
               />
             ) : (
-              <Select
+              <SelectComponent
                 name="playground-demo"
                 label={label || undefined}
                 options={COUNTRY_OPTIONS}
@@ -1490,11 +1493,11 @@ export default function SelectPage() {
   useStyles('select-page', pageStyles)
 
   const { tier, setTier } = useTier()
-  const effectiveTier = tier === 'premium' ? 'standard' : tier
   const [brandColor, setBrandColor] = useState('#6366f1')
   const pageRef = useRef<HTMLDivElement>(null)
   const { mode } = useTheme()
-  const isLite = effectiveTier === 'lite'
+  const isLite = tier === 'lite'
+  const SelectComponent = tier === 'premium' ? PremiumSelect : Select
 
   // Demo state for feature demos
   const [searchableValue, setSearchableValue] = useState<string>('')
@@ -1571,7 +1574,7 @@ export default function SelectPage() {
         <h1 className="select-page__title">Select</h1>
         <p className="select-page__desc">
           Dropdown selection component with search, multi-select, grouped options, and icon support.
-          Ships in two weight tiers from a native {'<select>'} lite to a fully custom Standard dropdown.
+          Ships in three weight tiers from a native {'<select>'} lite to a fully custom Standard, plus Premium with spring dropdown and aurora glow.
         </p>
         <div className="select-page__import-row">
           <code className="select-page__import-code">{IMPORT_STRINGS[tier] ?? IMPORT_STRINGS.standard}</code>
@@ -1580,7 +1583,7 @@ export default function SelectPage() {
       </div>
 
       {/* ── 2. Live Playground ──────────────────────────── */}
-      <PlaygroundSection tier={effectiveTier} />
+      <PlaygroundSection tier={tier} />
 
       {/* ── 3. Variants ─────────────────────────────────── */}
       <section className="select-page__section" id="variants">
@@ -1601,7 +1604,7 @@ export default function SelectPage() {
                   placeholder="Choose country..."
                 />
               ) : (
-                <Select
+                <SelectComponent
                   name="variant-country"
                   label="Country"
                   options={COUNTRY_OPTIONS}
@@ -1621,7 +1624,7 @@ export default function SelectPage() {
                   placeholder="Pick a color..."
                 />
               ) : (
-                <Select
+                <SelectComponent
                   name="variant-color"
                   label="Color"
                   options={COLOR_OPTIONS}
@@ -1641,7 +1644,7 @@ export default function SelectPage() {
                   placeholder="Choose framework..."
                 />
               ) : (
-                <Select
+                <SelectComponent
                   name="variant-grouped"
                   label="Framework"
                   options={GROUPED_OPTIONS}
@@ -1678,7 +1681,7 @@ export default function SelectPage() {
                     placeholder="Select..."
                   />
                 ) : (
-                  <Select
+                  <SelectComponent
                     name={`size-${s}`}
                     options={COUNTRY_OPTIONS}
                     size={s as Size}
@@ -1709,7 +1712,7 @@ export default function SelectPage() {
             <div className="select-page__feature-cell">
               <span className="select-page__feature-label">Searchable</span>
               <span className="select-page__feature-desc">Type to filter options in real-time.</span>
-              <Select
+              <SelectComponent
                 name="feature-searchable"
                 options={LANGUAGE_OPTIONS}
                 value={searchableValue}
@@ -1725,7 +1728,7 @@ export default function SelectPage() {
             <div className="select-page__feature-cell">
               <span className="select-page__feature-label">Clearable</span>
               <span className="select-page__feature-desc">Shows a clear button when a value is selected.</span>
-              <Select
+              <SelectComponent
                 name="feature-clearable"
                 options={TIMEZONE_OPTIONS}
                 value={clearableValue}
@@ -1741,7 +1744,7 @@ export default function SelectPage() {
             <div className="select-page__feature-cell">
               <span className="select-page__feature-label">Multiple</span>
               <span className="select-page__feature-desc">Select multiple options, shown as tags in the trigger.</span>
-              <Select
+              <SelectComponent
                 name="feature-multiple"
                 options={LANGUAGE_OPTIONS}
                 value={multipleValue}
@@ -1767,7 +1770,7 @@ export default function SelectPage() {
                 placeholder="Select framework..."
               />
             ) : (
-              <Select
+              <SelectComponent
                 name="feature-grouped"
                 options={GROUPED_OPTIONS}
                 value={groupedValue}
@@ -1782,7 +1785,7 @@ export default function SelectPage() {
             <div className="select-page__feature-cell">
               <span className="select-page__feature-label">With Icons</span>
               <span className="select-page__feature-desc">Options can include leading icon elements for visual context.</span>
-              <Select
+              <SelectComponent
                 name="feature-icons"
                 options={ICON_OPTIONS}
                 value={iconValue}
@@ -1804,7 +1807,7 @@ export default function SelectPage() {
                 error="Please select a country"
               />
             ) : (
-              <Select
+              <SelectComponent
                 name="feature-error"
                 options={COUNTRY_OPTIONS}
                 value={errorValue}
@@ -1899,7 +1902,7 @@ export default function SelectPage() {
             </div>
           </div>
 
-          {/* Premium — maps to Standard for Select */}
+          {/* Premium */}
           <div
             className={`select-page__tier-card${tier === 'premium' ? ' select-page__tier-card--active' : ''}`}
             onClick={() => setTier('premium')}
@@ -1909,17 +1912,17 @@ export default function SelectPage() {
           >
             <div className="select-page__tier-header">
               <span className="select-page__tier-name">Premium</span>
-              <span className="select-page__tier-size">~4 KB</span>
+              <span className="select-page__tier-size">~4.2 KB</span>
             </div>
             <p className="select-page__tier-desc">
-              Same as Standard — Select does not have a separate premium tier.
-              Selecting Premium uses the Standard implementation.
+              Spring-animated dropdown entrance, aurora glow on trigger when focused/open,
+              and shimmer highlight on selected option. Wraps Standard with premium CSS layer.
             </p>
             <div className="select-page__tier-import">
-              import {'{'} Select {'}'} from '@annondeveloper/ui-kit'
+              import {'{'} Select {'}'} from '@annondeveloper/ui-kit/premium'
             </div>
             <div className="select-page__tier-preview">
-              <Select
+              <PremiumSelect
                 name="tier-premium-demo"
                 options={COUNTRY_OPTIONS}
                 placeholder="Select..."

@@ -5,6 +5,7 @@ import { css } from '@ui/core/styles/css-tag'
 import { useStyles } from '@ui/core/styles/use-styles'
 import { Badge } from '@ui/components/badge'
 import { Badge as LiteBadge } from '@ui/lite/badge'
+import { Badge as PremiumBadge } from '@ui/premium/badge'
 import { Button } from '@ui/components/button'
 import { Card } from '@ui/components/card'
 import { CopyBlock } from '@ui/domain/copy-block'
@@ -441,7 +442,7 @@ const pageStyles = css`
 
       .badge-page__tiers {
         display: grid;
-        grid-template-columns: repeat(2, 1fr);
+        grid-template-columns: repeat(3, 1fr);
         gap: 1rem;
       }
 
@@ -801,6 +802,7 @@ const LITE_SIZES: LiteSize[] = ['xs', 'sm', 'md']
 const IMPORT_STRINGS: Record<string, string> = {
   lite: "import { Badge } from '@annondeveloper/ui-kit/lite'",
   standard: "import { Badge } from '@annondeveloper/ui-kit'",
+  premium: "import { Badge } from '@annondeveloper/ui-kit/premium'",
 }
 
 const COLOR_PRESETS = [
@@ -1054,7 +1056,7 @@ function PlaygroundSection({ tier: tierProp }: { tier: Tier }) {
   const [motion, setMotion] = useState<0 | 1 | 2 | 3>(3)
   const [copyStatus, setCopyStatus] = useState('')
 
-  const BadgeComponent = tier === 'lite' ? LiteBadge : Badge
+  const BadgeComponent = tier === 'premium' ? PremiumBadge : tier === 'lite' ? LiteBadge : Badge
 
   // Clamp size for lite tier
   const effectiveSize = tier === 'lite' && !LITE_SIZES.includes(size as LiteSize) ? 'md' : size
@@ -1258,8 +1260,7 @@ export default function BadgePage() {
   const pageRef = useRef<HTMLDivElement>(null)
   const { mode } = useTheme()
 
-  // Only lite and standard tiers for Badge
-  const effectiveTier = tier === 'premium' ? 'standard' : tier
+  // tier removed — premium is now a real tier
 
   const themeTokens = useMemo(() => {
     try {
@@ -1318,7 +1319,7 @@ export default function BadgePage() {
     return () => observer.disconnect()
   }, [])
 
-  const BadgeComponent = effectiveTier === 'lite' ? LiteBadge : Badge
+  const BadgeComponent = tier === 'premium' ? PremiumBadge : tier === 'lite' ? LiteBadge : Badge
 
   return (
     <div className="badge-page" ref={pageRef} style={themeStyle}>
@@ -1330,13 +1331,13 @@ export default function BadgePage() {
           Ships in two weight tiers from a CSS-only lite to a full-featured standard with motion.
         </p>
         <div className="badge-page__import-row">
-          <code className="badge-page__import-code">{IMPORT_STRINGS[effectiveTier] || IMPORT_STRINGS.standard}</code>
-          <CopyButton text={IMPORT_STRINGS[effectiveTier] || IMPORT_STRINGS.standard} />
+          <code className="badge-page__import-code">{IMPORT_STRINGS[tier] || IMPORT_STRINGS.standard}</code>
+          <CopyButton text={IMPORT_STRINGS[tier] || IMPORT_STRINGS.standard} />
         </div>
       </div>
 
       {/* ── 2. Live Playground ──────────────────────────── */}
-      <PlaygroundSection tier={effectiveTier} />
+      <PlaygroundSection tier={tier} />
 
       {/* ── 3. All Variants ────────────────────────────── */}
       <section className="badge-page__section" id="variants">
@@ -1364,13 +1365,13 @@ export default function BadgePage() {
           <a href="#sizes">Size Scale</a>
         </h2>
         <p className="badge-page__section-desc">
-          {effectiveTier === 'lite'
+          {tier === 'lite'
             ? 'Three sizes for the lite tier: compact (xs), small (sm), and medium (md).'
             : 'Five sizes from compact inline labels (xs) to large prominent badges (xl). Sizes control padding and font-size.'}
         </p>
         <div className="badge-page__preview">
           <div className="badge-page__labeled-row" style={{ alignItems: 'flex-end' }}>
-            {(effectiveTier === 'lite' ? LITE_SIZES : SIZES).map(s => (
+            {(tier === 'lite' ? LITE_SIZES : SIZES).map(s => (
               <div key={s} className="badge-page__labeled-item">
                 <BadgeComponent variant="primary" size={s as any}>Badge</BadgeComponent>
                 <span className="badge-page__item-label">{s}</span>
@@ -1393,32 +1394,32 @@ export default function BadgePage() {
             <BadgeComponent variant="primary">Default</BadgeComponent>
             <span className="badge-page__state-label">Default</span>
           </div>
-          {effectiveTier !== 'lite' && (
+          {tier !== 'lite' && (
             <div className="badge-page__state-cell">
               <Badge variant="primary" dot>With Dot</Badge>
               <span className="badge-page__state-label">Dot</span>
             </div>
           )}
-          {effectiveTier !== 'lite' && (
+          {tier !== 'lite' && (
             <div className="badge-page__state-cell">
               <Badge variant="danger" dot pulse>Pulse</Badge>
               <span className="badge-page__state-label">Pulse</span>
               <span className="badge-page__state-hint">animated dot</span>
             </div>
           )}
-          {effectiveTier !== 'lite' && (
+          {tier !== 'lite' && (
             <div className="badge-page__state-cell">
               <Badge variant="primary" count={5}>Count</Badge>
               <span className="badge-page__state-label">Count</span>
             </div>
           )}
-          {effectiveTier !== 'lite' && (
+          {tier !== 'lite' && (
             <div className="badge-page__state-cell">
               <Badge variant="primary" icon={<Icon name="check" size="sm" />}>Verified</Badge>
               <span className="badge-page__state-label">With Icon</span>
             </div>
           )}
-          {effectiveTier !== 'lite' && (
+          {tier !== 'lite' && (
             <div className="badge-page__state-cell">
               <Badge variant="danger" count={150} maxCount={99} />
               <span className="badge-page__state-label">Overflow</span>
@@ -1429,7 +1430,7 @@ export default function BadgePage() {
       </section>
 
       {/* ── 6a. Dot Indicator ──────────────────────────── */}
-      {effectiveTier !== 'lite' && (
+      {tier !== 'lite' && (
         <section className="badge-page__section" id="dot">
           <h2 className="badge-page__section-title">
             <a href="#dot">Dot Indicator</a>
@@ -1457,7 +1458,7 @@ export default function BadgePage() {
       )}
 
       {/* ── 6b. Pulse Animation ──────────────────────────── */}
-      {effectiveTier !== 'lite' && (
+      {tier !== 'lite' && (
         <section className="badge-page__section" id="pulse">
           <h2 className="badge-page__section-title">
             <a href="#pulse">Pulse Animation</a>
@@ -1492,7 +1493,7 @@ export default function BadgePage() {
       )}
 
       {/* ── 6c. Count Badge ──────────────────────────────── */}
-      {effectiveTier !== 'lite' && (
+      {tier !== 'lite' && (
         <section className="badge-page__section" id="count">
           <h2 className="badge-page__section-title">
             <a href="#count">Count Badge</a>
@@ -1535,7 +1536,7 @@ export default function BadgePage() {
       )}
 
       {/* ── 6d. With Icons ──────────────────────────────── */}
-      {effectiveTier !== 'lite' && (
+      {tier !== 'lite' && (
         <section className="badge-page__section" id="icons">
           <h2 className="badge-page__section-title">
             <a href="#icons">With Icons</a>
@@ -1578,14 +1579,14 @@ export default function BadgePage() {
           <a href="#tiers">Weight Tiers</a>
         </h2>
         <p className="badge-page__section-desc">
-          Choose between two weight tiers. Lite is CSS-only with no JavaScript beyond a forwardRef wrapper.
-          Standard adds dot, pulse, count, icon, and motion support.
+          Choose between three weight tiers. Lite is CSS-only with no JavaScript beyond a forwardRef wrapper.
+          Standard adds dot, pulse, count, icon, and motion support. Premium adds ambient glow, spring-scale entrance, and enhanced pulse.
         </p>
 
         <div className="badge-page__tiers">
           {/* Lite */}
           <div
-            className={`badge-page__tier-card${effectiveTier === 'lite' ? ' badge-page__tier-card--active' : ''}`}
+            className={`badge-page__tier-card${tier === 'lite' ? ' badge-page__tier-card--active' : ''}`}
             onClick={() => setTier('lite')}
             role="button"
             tabIndex={0}
@@ -1616,7 +1617,7 @@ export default function BadgePage() {
 
           {/* Standard */}
           <div
-            className={`badge-page__tier-card${effectiveTier === 'standard' ? ' badge-page__tier-card--active' : ''}`}
+            className={`badge-page__tier-card${tier === 'standard' ? ' badge-page__tier-card--active' : ''}`}
             onClick={() => setTier('standard')}
             role="button"
             tabIndex={0}
@@ -1641,6 +1642,37 @@ export default function BadgePage() {
                 <span>Component: <strong style={{ color: 'var(--text-primary)' }}>1.5 KB</strong></span>
                 <span>+ Shared: <strong style={{ color: 'var(--text-primary)' }}>0.9 KB</strong></span>
                 <span>= <strong style={{ color: 'var(--brand)' }}>2.4 KB</strong> gzip</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Premium */}
+          <div
+            className={`badge-page__tier-card${tier === 'premium' ? ' badge-page__tier-card--active' : ''}`}
+            onClick={() => setTier('premium')}
+            role="button"
+            tabIndex={0}
+            onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setTier('premium') } }}
+          >
+            <div className="badge-page__tier-header">
+              <span className="badge-page__tier-name">Premium</span>
+              <span className="badge-page__tier-size">~1.7 KB</span>
+            </div>
+            <p className="badge-page__tier-desc">
+              Ambient glow matching variant color, spring-scale entrance animation,
+              and enhanced pulse effect. Wraps Standard with premium CSS layer.
+            </p>
+            <div className="badge-page__tier-import">
+              import {'{'} Badge {'}'} from '@annondeveloper/ui-kit/premium'
+            </div>
+            <div className="badge-page__tier-preview">
+              <PremiumBadge variant="primary" dot pulse icon={<Icon name="check" size="sm" />}>Premium</PremiumBadge>
+            </div>
+            <div className="badge-page__size-breakdown">
+              <div className="badge-page__size-row">
+                <span>Component: <strong style={{ color: 'var(--text-primary)' }}>1.7 KB</strong></span>
+                <span>+ Shared: <strong style={{ color: 'var(--text-primary)' }}>0.9 KB</strong></span>
+                <span>= <strong style={{ color: 'var(--brand)' }}>2.6 KB</strong> gzip</span>
               </div>
             </div>
           </div>

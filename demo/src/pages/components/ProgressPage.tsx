@@ -5,6 +5,7 @@ import { css } from '@ui/core/styles/css-tag'
 import { useStyles } from '@ui/core/styles/use-styles'
 import { Progress } from '@ui/components/progress'
 import { Progress as LiteProgress } from '@ui/lite/progress'
+import { Progress as PremiumProgress } from '@ui/premium/progress'
 import { Card } from '@ui/components/card'
 import { CopyBlock } from '@ui/domain/copy-block'
 import { Tabs, TabPanel } from '@ui/components/tabs'
@@ -788,7 +789,7 @@ const SIZES: Size[] = ['xs', 'sm', 'md', 'lg', 'xl']
 const IMPORT_STRINGS: Record<Tier, string> = {
   lite: "import { Progress } from '@annondeveloper/ui-kit/lite'",
   standard: "import { Progress } from '@annondeveloper/ui-kit'",
-  premium: "import { Progress } from '@annondeveloper/ui-kit'",
+  premium: "import { Progress } from '@annondeveloper/ui-kit/premium'",
 }
 
 const COLOR_PRESETS = [
@@ -997,34 +998,34 @@ function PlaygroundSection({ tier: tierProp }: { tier: Tier }) {
   const [motion, setMotion] = useState<0 | 1 | 2 | 3>(3)
   const [copyStatus, setCopyStatus] = useState('')
 
-  const effectiveTier = tier === 'premium' ? 'standard' : tier
-  const ProgressComponent = effectiveTier === 'lite' ? LiteProgress : Progress
+
+  const ProgressComponent = tier === 'premium' ? PremiumProgress : tier === 'lite' ? LiteProgress : Progress
 
   const currentValue = indeterminate ? undefined : value
 
   const reactCode = useMemo(
-    () => generateReactCode(effectiveTier, variant, size, currentValue, showValue, label, motion),
-    [effectiveTier, variant, size, currentValue, showValue, label, motion],
+    () => generateReactCode(tier, variant, size, currentValue, showValue, label, motion),
+    [tier, variant, size, currentValue, showValue, label, motion],
   )
 
   const htmlCode = useMemo(
-    () => generateHtmlCode(effectiveTier, variant, size, currentValue),
-    [effectiveTier, variant, size, currentValue],
+    () => generateHtmlCode(tier, variant, size, currentValue),
+    [tier, variant, size, currentValue],
   )
 
   const vueCode = useMemo(
-    () => generateVueCode(effectiveTier, variant, size, currentValue),
-    [effectiveTier, variant, size, currentValue],
+    () => generateVueCode(tier, variant, size, currentValue),
+    [tier, variant, size, currentValue],
   )
 
   const angularCode = useMemo(
-    () => generateAngularCode(effectiveTier, variant, size, currentValue),
-    [effectiveTier, variant, size, currentValue],
+    () => generateAngularCode(tier, variant, size, currentValue),
+    [tier, variant, size, currentValue],
   )
 
   const svelteCode = useMemo(
-    () => generateSvelteCode(effectiveTier, variant, size, currentValue),
-    [effectiveTier, variant, size, currentValue],
+    () => generateSvelteCode(tier, variant, size, currentValue),
+    [tier, variant, size, currentValue],
   )
 
   const [activeCodeTab, setActiveCodeTab] = useState('react')
@@ -1049,7 +1050,7 @@ function PlaygroundSection({ tier: tierProp }: { tier: Tier }) {
   }, [activeCodeTab, reactCode, htmlCode, vueCode, angularCode, svelteCode])
 
   const previewProps: Record<string, unknown> = {}
-  if (effectiveTier === 'lite') {
+  if (tier === 'lite') {
     if (!indeterminate) previewProps.value = value
     previewProps.max = 100
   } else {
@@ -1135,15 +1136,15 @@ function PlaygroundSection({ tier: tierProp }: { tier: Tier }) {
             />
           </div>
 
-          {effectiveTier !== 'lite' && (
+          {tier !== 'lite' && (
             <OptionGroup label="Variant" options={VARIANTS} value={variant} onChange={setVariant} />
           )}
 
-          {effectiveTier !== 'lite' && (
+          {tier !== 'lite' && (
             <OptionGroup label="Size" options={SIZES} value={size} onChange={setSize} />
           )}
 
-          {effectiveTier !== 'lite' && (
+          {tier !== 'lite' && (
             <OptionGroup
               label="Motion"
               options={['0', '1', '2', '3'] as const}
@@ -1156,11 +1157,11 @@ function PlaygroundSection({ tier: tierProp }: { tier: Tier }) {
             <span className="progress-page__control-label">Toggles</span>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.375rem' }}>
               <Toggle label="Indeterminate" checked={indeterminate} onChange={setIndeterminate} />
-              {effectiveTier !== 'lite' && <Toggle label="Show value" checked={showValue} onChange={setShowValue} />}
+              {tier !== 'lite' && <Toggle label="Show value" checked={showValue} onChange={setShowValue} />}
             </div>
           </div>
 
-          {effectiveTier !== 'lite' && (
+          {tier !== 'lite' && (
             <div className="progress-page__control-group">
               <span className="progress-page__control-label">Label (aria-label)</span>
               <input
@@ -1188,8 +1189,7 @@ export default function ProgressPage() {
   const pageRef = useRef<HTMLDivElement>(null)
   const { mode } = useTheme()
 
-  // Premium maps to Standard for Progress (no premium tier)
-  const effectiveTier = tier === 'premium' ? 'standard' : tier
+
 
   const themeTokens = useMemo(() => {
     try {
@@ -1248,7 +1248,7 @@ export default function ProgressPage() {
     return () => observer.disconnect()
   }, [])
 
-  const ProgressComponent = effectiveTier === 'lite' ? LiteProgress : Progress
+  const ProgressComponent = tier === 'premium' ? PremiumProgress : tier === 'lite' ? LiteProgress : Progress
 
   return (
     <div className="progress-page" ref={pageRef} style={themeStyle}>
@@ -1257,16 +1257,16 @@ export default function ProgressPage() {
         <h1 className="progress-page__title">Progress</h1>
         <p className="progress-page__desc">
           Determinate and indeterminate progress indicator with variant colors, five track sizes,
-          and smooth animated fill. Ships in two weight tiers from a CSS-only lite to a full-featured standard.
+          and smooth animated fill. Ships in three weight tiers from a CSS-only lite to a full-featured standard, plus Premium with shimmer and aurora glow.
         </p>
         <div className="progress-page__import-row">
-          <code className="progress-page__import-code">{IMPORT_STRINGS[effectiveTier]}</code>
-          <CopyButton text={IMPORT_STRINGS[effectiveTier]} />
+          <code className="progress-page__import-code">{IMPORT_STRINGS[tier]}</code>
+          <CopyButton text={IMPORT_STRINGS[tier]} />
         </div>
       </div>
 
       {/* ── 2. Live Playground ──────────────────────────── */}
-      <PlaygroundSection tier={effectiveTier} />
+      <PlaygroundSection tier={tier} />
 
       {/* ── 3. Variants ─────────────────────────────────── */}
       <section className="progress-page__section" id="variants">
@@ -1280,7 +1280,7 @@ export default function ProgressPage() {
           {VARIANTS.map(v => (
             <div key={v} className="progress-page__variant-cell">
               <span className="progress-page__variant-label">{v}</span>
-              {effectiveTier === 'lite' ? (
+              {tier === 'lite' ? (
                 <LiteProgress value={72} max={100} />
               ) : (
                 <Progress value={72} variant={v} showValue />
@@ -1303,7 +1303,7 @@ export default function ProgressPage() {
           {SIZES.map(s => (
             <div key={s} className="progress-page__labeled-item" style={{ flexDirection: 'row', alignItems: 'center', gap: '0.75rem' }}>
               <span className="progress-page__item-label" style={{ minInlineSize: '2ch' }}>{s}</span>
-              {effectiveTier === 'lite' ? (
+              {tier === 'lite' ? (
                 <LiteProgress value={60} max={100} />
               ) : (
                 <Progress value={60} size={s} />
@@ -1325,7 +1325,7 @@ export default function ProgressPage() {
           {/* Indeterminate */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
             <span className="progress-page__item-label">indeterminate (no value)</span>
-            {effectiveTier === 'lite' ? (
+            {tier === 'lite' ? (
               <LiteProgress max={100} />
             ) : (
               <Progress label="Loading..." />
@@ -1333,7 +1333,7 @@ export default function ProgressPage() {
           </div>
 
           {/* With value display */}
-          {effectiveTier !== 'lite' && (
+          {tier !== 'lite' && (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
               <span className="progress-page__item-label">showValue</span>
               <Progress value={83} showValue label="Upload progress" />
@@ -1341,7 +1341,7 @@ export default function ProgressPage() {
           )}
 
           {/* With label */}
-          {effectiveTier !== 'lite' && (
+          {tier !== 'lite' && (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
               <span className="progress-page__item-label">aria-label for screen readers</span>
               <Progress value={45} label="Downloading assets" showValue />
@@ -1353,7 +1353,7 @@ export default function ProgressPage() {
             <span className="progress-page__item-label">determinate at different values</span>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
               {[0, 25, 50, 75, 100].map(v => (
-                effectiveTier === 'lite' ? (
+                tier === 'lite' ? (
                   <div key={v} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                     <span style={{ fontSize: '0.75rem', color: 'var(--text-tertiary)', minInlineSize: '3ch', textAlign: 'end', fontVariantNumeric: 'tabular-nums' }}>{v}%</span>
                     <LiteProgress value={v} max={100} />
@@ -1375,12 +1375,13 @@ export default function ProgressPage() {
         <p className="progress-page__section-desc">
           Choose the right balance of features and bundle size. Lite is CSS-only,
           Standard adds variants, sizes, motion, value display, and indeterminate animation.
+          Premium adds shimmer sweep, aurora glow, and celebration particles at 100%.
         </p>
 
-        <div className="progress-page__tiers" style={{ gridTemplateColumns: 'repeat(2, 1fr)' }}>
+        <div className="progress-page__tiers" style={{ gridTemplateColumns: 'repeat(3, 1fr)' }}>
           {/* Lite */}
           <div
-            className={`progress-page__tier-card${effectiveTier === 'lite' ? ' progress-page__tier-card--active' : ''}`}
+            className={`progress-page__tier-card${tier === 'lite' ? ' progress-page__tier-card--active' : ''}`}
             onClick={() => setTier('lite')}
             role="button"
             tabIndex={0}
@@ -1411,7 +1412,7 @@ export default function ProgressPage() {
 
           {/* Standard */}
           <div
-            className={`progress-page__tier-card${effectiveTier === 'standard' ? ' progress-page__tier-card--active' : ''}`}
+            className={`progress-page__tier-card${tier === 'standard' ? ' progress-page__tier-card--active' : ''}`}
             onClick={() => setTier('standard')}
             role="button"
             tabIndex={0}
@@ -1439,13 +1440,38 @@ export default function ProgressPage() {
               </div>
             </div>
           </div>
-        </div>
 
-        {tier === 'premium' && (
-          <p style={{ fontSize: '0.8125rem', color: 'var(--text-tertiary)', fontStyle: 'italic', marginBlockStart: '1rem', lineHeight: 1.5 }}>
-            Progress does not have a Premium tier. Premium tier selection maps to Standard for this component.
-          </p>
-        )}
+          {/* Premium */}
+          <div
+            className={`progress-page__tier-card${tier === 'premium' ? ' progress-page__tier-card--active' : ''}`}
+            onClick={() => setTier('premium')}
+            role="button"
+            tabIndex={0}
+            onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setTier('premium') } }}
+          >
+            <div className="progress-page__tier-header">
+              <span className="progress-page__tier-name">Premium</span>
+              <span className="progress-page__tier-size">~1.5 KB</span>
+            </div>
+            <p className="progress-page__tier-desc">
+              Animated shimmer sweep across the filled bar, aurora glow beneath the track,
+              and celebration particles at 100%. Wraps Standard with premium CSS layer.
+            </p>
+            <div className="progress-page__tier-import">
+              import {'{'} Progress {'}'} from '@annondeveloper/ui-kit/premium'
+            </div>
+            <div className="progress-page__tier-preview">
+              <PremiumProgress value={65} variant="default" showValue />
+            </div>
+            <div className="progress-page__size-breakdown">
+              <div className="progress-page__size-row">
+                <span>Component: <strong style={{ color: 'var(--text-primary)' }}>1.5 KB</strong></span>
+                <span>+ Shared: <strong style={{ color: 'var(--text-primary)' }}>0.9 KB</strong></span>
+                <span>= <strong style={{ color: 'var(--brand)' }}>2.4 KB</strong> gzip</span>
+              </div>
+            </div>
+          </div>
+        </div>
       </section>
 
       {/* ── 7. Brand Color ───────────────────────────────── */}
@@ -1485,7 +1511,7 @@ export default function ProgressPage() {
           )}
           {/* Preview with custom brand */}
           <div className="progress-page__preview" style={{ gap: '1rem' }}>
-            {effectiveTier === 'lite' ? (
+            {tier === 'lite' ? (
               <LiteProgress value={72} max={100} />
             ) : (
               <>
@@ -1507,7 +1533,7 @@ export default function ProgressPage() {
           onto the underlying {'<div>'} element with <code className="progress-page__a11y-key">role="progressbar"</code>.
         </p>
         <Card variant="default" padding="md">
-          <PropsTable props={effectiveTier === 'lite' ? progressProps.filter(p => ['value', 'max', 'className', 'ref'].includes(p.name)) : progressProps} />
+          <PropsTable props={tier === 'lite' ? progressProps.filter(p => ['value', 'max', 'className', 'ref'].includes(p.name)) : progressProps} />
         </Card>
       </section>
 

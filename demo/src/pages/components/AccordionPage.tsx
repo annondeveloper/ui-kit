@@ -5,6 +5,7 @@ import { css } from '@ui/core/styles/css-tag'
 import { useStyles } from '@ui/core/styles/use-styles'
 import { Accordion } from '@ui/components/accordion'
 import { Accordion as LiteAccordion } from '@ui/lite/accordion'
+import { Accordion as PremiumAccordion } from '@ui/premium/accordion'
 import { Button } from '@ui/components/button'
 import { Card } from '@ui/components/card'
 import { CopyBlock } from '@ui/domain/copy-block'
@@ -682,7 +683,7 @@ const accordionItemPropsData: PropDef[] = [
 const IMPORT_STRINGS: Record<Tier, string> = {
   lite: "import { Accordion } from '@annondeveloper/ui-kit/lite'",
   standard: "import { Accordion } from '@annondeveloper/ui-kit'",
-  premium: "import { Accordion } from '@annondeveloper/ui-kit'",
+  premium: "import { Accordion } from '@annondeveloper/ui-kit/premium'",
 }
 
 const COLOR_PRESETS = [
@@ -840,6 +841,8 @@ function generateReactCode(
 ): string {
   const importPath = tier === 'lite'
     ? "@annondeveloper/ui-kit/lite"
+    : tier === 'premium'
+    ? "@annondeveloper/ui-kit/premium"
     : "@annondeveloper/ui-kit"
   const imports = [`import { Accordion } from '${importPath}'`]
   if (showIcons && tier !== 'lite') imports.push(`import { Icon } from '${importPath === "@annondeveloper/ui-kit/lite" ? "@annondeveloper/ui-kit" : importPath}'`)
@@ -1050,7 +1053,6 @@ const ICON_ITEMS = [
 function PlaygroundSection({ tier: tierProp }: { tier: Tier }) {
   const { tier: contextTier } = useTier()
   const tier = tierProp ?? contextTier
-  const effectiveTier = tier === 'premium' ? 'standard' : tier
   const [type, setType] = useState<'single' | 'multiple'>('multiple')
   const [motion, setMotion] = useState<0 | 1 | 2 | 3>(3)
   const [defaultOpen, setDefaultOpen] = useState<string[]>(['what-is'])
@@ -1060,7 +1062,7 @@ function PlaygroundSection({ tier: tierProp }: { tier: Tier }) {
 
   const playgroundItems = useMemo(() => {
     const base = ICON_ITEMS
-    if (showIcons && effectiveTier !== 'lite') {
+    if (showIcons && tier !== 'lite') {
       return base.map(item => ({
         id: item.id,
         trigger: (
@@ -1076,32 +1078,32 @@ function PlaygroundSection({ tier: tierProp }: { tier: Tier }) {
       trigger: item.trigger,
       content: item.content,
     }))
-  }, [showIcons, effectiveTier])
-  const AccordionComponent = effectiveTier === 'lite' ? LiteAccordion : Accordion
+  }, [showIcons, tier])
+  const AccordionComponent = tier === 'premium' ? PremiumAccordion : tier === 'lite' ? LiteAccordion : Accordion
 
   const reactCode = useMemo(
-    () => generateReactCode(effectiveTier, type, defaultOpen, motion, showIcons),
-    [effectiveTier, type, defaultOpen, motion, showIcons],
+    () => generateReactCode(tier, type, defaultOpen, motion, showIcons),
+    [tier, type, defaultOpen, motion, showIcons],
   )
 
   const htmlCode = useMemo(
-    () => generateHtmlCode(effectiveTier, type, defaultOpen),
-    [effectiveTier, type, defaultOpen],
+    () => generateHtmlCode(tier, type, defaultOpen),
+    [tier, type, defaultOpen],
   )
 
   const vueCode = useMemo(
-    () => generateVueCode(effectiveTier, type),
-    [effectiveTier, type],
+    () => generateVueCode(tier, type),
+    [tier, type],
   )
 
   const angularCode = useMemo(
-    () => generateAngularCode(effectiveTier, type),
-    [effectiveTier, type],
+    () => generateAngularCode(tier, type),
+    [tier, type],
   )
 
   const svelteCode = useMemo(
-    () => generateSvelteCode(effectiveTier, type),
-    [effectiveTier, type],
+    () => generateSvelteCode(tier, type),
+    [tier, type],
   )
 
   const [activeCodeTab, setActiveCodeTab] = useState('react')
@@ -1132,10 +1134,10 @@ function PlaygroundSection({ tier: tierProp }: { tier: Tier }) {
 
   const accordionComponentProps: Record<string, unknown> = {
     items: playgroundItems,
-    key: `${effectiveTier}-${showIcons}`,
+    key: `${tier}-${showIcons}`,
   }
 
-  if (effectiveTier === 'lite') {
+  if (tier === 'lite') {
     accordionComponentProps.defaultOpen = defaultOpen
   } else {
     accordionComponentProps.type = type
@@ -1200,13 +1202,13 @@ function PlaygroundSection({ tier: tierProp }: { tier: Tier }) {
 
         {/* Controls panel */}
         <div className="accordion-page__playground-controls">
-          {effectiveTier === 'lite' && (
+          {tier === 'lite' && (
             <div style={{ fontSize: 'var(--text-xs)', color: 'var(--text-tertiary)', fontStyle: 'italic', padding: '0.5rem', background: 'oklch(100% 0 0 / 0.03)', borderRadius: 'var(--radius-sm)' }}>
               Lite tier uses native {'<details>'} elements with no JS. Type, motion, and icon controls are standard-only features.
             </div>
           )}
 
-          {effectiveTier !== 'lite' && (
+          {tier !== 'lite' && (
             <OptionGroup
               label="Type"
               options={['single', 'multiple'] as const}
@@ -1215,7 +1217,7 @@ function PlaygroundSection({ tier: tierProp }: { tier: Tier }) {
             />
           )}
 
-          {effectiveTier !== 'lite' && (
+          {tier !== 'lite' && (
             <OptionGroup
               label="Motion"
               options={['0', '1', '2', '3'] as const}
@@ -1242,7 +1244,7 @@ function PlaygroundSection({ tier: tierProp }: { tier: Tier }) {
             </div>
           </div>
 
-          {effectiveTier !== 'lite' && (
+          {tier !== 'lite' && (
             <div className="accordion-page__control-group">
               <span className="accordion-page__control-label">Features</span>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.375rem' }}>
@@ -1271,11 +1273,10 @@ export default function AccordionPage() {
   useStyles('accordion-page', pageStyles)
 
   const { tier, setTier } = useTier()
-  const effectiveTier = tier === 'premium' ? 'standard' : tier
   const [brandColor, setBrandColor] = useState('#6366f1')
   const { mode } = useTheme()
 
-  const AccordionComponent = effectiveTier === 'lite' ? LiteAccordion : Accordion
+  const AccordionComponent = tier === 'premium' ? PremiumAccordion : tier === 'lite' ? LiteAccordion : Accordion
 
   const themeTokens = useMemo(() => {
     try {
@@ -1341,7 +1342,7 @@ export default function AccordionPage() {
         <h1 className="accordion-page__title">Accordion</h1>
         <p className="accordion-page__desc">
           Collapsible content sections built on native {'<details>'} elements with smooth height
-          animation, single/multiple mode, and keyboard navigation. Ships in two weight tiers
+          animation, single/multiple mode, and keyboard navigation. Ships in three weight tiers
           from 0.3KB lite to 2KB standard.
         </p>
         <div className="accordion-page__import-row">
@@ -1361,7 +1362,7 @@ export default function AccordionPage() {
         <p className="accordion-page__section-desc">
           Single mode allows only one item open at a time. Multiple mode (default) allows
           any number of items to be expanded simultaneously.
-          {effectiveTier === 'lite' && (
+          {tier === 'lite' && (
             <span style={{ display: 'block', marginBlockStart: '0.5rem', color: 'var(--text-tertiary)', fontStyle: 'italic' }}>
               Note: Lite tier always uses native {'<details>'} behavior (multiple mode). Single mode requires Standard tier.
             </span>
@@ -1370,10 +1371,10 @@ export default function AccordionPage() {
         <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
           <div>
             <h3 style={{ fontSize: 'var(--text-sm)', fontWeight: 600, color: 'var(--text-primary)', marginBlockEnd: '0.75rem' }}>
-              Single mode {effectiveTier === 'lite' && <span style={{ fontWeight: 400, color: 'var(--text-tertiary)' }}>(Standard only)</span>}
+              Single mode {tier === 'lite' && <span style={{ fontWeight: 400, color: 'var(--text-tertiary)' }}>(Standard only)</span>}
             </h3>
             <div className="accordion-page__preview accordion-page__preview--col">
-              {effectiveTier === 'lite' ? (
+              {tier === 'lite' ? (
                 <>
                   <div style={{ fontSize: 'var(--text-xs)', color: 'var(--text-tertiary)', fontStyle: 'italic', marginBlockEnd: '0.5rem' }}>
                     Lite fallback — native {'<details>'} cannot enforce single mode:
@@ -1397,7 +1398,7 @@ export default function AccordionPage() {
               Multiple mode
             </h3>
             <div className="accordion-page__preview accordion-page__preview--col">
-              {effectiveTier === 'lite' ? (
+              {tier === 'lite' ? (
                 <LiteAccordion
                   items={FAQ_ITEMS.slice(0, 3)}
                   defaultOpen={['what-is', 'bundle-size']}
@@ -1426,13 +1427,13 @@ export default function AccordionPage() {
         <div className="accordion-page__preview accordion-page__preview--col">
           <AccordionComponent
             items={FAQ_ITEMS}
-            {...(effectiveTier !== 'lite' ? { type: 'multiple' as const } : {})}
+            {...(tier !== 'lite' ? { type: 'multiple' as const } : {})}
             defaultOpen={['what-is', 'bundle-size', 'accessibility']}
           />
         </div>
         <div style={{ marginBlockStart: '1rem' }}>
           <CopyBlock
-            code={effectiveTier === 'lite'
+            code={tier === 'lite'
               ? `<Accordion\n  items={faqItems}\n  defaultOpen={['what-is', 'bundle-size', 'accessibility']}\n/>`
               : `<Accordion\n  items={faqItems}\n  type="multiple"\n  defaultOpen={['what-is', 'bundle-size', 'accessibility']}\n/>`
             }
@@ -1472,14 +1473,14 @@ export default function AccordionPage() {
         <p className="accordion-page__section-desc">
           Trigger content accepts any ReactNode, so you can include icons, badges, or rich content
           in the accordion headers.
-          {effectiveTier === 'lite' && (
+          {tier === 'lite' && (
             <span style={{ display: 'block', marginBlockStart: '0.5rem', color: 'var(--text-tertiary)', fontStyle: 'italic' }}>
               Note: Lite tier renders plain text triggers via native {'<details>'}. Icons require the Standard tier.
             </span>
           )}
         </p>
 
-        {effectiveTier === 'lite' ? (
+        {tier === 'lite' ? (
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
             <div>
               <h3 style={{ fontSize: 'var(--text-sm)', fontWeight: 600, color: 'var(--text-primary)', marginBlockEnd: '0.75rem' }}>
@@ -1590,7 +1591,7 @@ export default function AccordionPage() {
           Accordion content can contain another Accordion for multi-level navigation or deeply
           structured content. Each level operates independently.
         </p>
-        {effectiveTier === 'lite' ? (
+        {tier === 'lite' ? (
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
             <div>
               <h3 style={{ fontSize: 'var(--text-sm)', fontWeight: 600, color: 'var(--text-primary)', marginBlockEnd: '0.75rem' }}>
@@ -1667,8 +1668,8 @@ export default function AccordionPage() {
           <a href="#tiers">Weight Tiers</a>
         </h2>
         <p className="accordion-page__section-desc">
-          Choose the right balance of features and bundle size. Accordion ships in two tiers.
-          Premium maps to Standard since Accordion does not require premium visual effects.
+          Choose the right balance of features and bundle size. Accordion ships in three tiers.
+          Premium adds spring expand/collapse, aurora glow on active headers, and shimmer dividers.
         </p>
 
         <div className="accordion-page__tiers">
@@ -1744,7 +1745,7 @@ export default function AccordionPage() {
             </div>
           </div>
 
-          {/* Premium (maps to Standard) */}
+          {/* Premium */}
           <div
             className={`accordion-page__tier-card${tier === 'premium' ? ' accordion-page__tier-card--active' : ''}`}
             onClick={() => setTier('premium')}
@@ -1754,28 +1755,28 @@ export default function AccordionPage() {
           >
             <div className="accordion-page__tier-header">
               <span className="accordion-page__tier-name">Premium</span>
-              <span className="accordion-page__tier-size">= Standard</span>
+              <span className="accordion-page__tier-size">~3.1 KB</span>
             </div>
             <p className="accordion-page__tier-desc">
-              Maps to Standard tier. Accordion's interaction model does not benefit from
-              premium visual effects like ripple or cursor glow.
+              Spring-animated expand/collapse with overshoot curve, aurora glow on active header,
+              and shimmer dividers. Wraps Standard with premium CSS layer.
             </p>
             <div className="accordion-page__tier-import">
-              import {'{'} Accordion {'}'} from '@annondeveloper/ui-kit'
+              import {'{'} Accordion {'}'} from '@annondeveloper/ui-kit/premium'
             </div>
             <div className="accordion-page__tier-preview">
-              <Accordion
+              <PremiumAccordion
                 items={[
-                  { id: 'prem-demo', trigger: 'Premium = Standard', content: 'Same component, same bundle size.' },
+                  { id: 'prem-demo', trigger: 'Spring expand + aurora glow', content: 'Premium tier with physics-based animations and atmospheric effects.' },
                 ]}
                 defaultOpen={['prem-demo']}
               />
             </div>
             <div className="accordion-page__size-breakdown">
               <div className="accordion-page__size-row">
-                <span>Component: <strong style={{ color: 'var(--text-primary)' }}>2.0 KB</strong></span>
+                <span>Component: <strong style={{ color: 'var(--text-primary)' }}>2.2 KB</strong></span>
                 <span>+ Shared: <strong style={{ color: 'var(--text-primary)' }}>0.9 KB</strong></span>
-                <span>= <strong style={{ color: 'var(--brand)' }}>2.9 KB</strong> gzip</span>
+                <span>= <strong style={{ color: 'var(--brand)' }}>3.1 KB</strong> gzip</span>
               </div>
             </div>
           </div>

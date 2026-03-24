@@ -5,6 +5,7 @@ import { css } from '@ui/core/styles/css-tag'
 import { useStyles } from '@ui/core/styles/use-styles'
 import { Tooltip } from '@ui/components/tooltip'
 import { Tooltip as LiteTooltip } from '@ui/lite/tooltip'
+import { Tooltip as PremiumTooltip } from '@ui/premium/tooltip'
 import { Card } from '@ui/components/card'
 import { CopyBlock } from '@ui/domain/copy-block'
 import { Tabs, TabPanel } from '@ui/components/tabs'
@@ -732,7 +733,7 @@ const PLACEMENTS: Placement[] = ['top', 'bottom', 'left', 'right']
 const IMPORT_STRINGS: Record<Tier, string> = {
   lite: "import { Tooltip } from '@annondeveloper/ui-kit/lite'",
   standard: "import { Tooltip } from '@annondeveloper/ui-kit'",
-  premium: "import { Tooltip } from '@annondeveloper/ui-kit'",
+  premium: "import { Tooltip } from '@annondeveloper/ui-kit/premium'",
 }
 
 const COLOR_PRESETS = [
@@ -1002,6 +1003,7 @@ function PlaygroundSection({ tier: tierProp }: { tier: Tier }) {
   const [motion, setMotion] = useState<0 | 1 | 2 | 3>(3)
   const [copyStatus, setCopyStatus] = useState('')
   const [activeCodeTab, setActiveCodeTab] = useState('react')
+  const TooltipComponent = tier === 'premium' ? PremiumTooltip : Tooltip
 
   const reactCode = useMemo(
     () => generateReactCode(tier, placement, delay, disabled, customContent, motion),
@@ -1088,7 +1090,7 @@ function PlaygroundSection({ tier: tierProp }: { tier: Tier }) {
                 </button>
               </LiteTooltip>
             ) : (
-              <Tooltip
+              <TooltipComponent
                 content={tooltipContent}
                 placement={placement}
                 delay={delay}
@@ -1110,7 +1112,7 @@ function PlaygroundSection({ tier: tierProp }: { tier: Tier }) {
                 >
                   Hover me
                 </button>
-              </Tooltip>
+              </TooltipComponent>
             )}
           </div>
 
@@ -1200,9 +1202,7 @@ export default function TooltipPage() {
   const [brandColor, setBrandColor] = useState('#6366f1')
   const pageRef = useRef<HTMLDivElement>(null)
   const { mode } = useTheme()
-
-  // Resolve effective tier: premium maps to standard (no premium tooltip exists)
-  const effectiveTier = tier === 'premium' ? 'standard' : tier
+  const TooltipComponent = tier === 'premium' ? PremiumTooltip : Tooltip
 
   const themeTokens = useMemo(() => {
     try {
@@ -1283,13 +1283,13 @@ export default function TooltipPage() {
           0.2KB lite to 1.8KB standard with motion-aware animations.
         </p>
         <div className="tooltip-page__import-row">
-          <code className="tooltip-page__import-code">{IMPORT_STRINGS[effectiveTier]}</code>
-          <CopyButton text={IMPORT_STRINGS[effectiveTier]} />
+          <code className="tooltip-page__import-code">{IMPORT_STRINGS[tier]}</code>
+          <CopyButton text={IMPORT_STRINGS[tier]} />
         </div>
       </div>
 
       {/* ── 2. Live Playground ──────────────────────────── */}
-      <PlaygroundSection tier={effectiveTier} />
+      <PlaygroundSection tier={tier} />
 
       {/* ── 3. Placement Variants ────────────────────────── */}
       <section className="tooltip-page__section" id="placement">
@@ -1302,7 +1302,7 @@ export default function TooltipPage() {
         </p>
         <div className="tooltip-page__preview">
           <div className="tooltip-page__labeled-row" style={{ justifyContent: 'center' }}>
-            {effectiveTier === 'lite' ? (
+            {tier === 'lite' ? (
               PLACEMENTS.map(p => (
                 <div key={p} className="tooltip-page__labeled-item">
                   <LiteTooltip content={`Tooltip on ${p}`}>
@@ -1316,11 +1316,11 @@ export default function TooltipPage() {
             ) : (
               PLACEMENTS.map(p => (
                 <div key={p} className="tooltip-page__labeled-item">
-                  <Tooltip content={`Tooltip on ${p}`} placement={p}>
+                  <TooltipComponent content={`Tooltip on ${p}`} placement={p}>
                     <button type="button" style={triggerButtonStyle}>
                       {p.charAt(0).toUpperCase() + p.slice(1)}
                     </button>
-                  </Tooltip>
+                  </TooltipComponent>
                   <span className="tooltip-page__item-label">{p}</span>
                 </div>
               ))
@@ -1345,7 +1345,7 @@ export default function TooltipPage() {
           </h3>
           <div className="tooltip-page__preview">
             <div className="tooltip-page__labeled-row" style={{ justifyContent: 'center' }}>
-              {effectiveTier === 'lite' ? (
+              {tier === 'lite' ? (
                 <>
                   <div className="tooltip-page__labeled-item">
                     <LiteTooltip content="Instant tooltip">
@@ -1357,11 +1357,11 @@ export default function TooltipPage() {
               ) : (
                 [0, 150, 300, 500, 1000].map(d => (
                   <div key={d} className="tooltip-page__labeled-item">
-                    <Tooltip content={`Appears after ${d}ms`} delay={d}>
+                    <TooltipComponent content={`Appears after ${d}ms`} delay={d}>
                       <button type="button" style={triggerButtonStyle}>
                         {d === 0 ? 'Instant' : `${d}ms`}
                       </button>
-                    </Tooltip>
+                    </TooltipComponent>
                     <span className="tooltip-page__item-label">{d}ms</span>
                   </div>
                 ))
@@ -1376,7 +1376,7 @@ export default function TooltipPage() {
             Arrow Indicator
           </h3>
           <div className="tooltip-page__preview">
-            {effectiveTier === 'lite' ? (
+            {tier === 'lite' ? (
               <LiteTooltip content="Lite uses native title (no arrow)">
                 <button type="button" style={triggerButtonStyle}>Hover me</button>
               </LiteTooltip>
@@ -1384,11 +1384,11 @@ export default function TooltipPage() {
               <div className="tooltip-page__labeled-row" style={{ justifyContent: 'center' }}>
                 {PLACEMENTS.map(p => (
                   <div key={p} className="tooltip-page__labeled-item">
-                    <Tooltip content={`Arrow on ${p}`} placement={p}>
+                    <TooltipComponent content={`Arrow on ${p}`} placement={p}>
                       <button type="button" style={triggerButtonStyle}>
                         {p.charAt(0).toUpperCase() + p.slice(1)}
                       </button>
-                    </Tooltip>
+                    </TooltipComponent>
                     <span className="tooltip-page__item-label">arrow {p}</span>
                   </div>
                 ))}
@@ -1398,7 +1398,7 @@ export default function TooltipPage() {
         </div>
 
         {/* Custom content */}
-        {effectiveTier !== 'lite' && (
+        {tier !== 'lite' && (
           <div>
             <h3 style={{ fontSize: 'var(--text-sm)', fontWeight: 600, color: 'var(--text-primary)', marginBlockEnd: '0.75rem' }}>
               Custom Content
@@ -1406,13 +1406,13 @@ export default function TooltipPage() {
             <div className="tooltip-page__preview">
               <div className="tooltip-page__labeled-row" style={{ justifyContent: 'center' }}>
                 <div className="tooltip-page__labeled-item">
-                  <Tooltip content="Simple text tooltip">
+                  <TooltipComponent content="Simple text tooltip">
                     <button type="button" style={triggerButtonStyle}>Text content</button>
-                  </Tooltip>
+                  </TooltipComponent>
                   <span className="tooltip-page__item-label">text</span>
                 </div>
                 <div className="tooltip-page__labeled-item">
-                  <Tooltip
+                  <TooltipComponent
                     content={
                       <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
                         <strong style={{ fontSize: '0.8125rem' }}>Keyboard shortcut</strong>
@@ -1421,11 +1421,11 @@ export default function TooltipPage() {
                     }
                   >
                     <button type="button" style={triggerButtonStyle}>Rich content</button>
-                  </Tooltip>
+                  </TooltipComponent>
                   <span className="tooltip-page__item-label">rich</span>
                 </div>
                 <div className="tooltip-page__labeled-item">
-                  <Tooltip
+                  <TooltipComponent
                     content={
                       <div style={{ display: 'flex', alignItems: 'center', gap: '0.375rem' }}>
                         <Icon name="info" size="sm" />
@@ -1434,7 +1434,7 @@ export default function TooltipPage() {
                     }
                   >
                     <button type="button" style={triggerButtonStyle}>With icon</button>
-                  </Tooltip>
+                  </TooltipComponent>
                   <span className="tooltip-page__item-label">icon</span>
                 </div>
               </div>
@@ -1471,7 +1471,7 @@ export default function TooltipPage() {
         <div className="tooltip-page__tiers">
           {/* Lite */}
           <div
-            className={`tooltip-page__tier-card${effectiveTier === 'lite' ? ' tooltip-page__tier-card--active' : ''}`}
+            className={`tooltip-page__tier-card${tier === 'lite' ? ' tooltip-page__tier-card--active' : ''}`}
             onClick={() => setTier('lite')}
             role="button"
             tabIndex={0}
@@ -1504,7 +1504,7 @@ export default function TooltipPage() {
 
           {/* Standard */}
           <div
-            className={`tooltip-page__tier-card${effectiveTier === 'standard' ? ' tooltip-page__tier-card--active' : ''}`}
+            className={`tooltip-page__tier-card${tier === 'standard' ? ' tooltip-page__tier-card--active' : ''}`}
             onClick={() => setTier('standard')}
             role="button"
             tabIndex={0}
@@ -1535,33 +1535,35 @@ export default function TooltipPage() {
             </div>
           </div>
 
-          {/* Premium -> Standard */}
+          {/* Premium */}
           <div
             className={`tooltip-page__tier-card${tier === 'premium' ? ' tooltip-page__tier-card--active' : ''}`}
-            onClick={() => setTier('standard')}
+            onClick={() => setTier('premium')}
             role="button"
             tabIndex={0}
-            onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setTier('standard') } }}
+            onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setTier('premium') } }}
           >
             <div className="tooltip-page__tier-header">
               <span className="tooltip-page__tier-name">Premium</span>
-              <span className="tooltip-page__tier-size">= Standard</span>
+              <span className="tooltip-page__tier-size">~2.0 KB</span>
             </div>
             <p className="tooltip-page__tier-desc">
-              No separate Premium tier for Tooltip. Selecting Premium uses the Standard
-              implementation. All features are included in Standard.
+              Spring-scale entrance with blur-in, directional slide offsets,
+              and aurora glow shadow around the tooltip panel. Wraps Standard with premium CSS layer.
             </p>
             <div className="tooltip-page__tier-import">
-              import {'{'} Tooltip {'}'} from '@annondeveloper/ui-kit'
+              import {'{'} Tooltip {'}'} from '@annondeveloper/ui-kit/premium'
             </div>
             <div className="tooltip-page__tier-preview">
-              <Tooltip content="Same as Standard" placement="top">
-                <button type="button" style={triggerButtonStyle}>Premium = Standard</button>
-              </Tooltip>
+              <PremiumTooltip content="Premium spring + glow" placement="top">
+                <button type="button" style={triggerButtonStyle}>Premium Tooltip</button>
+              </PremiumTooltip>
             </div>
             <div className="tooltip-page__size-breakdown">
               <div className="tooltip-page__size-row">
-                <span>Uses Standard tier implementation</span>
+                <span>Component: <strong style={{ color: 'var(--text-primary)' }}>2.0 KB</strong></span>
+                <span>+ Shared: <strong style={{ color: 'var(--text-primary)' }}>0.9 KB</strong></span>
+                <span>= <strong style={{ color: 'var(--brand)' }}>2.9 KB</strong> gzip</span>
               </div>
             </div>
           </div>
@@ -1606,18 +1608,18 @@ export default function TooltipPage() {
 
           {/* Preview with brand color */}
           <div className="tooltip-page__preview" style={{ marginBlockStart: '0.5rem' }}>
-            {effectiveTier === 'lite' ? (
+            {tier === 'lite' ? (
               <LiteTooltip content="Branded tooltip">
                 <button type="button" style={triggerButtonStyle}>Hover for branded tooltip</button>
               </LiteTooltip>
             ) : (
               <div className="tooltip-page__labeled-row" style={{ justifyContent: 'center' }}>
                 {PLACEMENTS.map(p => (
-                  <Tooltip key={p} content={`Branded ${p} tooltip`} placement={p}>
+                  <TooltipComponent key={p} content={`Branded ${p} tooltip`} placement={p}>
                     <button type="button" style={triggerButtonStyle}>
                       {p.charAt(0).toUpperCase() + p.slice(1)}
                     </button>
-                  </Tooltip>
+                  </TooltipComponent>
                 ))}
               </div>
             )}

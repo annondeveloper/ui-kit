@@ -5,6 +5,7 @@ import { css } from '@ui/core/styles/css-tag'
 import { useStyles } from '@ui/core/styles/use-styles'
 import { Checkbox } from '@ui/components/checkbox'
 import { Checkbox as LiteCheckbox } from '@ui/lite/checkbox'
+import { Checkbox as PremiumCheckbox } from '@ui/premium/checkbox'
 import { Button } from '@ui/components/button'
 import { Card } from '@ui/components/card'
 import { CopyBlock } from '@ui/domain/copy-block'
@@ -781,7 +782,7 @@ const SIZES: Size[] = ['xs', 'sm', 'md', 'lg', 'xl']
 const IMPORT_STRINGS: Record<Tier, string> = {
   lite: "import { Checkbox } from '@annondeveloper/ui-kit/lite'",
   standard: "import { Checkbox } from '@annondeveloper/ui-kit'",
-  premium: "import { Checkbox } from '@annondeveloper/ui-kit'",
+  premium: "import { Checkbox } from '@annondeveloper/ui-kit/premium'",
 }
 
 const COLOR_PRESETS = [
@@ -898,9 +899,9 @@ function generateLiteCss(size: Size, brandColor: string): string {
 }
 
 function generateHtmlExport(tier: Tier, size: Size, label: string, checked: boolean, indeterminate: boolean, brandColor: string): string {
-  const effectiveTier = tier === 'premium' ? 'standard' : tier
-  const className = effectiveTier === 'lite' ? 'ui-lite-checkbox' : 'ui-checkbox'
-  const tierLabel = effectiveTier === 'lite' ? 'lite' : 'standard'
+
+  const className = tier === 'lite' ? 'ui-lite-checkbox' : 'ui-checkbox'
+  const tierLabel = tier === 'lite' ? 'lite' : 'standard'
   const cssCode = generateLiteCss(size, brandColor)
 
   const checkedAttr = checked ? ' checked' : ''
@@ -930,16 +931,16 @@ function generateReactCode(
   error: string,
   motion: number,
 ): string {
-  const effectiveTier = tier === 'premium' ? 'standard' : tier
-  const importStr = IMPORT_STRINGS[effectiveTier]
+
+  const importStr = IMPORT_STRINGS[tier]
 
   const props: string[] = []
   if (size !== 'md') props.push(`  size="${size}"`)
   if (checked) props.push('  checked')
-  if (indeterminate && effectiveTier !== 'lite') props.push('  indeterminate')
+  if (indeterminate && tier !== 'lite') props.push('  indeterminate')
   if (disabled) props.push('  disabled')
-  if (error && effectiveTier !== 'lite') props.push(`  error="${error}"`)
-  if (motion !== 3 && effectiveTier !== 'lite') props.push(`  motion={${motion}}`)
+  if (error && tier !== 'lite') props.push(`  error="${error}"`)
+  if (motion !== 3 && tier !== 'lite') props.push(`  motion={${motion}}`)
   if (label) props.push(`  label="${label}"`)
 
   const jsx = props.length === 0
@@ -950,9 +951,9 @@ function generateReactCode(
 }
 
 function generateVueCode(tier: Tier, size: Size, label: string, checked: boolean, disabled: boolean): string {
-  const effectiveTier = tier === 'premium' ? 'standard' : tier
 
-  if (effectiveTier === 'lite') {
+
+  if (tier === 'lite') {
     const attrs: string[] = ['class="ui-lite-checkbox"']
     if (checked) attrs.push(':checked="true"')
     if (disabled) attrs.push(':disabled="true"')
@@ -973,9 +974,9 @@ function generateVueCode(tier: Tier, size: Size, label: string, checked: boolean
 }
 
 function generateAngularCode(tier: Tier, size: Size, label: string, checked: boolean, disabled: boolean): string {
-  const effectiveTier = tier === 'premium' ? 'standard' : tier
 
-  if (effectiveTier === 'lite') {
+
+  if (tier === 'lite') {
     const attrs = ['class="ui-lite-checkbox"', `data-size="${size}"`]
     if (disabled) attrs.push('[disabled]="true"')
     return `<!-- Angular — Lite tier (CSS-only) -->\n<label ${attrs.join(' ')}>\n  <input type="checkbox"${checked ? ' checked' : ''}${disabled ? ' [disabled]="true"' : ''} />\n  <span>${label}</span>\n</label>\n\n/* In styles.css */\n@import '@annondeveloper/ui-kit/lite/styles.css';`
@@ -985,9 +986,9 @@ function generateAngularCode(tier: Tier, size: Size, label: string, checked: boo
 }
 
 function generateSvelteCode(tier: Tier, size: Size, label: string, checked: boolean, disabled: boolean): string {
-  const effectiveTier = tier === 'premium' ? 'standard' : tier
 
-  if (effectiveTier === 'lite') {
+
+  if (tier === 'lite') {
     return `<!-- Svelte — Lite tier (CSS-only) -->\n<label\n  class="ui-lite-checkbox"\n  data-size="${size}"\n>\n  <input type="checkbox"${checked ? ' checked' : ''}${disabled ? ' disabled' : ''} />\n  <span>${label}</span>\n</label>\n\n<style>\n  @import '@annondeveloper/ui-kit/lite/styles.css';\n</style>`
   }
 
@@ -999,7 +1000,7 @@ function generateSvelteCode(tier: Tier, size: Size, label: string, checked: bool
 function PlaygroundSection({ tier: tierProp }: { tier: Tier }) {
   const { tier: contextTier } = useTier()
   const tier = tierProp ?? contextTier
-  const effectiveTier = tier === 'premium' ? 'standard' : tier
+
 
   const [size, setSize] = useState<Size>('md')
   const [checked, setChecked] = useState(false)
@@ -1010,7 +1011,7 @@ function PlaygroundSection({ tier: tierProp }: { tier: Tier }) {
   const [motion, setMotion] = useState<0 | 1 | 2 | 3>(3)
   const [copyStatus, setCopyStatus] = useState('')
 
-  const CheckboxComponent = effectiveTier === 'lite' ? LiteCheckbox : Checkbox
+  const CheckboxComponent = tier === 'premium' ? PremiumCheckbox : tier === 'lite' ? LiteCheckbox : Checkbox
 
   const reactCode = useMemo(
     () => generateReactCode(tier, size, label, checked, indeterminate, disabled, error, motion),
@@ -1060,7 +1061,7 @@ function PlaygroundSection({ tier: tierProp }: { tier: Tier }) {
 
   const previewProps: Record<string, unknown> = { size }
 
-  if (effectiveTier === 'lite') {
+  if (tier === 'lite') {
     // Lite tier — minimal props
     if (label) previewProps.label = label
     if (disabled) previewProps.disabled = disabled
@@ -1134,7 +1135,7 @@ function PlaygroundSection({ tier: tierProp }: { tier: Tier }) {
         <div className="checkbox-page__playground-controls">
           <OptionGroup label="Size" options={SIZES} value={size} onChange={setSize} />
 
-          {effectiveTier !== 'lite' && (
+          {tier !== 'lite' && (
             <OptionGroup
               label="Motion"
               options={['0', '1', '2', '3'] as const}
@@ -1147,12 +1148,12 @@ function PlaygroundSection({ tier: tierProp }: { tier: Tier }) {
             <span className="checkbox-page__control-label">Toggles</span>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.375rem' }}>
               <Toggle label="Checked" checked={checked} onChange={setChecked} />
-              {effectiveTier !== 'lite' && <Toggle label="Indeterminate" checked={indeterminate} onChange={setIndeterminate} />}
+              {tier !== 'lite' && <Toggle label="Indeterminate" checked={indeterminate} onChange={setIndeterminate} />}
               <Toggle label="Disabled" checked={disabled} onChange={setDisabled} />
             </div>
           </div>
 
-          {effectiveTier !== 'lite' && (
+          {tier !== 'lite' && (
             <div className="checkbox-page__control-group">
               <span className="checkbox-page__control-label">Error</span>
               <input
@@ -1187,12 +1188,12 @@ export default function CheckboxPage() {
   useStyles('checkbox-page', pageStyles)
 
   const { tier, setTier } = useTier()
-  const effectiveTier = tier === 'premium' ? 'standard' : tier
+
   const [brandColor, setBrandColor] = useState('#6366f1')
   const pageRef = useRef<HTMLDivElement>(null)
   const { mode } = useTheme()
 
-  const CheckboxComponent = effectiveTier === 'lite' ? LiteCheckbox : Checkbox
+  const CheckboxComponent = tier === 'premium' ? PremiumCheckbox : tier === 'lite' ? LiteCheckbox : Checkbox
 
   const themeTokens = useMemo(() => {
     try {
@@ -1262,8 +1263,8 @@ export default function CheckboxPage() {
           stroke-draw animation.
         </p>
         <div className="checkbox-page__import-row">
-          <code className="checkbox-page__import-code">{IMPORT_STRINGS[effectiveTier]}</code>
-          <CopyButton text={IMPORT_STRINGS[effectiveTier]} />
+          <code className="checkbox-page__import-code">{IMPORT_STRINGS[tier]}</code>
+          <CopyButton text={IMPORT_STRINGS[tier]} />
         </div>
       </div>
 
@@ -1308,7 +1309,7 @@ export default function CheckboxPage() {
             <CheckboxComponent label="Checked" defaultChecked />
             <span className="checkbox-page__state-label">Checked</span>
           </div>
-          {effectiveTier !== 'lite' && (
+          {tier !== 'lite' && (
             <div className="checkbox-page__state-cell">
               <Checkbox label="Indeterminate" indeterminate />
               <span className="checkbox-page__state-label">Indeterminate</span>
@@ -1322,7 +1323,7 @@ export default function CheckboxPage() {
             <CheckboxComponent label="Disabled checked" disabled defaultChecked />
             <span className="checkbox-page__state-label">Disabled + Checked</span>
           </div>
-          {effectiveTier !== 'lite' && (
+          {tier !== 'lite' && (
             <div className="checkbox-page__state-cell">
               <Checkbox label="With error" error="Required field" />
               <span className="checkbox-page__state-label">Error</span>
@@ -1356,7 +1357,7 @@ export default function CheckboxPage() {
         </div>
 
         {/* Description / Error */}
-        {effectiveTier !== 'lite' && (
+        {tier !== 'lite' && (
           <div style={{ marginBlockEnd: '1.5rem' }}>
             <h3 style={{ fontSize: 'var(--text-sm)', fontWeight: 600, color: 'var(--text-primary)', marginBlockEnd: '0.75rem' }}>
               Error Validation
@@ -1372,7 +1373,7 @@ export default function CheckboxPage() {
         )}
 
         {/* Indeterminate */}
-        {effectiveTier !== 'lite' && (
+        {tier !== 'lite' && (
           <div>
             <h3 style={{ fontSize: 'var(--text-sm)', fontWeight: 600, color: 'var(--text-primary)', marginBlockEnd: '0.75rem' }}>
               Indeterminate
@@ -1474,27 +1475,27 @@ export default function CheckboxPage() {
             </div>
           </div>
 
-          {/* Premium — maps to Standard */}
+          {/* Premium */}
           <div
             className={`checkbox-page__tier-card${tier === 'premium' ? ' checkbox-page__tier-card--active' : ''}`}
-            onClick={() => setTier('standard')}
+            onClick={() => setTier('premium')}
             role="button"
             tabIndex={0}
-            onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setTier('standard') } }}
+            onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setTier('premium') } }}
           >
             <div className="checkbox-page__tier-header">
               <span className="checkbox-page__tier-name">Premium</span>
-              <span className="checkbox-page__tier-size">~1.8 KB</span>
+              <span className="checkbox-page__tier-size">~2.0 KB</span>
             </div>
             <p className="checkbox-page__tier-desc">
-              Same as Standard — Checkbox does not have a separate premium tier.
-              Selecting Premium uses the Standard implementation.
+              Spring-scale pop animation on check, brand-colored glow when checked,
+              and motion-level-aware degradation. Wraps Standard with premium CSS layer.
             </p>
             <div className="checkbox-page__tier-import">
-              import {'{'} Checkbox {'}'} from '@annondeveloper/ui-kit'
+              import {'{'} Checkbox {'}'} from '@annondeveloper/ui-kit/premium'
             </div>
             <div className="checkbox-page__tier-preview">
-              <Checkbox label="Standard" defaultChecked />
+              <PremiumCheckbox label="Premium" defaultChecked />
             </div>
           </div>
         </div>

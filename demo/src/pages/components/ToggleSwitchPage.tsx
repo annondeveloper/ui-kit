@@ -5,6 +5,7 @@ import { css } from '@ui/core/styles/css-tag'
 import { useStyles } from '@ui/core/styles/use-styles'
 import { ToggleSwitch } from '@ui/components/toggle-switch'
 import { ToggleSwitch as LiteToggleSwitch } from '@ui/lite/toggle-switch'
+import { ToggleSwitch as PremiumToggleSwitch } from '@ui/premium/toggle-switch'
 import { Button } from '@ui/components/button'
 import { Card } from '@ui/components/card'
 import { CopyBlock } from '@ui/domain/copy-block'
@@ -780,7 +781,7 @@ const SIZES: Size[] = ['xs', 'sm', 'md', 'lg', 'xl']
 const IMPORT_STRINGS: Record<Tier, string> = {
   lite: "import { ToggleSwitch } from '@annondeveloper/ui-kit/lite'",
   standard: "import { ToggleSwitch } from '@annondeveloper/ui-kit'",
-  premium: "import { ToggleSwitch } from '@annondeveloper/ui-kit'",
+  premium: "import { ToggleSwitch } from '@annondeveloper/ui-kit/premium'",
 }
 
 const COLOR_PRESETS = [
@@ -1028,7 +1029,7 @@ function PlaygroundSection({ tier: tierProp }: { tier: Tier }) {
   const [motion, setMotion] = useState<0 | 1 | 2 | 3>(3)
   const [copyStatus, setCopyStatus] = useState('')
 
-  const SwitchComponent = tier === 'lite' ? LiteToggleSwitch : ToggleSwitch
+  const SwitchComponent = tier === 'premium' ? PremiumToggleSwitch : tier === 'lite' ? LiteToggleSwitch : ToggleSwitch
 
   const reactCode = useMemo(
     () => generateReactCode(tier, size, checked, disabled, labelText, motion),
@@ -1189,8 +1190,6 @@ export default function ToggleSwitchPage() {
   const pageRef = useRef<HTMLDivElement>(null)
   const { mode } = useTheme()
 
-  // No premium tier for ToggleSwitch — clamp to standard
-  const effectiveTier = tier === 'premium' ? 'standard' : tier
 
   const themeTokens = useMemo(() => {
     try {
@@ -1249,7 +1248,7 @@ export default function ToggleSwitchPage() {
     return () => observer.disconnect()
   }, [])
 
-  const SwitchComponent = effectiveTier === 'lite' ? LiteToggleSwitch : ToggleSwitch
+  const SwitchComponent = tier === 'premium' ? PremiumToggleSwitch : tier === 'lite' ? LiteToggleSwitch : ToggleSwitch
 
   return (
     <div className="toggle-switch-page" ref={pageRef} style={themeStyle}>
@@ -1261,13 +1260,13 @@ export default function ToggleSwitchPage() {
           and full accessibility. Ships in two weight tiers from a CSS-only lite to a full-featured standard.
         </p>
         <div className="toggle-switch-page__import-row">
-          <code className="toggle-switch-page__import-code">{IMPORT_STRINGS[effectiveTier]}</code>
-          <CopyButton text={IMPORT_STRINGS[effectiveTier]} />
+          <code className="toggle-switch-page__import-code">{IMPORT_STRINGS[tier]}</code>
+          <CopyButton text={IMPORT_STRINGS[tier]} />
         </div>
       </div>
 
       {/* ── 2. Live Playground ──────────────────────────── */}
-      <PlaygroundSection tier={effectiveTier} />
+      <PlaygroundSection tier={tier} />
 
       {/* ── 3. Size Scale ───────────────────────────────── */}
       <section className="toggle-switch-page__section" id="sizes">
@@ -1280,7 +1279,7 @@ export default function ToggleSwitchPage() {
         </p>
         <div className="toggle-switch-page__preview">
           <div className="toggle-switch-page__labeled-row" style={{ alignItems: 'center' }}>
-            {effectiveTier === 'lite' ? (
+            {tier === 'lite' ? (
               <div className="toggle-switch-page__labeled-item">
                 <LiteToggleSwitch label="Default size" />
                 <span className="toggle-switch-page__item-label">default</span>
@@ -1322,14 +1321,14 @@ export default function ToggleSwitchPage() {
             <SwitchComponent label="Disabled on" defaultChecked disabled />
             <span className="toggle-switch-page__state-label">Disabled (on)</span>
           </div>
-          {effectiveTier !== 'lite' && (
+          {tier !== 'lite' && (
             <div className="toggle-switch-page__state-cell">
               <ToggleSwitch label="Focus me" />
               <span className="toggle-switch-page__state-label">Focus</span>
               <span className="toggle-switch-page__state-hint">press Tab key</span>
             </div>
           )}
-          {effectiveTier !== 'lite' && (
+          {tier !== 'lite' && (
             <div className="toggle-switch-page__state-cell">
               <ToggleSwitch label="Error" error="Required field" />
               <span className="toggle-switch-page__state-label">Error</span>
@@ -1364,7 +1363,7 @@ export default function ToggleSwitchPage() {
           </div>
 
           {/* Error state */}
-          {effectiveTier !== 'lite' && (
+          {tier !== 'lite' && (
             <div>
               <p style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-tertiary)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBlockEnd: '0.5rem' }}>
                 Error State
@@ -1374,7 +1373,7 @@ export default function ToggleSwitchPage() {
           )}
 
           {/* Motion levels */}
-          {effectiveTier !== 'lite' && (
+          {tier !== 'lite' && (
             <div>
               <p style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-tertiary)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBlockEnd: '0.5rem' }}>
                 Motion Levels
@@ -1408,14 +1407,13 @@ export default function ToggleSwitchPage() {
           <a href="#tiers">Weight Tiers</a>
         </h2>
         <p className="toggle-switch-page__section-desc">
-          Choose the right balance of features and bundle size. ToggleSwitch ships in two tiers.
-          Premium tier maps to Standard for this component.
+          Choose the right balance of features and bundle size. ToggleSwitch ships in three tiers.
         </p>
 
-        <div className="toggle-switch-page__tiers" style={{ gridTemplateColumns: 'repeat(2, 1fr)' }}>
+        <div className="toggle-switch-page__tiers" style={{ gridTemplateColumns: 'repeat(3, 1fr)' }}>
           {/* Lite */}
           <div
-            className={`toggle-switch-page__tier-card${effectiveTier === 'lite' ? ' toggle-switch-page__tier-card--active' : ''}`}
+            className={`toggle-switch-page__tier-card${tier === 'lite' ? ' toggle-switch-page__tier-card--active' : ''}`}
             onClick={() => setTier('lite')}
             role="button"
             tabIndex={0}
@@ -1446,7 +1444,7 @@ export default function ToggleSwitchPage() {
 
           {/* Standard */}
           <div
-            className={`toggle-switch-page__tier-card${effectiveTier === 'standard' ? ' toggle-switch-page__tier-card--active' : ''}`}
+            className={`toggle-switch-page__tier-card${tier === 'standard' ? ' toggle-switch-page__tier-card--active' : ''}`}
             onClick={() => setTier('standard')}
             role="button"
             tabIndex={0}
@@ -1471,6 +1469,37 @@ export default function ToggleSwitchPage() {
                 <span>Component: <strong style={{ color: 'var(--text-primary)' }}>1.5 KB</strong></span>
                 <span>+ Shared: <strong style={{ color: 'var(--text-primary)' }}>0.9 KB</strong></span>
                 <span>= <strong style={{ color: 'var(--brand)' }}>2.4 KB</strong> gzip</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Premium */}
+          <div
+            className={`toggle-switch-page__tier-card${tier === 'premium' ? ' toggle-switch-page__tier-card--active' : ''}`}
+            onClick={() => setTier('premium')}
+            role="button"
+            tabIndex={0}
+            onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setTier('premium') } }}
+          >
+            <div className="toggle-switch-page__tier-header">
+              <span className="toggle-switch-page__tier-name">Premium</span>
+              <span className="toggle-switch-page__tier-size">~1.7 KB</span>
+            </div>
+            <p className="toggle-switch-page__tier-desc">
+              Spring-bounce thumb animation on toggle, brand glow trail behind thumb
+              when checked, and motion-level-aware degradation. Wraps Standard with premium CSS layer.
+            </p>
+            <div className="toggle-switch-page__tier-import">
+              import {'{'} ToggleSwitch {'}'} from '@annondeveloper/ui-kit/premium'
+            </div>
+            <div className="toggle-switch-page__tier-preview">
+              <PremiumToggleSwitch label="Premium" size="md" defaultChecked />
+            </div>
+            <div className="toggle-switch-page__size-breakdown">
+              <div className="toggle-switch-page__size-row">
+                <span>Component: <strong style={{ color: 'var(--text-primary)' }}>1.7 KB</strong></span>
+                <span>+ Shared: <strong style={{ color: 'var(--text-primary)' }}>0.9 KB</strong></span>
+                <span>= <strong style={{ color: 'var(--brand)' }}>2.6 KB</strong> gzip</span>
               </div>
             </div>
           </div>
@@ -1517,7 +1546,7 @@ export default function ToggleSwitchPage() {
           <div className="toggle-switch-page__preview" style={{ gap: '1.5rem' }}>
             <SwitchComponent label="Off state" />
             <SwitchComponent label="On state" defaultChecked />
-            {effectiveTier !== 'lite' && (
+            {tier !== 'lite' && (
               <>
                 <ToggleSwitch label="Large" size="lg" defaultChecked />
                 <ToggleSwitch label="Small" size="sm" defaultChecked />
