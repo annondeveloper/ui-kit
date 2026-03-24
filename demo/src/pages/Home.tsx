@@ -1,4 +1,4 @@
-import { Link} from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import { Button } from '@ui/components/button'
 import { Card } from '@ui/components/card'
 import { Badge } from '@ui/components/badge'
@@ -290,6 +290,178 @@ const homeStyles = css`
       line-height: 1.5;
     }
 
+    /* ─── Component Gallery ─── */
+    .home-gallery-group {
+      margin-block-end: 2rem;
+    }
+
+    .home-gallery-group-header {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-block-end: 0.75rem;
+      padding-block-end: 0.5rem;
+      border-block-end: 1px solid var(--border-subtle, oklch(100% 0 0 / 0.08));
+    }
+
+    .home-gallery-group-icon {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 1.75rem;
+      height: 1.75rem;
+      border-radius: var(--radius-sm, 0.25rem);
+      background: oklch(55% 0.15 270 / 0.1);
+      color: var(--brand, oklch(70% 0.18 270));
+    }
+
+    .home-gallery-group-title {
+      font-size: var(--text-md, 1rem);
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+
+    .home-gallery-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 0.75rem;
+    }
+
+    .home-gallery-card {
+      display: flex;
+      flex-direction: column;
+      gap: 0.375rem;
+      padding: 1rem 1.125rem;
+      text-decoration: none;
+      color: inherit;
+      border-radius: var(--radius-md, 0.5rem);
+      background: var(--bg-surface, oklch(20% 0 0));
+      border: 1px solid var(--border-subtle, oklch(100% 0 0 / 0.08));
+      transition: border-color 0.2s, background 0.2s, transform 0.15s;
+    }
+    .home-gallery-card:hover {
+      border-color: var(--brand, oklch(70% 0.18 270));
+      background: oklch(100% 0 0 / 0.03);
+      transform: translateY(-1px);
+    }
+    .home-gallery-card--disabled {
+      opacity: 0.45;
+      pointer-events: none;
+      cursor: default;
+    }
+    .home-gallery-card--disabled:hover {
+      border-color: var(--border-subtle, oklch(100% 0 0 / 0.08));
+      background: var(--bg-surface, oklch(20% 0 0));
+      transform: none;
+    }
+
+    .home-gallery-card-top {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .home-gallery-card-name {
+      font-size: var(--text-sm, 0.875rem);
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .home-gallery-card-tiers {
+      display: flex;
+      gap: 0.25rem;
+      margin-inline-start: auto;
+    }
+
+    .home-gallery-tier {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 1.25rem;
+      height: 1.25rem;
+      border-radius: var(--radius-sm, 0.25rem);
+      font-size: 0.5625rem;
+      font-weight: 700;
+      line-height: 1;
+    }
+    .home-gallery-tier--L {
+      background: oklch(70% 0.12 150 / 0.15);
+      color: oklch(75% 0.15 150);
+    }
+    .home-gallery-tier--S {
+      background: oklch(65% 0.12 250 / 0.15);
+      color: oklch(70% 0.15 250);
+    }
+    .home-gallery-tier--P {
+      background: oklch(65% 0.15 310 / 0.15);
+      color: oklch(72% 0.18 310);
+    }
+
+    .home-gallery-card-desc {
+      font-size: var(--text-xs, 0.75rem);
+      color: var(--text-tertiary);
+      line-height: 1.5;
+    }
+
+    /* ─── Getting Started ─── */
+    .home-getting-started {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1rem;
+    }
+
+    .home-tier-card {
+      padding: 1.5rem;
+      border-radius: var(--radius-md, 0.5rem);
+      background: var(--bg-surface, oklch(20% 0 0));
+      border: 1px solid var(--border-subtle, oklch(100% 0 0 / 0.08));
+    }
+
+    .home-tier-card-header {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-block-end: 0.375rem;
+    }
+
+    .home-tier-card-title {
+      font-size: var(--text-md, 1rem);
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+
+    .home-tier-card-desc {
+      font-size: var(--text-sm, 0.875rem);
+      color: var(--text-secondary);
+      line-height: 1.5;
+      margin-block-end: 1rem;
+    }
+
+    .home-tier-card-code {
+      font-size: var(--text-xs, 0.75rem);
+      font-family: monospace;
+      padding: 0.625rem 0.875rem;
+      border-radius: var(--radius-sm, 0.25rem);
+      background: oklch(10% 0 0 / 0.5);
+      color: var(--text-secondary);
+      overflow-x: auto;
+      white-space: nowrap;
+    }
+
+    /* ─── Hero Preview Strip ─── */
+    .home-hero-preview {
+      display: flex;
+      gap: 0.75rem;
+      justify-content: center;
+      align-items: center;
+      flex-wrap: wrap;
+      margin-block-start: 2rem;
+      padding: 1rem;
+      border-radius: var(--radius-md, 0.5rem);
+      background: oklch(100% 0 0 / 0.02);
+      border: 1px solid var(--border-subtle, oklch(100% 0 0 / 0.06));
+    }
+
     /* ─── Footer ─── */
     .home-footer {
       display: flex;
@@ -366,6 +538,88 @@ const categories: { name: string; count: number; path: string; desc: string }[] 
   { name: 'Navigation', count: 7, path: '/core', desc: 'Tabs, Breadcrumbs, Navbar...' },
 ]
 
+// ─── Component Gallery Data ──────────────────────────────────────────────────
+type TierBadge = 'L' | 'S' | 'P'
+
+interface GalleryItem {
+  name: string
+  desc: string
+  path: string | null
+  tiers: TierBadge[]
+}
+
+interface GalleryGroup {
+  label: string
+  icon: IconName
+  items: GalleryItem[]
+}
+
+const galleryGroups: GalleryGroup[] = [
+  {
+    label: 'Primitives',
+    icon: 'code',
+    items: [
+      { name: 'Button', desc: 'Actions with variants, sizes, icons, loading states', path: '/components/button', tiers: ['L', 'S', 'P'] },
+      { name: 'Badge', desc: 'Status indicators, counts, and labels', path: '/components/badge', tiers: ['L', 'S', 'P'] },
+      { name: 'Card', desc: 'Versatile container with header, body, footer', path: '/components/card', tiers: ['L', 'S', 'P'] },
+      { name: 'Avatar', desc: 'User images with fallback initials', path: null, tiers: ['L', 'S'] },
+      { name: 'Divider', desc: 'Visual separation between content areas', path: null, tiers: ['L'] },
+      { name: 'Skeleton', desc: 'Animated loading placeholders', path: null, tiers: ['L', 'S'] },
+    ],
+  },
+  {
+    label: 'Forms',
+    icon: 'edit',
+    items: [
+      { name: 'Select', desc: 'Dropdown selection with search, multi-select', path: '/components/select', tiers: ['L', 'S', 'P'] },
+      { name: 'Checkbox', desc: 'Binary toggle with indeterminate state', path: '/components/checkbox', tiers: ['L', 'S', 'P'] },
+      { name: 'ToggleSwitch', desc: 'On/off switch with animated thumb', path: '/components/toggle-switch', tiers: ['L', 'S', 'P'] },
+      { name: 'Slider', desc: 'Range input with marks and tooltips', path: null, tiers: ['L', 'S', 'P'] },
+      { name: 'RadioGroup', desc: 'Single selection from a set', path: null, tiers: ['L', 'S'] },
+      { name: 'DatePicker', desc: 'Calendar-based date selection', path: null, tiers: ['S', 'P'] },
+      { name: 'ComboBox', desc: 'Filterable dropdown with autocomplete', path: null, tiers: ['S', 'P'] },
+      { name: 'TagInput', desc: 'Multi-value input with tag chips', path: null, tiers: ['S', 'P'] },
+      { name: 'FileUpload', desc: 'Drag and drop file uploader', path: null, tiers: ['S', 'P'] },
+      { name: 'Rating', desc: 'Star or custom icon rating input', path: null, tiers: ['L', 'S'] },
+    ],
+  },
+  {
+    label: 'Overlays',
+    icon: 'menu',
+    items: [
+      { name: 'Dialog', desc: 'Modal dialogs with focus trapping', path: '/components/dialog', tiers: ['L', 'S', 'P'] },
+      { name: 'Drawer', desc: 'Slide-out panel from any edge', path: '/components/drawer', tiers: ['L', 'S', 'P'] },
+      { name: 'Tooltip', desc: 'Contextual info on hover or focus', path: '/components/tooltip', tiers: ['L', 'S', 'P'] },
+      { name: 'Alert', desc: 'Inline status messages and banners', path: '/components/alert', tiers: ['L', 'S', 'P'] },
+      { name: 'Sheet', desc: 'Bottom sheet for mobile interfaces', path: null, tiers: ['S', 'P'] },
+      { name: 'Popover', desc: 'Anchored floating content panels', path: null, tiers: ['S', 'P'] },
+      { name: 'DropdownMenu', desc: 'Contextual action menus', path: null, tiers: ['S', 'P'] },
+    ],
+  },
+  {
+    label: 'Navigation',
+    icon: 'arrow-right',
+    items: [
+      { name: 'Tabs', desc: 'Tabbed content with keyboard navigation', path: '/components/tabs', tiers: ['L', 'S', 'P'] },
+      { name: 'Accordion', desc: 'Collapsible content sections', path: '/components/accordion', tiers: ['L', 'S', 'P'] },
+      { name: 'Breadcrumbs', desc: 'Hierarchical navigation trail', path: null, tiers: ['L', 'S'] },
+      { name: 'Pagination', desc: 'Page navigation controls', path: null, tiers: ['L', 'S'] },
+      { name: 'Navbar', desc: 'Top-level application navigation', path: null, tiers: ['S', 'P'] },
+      { name: 'Sidebar', desc: 'Collapsible side navigation', path: null, tiers: ['S', 'P'] },
+    ],
+  },
+  {
+    label: 'Data',
+    icon: 'bar-chart',
+    items: [
+      { name: 'DataTable', desc: 'Sortable, filterable data grids', path: '/components/data-table', tiers: ['L', 'S', 'P'] },
+      { name: 'MetricCard', desc: 'KPI display with sparklines and trends', path: '/components/metric-card', tiers: ['L', 'S', 'P'] },
+      { name: 'UpstreamDashboard', desc: 'Real-time service monitoring layout', path: '/components/upstream-dashboard', tiers: ['P'] },
+      { name: 'Progress', desc: 'Linear and circular progress indicators', path: '/components/progress', tiers: ['L', 'S', 'P'] },
+    ],
+  },
+]
+
 const motionLevels: { level: 0 | 1 | 2 | 3; label: string; desc: string }[] = [
   { level: 0, label: 'None', desc: 'Instant transitions. Respects prefers-reduced-motion.' },
   { level: 1, label: 'Subtle', desc: 'Simple CSS easing. Gentle fades and slides.' },
@@ -402,13 +656,15 @@ export default function Home() {
           The component library<br />that needs nothing else
         </h1>
         <p className={cls('home-hero-sub')}>
-          77 components. Physics-based animations. OKLCH color system.
-          Aurora Fluid design language. Built entirely from scratch.
+          99 components. Physics-based animations. OKLCH color system.
+          Aurora Fluid design language. 3 weight tiers. Built entirely from scratch.
         </p>
         <div className={cls('home-hero-actions')}>
-          <Button variant="primary" size="lg" icon={<Icon name="zap" size="sm" />}>
-            Get Started
-          </Button>
+          <Link to="/components/button" style={{ textDecoration: 'none' }}>
+            <Button variant="primary" size="lg" icon={<Icon name="zap" size="sm" />}>
+              Explore Components
+            </Button>
+          </Link>
           <Button
             variant="secondary"
             size="lg"
@@ -419,29 +675,40 @@ export default function Home() {
           </Button>
         </div>
 
+        {/* Live Preview Strip */}
+        <div className={cls('home-hero-preview')}>
+          <Button variant="primary" size="sm">Primary</Button>
+          <Button variant="secondary" size="sm">Secondary</Button>
+          <Badge variant="primary" size="sm">New</Badge>
+          <Badge variant="default" size="sm">v2.0</Badge>
+          <StatusBadge status="ok" label="Healthy" pulse />
+          <StatusBadge status="warning" label="Degraded" />
+          <StatusPulse status="ok" size="sm" />
+        </div>
+
         {/* Stats Bar */}
         <div className={cls('home-stats')}>
           <div className={cls('home-stat')}>
             <span className={cls('home-stat-value')}>
-              <AnimatedCounter value={77} />
+              <AnimatedCounter value={99} />
             </span>
             <span className={cls('home-stat-label')}>Components</span>
           </div>
           <div className={cls('home-stat')}>
             <span className={cls('home-stat-value')}>
-              <AnimatedCounter value={2895} />
+              <AnimatedCounter value={75} />
             </span>
-            <span className={cls('home-stat-label')}>Tests</span>
+            <span className={cls('home-stat-label')}>Lite Tier</span>
           </div>
           <div className={cls('home-stat')}>
             <span className={cls('home-stat-value')}>
-              <AnimatedCounter value={0} />
+              <AnimatedCounter value={14} />
             </span>
-            <span className={cls('home-stat-label')}>Dependencies</span>
+            <span className={cls('home-stat-label')}>Premium</span>
           </div>
           <div className={cls('home-stat')}>
-            <span className={cls('home-stat-value')}>~100 KB</span>
-            <span className={cls('home-stat-label')}>Gzipped</span>
+            <span className={cls('home-stat-value')}>3</span>
+            <span className={cls('home-stat-label')}>Weight Tiers</span>
           </div>
         </div>
       </section>
@@ -531,7 +798,7 @@ export default function Home() {
       {/* ── Section 4: Component Categories ── */}
       <section className={cls('home-section')}>
         <div className={cls('home-section-header')}>
-          <h2>77 components, 8 categories</h2>
+          <h2>99 components, 8 categories</h2>
           <p>
             From primitives to domain-specific widgets -- everything you need
             in a single import.
@@ -551,7 +818,115 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ── Section 5: Code Example ── */}
+      {/* ── Section 5: Component Gallery ── */}
+      <section className={cls('home-section')}>
+        <div className={cls('home-section-header')}>
+          <h2>Component Gallery</h2>
+          <p>
+            Interactive demo pages for every component. Each one shows all weight tiers,
+            sizes, variants, and accessibility features.
+          </p>
+        </div>
+
+        {galleryGroups.map((group) => (
+          <div key={group.label} className={cls('home-gallery-group')}>
+            <div className={cls('home-gallery-group-header')}>
+              <span className={cls('home-gallery-group-icon')}>
+                <Icon name={group.icon} size={14} />
+              </span>
+              <span className={cls('home-gallery-group-title')}>{group.label}</span>
+            </div>
+            <div className={cls('home-gallery-grid')}>
+              {group.items.map((item) =>
+                item.path ? (
+                  <Link
+                    key={item.name}
+                    to={item.path}
+                    className={cls('home-gallery-card')}
+                  >
+                    <div className={cls('home-gallery-card-top')}>
+                      <span className={cls('home-gallery-card-name')}>{item.name}</span>
+                      <span className={cls('home-gallery-card-tiers')}>
+                        {item.tiers.map((t) => (
+                          <span key={t} className={cls(`home-gallery-tier home-gallery-tier--${t}`)}>{t}</span>
+                        ))}
+                      </span>
+                    </div>
+                    <span className={cls('home-gallery-card-desc')}>{item.desc}</span>
+                  </Link>
+                ) : (
+                  <div
+                    key={item.name}
+                    className={cls('home-gallery-card home-gallery-card--disabled')}
+                  >
+                    <div className={cls('home-gallery-card-top')}>
+                      <span className={cls('home-gallery-card-name')}>{item.name}</span>
+                      <span className={cls('home-gallery-card-tiers')}>
+                        {item.tiers.map((t) => (
+                          <span key={t} className={cls(`home-gallery-tier home-gallery-tier--${t}`)}>{t}</span>
+                        ))}
+                      </span>
+                    </div>
+                    <span className={cls('home-gallery-card-desc')}>{item.desc}</span>
+                  </div>
+                )
+              )}
+            </div>
+          </div>
+        ))}
+      </section>
+
+      {/* ── Section 6: Getting Started ── */}
+      <section className={cls('home-section')}>
+        <div className={cls('home-section-header')}>
+          <h2>Getting Started</h2>
+          <p>
+            Choose the weight tier that fits your project. Lite ships the smallest bundle,
+            Premium unlocks every feature.
+          </p>
+        </div>
+
+        <div className={cls('home-getting-started')}>
+          <div className={cls('home-tier-card')}>
+            <div className={cls('home-tier-card-header')}>
+              <Badge variant="default" size="sm">Lite</Badge>
+              <span className={cls('home-tier-card-title')}>75 components</span>
+            </div>
+            <p className={cls('home-tier-card-desc')}>
+              Core primitives, forms, and data display. Minimal bundle for production apps.
+            </p>
+            <div className={cls('home-tier-card-code')}>
+              npm install @annondeveloper/ui-kit
+            </div>
+          </div>
+          <div className={cls('home-tier-card')}>
+            <div className={cls('home-tier-card-header')}>
+              <Badge variant="primary" size="sm">Standard</Badge>
+              <span className={cls('home-tier-card-title')}>89 components</span>
+            </div>
+            <p className={cls('home-tier-card-desc')}>
+              Everything in Lite plus overlays, navigation, advanced forms, and more animations.
+            </p>
+            <div className={cls('home-tier-card-code')}>
+              npm install @annondeveloper/ui-kit
+            </div>
+          </div>
+          <div className={cls('home-tier-card')}>
+            <div className={cls('home-tier-card-header')}>
+              <Badge variant="primary" size="sm" style={{ background: 'oklch(65% 0.18 310)' }}>Premium</Badge>
+              <span className={cls('home-tier-card-title')}>99 components</span>
+            </div>
+            <p className={cls('home-tier-card-desc')}>
+              Full library with monitoring dashboards, AI components, cinematic physics, and domain widgets.
+            </p>
+            <div className={cls('home-tier-card-code')}>
+              npm install @annondeveloper/ui-kit
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ── Section 7: Code Example ── */}
       <section className={cls('home-section')}>
         <div className={cls('home-section-header')}>
           <h2>Simple to use</h2>
@@ -568,7 +943,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ── Section 6: Motion Levels ── */}
+      {/* ── Section 8: Motion Levels ── */}
       <section className={cls('home-section')}>
         <div className={cls('home-section-header')}>
           <h2>4 motion levels</h2>
@@ -596,7 +971,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ── Section 7: Footer ── */}
+      {/* ── Section 9: Footer ── */}
       <footer className={cls('home-footer')}>
         <a href="https://github.com/annondeveloper/ui-kit" target="_blank" rel="noopener noreferrer">
           GitHub

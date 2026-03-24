@@ -27,6 +27,88 @@ const pages: { path: string; label: string; icon: IconName }[] = [
   { path: '/docs', label: 'Documentation', icon: 'file' },
 ]
 
+// ─── Component Sidebar Groups ─────────────────────────────────────────────────
+interface ComponentEntry {
+  name: string
+  path: string | null // null = no page yet (dimmed)
+}
+
+interface ComponentGroup {
+  label: string
+  icon: IconName
+  items: ComponentEntry[]
+}
+
+const componentGroups: ComponentGroup[] = [
+  {
+    label: 'Primitives',
+    icon: 'code',
+    items: [
+      { name: 'Button', path: '/components/button' },
+      { name: 'Badge', path: '/components/badge' },
+      { name: 'Avatar', path: null },
+      { name: 'Card', path: '/components/card' },
+      { name: 'Divider', path: null },
+      { name: 'Skeleton', path: null },
+    ],
+  },
+  {
+    label: 'Forms',
+    icon: 'edit',
+    items: [
+      { name: 'Select', path: '/components/select' },
+      { name: 'Checkbox', path: '/components/checkbox' },
+      { name: 'ToggleSwitch', path: '/components/toggle-switch' },
+      { name: 'Slider', path: null },
+      { name: 'RadioGroup', path: null },
+      { name: 'FormInput', path: null },
+      { name: 'ComboBox', path: null },
+      { name: 'DatePicker', path: null },
+      { name: 'TagInput', path: null },
+      { name: 'OtpInput', path: null },
+      { name: 'FileUpload', path: null },
+      { name: 'ColorInput', path: null },
+      { name: 'SearchInput', path: null },
+      { name: 'Rating', path: null },
+    ],
+  },
+  {
+    label: 'Overlays',
+    icon: 'menu',
+    items: [
+      { name: 'Dialog', path: '/components/dialog' },
+      { name: 'Drawer', path: '/components/drawer' },
+      { name: 'Tooltip', path: '/components/tooltip' },
+      { name: 'Alert', path: '/components/alert' },
+      { name: 'Sheet', path: null },
+      { name: 'Popover', path: null },
+      { name: 'DropdownMenu', path: null },
+    ],
+  },
+  {
+    label: 'Navigation',
+    icon: 'arrow-right',
+    items: [
+      { name: 'Tabs', path: '/components/tabs' },
+      { name: 'Accordion', path: '/components/accordion' },
+      { name: 'Breadcrumbs', path: null },
+      { name: 'Pagination', path: null },
+      { name: 'Navbar', path: null },
+      { name: 'Sidebar', path: null },
+    ],
+  },
+  {
+    label: 'Data',
+    icon: 'bar-chart',
+    items: [
+      { name: 'DataTable', path: '/components/data-table' },
+      { name: 'MetricCard', path: '/components/metric-card' },
+      { name: 'UpstreamDashboard', path: '/components/upstream-dashboard' },
+      { name: 'Progress', path: '/components/progress' },
+    ],
+  },
+]
+
 const layoutStyles = css`
   @layer demo {
     /* ─── Root layout ─── */
@@ -109,6 +191,97 @@ const layoutStyles = css`
       background: var(--brand-subtle);
       color: var(--brand);
       font-weight: 600;
+    }
+
+    /* Component nav section */
+    .site-nav-divider {
+      height: 1px;
+      background: var(--border-subtle);
+      margin-block: 0.5rem;
+    }
+
+    .site-nav-section-label {
+      display: flex;
+      align-items: center;
+      gap: 0.375rem;
+      padding: 0.375rem 0.625rem;
+      font-size: 0.6875rem;
+      font-weight: 700;
+      color: var(--text-tertiary);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      cursor: pointer;
+      border: none;
+      background: none;
+      width: 100%;
+      text-align: start;
+      border-radius: var(--radius-sm);
+      transition: color 0.1s;
+    }
+    .site-nav-section-label:hover {
+      color: var(--text-secondary);
+    }
+    .site-nav-section-chevron {
+      margin-inline-start: auto;
+      transition: transform 0.2s;
+    }
+    .site-nav-section-chevron--open {
+      transform: rotate(90deg);
+    }
+
+    .site-nav-group-label {
+      display: flex;
+      align-items: center;
+      gap: 0.375rem;
+      padding: 0.3125rem 0.625rem 0.3125rem 1rem;
+      font-size: 0.6875rem;
+      font-weight: 600;
+      color: var(--text-tertiary);
+      cursor: pointer;
+      border: none;
+      background: none;
+      width: 100%;
+      text-align: start;
+      border-radius: var(--radius-sm);
+      transition: color 0.1s;
+    }
+    .site-nav-group-label:hover {
+      color: var(--text-secondary);
+    }
+    .site-nav-group-chevron {
+      margin-inline-start: auto;
+      transition: transform 0.15s;
+    }
+    .site-nav-group-chevron--open {
+      transform: rotate(90deg);
+    }
+
+    .site-nav-component-link {
+      display: flex;
+      align-items: center;
+      gap: 0.375rem;
+      padding: 0.25rem 0.625rem 0.25rem 1.75rem;
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+      text-decoration: none;
+      border-radius: var(--radius-sm);
+      transition: background 0.1s, color 0.1s;
+      line-height: 1;
+    }
+    .site-nav-component-link:hover {
+      background: oklch(100% 0 0 / 0.04);
+      color: var(--text-primary);
+    }
+    .site-nav-component-link--active {
+      background: var(--brand-subtle);
+      color: var(--brand);
+      font-weight: 600;
+    }
+    .site-nav-component-link--disabled {
+      color: var(--text-tertiary);
+      opacity: 0.45;
+      pointer-events: none;
+      cursor: default;
     }
 
     /* Sidebar footer with controls */
@@ -261,6 +434,64 @@ const layoutStyles = css`
   }
 `
 
+function ComponentNav({ onClick }: { onClick?: () => void }) {
+  const [sectionOpen, setSectionOpen] = useState(true)
+  const [openGroups, setOpenGroups] = useState<Record<string, boolean>>(() =>
+    Object.fromEntries(componentGroups.map(g => [g.label, true]))
+  )
+
+  const toggleGroup = (label: string) =>
+    setOpenGroups(prev => ({ ...prev, [label]: !prev[label] }))
+
+  return (
+    <>
+      <div className="site-nav-divider" />
+      <button
+        className="site-nav-section-label"
+        onClick={() => setSectionOpen(o => !o)}
+      >
+        <Icon name="code" size={12} />
+        Components
+        <span className={`site-nav-section-chevron${sectionOpen ? ' site-nav-section-chevron--open' : ''}`}>
+          <Icon name="chevron-right" size={10} />
+        </span>
+      </button>
+      {sectionOpen && componentGroups.map(group => (
+        <div key={group.label}>
+          <button
+            className="site-nav-group-label"
+            onClick={() => toggleGroup(group.label)}
+          >
+            <Icon name={group.icon} size={11} />
+            {group.label}
+            <span className={`site-nav-group-chevron${openGroups[group.label] ? ' site-nav-group-chevron--open' : ''}`}>
+              <Icon name="chevron-right" size={9} />
+            </span>
+          </button>
+          {openGroups[group.label] && group.items.map(item =>
+            item.path ? (
+              <NavLink
+                key={item.name}
+                to={item.path}
+                onClick={onClick}
+                className={({ isActive }) =>
+                  `site-nav-component-link${isActive ? ' site-nav-component-link--active' : ''}`
+                }
+              >
+                {item.name}
+              </NavLink>
+            ) : (
+              <span key={item.name} className="site-nav-component-link site-nav-component-link--disabled">
+                {item.name}
+              </span>
+            )
+          )}
+        </div>
+      ))}
+    </>
+  )
+}
+
 function NavLinks({ onClick }: { onClick?: () => void }) {
   return (
     <>
@@ -278,6 +509,7 @@ function NavLinks({ onClick }: { onClick?: () => void }) {
           {p.label}
         </NavLink>
       ))}
+      <ComponentNav onClick={onClick} />
     </>
   )
 }
