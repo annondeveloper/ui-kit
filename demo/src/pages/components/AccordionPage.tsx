@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useMemo, useEffect } from 'react'
+import { useState, useMemo, useEffect, useCallback } from 'react'
 import { css } from '@ui/core/styles/css-tag'
 import { useStyles } from '@ui/core/styles/use-styles'
 import { Accordion } from '@ui/components/accordion'
@@ -836,26 +836,34 @@ function generateReactCode(
   type: 'single' | 'multiple',
   defaultOpen: string[],
   motion: number,
+  showIcons: boolean,
 ): string {
   const importPath = tier === 'lite'
     ? "@annondeveloper/ui-kit/lite"
     : "@annondeveloper/ui-kit"
-  const importStr = `import { Accordion } from '${importPath}'`
+  const imports = [`import { Accordion } from '${importPath}'`]
+  if (showIcons && tier !== 'lite') imports.push(`import { Icon } from '${importPath === "@annondeveloper/ui-kit/lite" ? "@annondeveloper/ui-kit" : importPath}'`)
 
-  const itemsStr = `const items = [
+  const itemsStr = showIcons && tier !== 'lite'
+    ? `const items = [
+  { id: 'item-1', trigger: <><Icon name="info" size={16} /> What is ui-kit?</>, content: 'A zero-dependency React component library...' },
+  { id: 'item-2', trigger: <><Icon name="zap" size={16} /> How small is the bundle?</>, content: 'Core primitives are under 2KB gzip...' },
+  { id: 'item-3', trigger: <><Icon name="shield" size={16} /> Is it accessible?</>, content: 'Every component follows WAI-ARIA APG patterns...' },
+]`
+    : `const items = [
   { id: 'item-1', trigger: 'What is ui-kit?', content: 'A zero-dependency React component library...' },
   { id: 'item-2', trigger: 'How small is the bundle?', content: 'Core primitives are under 2KB gzip...' },
   { id: 'item-3', trigger: 'Is it accessible?', content: 'Every component follows WAI-ARIA APG patterns...' },
 ]`
 
   const props: string[] = ['  items={items}']
-  if (type !== 'multiple') props.push(`  type="${type}"`)
+  if (type !== 'multiple' && tier !== 'lite') props.push(`  type="${type}"`)
   if (defaultOpen.length > 0) props.push(`  defaultOpen={[${defaultOpen.map(d => `'${d}'`).join(', ')}]}`)
   if (motion !== 3 && tier !== 'lite') props.push(`  motion={${motion}}`)
 
   const jsx = `<Accordion\n${props.join('\n')}\n/>`
 
-  return `${importStr}\n\n${itemsStr}\n\n${jsx}`
+  return `${imports.join('\n')}\n\n${itemsStr}\n\n${jsx}`
 }
 
 function generateHtmlCode(tier: Tier, type: 'single' | 'multiple', defaultOpen: string[]): string {
@@ -1012,6 +1020,33 @@ function generateSvelteCode(tier: Tier, type: 'single' | 'multiple'): string {
 
 // ─── Section: Interactive Playground ──────────────────────────────────────────
 
+const ICON_ITEMS = [
+  {
+    id: 'what-is',
+    icon: 'info' as const,
+    trigger: 'What is ui-kit?',
+    content: 'A zero-dependency React component library with 62 components, physics-based animations, OKLCH color system, and Aurora Fluid design identity. Ships in three weight tiers from ultra-light CSS-only to premium with cinematic effects.',
+  },
+  {
+    id: 'bundle-size',
+    icon: 'zap' as const,
+    trigger: 'How small is the bundle?',
+    content: 'Core primitives are under 2KB gzip. The full library is under 85KB JS gzip and 20KB CSS gzip. Each component can be individually imported for optimal tree-shaking.',
+  },
+  {
+    id: 'accessibility',
+    icon: 'shield' as const,
+    trigger: 'Is it accessible?',
+    content: 'Every component follows WAI-ARIA APG patterns, supports keyboard navigation, respects prefers-reduced-motion, meets WCAG AA contrast ratios, and works with forced-colors mode. Touch targets are enforced at 44px minimum.',
+  },
+  {
+    id: 'framework-support',
+    icon: 'settings' as const,
+    trigger: 'Does it work with other frameworks?',
+    content: 'The Lite tier is pure CSS with minimal HTML and works in Vue, Angular, Svelte, or plain HTML. Standard and Premium tiers are React 19 components with optional CSS-only fallbacks for non-React projects.',
+  },
+]
+
 function PlaygroundSection({ tier: tierProp }: { tier: Tier }) {
   const { tier: contextTier } = useTier()
   const tier = tierProp ?? contextTier
@@ -1019,14 +1054,34 @@ function PlaygroundSection({ tier: tierProp }: { tier: Tier }) {
   const [type, setType] = useState<'single' | 'multiple'>('multiple')
   const [motion, setMotion] = useState<0 | 1 | 2 | 3>(3)
   const [defaultOpen, setDefaultOpen] = useState<string[]>(['what-is'])
+  const [showIcons, setShowIcons] = useState(false)
+  const [collapsible, setCollapsible] = useState(true)
   const [copyStatus, setCopyStatus] = useState('')
 
-  const playgroundItems = FAQ_ITEMS.slice(0, 4)
+  const playgroundItems = useMemo(() => {
+    const base = ICON_ITEMS
+    if (showIcons && effectiveTier !== 'lite') {
+      return base.map(item => ({
+        id: item.id,
+        trigger: (
+          <span style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+            <Icon name={item.icon} size={16} /> {item.trigger}
+          </span>
+        ),
+        content: item.content,
+      }))
+    }
+    return base.map(item => ({
+      id: item.id,
+      trigger: item.trigger,
+      content: item.content,
+    }))
+  }, [showIcons, effectiveTier])
   const AccordionComponent = effectiveTier === 'lite' ? LiteAccordion : Accordion
 
   const reactCode = useMemo(
-    () => generateReactCode(effectiveTier, type, defaultOpen, motion),
-    [effectiveTier, type, defaultOpen, motion],
+    () => generateReactCode(effectiveTier, type, defaultOpen, motion, showIcons),
+    [effectiveTier, type, defaultOpen, motion, showIcons],
   )
 
   const htmlCode = useMemo(
@@ -1070,8 +1125,14 @@ function PlaygroundSection({ tier: tierProp }: { tier: Tier }) {
     }
   }, [activeCodeTab, reactCode, htmlCode, vueCode, angularCode, svelteCode])
 
+  const handleOpenChange = useCallback((openIds: string[]) => {
+    if (!collapsible && openIds.length === 0) return
+    setDefaultOpen(openIds)
+  }, [collapsible])
+
   const accordionComponentProps: Record<string, unknown> = {
     items: playgroundItems,
+    key: `${effectiveTier}-${showIcons}`,
   }
 
   if (effectiveTier === 'lite') {
@@ -1080,6 +1141,7 @@ function PlaygroundSection({ tier: tierProp }: { tier: Tier }) {
     accordionComponentProps.type = type
     accordionComponentProps.defaultOpen = defaultOpen
     accordionComponentProps.motion = motion
+    accordionComponentProps.onOpenChange = handleOpenChange
   }
 
   return (
@@ -1138,6 +1200,12 @@ function PlaygroundSection({ tier: tierProp }: { tier: Tier }) {
 
         {/* Controls panel */}
         <div className="accordion-page__playground-controls">
+          {effectiveTier === 'lite' && (
+            <div style={{ fontSize: 'var(--text-xs)', color: 'var(--text-tertiary)', fontStyle: 'italic', padding: '0.5rem', background: 'oklch(100% 0 0 / 0.03)', borderRadius: 'var(--radius-sm)' }}>
+              Lite tier uses native {'<details>'} elements with no JS. Type, motion, and icon controls are standard-only features.
+            </div>
+          )}
+
           {effectiveTier !== 'lite' && (
             <OptionGroup
               label="Type"
@@ -1159,7 +1227,7 @@ function PlaygroundSection({ tier: tierProp }: { tier: Tier }) {
           <div className="accordion-page__control-group">
             <span className="accordion-page__control-label">Default Open</span>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.375rem' }}>
-              {playgroundItems.map(item => (
+              {ICON_ITEMS.map(item => (
                 <Toggle
                   key={item.id}
                   label={item.trigger}
@@ -1173,6 +1241,24 @@ function PlaygroundSection({ tier: tierProp }: { tier: Tier }) {
               ))}
             </div>
           </div>
+
+          {effectiveTier !== 'lite' && (
+            <div className="accordion-page__control-group">
+              <span className="accordion-page__control-label">Features</span>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.375rem' }}>
+                <Toggle
+                  label="Icons in triggers"
+                  checked={showIcons}
+                  onChange={setShowIcons}
+                />
+                <Toggle
+                  label="Collapsible (allow closing all)"
+                  checked={collapsible}
+                  onChange={setCollapsible}
+                />
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </section>
@@ -1275,18 +1361,28 @@ export default function AccordionPage() {
         <p className="accordion-page__section-desc">
           Single mode allows only one item open at a time. Multiple mode (default) allows
           any number of items to be expanded simultaneously.
+          {effectiveTier === 'lite' && (
+            <span style={{ display: 'block', marginBlockStart: '0.5rem', color: 'var(--text-tertiary)', fontStyle: 'italic' }}>
+              Note: Lite tier always uses native {'<details>'} behavior (multiple mode). Single mode requires Standard tier.
+            </span>
+          )}
         </p>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
           <div>
             <h3 style={{ fontSize: 'var(--text-sm)', fontWeight: 600, color: 'var(--text-primary)', marginBlockEnd: '0.75rem' }}>
-              Single mode
+              Single mode {effectiveTier === 'lite' && <span style={{ fontWeight: 400, color: 'var(--text-tertiary)' }}>(Standard only)</span>}
             </h3>
             <div className="accordion-page__preview accordion-page__preview--col">
               {effectiveTier === 'lite' ? (
-                <LiteAccordion
-                  items={FAQ_ITEMS.slice(0, 3)}
-                  defaultOpen={['what-is']}
-                />
+                <>
+                  <div style={{ fontSize: 'var(--text-xs)', color: 'var(--text-tertiary)', fontStyle: 'italic', marginBlockEnd: '0.5rem' }}>
+                    Lite fallback — native {'<details>'} cannot enforce single mode:
+                  </div>
+                  <LiteAccordion
+                    items={FAQ_ITEMS.slice(0, 3)}
+                    defaultOpen={['what-is']}
+                  />
+                </>
               ) : (
                 <Accordion
                   items={FAQ_ITEMS.slice(0, 3)}
@@ -1376,41 +1472,107 @@ export default function AccordionPage() {
         <p className="accordion-page__section-desc">
           Trigger content accepts any ReactNode, so you can include icons, badges, or rich content
           in the accordion headers.
+          {effectiveTier === 'lite' && (
+            <span style={{ display: 'block', marginBlockStart: '0.5rem', color: 'var(--text-tertiary)', fontStyle: 'italic' }}>
+              Note: Lite tier renders plain text triggers via native {'<details>'}. Icons require the Standard tier.
+            </span>
+          )}
         </p>
-        <div className="accordion-page__preview accordion-page__preview--col">
-          <AccordionComponent
-            items={[
-              {
-                id: 'icon-1',
-                trigger: (
-                  <span style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                    <Icon name="zap" size={16} /> Performance
-                  </span>
-                ),
-                content: 'Core primitives are under 2KB gzip. The motion engine is 3.5KB. Every component is individually tree-shakeable.',
-              },
-              {
-                id: 'icon-2',
-                trigger: (
-                  <span style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                    <Icon name="shield" size={16} /> Security
-                  </span>
-                ),
-                content: 'Zero external dependencies means minimal supply chain risk. All inputs are sanitized with no dynamic code execution.',
-              },
-              {
-                id: 'icon-3',
-                trigger: (
-                  <span style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                    <Icon name="settings" size={16} /> Configuration
-                  </span>
-                ),
-                content: 'Zero configuration required. Wrap your app in UIProvider and start importing components. Theming is optional.',
-              },
-            ]}
-            defaultOpen={['icon-1']}
-          />
-        </div>
+
+        {effectiveTier === 'lite' ? (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+            <div>
+              <h3 style={{ fontSize: 'var(--text-sm)', fontWeight: 600, color: 'var(--text-primary)', marginBlockEnd: '0.75rem' }}>
+                Lite — plain text triggers only
+              </h3>
+              <div className="accordion-page__preview accordion-page__preview--col">
+                <LiteAccordion
+                  items={[
+                    { id: 'icon-1', trigger: 'Performance', content: 'Core primitives are under 2KB gzip. The motion engine is 3.5KB. Every component is individually tree-shakeable.' },
+                    { id: 'icon-2', trigger: 'Security', content: 'Zero external dependencies means minimal supply chain risk. All inputs are sanitized with no dynamic code execution.' },
+                    { id: 'icon-3', trigger: 'Configuration', content: 'Zero configuration required. Wrap your app in UIProvider and start importing components. Theming is optional.' },
+                  ]}
+                  defaultOpen={['icon-1']}
+                />
+              </div>
+            </div>
+            <div>
+              <h3 style={{ fontSize: 'var(--text-sm)', fontWeight: 600, color: 'var(--text-primary)', marginBlockEnd: '0.75rem' }}>
+                Standard — with icons in triggers
+              </h3>
+              <div className="accordion-page__preview accordion-page__preview--col">
+                <Accordion
+                  items={[
+                    {
+                      id: 'icon-1',
+                      trigger: (
+                        <span style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                          <Icon name="zap" size={16} /> Performance
+                        </span>
+                      ),
+                      content: 'Core primitives are under 2KB gzip. The motion engine is 3.5KB. Every component is individually tree-shakeable.',
+                    },
+                    {
+                      id: 'icon-2',
+                      trigger: (
+                        <span style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                          <Icon name="shield" size={16} /> Security
+                        </span>
+                      ),
+                      content: 'Zero external dependencies means minimal supply chain risk. All inputs are sanitized with no dynamic code execution.',
+                    },
+                    {
+                      id: 'icon-3',
+                      trigger: (
+                        <span style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                          <Icon name="settings" size={16} /> Configuration
+                        </span>
+                      ),
+                      content: 'Zero configuration required. Wrap your app in UIProvider and start importing components. Theming is optional.',
+                    },
+                  ]}
+                  defaultOpen={['icon-1']}
+                />
+              </div>
+            </div>
+          </div>
+        ) : (
+          <div className="accordion-page__preview accordion-page__preview--col">
+            <Accordion
+              items={[
+                {
+                  id: 'icon-1',
+                  trigger: (
+                    <span style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                      <Icon name="zap" size={16} /> Performance
+                    </span>
+                  ),
+                  content: 'Core primitives are under 2KB gzip. The motion engine is 3.5KB. Every component is individually tree-shakeable.',
+                },
+                {
+                  id: 'icon-2',
+                  trigger: (
+                    <span style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                      <Icon name="shield" size={16} /> Security
+                    </span>
+                  ),
+                  content: 'Zero external dependencies means minimal supply chain risk. All inputs are sanitized with no dynamic code execution.',
+                },
+                {
+                  id: 'icon-3',
+                  trigger: (
+                    <span style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                      <Icon name="settings" size={16} /> Configuration
+                    </span>
+                  ),
+                  content: 'Zero configuration required. Wrap your app in UIProvider and start importing components. Theming is optional.',
+                },
+              ]}
+              defaultOpen={['icon-1']}
+            />
+          </div>
+        )}
+
         <div style={{ marginBlockStart: '1rem' }}>
           <CopyBlock
             code={`<Accordion items={[\n  {\n    id: 'perf',\n    trigger: <><Icon name="zap" /> Performance</>,\n    content: 'Core primitives are under 2KB gzip...',\n  },\n  // ...\n]} />`}
@@ -1428,22 +1590,69 @@ export default function AccordionPage() {
           Accordion content can contain another Accordion for multi-level navigation or deeply
           structured content. Each level operates independently.
         </p>
-        <div className="accordion-page__preview accordion-page__preview--col">
-          <AccordionComponent
-            items={NESTED_OUTER_ITEMS.map(item => ({
-              ...item,
-              content: item.id === 'advanced-topics' ? (
-                <div style={{ paddingBlockStart: '0.5rem' }}>
-                  <AccordionComponent
-                    items={NESTED_INNER_ITEMS}
-                    defaultOpen={['nested-motion']}
-                  />
-                </div>
-              ) : item.content,
-            }))}
-            defaultOpen={['advanced-topics']}
-          />
-        </div>
+        {effectiveTier === 'lite' ? (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+            <div>
+              <h3 style={{ fontSize: 'var(--text-sm)', fontWeight: 600, color: 'var(--text-primary)', marginBlockEnd: '0.75rem' }}>
+                Lite — nested native {'<details>'}
+              </h3>
+              <div className="accordion-page__preview accordion-page__preview--col">
+                <LiteAccordion
+                  items={NESTED_OUTER_ITEMS.map(item => ({
+                    ...item,
+                    content: item.id === 'advanced-topics' ? (
+                      <div style={{ paddingBlockStart: '0.5rem' }}>
+                        <LiteAccordion
+                          items={NESTED_INNER_ITEMS}
+                          defaultOpen={['nested-motion']}
+                        />
+                      </div>
+                    ) : item.content,
+                  }))}
+                  defaultOpen={['advanced-topics']}
+                />
+              </div>
+            </div>
+            <div>
+              <h3 style={{ fontSize: 'var(--text-sm)', fontWeight: 600, color: 'var(--text-primary)', marginBlockEnd: '0.75rem' }}>
+                Standard — smooth animated nesting
+              </h3>
+              <div className="accordion-page__preview accordion-page__preview--col">
+                <Accordion
+                  items={NESTED_OUTER_ITEMS.map(item => ({
+                    ...item,
+                    content: item.id === 'advanced-topics' ? (
+                      <div style={{ paddingBlockStart: '0.5rem' }}>
+                        <Accordion
+                          items={NESTED_INNER_ITEMS}
+                          defaultOpen={['nested-motion']}
+                        />
+                      </div>
+                    ) : item.content,
+                  }))}
+                  defaultOpen={['advanced-topics']}
+                />
+              </div>
+            </div>
+          </div>
+        ) : (
+          <div className="accordion-page__preview accordion-page__preview--col">
+            <Accordion
+              items={NESTED_OUTER_ITEMS.map(item => ({
+                ...item,
+                content: item.id === 'advanced-topics' ? (
+                  <div style={{ paddingBlockStart: '0.5rem' }}>
+                    <Accordion
+                      items={NESTED_INNER_ITEMS}
+                      defaultOpen={['nested-motion']}
+                    />
+                  </div>
+                ) : item.content,
+              }))}
+              defaultOpen={['advanced-topics']}
+            />
+          </div>
+        )}
         <div style={{ marginBlockStart: '1rem' }}>
           <CopyBlock
             code={`<Accordion items={[\n  { id: 'topic', trigger: 'Advanced Topics', content: (\n    <Accordion\n      items={nestedItems}\n      defaultOpen={['nested-motion']}\n    />\n  )},\n]} />`}
