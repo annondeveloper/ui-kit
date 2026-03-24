@@ -593,7 +593,9 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(
 
       const handleClickOutside = (e: MouseEvent) => {
         const root = rootRef.current
-        if (root && !root.contains(e.target as Node)) {
+        const popover = popoverRef.current
+        const target = e.target as Node
+        if (root && !root.contains(target) && (!popover || !popover.contains(target))) {
           close()
         }
       }

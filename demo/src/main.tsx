@@ -24,6 +24,10 @@ const MetricCardPage = lazy(() => import('./pages/components/MetricCardPage'))
 const CardPage = lazy(() => import('./pages/components/CardPage'))
 const BadgePage = lazy(() => import('./pages/components/BadgePage'))
 const UpstreamDashboardPage = lazy(() => import('./pages/components/UpstreamDashboardPage'))
+const TabsPage = lazy(() => import('./pages/components/TabsPage'))
+const AccordionPage = lazy(() => import('./pages/components/AccordionPage'))
+const AlertPage = lazy(() => import('./pages/components/AlertPage'))
+const DrawerPage = lazy(() => import('./pages/components/DrawerPage'))
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
@@ -49,6 +53,10 @@ createRoot(document.getElementById('root')!).render(
             <Route path="components/card" element={<Suspense><CardPage /></Suspense>} />
             <Route path="components/badge" element={<Suspense><BadgePage /></Suspense>} />
             <Route path="components/upstream-dashboard" element={<Suspense><UpstreamDashboardPage /></Suspense>} />
+            <Route path="components/tabs" element={<Suspense><TabsPage /></Suspense>} />
+            <Route path="components/accordion" element={<Suspense><AccordionPage /></Suspense>} />
+            <Route path="components/alert" element={<Suspense><AlertPage /></Suspense>} />
+            <Route path="components/drawer" element={<Suspense><DrawerPage /></Suspense>} />
             <Route path="docs" element={<Suspense><DocsPage /></Suspense>} />
           </Route>
         </Routes>

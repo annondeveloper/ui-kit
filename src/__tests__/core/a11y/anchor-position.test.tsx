@@ -11,7 +11,7 @@ describe('useAnchorPosition', () => {
       return useAnchorPosition(triggerRef, floatingRef)
     })
 
-    expect(result.current).toEqual({ x: 0, y: 0, placement: 'bottom' })
+    expect(result.current).toEqual({ x: 0, y: 0, width: 0, placement: 'bottom' })
   })
 
   it('returns position with configured placement', () => {
@@ -31,7 +31,7 @@ describe('useAnchorPosition', () => {
       return useAnchorPosition(triggerRef, floatingRef, { enabled: false })
     })
 
-    expect(result.current).toEqual({ x: 0, y: 0, placement: 'bottom' })
+    expect(result.current).toEqual({ x: 0, y: 0, width: 0, placement: 'bottom' })
   })
 })
 
