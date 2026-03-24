@@ -28,6 +28,10 @@ const TabsPage = lazy(() => import('./pages/components/TabsPage'))
 const AccordionPage = lazy(() => import('./pages/components/AccordionPage'))
 const AlertPage = lazy(() => import('./pages/components/AlertPage'))
 const DrawerPage = lazy(() => import('./pages/components/DrawerPage'))
+const TooltipPage = lazy(() => import('./pages/components/TooltipPage'))
+const ProgressPage = lazy(() => import('./pages/components/ProgressPage'))
+const CheckboxPage = lazy(() => import('./pages/components/CheckboxPage'))
+const ToggleSwitchPage = lazy(() => import('./pages/components/ToggleSwitchPage'))
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
@@ -57,6 +61,10 @@ createRoot(document.getElementById('root')!).render(
             <Route path="components/accordion" element={<Suspense><AccordionPage /></Suspense>} />
             <Route path="components/alert" element={<Suspense><AlertPage /></Suspense>} />
             <Route path="components/drawer" element={<Suspense><DrawerPage /></Suspense>} />
+            <Route path="components/tooltip" element={<Suspense><TooltipPage /></Suspense>} />
+            <Route path="components/progress" element={<Suspense><ProgressPage /></Suspense>} />
+            <Route path="components/checkbox" element={<Suspense><CheckboxPage /></Suspense>} />
+            <Route path="components/toggle-switch" element={<Suspense><ToggleSwitchPage /></Suspense>} />
             <Route path="docs" element={<Suspense><DocsPage /></Suspense>} />
           </Route>
         </Routes>
