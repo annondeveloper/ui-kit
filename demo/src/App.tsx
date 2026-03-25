@@ -7,6 +7,8 @@ import { SearchInput } from '@ui/components/search-input'
 import { Badge } from '@ui/components/badge'
 import { Divider } from '@ui/components/divider'
 import { ToggleSwitch } from '@ui/components/toggle-switch'
+import { Tooltip } from '@ui/components/tooltip'
+import { BorderBeam } from '@ui/domain/border-beam'
 import { Icon, type IconName } from '@ui/core/icons/icon'
 import { Skeleton } from '@ui/components/skeleton'
 import { css } from '@ui/core/styles/css-tag'
@@ -182,6 +184,9 @@ const componentGroups: ComponentGroup[] = [
   },
 ]
 
+// Total component count
+const totalComponents = componentGroups.reduce((sum, g) => sum + g.items.length, 0)
+
 // ─── Styles ───────────────────────────────────────────────────────────────────
 const layoutStyles = css`
   @layer demo {
@@ -193,15 +198,271 @@ const layoutStyles = css`
 
     /* ─── Desktop sidebar ─── */
     .site-sidebar {
-      width: 260px;
+      width: clamp(240px, 18vw, 280px);
       flex-shrink: 0;
       position: sticky;
       top: 0;
       height: 100dvh;
       display: flex;
       flex-direction: column;
-      background: var(--bg-surface);
-      border-inline-end: 1px solid var(--border-subtle);
+      transition: background 0.4s ease, border-color 0.4s ease,
+                  backdrop-filter 0.4s ease;
+    }
+
+    /* ════════════════════════════════════════════════════════════
+       LITE TIER — clean, minimal, no effects
+       ════════════════════════════════════════════════════════════ */
+    .site-sidebar[data-tier="lite"] {
+      background: var(--bg-base, oklch(14% 0 0));
+      border-inline-end: 1px solid oklch(100% 0 0 / 0.06);
+    }
+
+    .site-sidebar[data-tier="lite"] .site-brand__logo {
+      background: oklch(40% 0 0);
+      box-shadow: none;
+    }
+    .site-sidebar[data-tier="lite"] .site-brand__logo::after {
+      display: none;
+    }
+    .site-sidebar[data-tier="lite"] .site-brand__name {
+      color: var(--text-secondary, oklch(70% 0 0));
+    }
+    .site-sidebar[data-tier="lite"] .site-brand__tagline {
+      display: none;
+    }
+    .site-sidebar[data-tier="lite"] .site-brand__version {
+      display: none;
+    }
+
+    /* Lite: no search hint badge */
+    .site-sidebar[data-tier="lite"] .site-search__hint {
+      display: none;
+    }
+
+    /* Lite: flat nav links, no transitions */
+    .site-sidebar[data-tier="lite"] .site-nav-link {
+      transition: none;
+      border-radius: 0;
+      padding-block: 0.375rem;
+    }
+    .site-sidebar[data-tier="lite"] .site-nav-link:hover {
+      background: oklch(100% 0 0 / 0.03);
+    }
+    .site-sidebar[data-tier="lite"] .site-nav-link--active {
+      background: oklch(100% 0 0 / 0.05);
+      color: var(--text-primary);
+      font-weight: 600;
+    }
+
+    /* Lite: no badges on groups */
+    .site-sidebar[data-tier="lite"] .site-group__count .ui-badge {
+      display: none;
+    }
+
+    /* Lite: instant collapse, no spring */
+    .site-sidebar[data-tier="lite"] .site-group__body {
+      transition: grid-template-rows 0.01s;
+    }
+    .site-sidebar[data-tier="lite"] .site-group__chevron {
+      transition: transform 0.01s;
+    }
+
+    /* Lite: simple component links */
+    .site-sidebar[data-tier="lite"] .site-clink {
+      transition: none;
+      border-inline-start: none;
+    }
+    .site-sidebar[data-tier="lite"] .site-clink--active {
+      color: var(--text-primary);
+      background: oklch(100% 0 0 / 0.05);
+      border-inline-start: none;
+      font-weight: 600;
+    }
+
+    /* Lite: no premium dots */
+    .site-sidebar[data-tier="lite"] .site-clink__premium {
+      display: none;
+    }
+
+    /* Lite: minimal footer */
+    .site-sidebar[data-tier="lite"] .site-sidebar-footer {
+      border-block-start: 1px solid oklch(100% 0 0 / 0.06);
+    }
+
+    /* Lite: no glow on tier pill */
+    .site-sidebar[data-tier="lite"] .site-tier-pill--active {
+      background: oklch(50% 0 0);
+      border-color: oklch(50% 0 0);
+      box-shadow: none;
+    }
+
+    /* Lite: hide search — too fancy for lite */
+    /* Actually keep search, just make it simpler */
+    .site-sidebar[data-tier="lite"] .ui-search-input .ui-search-input__field:focus {
+      box-shadow: none;
+      border-color: oklch(100% 0 0 / 0.2);
+    }
+
+    /* ════════════════════════════════════════════════════════════
+       STANDARD TIER — polished, brand-tinted
+       ════════════════════════════════════════════════════════════ */
+    .site-sidebar[data-tier="standard"] {
+      background: var(--bg-surface, oklch(16% 0.01 270));
+      border-inline-end: 1px solid var(--border-subtle, oklch(100% 0 0 / 0.08));
+    }
+
+    /* ════════════════════════════════════════════════════════════
+       PREMIUM TIER — glassmorphism, aurora glows, shimmer
+       ════════════════════════════════════════════════════════════ */
+    .site-sidebar[data-tier="premium"] {
+      background: oklch(15% 0.02 270 / 0.7);
+      border-inline-end: 1px solid oklch(100% 0 0 / 0.1);
+      backdrop-filter: blur(16px) saturate(1.4);
+      -webkit-backdrop-filter: blur(16px) saturate(1.4);
+    }
+
+    /* Premium: aurora ambient glow behind brand */
+    .site-sidebar[data-tier="premium"] .site-brand {
+      position: relative;
+      overflow: hidden;
+    }
+    .site-sidebar[data-tier="premium"] .site-brand::before {
+      content: '';
+      position: absolute;
+      inset: -20px;
+      background: radial-gradient(
+        ellipse 120px 80px at 30% 50%,
+        oklch(65% 0.2 270 / 0.15),
+        transparent
+      ),
+      radial-gradient(
+        ellipse 100px 60px at 70% 40%,
+        oklch(70% 0.18 310 / 0.1),
+        transparent
+      );
+      animation: site-aurora-pulse 6s ease-in-out infinite alternate;
+      pointer-events: none;
+      z-index: 0;
+    }
+    .site-sidebar[data-tier="premium"] .site-brand > * {
+      position: relative;
+      z-index: 1;
+    }
+
+    @keyframes site-aurora-pulse {
+      0% { opacity: 0.6; transform: scale(1); }
+      50% { opacity: 1; transform: scale(1.05); }
+      100% { opacity: 0.7; transform: scale(0.98); }
+    }
+
+    /* Premium: brand logo animated glow */
+    .site-sidebar[data-tier="premium"] .site-brand__logo {
+      box-shadow: 0 0 16px oklch(from var(--brand, oklch(65% 0.2 270)) l c h / 0.35),
+                  0 0 32px oklch(from var(--brand, oklch(65% 0.2 270)) l c h / 0.15);
+      animation: site-logo-glow 3s ease-in-out infinite alternate;
+    }
+
+    @keyframes site-logo-glow {
+      0% { box-shadow: 0 0 12px oklch(from var(--brand, oklch(65% 0.2 270)) l c h / 0.3); }
+      100% { box-shadow: 0 0 24px oklch(from var(--brand, oklch(65% 0.2 270)) l c h / 0.5),
+                          0 0 48px oklch(from var(--brand, oklch(65% 0.2 270)) l c h / 0.15); }
+    }
+
+    /* Premium: glowing search focus ring */
+    .site-sidebar[data-tier="premium"] .ui-search-input .ui-search-input__field:focus {
+      border-color: var(--brand, oklch(65% 0.2 270));
+      box-shadow: 0 0 0 3px oklch(from var(--brand, oklch(65% 0.2 270)) l c h / 0.2),
+                  0 0 16px oklch(from var(--brand, oklch(65% 0.2 270)) l c h / 0.12);
+    }
+
+    /* Premium: group header shimmer on hover */
+    .site-sidebar[data-tier="premium"] .site-group__header {
+      position: relative;
+      overflow: hidden;
+    }
+    .site-sidebar[data-tier="premium"] .site-group__header::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(
+        110deg,
+        transparent 20%,
+        oklch(100% 0 0 / 0.04) 45%,
+        oklch(100% 0 0 / 0.08) 50%,
+        oklch(100% 0 0 / 0.04) 55%,
+        transparent 80%
+      );
+      transform: translateX(-100%);
+      transition: transform 0.6s ease;
+      pointer-events: none;
+    }
+    .site-sidebar[data-tier="premium"] .site-group__header:hover::before {
+      transform: translateX(100%);
+    }
+
+    /* Premium: active nav items glow trail */
+    .site-sidebar[data-tier="premium"] .site-nav-link--active {
+      background: oklch(from var(--brand, oklch(65% 0.2 270)) l c h / 0.12);
+      box-shadow: inset 0 0 12px oklch(from var(--brand, oklch(65% 0.2 270)) l c h / 0.08),
+                  0 0 8px oklch(from var(--brand, oklch(65% 0.2 270)) l c h / 0.06);
+    }
+
+    /* Premium: active component link glow */
+    .site-sidebar[data-tier="premium"] .site-clink--active {
+      background: oklch(from var(--brand, oklch(65% 0.2 270)) l c h / 0.1);
+      box-shadow: inset 0 0 8px oklch(from var(--brand, oklch(65% 0.2 270)) l c h / 0.06);
+    }
+
+    /* Premium: animated pulse on premium dots */
+    .site-sidebar[data-tier="premium"] .site-clink__premium {
+      background: oklch(75% 0.2 310);
+      animation: site-premium-dot-pulse 2s ease-in-out infinite;
+    }
+
+    @keyframes site-premium-dot-pulse {
+      0%, 100% { opacity: 1; box-shadow: 0 0 4px oklch(75% 0.2 310 / 0.5); }
+      50% { opacity: 0.6; box-shadow: 0 0 8px oklch(75% 0.2 310 / 0.3); }
+    }
+
+    /* Premium: badge glow */
+    .site-sidebar[data-tier="premium"] .site-group__count .ui-badge[data-variant="primary"] {
+      box-shadow: 0 0 6px oklch(from var(--brand, oklch(65% 0.2 270)) l c h / 0.25);
+    }
+
+    /* Premium: spring transitions on everything */
+    .site-sidebar[data-tier="premium"] .site-nav-link {
+      transition: background 0.35s cubic-bezier(0.34, 1.56, 0.64, 1),
+                  color 0.25s ease,
+                  box-shadow 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    .site-sidebar[data-tier="premium"] .site-clink {
+      transition: background 0.35s cubic-bezier(0.34, 1.56, 0.64, 1),
+                  color 0.25s ease,
+                  border-color 0.35s cubic-bezier(0.34, 1.56, 0.64, 1),
+                  box-shadow 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    .site-sidebar[data-tier="premium"] .site-group__body {
+      transition: grid-template-rows 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    .site-sidebar[data-tier="premium"] .site-group__chevron {
+      transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    /* Premium: tier pill glow when active */
+    .site-sidebar[data-tier="premium"] .site-tier-pill--active {
+      box-shadow: 0 0 12px oklch(from var(--brand, oklch(65% 0.2 270)) l c h / 0.4),
+                  0 0 4px oklch(from var(--brand, oklch(65% 0.2 270)) l c h / 0.2);
+    }
+
+    /* Premium: glass footer */
+    .site-sidebar[data-tier="premium"] .site-sidebar-footer {
+      background: oklch(15% 0.02 270 / 0.4);
+      border-block-start: 1px solid oklch(100% 0 0 / 0.08);
+    }
+
+    /* Premium: motion segment glow */
+    .site-sidebar[data-tier="premium"] .site-motion-seg__btn--active {
+      box-shadow: 0 0 8px oklch(from var(--brand, oklch(65% 0.2 270)) l c h / 0.35);
     }
 
     /* ─── Brand header ─── */
@@ -221,6 +482,7 @@ const layoutStyles = css`
       display: grid;
       place-items: center;
       flex-shrink: 0;
+      transition: box-shadow 0.4s ease;
     }
     .site-brand__logo::after {
       content: '';
@@ -244,6 +506,7 @@ const layoutStyles = css`
       color: var(--text-primary);
       line-height: 1.1;
       letter-spacing: -0.01em;
+      transition: color 0.3s ease;
     }
 
     .site-brand__tagline {
@@ -252,10 +515,24 @@ const layoutStyles = css`
       letter-spacing: 0.06em;
       text-transform: uppercase;
       font-weight: 500;
+      transition: opacity 0.3s ease;
     }
 
     .site-brand__version {
       margin-inline-start: auto;
+      transition: opacity 0.3s ease;
+    }
+
+    /* ─── Brand area wrapper for premium BorderBeam ─── */
+    .site-brand-wrap {
+      margin: 0;
+    }
+    .site-brand-wrap--premium {
+      margin: 0.5rem 0.75rem 0;
+      border-radius: var(--radius-lg, 0.75rem);
+    }
+    .site-brand-wrap--premium .site-brand {
+      padding: 1rem 0.75rem 0.5rem;
     }
 
     /* ─── Search wrapper ─── */
@@ -278,6 +555,7 @@ const layoutStyles = css`
       border: 1px solid var(--border-subtle);
       pointer-events: none;
       line-height: 1.4;
+      transition: opacity 0.2s ease;
     }
 
     /* ─── Scrollable nav region ─── */
@@ -318,6 +596,23 @@ const layoutStyles = css`
       background: oklch(from var(--brand, oklch(65% 0.2 270)) l c h / 0.08);
       color: var(--brand);
       font-weight: 600;
+    }
+
+    /* ─── Section header ─── */
+    .site-section-header {
+      display: flex;
+      align-items: center;
+      gap: 0.375rem;
+      padding: 0.5rem 0.75rem 0.25rem;
+      font-size: 0.625rem;
+      font-weight: 700;
+      color: var(--text-tertiary);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      user-select: none;
+    }
+    .site-section-header__count {
+      margin-inline-start: auto;
     }
 
     /* ─── Component groups ─── */
@@ -377,6 +672,22 @@ const layoutStyles = css`
     @media (prefers-reduced-motion: reduce) {
       .site-group__chevron {
         transition: transform 0.01s;
+      }
+      .site-sidebar[data-tier="premium"] .site-brand::before {
+        animation: none;
+      }
+      .site-sidebar[data-tier="premium"] .site-brand__logo {
+        animation: none;
+      }
+      .site-sidebar[data-tier="premium"] .site-clink__premium {
+        animation: none;
+      }
+      .site-sidebar[data-tier="premium"] .site-group__header::before {
+        display: none;
+      }
+      .site-sidebar[data-tier="premium"] .site-nav-link,
+      .site-sidebar[data-tier="premium"] .site-clink {
+        transition: none;
       }
     }
 
@@ -446,6 +757,7 @@ const layoutStyles = css`
       background: oklch(75% 0.18 60);
       flex-shrink: 0;
       margin-inline-start: auto;
+      transition: background 0.3s ease, box-shadow 0.3s ease;
     }
 
     /* ─── Search results mode ─── */
@@ -490,6 +802,7 @@ const layoutStyles = css`
       display: flex;
       flex-direction: column;
       gap: 0.625rem;
+      transition: background 0.4s ease, border-color 0.4s ease;
     }
 
     .site-control-row {
@@ -563,7 +876,7 @@ const layoutStyles = css`
       font-size: 0.625rem;
       font-weight: 700;
       cursor: pointer;
-      transition: all 0.15s;
+      transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
       text-transform: uppercase;
       letter-spacing: 0.03em;
     }
@@ -575,6 +888,7 @@ const layoutStyles = css`
       background: var(--brand);
       color: oklch(100% 0 0);
       border-color: var(--brand);
+      transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
     }
 
     /* Theme toggle row */
@@ -674,6 +988,36 @@ const layoutStyles = css`
   }
 `
 
+// ─── Brand Area Component ─────────────────────────────────────────────────────
+function BrandArea({ tier }: { tier: Tier }) {
+  const inner = (
+    <div className="site-brand">
+      <div className="site-brand__logo">
+        <Icon name="zap" size={16} style={{ color: 'white' }} />
+      </div>
+      <div className="site-brand__text">
+        <div className="site-brand__name">ui-kit</div>
+        <div className="site-brand__tagline">Aurora Fluid v2</div>
+      </div>
+      <span className="site-brand__version">
+        <Badge variant="primary" size="xs">v2.0</Badge>
+      </span>
+    </div>
+  )
+
+  if (tier === 'premium') {
+    return (
+      <div className="site-brand-wrap site-brand-wrap--premium">
+        <BorderBeam duration={8} color="oklch(65% 0.2 270 / 0.6)" size={60}>
+          {inner}
+        </BorderBeam>
+      </div>
+    )
+  }
+
+  return <div className="site-brand-wrap">{inner}</div>
+}
+
 // ─── Sidebar Content (shared desktop + mobile) ───────────────────────────────
 
 interface SidebarContentProps {
@@ -707,6 +1051,8 @@ function SidebarContent({
 }: SidebarContentProps) {
   const location = useLocation()
   const isSearching = searchQuery.length > 0
+  const isPremium = tier === 'premium'
+  const isLite = tier === 'lite'
 
   // Filtered results when searching
   const searchResults = useMemo(() => {
@@ -753,21 +1099,43 @@ function SidebarContent({
     return null
   }, [location.pathname])
 
+  // Render a component link item
+  const renderComponentLink = (item: ComponentEntry, showHighlight = false) => {
+    const content = (
+      <>
+        {showHighlight ? highlightMatch(item.name) : item.name}
+        {item.premium && !isLite && (
+          <span className="site-clink__premium" title="Premium tier" />
+        )}
+      </>
+    )
+
+    if (!item.path) {
+      return (
+        <span key={item.name} className="site-clink site-clink--disabled">
+          {content}
+        </span>
+      )
+    }
+
+    return (
+      <NavLink
+        key={item.name}
+        to={item.path}
+        onClick={onClick}
+        className={({ isActive }) =>
+          `site-clink${isActive ? ' site-clink--active' : ''}`
+        }
+      >
+        {content}
+      </NavLink>
+    )
+  }
+
   return (
     <>
       {/* Brand */}
-      <div className="site-brand">
-        <div className="site-brand__logo">
-          <Icon name="zap" size={16} style={{ color: 'white' }} />
-        </div>
-        <div className="site-brand__text">
-          <div className="site-brand__name">ui-kit</div>
-          <div className="site-brand__tagline">Aurora Fluid v2</div>
-        </div>
-        <span className="site-brand__version">
-          <Badge variant="primary" size="xs">v2.0</Badge>
-        </span>
-      </div>
+      <BrandArea tier={tier} />
 
       {/* Search */}
       <div className="site-search">
@@ -809,6 +1177,19 @@ function SidebarContent({
 
         {!isSearching && <Divider spacing="sm" />}
 
+        {/* Section header: Components */}
+        {!isSearching && (
+          <div className="site-section-header">
+            <Icon name="code" size={10} />
+            Components
+            {!isLite && (
+              <span className="site-section-header__count">
+                <Badge variant="default" size="xs">{totalComponents}</Badge>
+              </span>
+            )}
+          </div>
+        )}
+
         {/* Search results */}
         {isSearching && (
           <div className="site-search-results">
@@ -819,25 +1200,7 @@ function SidebarContent({
                     <div className="site-search-results__group">
                       {group.label} ({items.length})
                     </div>
-                    {items.map(item =>
-                      item.path ? (
-                        <NavLink
-                          key={item.name}
-                          to={item.path}
-                          onClick={onClick}
-                          className={({ isActive }) =>
-                            `site-clink${isActive ? ' site-clink--active' : ''}`
-                          }
-                        >
-                          {highlightMatch(item.name)}
-                          {item.premium && <span className="site-clink__premium" title="Premium tier" />}
-                        </NavLink>
-                      ) : (
-                        <span key={item.name} className="site-clink site-clink--disabled">
-                          {highlightMatch(item.name)}
-                        </span>
-                      )
-                    )}
+                    {items.map(item => renderComponentLink(item, true))}
                   </div>
                 ))}
               </>
@@ -868,7 +1231,9 @@ function SidebarContent({
                     <Icon name={group.icon} size={11} />
                     {group.label}
                     <span className="site-group__count">
-                      <Badge variant={isActiveGroup ? 'primary' : 'default'} size="xs">{group.items.length}</Badge>
+                      <Badge variant={isActiveGroup ? 'primary' : 'default'} size="xs">
+                        {group.items.length}
+                      </Badge>
                       <span className={`site-group__chevron${isOpen ? ' site-group__chevron--open' : ''}`}>
                         <Icon name="chevron-right" size={9} />
                       </span>
@@ -877,25 +1242,7 @@ function SidebarContent({
                   <div className={`site-group__body${isOpen ? ' site-group__body--open' : ''}`}>
                     <div className="site-group__inner">
                       <div className="site-group__list">
-                        {group.items.map(item =>
-                          item.path ? (
-                            <NavLink
-                              key={item.name}
-                              to={item.path}
-                              onClick={onClick}
-                              className={({ isActive }) =>
-                                `site-clink${isActive ? ' site-clink--active' : ''}`
-                              }
-                            >
-                              {item.name}
-                              {item.premium && <span className="site-clink__premium" title="Premium tier" />}
-                            </NavLink>
-                          ) : (
-                            <span key={item.name} className="site-clink site-clink--disabled">
-                              {item.name}
-                            </span>
-                          )
-                        )}
+                        {group.items.map(item => renderComponentLink(item))}
                       </div>
                     </div>
                   </div>
@@ -912,15 +1259,26 @@ function SidebarContent({
         <div className="site-control-row">
           <span className="site-control-label">Tier</span>
           <div className="site-tier-pills">
-            {(['lite', 'standard', 'premium'] as const).map(t => (
-              <button
-                key={t}
-                className={`site-tier-pill${tier === t ? ' site-tier-pill--active' : ''}`}
-                onClick={() => setTier(t)}
-              >
-                {t === 'lite' ? 'Lite' : t === 'standard' ? 'Std' : 'Pro'}
-              </button>
-            ))}
+            {(['lite', 'standard', 'premium'] as const).map(t => {
+              const label = t === 'lite' ? 'Lite' : t === 'standard' ? 'Std' : 'Pro'
+              const btn = (
+                <button
+                  key={t}
+                  className={`site-tier-pill${tier === t ? ' site-tier-pill--active' : ''}`}
+                  onClick={() => setTier(t)}
+                >
+                  {label}
+                </button>
+              )
+              if (isPremium) {
+                return (
+                  <Tooltip key={t} content={`Switch to ${t} tier`} placement="top" delay={200}>
+                    {btn}
+                  </Tooltip>
+                )
+              }
+              return btn
+            })}
           </div>
         </div>
 
@@ -1037,7 +1395,7 @@ export default function App() {
       <TierContext.Provider value={{ tier, setTier }}>
       <div className="site">
         {/* Desktop sidebar */}
-        <aside className="site-sidebar">
+        <aside className="site-sidebar" data-tier={tier}>
           <SidebarContent
             {...sharedProps}
             searchInputRef={searchInputRef}
@@ -1059,7 +1417,7 @@ export default function App() {
 
         {/* Mobile drawer — same sidebar content */}
         <Drawer open={drawerOpen} onClose={closeDrawer} side="left" size="sm">
-          <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }} data-tier={tier}>
             <SidebarContent
               {...sharedProps}
               onClick={closeDrawer}

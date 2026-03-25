@@ -622,9 +622,6 @@ type Trend = 'up' | 'down' | 'flat'
 
 // ─── Constants ───────────────────────────────────────────────────────────────
 
-const STATUSES: Status[] = ['ok', 'warning', 'critical']
-const TRENDS: Trend[] = ['up', 'down', 'flat']
-
 const IMPORT_STRINGS: Record<Tier, string> = {
   lite: "import { MetricCard } from '@annondeveloper/ui-kit/lite'",
   standard: "import { MetricCard } from '@annondeveloper/ui-kit'",
@@ -951,7 +948,7 @@ function PlaygroundSection({ tier: tierProp, brandColor }: { tier: Tier; brandCo
         {/* Preview area */}
         <div className="mc-page__playground-preview">
           <div className="mc-page__playground-result" style={{ ...previewStyle, maxInlineSize: '320px', margin: '0 auto' }}>
-            <MetricCard {...cardProps} />
+            <MetricCard {...cardProps as any} />
           </div>
 
           {/* Tabbed code output */}
