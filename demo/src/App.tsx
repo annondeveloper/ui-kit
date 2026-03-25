@@ -15,13 +15,6 @@ export function useTier() { return useContext(TierContext) }
 
 const pages: { path: string; label: string; icon: IconName }[] = [
   { path: '/', label: 'Home', icon: 'zap' },
-  { path: '/core', label: 'Primitives', icon: 'code' },
-  { path: '/forms', label: 'Forms', icon: 'edit' },
-  { path: '/overlays', label: 'Overlays', icon: 'menu' },
-  { path: '/data', label: 'Data', icon: 'bar-chart' },
-  { path: '/monitor', label: 'Monitoring', icon: 'activity' },
-  { path: '/ai', label: 'AI & Realtime', icon: 'terminal' },
-  { path: '/animations', label: 'Animations', icon: 'zap' },
   { path: '/icons', label: 'Icons', icon: 'image' },
   { path: '/themes', label: 'Theme Playground', icon: 'settings' as const },
   { path: '/docs', label: 'Documentation', icon: 'file' },

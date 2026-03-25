@@ -4,7 +4,7 @@ import { useState, useMemo, useRef, useEffect } from 'react'
 import { css } from '@ui/core/styles/css-tag'
 import { useStyles } from '@ui/core/styles/use-styles'
 import { Sidebar, SidebarHeader, SidebarContent, SidebarFooter, SidebarItem } from '@ui/components/sidebar'
-import { Sidebar as LiteSidebar, SidebarHeader as LiteSidebarHeader, SidebarContent as LiteSidebarContent, SidebarFooter as LiteSidebarFooter, SidebarItem as LiteSidebarItem } from '@ui/lite/sidebar'
+import { Sidebar as LiteSidebar, SidebarItem as LiteSidebarItem } from '@ui/lite/sidebar'
 import { Button } from '@ui/components/button'
 import { Card } from '@ui/components/card'
 import { CopyBlock } from '@ui/domain/copy-block'
@@ -761,9 +761,9 @@ function DemoSidebar({
   lite?: boolean
 }) {
   const SidebarComp = lite ? LiteSidebar : Sidebar
-  const HeaderComp = lite ? LiteSidebarHeader : SidebarHeader
-  const ContentComp = lite ? LiteSidebarContent : SidebarContent
-  const FooterComp = lite ? LiteSidebarFooter : SidebarFooter
+  const HeaderComp = SidebarHeader
+  const ContentComp = SidebarContent
+  const FooterComp = SidebarFooter
   const ItemComp = lite ? LiteSidebarItem : SidebarItem
 
   return (
@@ -1392,11 +1392,9 @@ export default function SidebarPage() {
               import {'{'} Sidebar {'}'} from '@annondeveloper/ui-kit/lite'
             </div>
             <div className="sidebar-page__tier-preview">
-              <LiteSidebar collapsed={false} width={120} collapsedWidth={48}>
-                <LiteSidebarContent>
-                  <LiteSidebarItem icon={<Icon name="home" size="sm" />} label="Home" active />
-                  <LiteSidebarItem icon={<Icon name="settings" size="sm" />} label="Settings" />
-                </LiteSidebarContent>
+              <LiteSidebar>
+                <LiteSidebarItem icon={<Icon name="home" size="sm" />} label="Home" active />
+                <LiteSidebarItem icon={<Icon name="settings" size="sm" />} label="Settings" />
               </LiteSidebar>
             </div>
             <div className="sidebar-page__size-breakdown">

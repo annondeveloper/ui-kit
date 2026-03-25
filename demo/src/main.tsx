@@ -5,16 +5,9 @@ import { ToastProvider } from '@ui/domain/toast'
 import App from './App'
 import './index.css'
 
-// ─── Category Pages ──────────────────────────────────────────────────────────
+// ─── Utility Pages ──────────────────────────────────────────────────────────
 const Home = lazy(() => import('./pages/Home'))
-const CorePage = lazy(() => import('./pages/CorePage'))
-const FormsPage = lazy(() => import('./pages/FormsPage'))
-const OverlaysPage = lazy(() => import('./pages/OverlaysPage'))
-const DataPage = lazy(() => import('./pages/DataPage'))
-const MonitorPage = lazy(() => import('./pages/MonitorPage'))
-const AIPage = lazy(() => import('./pages/AIPage'))
 const DocsPage = lazy(() => import('./pages/DocsPage'))
-const AnimationsPage = lazy(() => import('./pages/AnimationsPage'))
 const IconsPage = lazy(() => import('./pages/IconsPage'))
 const ThemePage = lazy(() => import('./pages/ThemePage'))
 
@@ -119,15 +112,8 @@ createRoot(document.getElementById('root')!).render(
       <ToastProvider position="bottom-right">
         <Routes>
           <Route element={<App />}>
-            {/* Category pages */}
+            {/* Utility pages */}
             <Route index element={<Suspense><Home /></Suspense>} />
-            <Route path="core" element={<Suspense><CorePage /></Suspense>} />
-            <Route path="forms" element={<Suspense><FormsPage /></Suspense>} />
-            <Route path="overlays" element={<Suspense><OverlaysPage /></Suspense>} />
-            <Route path="data" element={<Suspense><DataPage /></Suspense>} />
-            <Route path="monitor" element={<Suspense><MonitorPage /></Suspense>} />
-            <Route path="ai" element={<Suspense><AIPage /></Suspense>} />
-            <Route path="animations" element={<Suspense><AnimationsPage /></Suspense>} />
             <Route path="icons" element={<Suspense><IconsPage /></Suspense>} />
             <Route path="themes" element={<Suspense><ThemePage /></Suspense>} />
             <Route path="docs" element={<Suspense><DocsPage /></Suspense>} />
