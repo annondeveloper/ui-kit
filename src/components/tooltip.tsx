@@ -45,10 +45,11 @@ const tooltipStyles = css`
         color: var(--text-primary, oklch(90% 0 0));
         font-size: var(--text-sm, 0.875rem);
         line-height: 1.4;
-        padding-block: 0.25rem;
-        padding-inline: 0.5rem;
+        padding-block: 0.375rem;
+        padding-inline: 0.625rem;
+        border: 1px solid var(--border-subtle, oklch(100% 0 0 / 0.1));
         border-radius: var(--radius-sm, 0.25rem);
-        box-shadow: var(--shadow-md, 0 4px 12px oklch(0% 0 0 / 0.25));
+        box-shadow: 0 4px 16px oklch(0% 0 0 / 0.35), 0 0 0 1px oklch(100% 0 0 / 0.04);
         text-wrap: pretty;
         word-break: break-word;
       }

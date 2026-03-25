@@ -206,8 +206,9 @@ describe('DatePicker', () => {
       fireEvent.click(screen.getByRole('button', { name: /calendar/i }))
 
       const grid = screen.getByRole('grid')
-      const todayCell = within(grid).getByText(String(today.getDate()))
-      expect(todayCell.closest('button')).toHaveAttribute('data-today', 'true')
+      const todayBtn = grid.querySelector('button[data-today="true"]')
+      expect(todayBtn).not.toBeNull()
+      expect(todayBtn!.textContent).toContain(String(today.getDate()))
     })
   })
 
