@@ -91,13 +91,14 @@ const toggleSwitchStyles = css`
         block-size: 28px;
       }
 
-      /* Thumb: white circle */
+      /* Thumb: white circle — positioned inside the border */
       .ui-toggle-switch__thumb {
         position: absolute;
         border-radius: var(--radius-full, 9999px);
         background: oklch(100% 0 0);
         box-shadow: var(--shadow-sm, 0 1px 2px oklch(0% 0 0 / 0.1));
-        inset-block-start: 2px;
+        inset-block: 0;
+        margin-block: auto;
         inset-inline-start: 2px;
       }
 
@@ -150,25 +151,22 @@ const toggleSwitchStyles = css`
         border-color: var(--brand, oklch(65% 0.2 270));
       }
 
-      /* Checked state — thumb slides right (xs) */
+      /* Checked state — thumb slides right: track - borders(4) - thumb - gap(2) */
       :scope[data-size="xs"] .ui-toggle-switch__input:checked ~ .ui-toggle-switch__track .ui-toggle-switch__thumb {
-        inset-inline-start: 10px;
+        inset-inline-start: calc(22px - 4px - 8px - 2px); /* 8px */
       }
-      /* Checked state — thumb slides right (sm) */
       :scope[data-size="sm"] .ui-toggle-switch__input:checked ~ .ui-toggle-switch__track .ui-toggle-switch__thumb {
-        inset-inline-start: 12px;
+        inset-inline-start: calc(28px - 4px - 12px - 2px); /* 10px */
       }
-      /* Checked state — thumb slides right (md) */
       :scope[data-size="md"] .ui-toggle-switch__input:checked ~ .ui-toggle-switch__track .ui-toggle-switch__thumb {
-        inset-inline-start: 16px;
+        inset-inline-start: calc(36px - 4px - 16px - 2px); /* 14px */
       }
-      /* Checked state — thumb slides right (lg) */
       :scope[data-size="lg"] .ui-toggle-switch__input:checked ~ .ui-toggle-switch__track .ui-toggle-switch__thumb {
-        inset-inline-start: 20px;
+        inset-inline-start: calc(44px - 4px - 20px - 2px); /* 18px */
       }
       /* Checked state — thumb slides right (xl) */
       :scope[data-size="xl"] .ui-toggle-switch__input:checked ~ .ui-toggle-switch__track .ui-toggle-switch__thumb {
-        inset-inline-start: 24px;
+        inset-inline-start: calc(52px - 4px - 24px - 2px); /* 22px */
       }
 
       /* Stretch effect at motion level 3 — thumb widens during active press */

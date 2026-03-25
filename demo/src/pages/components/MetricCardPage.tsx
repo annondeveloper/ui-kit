@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useMemo, useRef, useEffect } from 'react'
+import { useState, useMemo, useCallback, useRef, useEffect } from 'react'
 import { css } from '@ui/core/styles/css-tag'
 import { useStyles } from '@ui/core/styles/use-styles'
 import { Button } from '@ui/components/button'
@@ -9,23 +9,18 @@ import { MetricCard } from '@ui/domain/metric-card'
 import { CopyBlock } from '@ui/domain/copy-block'
 import { Tabs, TabPanel } from '@ui/components/tabs'
 import { Icon } from '@ui/core/icons/icon'
-import { generateTheme } from '@ui/core/tokens/generator'
-import { TOKEN_TO_CSS, type ThemeTokens } from '@ui/core/tokens/tokens'
-import { useTheme } from '@ui/core/tokens/theme-context'
-import { ColorInput } from '@ui/components/color-input'
-import { PropsTable, type PropDef } from '../../components/PropsTable'
-import { useTier } from '../../App'
+import { useTier, type Tier } from '../../App'
 
 // ─── Page Styles ──────────────────────────────────────────────────────────────
 
 const pageStyles = css`
   @layer demo {
-    @scope (.metric-card-page) {
+    @scope (.mc-page) {
       :scope {
         max-inline-size: min(960px, 100%);
         margin-inline: auto;
         container-type: inline-size;
-        container-name: metric-card-page;
+        container-name: mc-page;
         display: flex;
         flex-direction: column;
         gap: 2rem;
@@ -33,7 +28,7 @@ const pageStyles = css`
 
       /* ── Hero header ────────────────────────────────── */
 
-      .metric-card-page__hero {
+      .mc-page__hero {
         position: relative;
         padding: 3rem 2rem;
         border-radius: var(--radius-lg);
@@ -43,7 +38,7 @@ const pageStyles = css`
       }
 
       /* Animated aurora glow */
-      .metric-card-page__hero::before {
+      .mc-page__hero::before {
         content: '';
         position: absolute;
         inset: -50%;
@@ -66,10 +61,10 @@ const pageStyles = css`
       }
 
       @media (prefers-reduced-motion: reduce) {
-        .metric-card-page__hero::before { animation: none; }
+        .mc-page__hero::before { animation: none; }
       }
 
-      .metric-card-page__title {
+      .mc-page__title {
         position: relative;
         font-size: clamp(2rem, 5vw, 3rem);
         font-weight: 800;
@@ -82,7 +77,7 @@ const pageStyles = css`
         line-height: 1.1;
       }
 
-      .metric-card-page__desc {
+      .mc-page__desc {
         position: relative;
         color: var(--text-secondary);
         font-size: var(--text-base, 1rem);
@@ -92,7 +87,7 @@ const pageStyles = css`
         text-wrap: pretty;
       }
 
-      .metric-card-page__import-row {
+      .mc-page__import-row {
         position: relative;
         display: flex;
         align-items: center;
@@ -100,7 +95,7 @@ const pageStyles = css`
         flex-wrap: wrap;
       }
 
-      .metric-card-page__import-code {
+      .mc-page__import-code {
         font-family: 'SF Mono', 'Fira Code', 'JetBrains Mono', monospace;
         font-size: var(--text-sm, 0.875rem);
         background: oklch(0% 0 0 / 0.2);
@@ -116,14 +111,14 @@ const pageStyles = css`
         box-shadow: inset 0 1px 0 oklch(100% 0 0 / 0.03);
       }
 
-      .metric-card-page__copy-btn {
+      .mc-page__copy-btn {
         font-size: var(--text-xs, 0.75rem);
         flex-shrink: 0;
       }
 
       /* ── Sections ───────────────────────────────────── */
 
-      .metric-card-page__section {
+      .mc-page__section {
         background: oklch(from var(--bg-elevated) calc(l + 0.02) c h);
         border: 1px solid var(--border-default);
         border-radius: var(--radius-lg);
@@ -153,7 +148,7 @@ const pageStyles = css`
       }
 
       @supports not (animation-timeline: view()) {
-        .metric-card-page__section {
+        .mc-page__section {
           opacity: 0;
           transform: translateY(32px) scale(0.98);
           filter: blur(4px);
@@ -161,7 +156,7 @@ const pageStyles = css`
         }
       }
 
-      .metric-card-page__section-title {
+      .mc-page__section-title {
         font-size: 1.125rem;
         font-weight: 700;
         color: var(--text-primary);
@@ -172,16 +167,16 @@ const pageStyles = css`
         scroll-margin-block-start: 2rem;
       }
 
-      .metric-card-page__section-title a {
+      .mc-page__section-title a {
         color: inherit;
         text-decoration: none;
       }
-      .metric-card-page__section-title a:hover {
+      .mc-page__section-title a:hover {
         text-decoration: underline;
         text-underline-offset: 0.2em;
       }
 
-      .metric-card-page__section-desc {
+      .mc-page__section-desc {
         color: var(--text-secondary);
         font-size: var(--text-sm, 0.875rem);
         line-height: 1.6;
@@ -191,7 +186,7 @@ const pageStyles = css`
 
       /* ── Preview box ────────────────────────────────── */
 
-      .metric-card-page__preview {
+      .mc-page__preview {
         padding: 2.5rem;
         border-radius: var(--radius-md);
         background: var(--bg-base);
@@ -206,7 +201,7 @@ const pageStyles = css`
       }
 
       /* Subtle dot grid */
-      .metric-card-page__preview::before {
+      .mc-page__preview::before {
         content: '';
         position: absolute;
         inset: 0;
@@ -215,27 +210,20 @@ const pageStyles = css`
         pointer-events: none;
       }
 
-      .metric-card-page__preview--col {
+      .mc-page__preview--col {
         flex-direction: column;
-        align-items: flex-start;
+        align-items: stretch;
       }
 
-      .metric-card-page__preview--grid {
+      .mc-page__preview--grid {
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
         gap: 1rem;
       }
 
-      .metric-card-page__preview--dashboard {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-        gap: 1rem;
-        padding: 2rem;
-      }
-
       /* ── Playground ─────────────────────────────────── */
 
-      .metric-card-page__playground {
+      .mc-page__playground {
         display: grid;
         grid-template-columns: 1fr 320px;
         gap: 1.5rem;
@@ -243,30 +231,30 @@ const pageStyles = css`
       }
 
       @media (max-width: 768px) {
-        .metric-card-page__playground {
+        .mc-page__playground {
           grid-template-columns: 1fr;
         }
-        .metric-card-page__playground-controls {
+        .mc-page__playground-controls {
           position: static !important;
         }
       }
 
-      @container metric-card-page (max-width: 680px) {
-        .metric-card-page__playground {
+      @container mc-page (max-width: 680px) {
+        .mc-page__playground {
           grid-template-columns: 1fr;
         }
-        .metric-card-page__playground-controls {
+        .mc-page__playground-controls {
           position: static !important;
         }
       }
 
-      .metric-card-page__playground-preview {
+      .mc-page__playground-preview {
         display: flex;
         flex-direction: column;
         gap: 1.5rem;
       }
 
-      .metric-card-page__playground-result {
+      .mc-page__playground-result {
         min-block-size: 200px;
         display: grid;
         place-items: center;
@@ -278,7 +266,7 @@ const pageStyles = css`
       }
 
       /* Dot grid for playground result */
-      .metric-card-page__playground-result::before {
+      .mc-page__playground-result::before {
         content: '';
         position: absolute;
         inset: 0;
@@ -288,7 +276,7 @@ const pageStyles = css`
       }
 
       /* Subtle aurora glow in playground */
-      .metric-card-page__playground-result::after {
+      .mc-page__playground-result::after {
         content: '';
         position: absolute;
         inset: 0;
@@ -296,7 +284,7 @@ const pageStyles = css`
         pointer-events: none;
       }
 
-      .metric-card-page__playground-controls {
+      .mc-page__playground-controls {
         background: var(--bg-surface);
         border: 1px solid var(--border-subtle);
         border-radius: var(--radius-md);
@@ -308,13 +296,13 @@ const pageStyles = css`
         top: 1rem;
       }
 
-      .metric-card-page__control-group {
+      .mc-page__control-group {
         display: flex;
         flex-direction: column;
         gap: 0.375rem;
       }
 
-      .metric-card-page__control-label {
+      .mc-page__control-label {
         font-size: var(--text-xs, 0.75rem);
         font-weight: 600;
         color: var(--text-tertiary);
@@ -322,13 +310,13 @@ const pageStyles = css`
         letter-spacing: 0.05em;
       }
 
-      .metric-card-page__control-options {
+      .mc-page__control-options {
         display: flex;
         flex-wrap: wrap;
         gap: 0.375rem;
       }
 
-      .metric-card-page__option-btn {
+      .mc-page__option-btn {
         font-size: var(--text-xs, 0.75rem);
         padding: 0.25rem 0.625rem;
         border: 1px solid var(--border-default);
@@ -341,24 +329,18 @@ const pageStyles = css`
         transition: all 0.12s;
         line-height: 1.4;
       }
-      .metric-card-page__option-btn:hover {
+      .mc-page__option-btn:hover {
         border-color: var(--border-strong);
         color: var(--text-primary);
       }
-      .metric-card-page__option-btn--active {
+      .mc-page__option-btn--active {
         background: var(--brand);
         color: oklch(100% 0 0);
         border-color: var(--brand);
         box-shadow: 0 0 0 3px var(--brand-subtle);
       }
 
-      .metric-card-page__toggle-row {
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-      }
-
-      .metric-card-page__toggle-label {
+      .mc-page__toggle-label {
         font-size: var(--text-sm, 0.875rem);
         color: var(--text-secondary);
         cursor: pointer;
@@ -367,7 +349,7 @@ const pageStyles = css`
         gap: 0.375rem;
       }
 
-      .metric-card-page__text-input {
+      .mc-page__text-input {
         font-size: var(--text-sm, 0.875rem);
         padding: 0.375rem 0.625rem;
         border: 1px solid var(--border-default);
@@ -377,7 +359,7 @@ const pageStyles = css`
         font-family: inherit;
         inline-size: 100%;
       }
-      .metric-card-page__text-input:focus {
+      .mc-page__text-input:focus {
         outline: 2px solid var(--brand);
         outline-offset: 1px;
         border-color: transparent;
@@ -386,21 +368,21 @@ const pageStyles = css`
 
       /* ── Labeled row ────────────────────────────────── */
 
-      .metric-card-page__labeled-row {
+      .mc-page__labeled-row {
         display: flex;
         flex-wrap: wrap;
         gap: 1.5rem;
         align-items: flex-end;
       }
 
-      .metric-card-page__labeled-item {
+      .mc-page__labeled-item {
         display: flex;
         flex-direction: column;
         align-items: center;
         gap: 0.75rem;
       }
 
-      .metric-card-page__item-label {
+      .mc-page__item-label {
         font-size: 0.6875rem;
         color: var(--text-tertiary);
         font-family: 'SF Mono', 'Fira Code', 'JetBrains Mono', monospace;
@@ -410,164 +392,90 @@ const pageStyles = css`
 
       /* ── States grid ────────────────────────────────── */
 
-      .metric-card-page__states-grid {
+      .mc-page__states-grid {
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
         gap: 1rem;
       }
 
-      .metric-card-page__state-cell {
+      .mc-page__state-cell {
         display: flex;
         flex-direction: column;
-        align-items: center;
         gap: 0.5rem;
         padding: 1.25rem 0.75rem;
         border: 1px solid var(--border-subtle);
         border-radius: var(--radius-md);
         background: var(--bg-base);
-        transition: border-color 0.2s, box-shadow 0.2s;
-      }
-      .metric-card-page__state-cell:hover {
-        border-color: var(--border-default);
-        box-shadow: 0 2px 8px oklch(0% 0 0 / 0.05);
       }
 
-      .metric-card-page__state-label {
+      .mc-page__state-label {
         font-size: var(--text-xs, 0.75rem);
         color: var(--text-tertiary);
         font-weight: 500;
+        text-align: center;
       }
 
-      /* ── Tier selector ──────────────────────────────── */
+      /* ── Weight Tier Cards ──────────────────────────── */
 
-      .metric-card-page__tier-selector {
-        display: flex;
-        border: 1px solid var(--border-default);
-        border-radius: var(--radius-lg);
-        overflow: hidden;
-        inline-size: fit-content;
+      .mc-page__tiers {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 1rem;
+      }
+
+      .mc-page__tier-card {
         background: var(--bg-surface);
-        box-shadow: var(--shadow-sm, 0 1px 3px oklch(0% 0 0 / 0.08));
-      }
-
-      .metric-card-page__tier-btn {
-        padding: 0.5rem 1rem;
-        font-size: var(--text-sm, 0.875rem);
-        font-weight: 600;
-        font-family: inherit;
-        border: none;
-        background: transparent;
-        color: var(--text-secondary);
-        cursor: pointer;
-        transition: all 0.12s;
+        border: 1px solid var(--border-subtle);
+        border-radius: var(--radius-md);
+        padding: 1.5rem;
         display: flex;
         flex-direction: column;
-        align-items: center;
-        gap: 0.125rem;
-        line-height: 1.2;
-      }
-      .metric-card-page__tier-btn:not(:last-child) {
-        border-inline-end: 1px solid var(--border-default);
-      }
-      .metric-card-page__tier-btn:hover {
-        background: var(--border-subtle);
-        color: var(--text-primary);
-      }
-      .metric-card-page__tier-btn--active {
-        background: linear-gradient(135deg, var(--brand) 0%, oklch(from var(--brand, oklch(65% 0.2 270)) calc(l + 0.1) c h) 100%);
-        color: oklch(100% 0 0);
-        box-shadow: 0 2px 8px var(--brand-glow);
-      }
-      .metric-card-page__tier-btn--active:hover {
-        background: linear-gradient(135deg, var(--brand) 0%, oklch(from var(--brand, oklch(65% 0.2 270)) calc(l + 0.1) c h) 100%);
-        color: oklch(100% 0 0);
-      }
-
-      .metric-card-page__tier-size-label {
-        font-size: 0.5625rem;
-        font-weight: 400;
-        opacity: 0.7;
-      }
-
-      /* ── Color picker ──────────────────────────────── */
-
-      .metric-card-page__color-presets {
-        display: flex;
-        gap: 0.25rem;
-        flex-wrap: wrap;
-      }
-
-      .metric-card-page__color-preset {
-        inline-size: 24px;
-        block-size: 24px;
-        border-radius: 50%;
-        border: 2px solid transparent;
+        gap: 0.75rem;
         cursor: pointer;
-        padding: 0;
-        transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1),
-                    border-color 0.15s,
-                    box-shadow 0.15s;
-        box-shadow: 0 1px 3px oklch(0% 0 0 / 0.2);
+        transition: border-color 0.2s, box-shadow 0.2s, transform 0.2s;
+        min-width: 0;
+        overflow: hidden;
       }
-      .metric-card-page__color-preset:hover {
-        transform: scale(1.2);
-        box-shadow: 0 2px 8px oklch(0% 0 0 / 0.3);
+      .mc-page__tier-card:hover {
+        border-color: var(--border-strong);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 16px oklch(0% 0 0 / 0.2);
       }
-      .metric-card-page__color-preset--active {
-        border-color: oklch(100% 0 0);
-        transform: scale(1.2);
-        box-shadow: 0 0 0 2px var(--bg-base), 0 0 0 4px oklch(100% 0 0 / 0.5);
+      .mc-page__tier-card--active {
+        border-color: var(--brand);
+        box-shadow: 0 0 0 1px var(--brand), 0 0 20px oklch(from var(--brand) l c h / 0.12);
       }
+
+      .mc-page__tier-header { display: flex; align-items: center; justify-content: space-between; }
+      .mc-page__tier-name { font-size: var(--text-sm, 0.875rem); font-weight: 700; color: var(--text-primary); }
+      .mc-page__tier-size { font-size: var(--text-xs, 0.75rem); color: var(--text-tertiary); font-family: 'SF Mono', 'Fira Code', monospace; }
+      .mc-page__tier-desc { font-size: var(--text-xs, 0.75rem); color: var(--text-secondary); line-height: 1.5; }
+      .mc-page__tier-import {
+        font-family: 'SF Mono', 'Fira Code', monospace;
+        font-size: 0.625rem;
+        color: oklch(from var(--brand) calc(l + 0.1) c h);
+        background: var(--border-subtle);
+        padding: 0.375rem 0.5rem;
+        border-radius: var(--radius-sm);
+        word-break: break-all;
+        line-height: 1.4;
+      }
+      .mc-page__tier-preview { display: flex; justify-content: center; padding-block-start: 0.5rem; }
 
       /* ── Code tabs ─────────────────────────────────── */
 
-      .metric-card-page__code-tabs {
+      .mc-page__code-tabs {
         margin-block-start: 1rem;
       }
 
-      /* ── Export button row ─────────────────────────── */
+      .mc-page__export-row { display: flex; align-items: center; gap: 0.5rem; margin-block-start: 0.75rem; }
+      .mc-page__export-status { font-size: var(--text-xs, 0.75rem); color: var(--text-tertiary); font-style: italic; }
 
-      .metric-card-page__export-row {
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-        margin-block-start: 0.75rem;
-      }
-
-      .metric-card-page__export-status {
-        font-size: var(--text-xs, 0.75rem);
-        color: var(--text-tertiary);
-        font-style: italic;
-      }
-
-      /* ── A11y list ──────────────────────────────────── */
-
-      .metric-card-page__a11y-list {
-        list-style: none;
-        margin: 0;
-        padding: 0;
-        display: flex;
-        flex-direction: column;
-        gap: 0.625rem;
-      }
-
-      .metric-card-page__a11y-item {
-        display: flex;
-        align-items: flex-start;
-        gap: 0.5rem;
-        font-size: var(--text-sm, 0.875rem);
-        color: var(--text-secondary);
-        line-height: 1.5;
-      }
-
-      .metric-card-page__a11y-icon {
-        color: var(--brand);
-        flex-shrink: 0;
-        margin-block-start: 0.125rem;
-      }
-
-      .metric-card-page__a11y-key {
-        font-family: 'SF Mono', 'Fira Code', 'JetBrains Mono', monospace;
+      .mc-page__a11y-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.625rem; }
+      .mc-page__a11y-item { display: flex; align-items: flex-start; gap: 0.5rem; font-size: var(--text-sm, 0.875rem); color: var(--text-secondary); line-height: 1.5; }
+      .mc-page__a11y-icon { color: var(--brand); flex-shrink: 0; margin-block-start: 0.125rem; }
+      .mc-page__a11y-key {
+        font-family: 'SF Mono', 'Fira Code', monospace;
         font-size: var(--text-xs, 0.75rem);
         background: var(--border-subtle);
         padding: 0.125rem 0.375rem;
@@ -576,259 +484,154 @@ const pageStyles = css`
         color: var(--text-primary);
       }
 
-      /* ── Source link ─────────────────────────────────── */
+      /* ── Props table ──────────────────────────────────── */
 
-      .metric-card-page__source-link {
-        display: inline-flex;
-        align-items: center;
-        gap: 0.5rem;
+      .mc-page__props-table {
+        inline-size: 100%;
+        border-collapse: collapse;
         font-size: var(--text-sm, 0.875rem);
-        color: var(--brand);
-        text-decoration: none;
-        font-weight: 500;
-      }
-      .metric-card-page__source-link:hover {
-        text-decoration: underline;
-        text-underline-offset: 0.2em;
       }
 
-      /* ── Feature sub-heading ────────────────────────── */
+      .mc-page__props-table th {
+        text-align: start;
+        padding: 0.5rem 0.75rem;
+        font-weight: 600;
+        color: var(--text-secondary);
+        border-block-end: 2px solid var(--border-default);
+        white-space: nowrap;
+      }
 
-      .metric-card-page__feature-heading {
-        font-size: var(--text-sm, 0.875rem);
+      .mc-page__props-table td {
+        padding: 0.5rem 0.75rem;
+        border-block-end: 1px solid var(--border-subtle);
+        color: var(--text-secondary);
+        vertical-align: top;
+      }
+
+      .mc-page__props-table td:first-child {
         font-weight: 600;
         color: var(--text-primary);
-        margin: 0 0 0.75rem;
-        padding-block-start: 0.5rem;
-      }
-
-      /* ── Weight Tier cards ────────────────────────── */
-
-      .metric-card-page__tiers {
-        display: grid;
-        grid-template-columns: 1fr;
-        gap: 1rem;
-        max-inline-size: 420px;
-      }
-
-      .metric-card-page__tier-card {
-        background: var(--bg-surface);
-        border: 1px solid var(--brand);
-        border-radius: var(--radius-md);
-        padding: 1.5rem;
-        display: flex;
-        flex-direction: column;
-        gap: 0.75rem;
-        box-shadow: 0 0 0 1px var(--brand), 0 0 20px oklch(from var(--brand) l c h / 0.12);
-        background: oklch(from var(--bg-surface) calc(l + 0.02) c h);
-        min-width: 0;
-        overflow: hidden;
-      }
-
-      .metric-card-page__tier-header {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-      }
-
-      .metric-card-page__tier-name {
-        font-size: var(--text-sm, 0.875rem);
-        font-weight: 700;
-        color: var(--text-primary);
-      }
-
-      .metric-card-page__tier-size {
-        font-size: var(--text-xs, 0.75rem);
-        color: var(--text-tertiary);
         font-family: 'SF Mono', 'Fira Code', 'JetBrains Mono', monospace;
-      }
-
-      .metric-card-page__tier-desc {
         font-size: var(--text-xs, 0.75rem);
-        color: var(--text-secondary);
-        line-height: 1.5;
-        text-align: start;
       }
 
-      .metric-card-page__tier-import {
+      .mc-page__props-table td:nth-child(2) {
         font-family: 'SF Mono', 'Fira Code', 'JetBrains Mono', monospace;
-        font-size: 0.625rem;
+        font-size: var(--text-xs, 0.75rem);
         color: oklch(from var(--brand) calc(l + 0.1) c h);
-        background: var(--border-subtle);
-        padding: 0.375rem 0.5rem;
-        border-radius: var(--radius-sm);
-        overflow-wrap: break-word;
-        word-break: break-all;
-        text-align: start;
-        line-height: 1.4;
       }
 
-      .metric-card-page__tier-preview {
-        display: flex;
-        justify-content: center;
-        padding-block-start: 0.5rem;
+      .mc-page__props-table td:nth-child(3) {
+        font-family: 'SF Mono', 'Fira Code', 'JetBrains Mono', monospace;
+        font-size: var(--text-xs, 0.75rem);
       }
 
-      .metric-card-page__size-breakdown {
+      .mc-page__color-presets {
         display: flex;
-        flex-direction: column;
         gap: 0.25rem;
-        font-size: 0.75rem;
-        color: var(--text-tertiary);
+        flex-wrap: wrap;
       }
 
-      .metric-card-page__size-row {
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
+      .mc-page__color-preset {
+        inline-size: 24px;
+        block-size: 24px;
+        border-radius: 50%;
+        border: 2px solid transparent;
+        cursor: pointer;
+        padding: 0;
+        transition: transform 0.2s, border-color 0.15s;
+        box-shadow: 0 1px 3px oklch(0% 0 0 / 0.2);
+      }
+      .mc-page__color-preset:hover { transform: scale(1.2); }
+      .mc-page__color-preset--active {
+        border-color: oklch(100% 0 0);
+        transform: scale(1.2);
+        box-shadow: 0 0 0 2px var(--bg-base), 0 0 0 4px oklch(100% 0 0 / 0.5);
       }
 
       /* ── Responsive ──────────────────────────────── */
 
       @media (max-width: 768px) {
-        .metric-card-page__hero {
+        .mc-page__hero {
           padding: 2rem 1.25rem;
         }
 
-        .metric-card-page__title {
+        .mc-page__title {
           font-size: 1.75rem;
         }
 
-        .metric-card-page__preview {
+        .mc-page__preview {
           padding: 1.75rem;
         }
 
-        .metric-card-page__playground {
+        .mc-page__playground {
           grid-template-columns: 1fr;
         }
 
-        .metric-card-page__playground-result {
+        .mc-page__playground-result {
           padding: 2rem;
           min-block-size: 120px;
         }
 
-        .metric-card-page__labeled-row {
+        .mc-page__labeled-row {
           gap: 1rem;
         }
 
-        .metric-card-page__tier-selector {
-          flex-wrap: wrap;
-          inline-size: 100%;
+        .mc-page__states-grid {
+          grid-template-columns: 1fr;
         }
 
-        .metric-card-page__tier-btn {
-          flex: 1;
-          min-inline-size: 0;
+        .mc-page__tiers {
+          grid-template-columns: 1fr;
         }
 
-        .metric-card-page__states-grid {
-          grid-template-columns: repeat(2, 1fr);
-        }
-
-        .metric-card-page__section {
+        .mc-page__section {
           padding: 1.25rem;
         }
-
-        .metric-card-page__preview--dashboard,
-        .metric-card-page__preview--grid {
-          grid-template-columns: 1fr;
-        }
       }
 
-      @media (max-width: 400px) {
-        .metric-card-page__hero {
+      @media (max-width: 640px) {
+        .mc-page__tiers {
+          grid-template-columns: 1fr;
+        }
+        .mc-page__hero {
           padding: 1.5rem 1rem;
         }
-
-        .metric-card-page__title {
+        .mc-page__title {
           font-size: 1.5rem;
         }
-
-        .metric-card-page__preview {
+        .mc-page__preview {
           padding: 1rem;
         }
-
-        .metric-card-page__states-grid {
-          grid-template-columns: 1fr;
-        }
-
-        .metric-card-page__labeled-row {
-          gap: 0.5rem;
-          justify-content: center;
-        }
       }
 
-      @media (min-width: 3000px) {
-        :scope {
-          max-inline-size: 1400px;
-        }
-
-        .metric-card-page__title {
-          font-size: 4rem;
-        }
-
-        .metric-card-page__preview {
-          padding: 3.5rem;
-        }
-
-        .metric-card-page__labeled-row {
-          gap: 2.5rem;
-        }
-      }
-
-      /* ── Scrollbar + code blocks ──────────────────── */
-
-      .metric-card-page__import-code,
-      .metric-card-page code,
-      pre {
+      .mc-page__import-code, .mc-page code, pre {
         overflow-x: auto;
         scrollbar-width: thin;
         scrollbar-color: var(--border-default) transparent;
         max-inline-size: 100%;
       }
-
-      :scope ::-webkit-scrollbar {
-        width: 4px;
-        height: 4px;
-      }
-      :scope ::-webkit-scrollbar-track {
-        background: transparent;
-      }
-      :scope ::-webkit-scrollbar-thumb {
-        background: var(--border-default);
-        border-radius: 2px;
-      }
-      :scope ::-webkit-scrollbar-thumb:hover {
-        background: var(--border-strong);
-      }
     }
   }
 `
 
-// ─── Props Data ───────────────────────────────────────────────────────────────
-
-const metricCardProps: PropDef[] = [
-  { name: 'title', type: 'ReactNode', required: true, description: 'Header label describing the metric (e.g., "Revenue", "Users").' },
-  { name: 'value', type: 'ReactNode', required: true, description: 'The primary metric value displayed prominently.' },
-  { name: 'change', type: '{ value: number; period?: string }', description: 'Percentage change with optional comparison period (e.g., { value: 12.5, period: "last month" }).' },
-  { name: 'trend', type: "'up' | 'down' | 'flat'", description: 'Trend direction indicator arrow. Colored green (up), red (down), or neutral (flat).' },
-  { name: 'status', type: "'ok' | 'warning' | 'critical'", description: 'Status accent — adds a colored left border to indicate health.' },
-  { name: 'icon', type: 'ReactNode', description: 'Leading icon element rendered in the header row next to the title.' },
-  { name: 'sparkline', type: 'number[]', description: 'Array of numeric data points rendered as a mini sparkline chart below the value. Requires at least 2 points.' },
-  { name: 'loading', type: 'boolean', default: 'false', description: 'Shows a pulsing skeleton placeholder for the value.' },
-  { name: 'error', type: 'ReactNode', description: 'Error state content — replaces the value when present.' },
-  { name: 'empty', type: 'ReactNode', description: 'Empty state content — shown when value is falsy and no error.' },
-  { name: 'motion', type: '0 | 1 | 2 | 3', description: 'Animation intensity override. Controls entrance animation and hover effects.' },
-  { name: 'className', type: 'string', description: 'Additional CSS class name merged with the component class.' },
-]
-
-// ─── Helpers ──────────────────────────────────────────────────────────────────
+// ─── Types ───────────────────────────────────────────────────────────────────
 
 type Status = 'ok' | 'warning' | 'critical'
-type TrendDir = 'up' | 'down' | 'flat'
+type Trend = 'up' | 'down' | 'flat'
 
+// ─── Constants ───────────────────────────────────────────────────────────────
 
-const IMPORT_STRING = "import { MetricCard } from '@annondeveloper/ui-kit'"
+const STATUSES: Status[] = ['ok', 'warning', 'critical']
+const TRENDS: Trend[] = ['up', 'down', 'flat']
+
+const IMPORT_STRINGS: Record<Tier, string> = {
+  lite: "import { MetricCard } from '@annondeveloper/ui-kit/lite'",
+  standard: "import { MetricCard } from '@annondeveloper/ui-kit'",
+  premium: "import { MetricCard } from '@annondeveloper/ui-kit/premium'",
+}
+
+const SAMPLE_SPARKLINE = [12, 18, 14, 22, 19, 25, 28, 24, 30, 27, 35, 32]
 
 const COLOR_PRESETS = [
   { hex: '#6366f1', name: 'Indigo' },
@@ -843,9 +646,31 @@ const COLOR_PRESETS = [
   { hex: '#64748b', name: 'Slate' },
 ]
 
-const SAMPLE_SPARKLINE = [10, 25, 18, 30, 22, 35, 28, 42, 38, 45, 40, 52]
-const SAMPLE_SPARKLINE_DOWN = [52, 48, 45, 38, 42, 35, 30, 28, 25, 20, 22, 18]
-const SAMPLE_SPARKLINE_FLAT = [30, 32, 28, 31, 29, 30, 33, 28, 31, 30, 32, 29]
+// ─── Props Data ─────────────────────────────────────────────────────────────
+
+interface PropDef {
+  name: string
+  type: string
+  default?: string
+  description: string
+}
+
+const metricCardProps: PropDef[] = [
+  { name: 'title', type: 'ReactNode', description: 'Label displayed above the metric value. Typically a short string describing the metric.' },
+  { name: 'value', type: 'ReactNode', description: 'The primary numeric or text display. Rendered large and prominent.' },
+  { name: 'change', type: '{ value: number; period?: string }', description: 'Percentage change indicator. Shows + prefix for positive values and optional comparison period.' },
+  { name: 'trend', type: "'up' | 'down' | 'flat'", description: 'Directional arrow indicator. Colors: up = green, down = red, flat = neutral.' },
+  { name: 'status', type: "'ok' | 'warning' | 'critical'", description: 'Status accent: colored left border, ambient glow, and pulsing status dot.' },
+  { name: 'icon', type: 'ReactNode', description: 'Custom icon rendered in the header row next to the title.' },
+  { name: 'sparkline', type: 'number[]', description: 'Array of numeric data points. Rendered as a mini SVG sparkline chart below the value.' },
+  { name: 'loading', type: 'boolean', default: 'false', description: 'Shows a skeleton pulse animation and hides the value.' },
+  { name: 'error', type: 'ReactNode', description: 'Error state content. Replaces value and hides change/sparkline when set.' },
+  { name: 'empty', type: 'ReactNode', description: 'Empty state content shown when value is falsy and error is not set.' },
+  { name: 'motion', type: '0 | 1 | 2 | 3', description: 'Animation intensity. 0=none, 1=subtle transitions, 2=fade-up entrance, 3=full physics.' },
+  { name: 'className', type: 'string', description: 'Additional CSS class name merged with the component class.' },
+]
+
+// ─── Helpers ─────────────────────────────────────────────────────────────────
 
 function CopyButton({ text }: { text: string }) {
   const [copied, setCopied] = useState(false)
@@ -853,7 +678,7 @@ function CopyButton({ text }: { text: string }) {
     <Button
       size="sm"
       variant="secondary"
-      className="metric-card-page__copy-btn"
+      className="mc-page__copy-btn"
       onClick={() => {
         navigator.clipboard.writeText(text).then(() => {
           setCopied(true)
@@ -879,14 +704,14 @@ function OptionGroup<T extends string>({
   onChange: (v: T) => void
 }) {
   return (
-    <div className="metric-card-page__control-group">
-      <span className="metric-card-page__control-label">{label}</span>
-      <div className="metric-card-page__control-options">
+    <div className="mc-page__control-group">
+      <span className="mc-page__control-label">{label}</span>
+      <div className="mc-page__control-options">
         {options.map(opt => (
           <button
             key={opt}
             type="button"
-            className={`metric-card-page__option-btn${opt === value ? ' metric-card-page__option-btn--active' : ''}`}
+            className={`mc-page__option-btn${opt === value ? ' mc-page__option-btn--active' : ''}`}
             onClick={() => onChange(opt)}
           >
             {opt}
@@ -907,7 +732,7 @@ function Toggle({
   onChange: (v: boolean) => void
 }) {
   return (
-    <label className="metric-card-page__toggle-label">
+    <label className="mc-page__toggle-label">
       <input
         type="checkbox"
         checked={checked}
@@ -922,167 +747,155 @@ function Toggle({
 // ─── Code Generation ─────────────────────────────────────────────────────────
 
 function generateReactCode(
+  tier: Tier,
   title: string,
   value: string,
-  changeValue: string,
-  changePeriod: string,
-  trend: TrendDir | 'none',
+  trend: Trend | 'none',
   status: Status | 'none',
-  loading: boolean,
-  showIcon: boolean,
+  changeVal: number,
   showSparkline: boolean,
+  showIcon: boolean,
+  loading: boolean,
   motion: number,
 ): string {
-  const importStr = IMPORT_STRING
+  const importStr = IMPORT_STRINGS[tier]
   const iconImport = showIcon ? "\nimport { Icon } from '@annondeveloper/ui-kit'" : ''
 
-  const props: string[] = []
-  props.push(`  title="${title}"`)
-  props.push(`  value="${value}"`)
-  if (changeValue && changeValue !== '0') {
-    const cv = Number(changeValue)
-    const changeParts = [`value: ${cv}`]
-    if (changePeriod) changeParts.push(`period: '${changePeriod}'`)
-    props.push(`  change={{ ${changeParts.join(', ')} }}`)
-  }
+  const props: string[] = [`  title="${title}"`, `  value="${value}"`]
   if (trend !== 'none') props.push(`  trend="${trend}"`)
-  if (status !== 'none') props.push(`  status="${status}"`)
-  if (loading) props.push('  loading')
-  if (showIcon) props.push('  icon={<Icon name="activity" size="sm" />}')
-  if (showSparkline) props.push('  sparkline={[10, 25, 18, 30, 22, 35, 28, 42, 38, 45]}')
-  if (motion !== 3) props.push(`  motion={${motion}}`)
+  if (status !== 'none' && tier !== 'lite') props.push(`  status="${status}"`)
+  if (changeVal !== 0) props.push(`  change={{ value: ${changeVal}, period: 'last month' }}`)
+  if (showSparkline && tier !== 'lite') props.push(`  sparkline={[12, 18, 14, 22, 19, 25, 28, 24, 30, 27, 35, 32]}`)
+  if (showIcon && tier !== 'lite') props.push('  icon={<Icon name="activity" size="sm" />}')
+  if (loading && tier !== 'lite') props.push('  loading')
+  if (motion !== 3 && tier !== 'lite') props.push(`  motion={${motion}}`)
 
-  const jsx = `<MetricCard\n${props.join('\n')}\n/>`
-
-  return `${importStr}${iconImport}\n\n${jsx}`
+  return `${importStr}${iconImport}\n\n<MetricCard\n${props.join('\n')}\n/>`
 }
 
-function generateHtmlCssCode(
+function generateHtmlCode(
+  tier: Tier,
   title: string,
   value: string,
+  trend: Trend | 'none',
   status: Status | 'none',
 ): string {
-  const statusAttr = status !== 'none' ? ` data-status="${status}"` : ''
-  return `<!-- MetricCard — @annondeveloper/ui-kit -->
+  const statusAttr = status !== 'none' && tier !== 'lite' ? ` data-status="${status}"` : ''
+  const trendHtml = trend !== 'none'
+    ? `\n    <span class="ui-metric-card__trend" data-trend="${trend}">${trend === 'up' ? '\u2191' : trend === 'down' ? '\u2193' : '\u2192'}</span>`
+    : ''
+
+  return `<!-- MetricCard \u2014 @annondeveloper/ui-kit ${tier} tier -->
 <link rel="stylesheet" href="https://unpkg.com/@annondeveloper/ui-kit/css/components/metric-card.css">
 
-<div class="ui-metric-card"${statusAttr} role="group" aria-label="${title}">
+<div class="ui-metric-card" role="group" aria-label="${title}"${statusAttr}>
   <div class="ui-metric-card__header">
     <h3 class="ui-metric-card__title">${title}</h3>
   </div>
   <div class="ui-metric-card__value">${value}</div>
-</div>
-
-<!-- Or import in your CSS: -->
-<!-- @import '@annondeveloper/ui-kit/css/components/metric-card.css'; -->`
+  <div class="ui-metric-card__change">${trendHtml}
+  </div>
+</div>`
 }
 
 function generateVueCode(
+  tier: Tier,
   title: string,
   value: string,
-  trend: TrendDir | 'none',
+  trend: Trend | 'none',
   status: Status | 'none',
 ): string {
-  const props: string[] = []
-  props.push(`  title="${title}"`)
-  props.push(`  value="${value}"`)
-  if (trend !== 'none') props.push(`  trend="${trend}"`)
-  if (status !== 'none') props.push(`  status="${status}"`)
+  if (tier === 'lite') {
+    return `<template>
+  <div class="ui-metric-card" role="group" aria-label="${title}">
+    <div class="ui-metric-card__header">
+      <h3 class="ui-metric-card__title">${title}</h3>
+    </div>
+    <div class="ui-metric-card__value">${value}</div>
+  </div>
+</template>
+
+<style>
+@import '@annondeveloper/ui-kit/css/components/metric-card.css';
+</style>`
+  }
+
+  const importPath = tier === 'premium' ? '@annondeveloper/ui-kit/premium' : '@annondeveloper/ui-kit'
+  const attrs: string[] = [`  title="${title}"`, `  value="${value}"`]
+  if (trend !== 'none') attrs.push(`  trend="${trend}"`)
+  if (status !== 'none') attrs.push(`  status="${status}"`)
 
   return `<template>
   <MetricCard
-  ${props.join('\n  ')}
+  ${attrs.join('\n  ')}
   />
 </template>
 
 <script setup>
-import { MetricCard } from '@annondeveloper/ui-kit'
+import { MetricCard } from '${importPath}'
 </script>`
 }
 
-function generateAngularCode(
-  title: string,
-  value: string,
-  status: Status | 'none',
-): string {
-  const statusAttr = status !== 'none' ? `\n  data-status="${status}"` : ''
-  return `<!-- Angular — Use the CSS-only approach -->
-<div
-  class="ui-metric-card"${statusAttr}
-  role="group"
-  aria-label="${title}"
->
-  <div class="ui-metric-card__header">
-    <h3 class="ui-metric-card__title">${title}</h3>
-  </div>
-  <div class="ui-metric-card__value">${value}</div>
-</div>
-
-/* Import component CSS */
-@import '@annondeveloper/ui-kit/css/components/metric-card.css';`
+function generateAngularCode(tier: Tier, title: string, value: string, status: Status | 'none'): string {
+  const statusAttr = status !== 'none' && tier !== 'lite' ? ` data-status="${status}"` : ''
+  const cssPath = tier === 'premium' ? '@annondeveloper/ui-kit/premium' : '@annondeveloper/ui-kit'
+  return `<!-- Angular \u2014 ${tier} tier -->\n<div class="ui-metric-card" role="group" aria-label="${title}"${statusAttr}>\n  <div class="ui-metric-card__header">\n    <h3 class="ui-metric-card__title">${title}</h3>\n  </div>\n  <div class="ui-metric-card__value">${value}</div>\n</div>\n\n/* styles.css */\n@import '${cssPath}/css/components/metric-card.css';`
 }
 
-function generateSvelteCode(
-  title: string,
-  value: string,
-  trend: TrendDir | 'none',
-  status: Status | 'none',
-): string {
-  const props: string[] = []
-  props.push(`  title="${title}"`)
-  props.push(`  value="${value}"`)
-  if (trend !== 'none') props.push(`  trend="${trend}"`)
-  if (status !== 'none') props.push(`  status="${status}"`)
-
-  return `<script>
-  import { MetricCard } from '@annondeveloper/ui-kit';
-</script>
-
-<MetricCard
-${props.join('\n')}
-/>`
+function generateSvelteCode(tier: Tier, title: string, value: string, trend: Trend | 'none', status: Status | 'none'): string {
+  if (tier === 'lite') {
+    return `<div class="ui-metric-card" role="group" aria-label="${title}">\n  <div class="ui-metric-card__header">\n    <h3 class="ui-metric-card__title">${title}</h3>\n  </div>\n  <div class="ui-metric-card__value">${value}</div>\n</div>\n\n<style>\n  @import '@annondeveloper/ui-kit/css/components/metric-card.css';\n</style>`
+  }
+  const importPath = tier === 'premium' ? '@annondeveloper/ui-kit/premium' : '@annondeveloper/ui-kit'
+  const attrs: string[] = [`  title="${title}"`, `  value="${value}"`]
+  if (trend !== 'none') attrs.push(`  trend="${trend}"`)
+  if (status !== 'none') attrs.push(`  status="${status}"`)
+  return `<script>\n  import { MetricCard } from '${importPath}';\n</script>\n\n<MetricCard\n${attrs.join('\n')}\n/>`
 }
 
-// ─── Section: Interactive Playground ──────────────────────────────────────────
+// ─── Playground Section ──────────────────────────────────────────────────────
 
-function PlaygroundSection() {
+function PlaygroundSection({ tier: tierProp, brandColor }: { tier: Tier; brandColor: string }) {
+  const { tier: contextTier } = useTier()
+  const tier = tierProp ?? contextTier
+
   const [title, setTitle] = useState('Revenue')
-  const [value, setValue] = useState('$48,250')
-  const [changeValue, setChangeValue] = useState('12.5')
-  const [changePeriod, setChangePeriod] = useState('last month')
-  const [trend, setTrend] = useState<TrendDir | 'none'>('up')
-  const [status, setStatus] = useState<Status | 'none'>('none')
-  const [loading, setLoading] = useState(false)
-  const [showIcon, setShowIcon] = useState(true)
+  const [value, setValue] = useState('$48,290')
+  const [trend, setTrend] = useState<Trend | 'none'>('up')
+  const [status, setStatus] = useState<Status | 'none'>('ok')
+  const [changeVal, setChangeVal] = useState(12)
   const [showSparkline, setShowSparkline] = useState(true)
+  const [showIcon, setShowIcon] = useState(false)
+  const [loading, setLoading] = useState(false)
   const [motion, setMotion] = useState<0 | 1 | 2 | 3>(3)
   const [copyStatus, setCopyStatus] = useState('')
-  const [activeCodeTab, setActiveCodeTab] = useState('react')
 
   const reactCode = useMemo(
-    () => generateReactCode(title, value, changeValue, changePeriod, trend, status, loading, showIcon, showSparkline, motion),
-    [title, value, changeValue, changePeriod, trend, status, loading, showIcon, showSparkline, motion],
+    () => generateReactCode(tier, title, value, trend, status, changeVal, showSparkline, showIcon, loading, motion),
+    [tier, title, value, trend, status, changeVal, showSparkline, showIcon, loading, motion],
   )
 
-  const htmlCssCode = useMemo(
-    () => generateHtmlCssCode(title, value, status),
-    [title, value, status],
+  const htmlCode = useMemo(
+    () => generateHtmlCode(tier, title, value, trend, status),
+    [tier, title, value, trend, status],
   )
 
   const vueCode = useMemo(
-    () => generateVueCode(title, value, trend, status),
-    [title, value, trend, status],
+    () => generateVueCode(tier, title, value, trend, status),
+    [tier, title, value, trend, status],
   )
 
   const angularCode = useMemo(
-    () => generateAngularCode(title, value, status),
-    [title, value, status],
+    () => generateAngularCode(tier, title, value, status),
+    [tier, title, value, status],
   )
 
   const svelteCode = useMemo(
-    () => generateSvelteCode(title, value, trend, status),
-    [title, value, trend, status],
+    () => generateSvelteCode(tier, title, value, trend, status),
+    [tier, title, value, trend, status],
   )
+
+  const [activeCodeTab, setActiveCodeTab] = useState('react')
 
   const codeTabs = [
     { id: 'react', label: 'React' },
@@ -1095,73 +908,71 @@ function PlaygroundSection() {
   const activeCode = useMemo(() => {
     switch (activeCodeTab) {
       case 'react': return reactCode
-      case 'html': return htmlCssCode
+      case 'html': return htmlCode
       case 'vue': return vueCode
       case 'angular': return angularCode
       case 'svelte': return svelteCode
       default: return reactCode
     }
-  }, [activeCodeTab, reactCode, htmlCssCode, vueCode, angularCode, svelteCode])
+  }, [activeCodeTab, reactCode, htmlCode, vueCode, angularCode, svelteCode])
 
-  const previewProps: Record<string, unknown> = {
-    title,
-    value: loading ? undefined : value,
-    loading,
-    motion,
-  }
-  if (changeValue && changeValue !== '0') {
-    const cv = Number(changeValue)
-    if (!isNaN(cv)) {
-      previewProps.change = { value: cv, ...(changePeriod ? { period: changePeriod } : {}) }
-    }
-  }
-  if (trend !== 'none') previewProps.trend = trend
-  if (status !== 'none') previewProps.status = status
-  if (showIcon) previewProps.icon = <Icon name="activity" size="sm" />
-  if (showSparkline) previewProps.sparkline = SAMPLE_SPARKLINE
+  const handleCopy = useCallback(() => {
+    navigator.clipboard?.writeText(activeCode).then(() => {
+      setCopyStatus(`Copied ${codeTabs.find(t => t.id === activeCodeTab)?.label}!`)
+      setTimeout(() => setCopyStatus(''), 2000)
+    })
+  }, [activeCode, activeCodeTab])
+
+  // Build preview card props
+  const cardProps: Record<string, unknown> = { title, value }
+  if (trend !== 'none') cardProps.trend = trend
+  if (status !== 'none' && tier !== 'lite') cardProps.status = status
+  if (changeVal !== 0) cardProps.change = { value: changeVal, period: 'last month' }
+  if (showSparkline && tier !== 'lite') cardProps.sparkline = SAMPLE_SPARKLINE
+  if (showIcon && tier !== 'lite') cardProps.icon = <Icon name="activity" size="sm" />
+  if (loading && tier !== 'lite') cardProps.loading = true
+  if (motion !== 3 && tier !== 'lite') cardProps.motion = motion
+
+  // Brand color as inline CSS variable on the preview container
+  const previewStyle: React.CSSProperties = brandColor !== '#6366f1'
+    ? { '--brand': brandColor, '--brand-glow': `${brandColor}40` } as React.CSSProperties
+    : {}
 
   return (
-    <section className="metric-card-page__section" id="playground">
-      <h2 className="metric-card-page__section-title">
+    <section className="mc-page__section" id="playground">
+      <h2 className="mc-page__section-title">
         <a href="#playground">Live Playground</a>
       </h2>
-      <p className="metric-card-page__section-desc">
+      <p className="mc-page__section-desc">
         Tweak every prop and see the result in real-time. The generated code updates as you change settings.
       </p>
 
-      <div className="metric-card-page__playground">
-        {/* Preview area — left / top */}
-        <div className="metric-card-page__playground-preview">
-          <div className="metric-card-page__playground-result">
-            <div style={{ inlineSize: 'min(320px, 100%)' }}>
-              <MetricCard {...previewProps as any} />
-            </div>
+      <div className="mc-page__playground">
+        {/* Preview area */}
+        <div className="mc-page__playground-preview">
+          <div className="mc-page__playground-result" style={{ ...previewStyle, maxInlineSize: '320px', margin: '0 auto' }}>
+            <MetricCard {...cardProps} />
           </div>
 
           {/* Tabbed code output */}
-          <div className="metric-card-page__code-tabs">
-            <div className="metric-card-page__export-row">
+          <div className="mc-page__code-tabs">
+            <div className="mc-page__export-row">
               <Button
                 size="xs"
                 variant="secondary"
                 icon={<Icon name="copy" size="sm" />}
-                onClick={() => {
-                  navigator.clipboard?.writeText(activeCode).then(() => {
-                    setCopyStatus(`Copied ${codeTabs.find(t => t.id === activeCodeTab)?.label}!`)
-                    setTimeout(() => setCopyStatus(''), 2000)
-                  })
-                }}
+                onClick={handleCopy}
               >
                 Copy {codeTabs.find(t => t.id === activeCodeTab)?.label}
               </Button>
-              {copyStatus && <span className="metric-card-page__export-status">{copyStatus}</span>}
+              {copyStatus && <span className="mc-page__export-status">{copyStatus}</span>}
             </div>
             <Tabs tabs={codeTabs} activeTab={activeCodeTab} onChange={setActiveCodeTab} size="sm" variant="pills">
               <TabPanel tabId="react">
                 <CopyBlock code={reactCode} language="typescript" showLineNumbers />
               </TabPanel>
               <TabPanel tabId="html">
-                <CopyBlock code={htmlCssCode} language="html" showLineNumbers />
+                <CopyBlock code={htmlCode} language="html" showLineNumbers />
               </TabPanel>
               <TabPanel tabId="vue">
                 <CopyBlock code={vueCode} language="html" showLineNumbers />
@@ -1176,81 +987,72 @@ function PlaygroundSection() {
           </div>
         </div>
 
-        {/* Controls panel — right / bottom */}
-        <div className="metric-card-page__playground-controls">
-          <div className="metric-card-page__control-group">
-            <span className="metric-card-page__control-label">Title</span>
-            <input
-              type="text"
-              value={title}
-              onChange={e => setTitle(e.target.value)}
-              className="metric-card-page__text-input"
-              placeholder="Metric title..."
-            />
-          </div>
-
-          <div className="metric-card-page__control-group">
-            <span className="metric-card-page__control-label">Value</span>
-            <input
-              type="text"
-              value={value}
-              onChange={e => setValue(e.target.value)}
-              className="metric-card-page__text-input"
-              placeholder="Metric value..."
-            />
-          </div>
-
-          <div className="metric-card-page__control-group">
-            <span className="metric-card-page__control-label">Change (%)</span>
-            <input
-              type="number"
-              value={changeValue}
-              onChange={e => setChangeValue(e.target.value)}
-              className="metric-card-page__text-input"
-              placeholder="12.5"
-              step="0.1"
-            />
-          </div>
-
-          <div className="metric-card-page__control-group">
-            <span className="metric-card-page__control-label">Period</span>
-            <input
-              type="text"
-              value={changePeriod}
-              onChange={e => setChangePeriod(e.target.value)}
-              className="metric-card-page__text-input"
-              placeholder="last month"
-            />
-          </div>
-
+        {/* Controls panel */}
+        <div className="mc-page__playground-controls">
           <OptionGroup
             label="Trend"
             options={['none', 'up', 'down', 'flat'] as const}
             value={trend}
-            onChange={v => setTrend(v as TrendDir | 'none')}
+            onChange={v => setTrend(v as Trend | 'none')}
           />
 
-          <OptionGroup
-            label="Status"
-            options={['none', 'ok', 'warning', 'critical'] as const}
-            value={status}
-            onChange={v => setStatus(v as Status | 'none')}
-          />
+          {tier !== 'lite' && (
+            <OptionGroup
+              label="Status"
+              options={['none', 'ok', 'warning', 'critical'] as const}
+              value={status}
+              onChange={v => setStatus(v as Status | 'none')}
+            />
+          )}
 
-          <OptionGroup
-            label="Motion"
-            options={['0', '1', '2', '3'] as const}
-            value={String(motion) as '0' | '1' | '2' | '3'}
-            onChange={v => setMotion(Number(v) as 0 | 1 | 2 | 3)}
-          />
+          {tier !== 'lite' && (
+            <OptionGroup
+              label="Motion"
+              options={['0', '1', '2', '3'] as const}
+              value={String(motion) as '0' | '1' | '2' | '3'}
+              onChange={v => setMotion(Number(v) as 0 | 1 | 2 | 3)}
+            />
+          )}
 
-          <div className="metric-card-page__control-group">
-            <span className="metric-card-page__control-label">Toggles</span>
+          <div className="mc-page__control-group">
+            <span className="mc-page__control-label">Toggles</span>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.375rem' }}>
-              <Toggle label="Loading" checked={loading} onChange={setLoading} />
-              <Toggle label="Icon" checked={showIcon} onChange={setShowIcon} />
-              <Toggle label="Sparkline" checked={showSparkline} onChange={setShowSparkline} />
+              {tier !== 'lite' && <Toggle label="Sparkline" checked={showSparkline} onChange={setShowSparkline} />}
+              {tier !== 'lite' && <Toggle label="Icon" checked={showIcon} onChange={setShowIcon} />}
+              {tier !== 'lite' && <Toggle label="Loading" checked={loading} onChange={setLoading} />}
             </div>
+          </div>
+
+          <div className="mc-page__control-group">
+            <span className="mc-page__control-label">Title</span>
+            <input
+              type="text"
+              value={title}
+              onChange={e => setTitle(e.target.value)}
+              className="mc-page__text-input"
+              placeholder="Metric title..."
+            />
+          </div>
+
+          <div className="mc-page__control-group">
+            <span className="mc-page__control-label">Value</span>
+            <input
+              type="text"
+              value={value}
+              onChange={e => setValue(e.target.value)}
+              className="mc-page__text-input"
+              placeholder="Metric value..."
+            />
+          </div>
+
+          <div className="mc-page__control-group">
+            <span className="mc-page__control-label">Change %</span>
+            <input
+              type="number"
+              value={changeVal}
+              onChange={e => setChangeVal(Number(e.target.value))}
+              className="mc-page__text-input"
+            />
           </div>
         </div>
       </div>
@@ -1261,44 +1063,24 @@ function PlaygroundSection() {
 // ─── Main Page ────────────────────────────────────────────────────────────────
 
 export default function MetricCardPage() {
-  useStyles('metric-card-page', pageStyles)
+  useStyles('mc-page', pageStyles)
 
-  useTier() // consistent with other pages
+  const { tier, setTier } = useTier()
   const [brandColor, setBrandColor] = useState('#6366f1')
   const pageRef = useRef<HTMLDivElement>(null)
-  const { mode } = useTheme()
 
-  const themeTokens = useMemo(() => {
-    try {
-      return generateTheme(brandColor, mode)
-    } catch {
-      return null
-    }
-  }, [brandColor, mode])
-
-  const BRAND_ONLY_KEYS: (keyof ThemeTokens)[] = [
-    'brand', 'brandLight', 'brandDark', 'brandSubtle', 'brandGlow',
-    'borderGlow', 'aurora1', 'aurora2',
-  ]
-
-  const themeStyle = useMemo(() => {
-    if (!themeTokens || brandColor === '#6366f1') return undefined
-    const style: Record<string, string> = {}
-    for (const key of BRAND_ONLY_KEYS) {
-      const cssVar = TOKEN_TO_CSS[key]
-      const value = themeTokens[key]
-      if (cssVar && value) style[cssVar] = value
-    }
-    return style as React.CSSProperties
-  }, [themeTokens, brandColor])
+  // Brand color as inline CSS variables (simple, no theme generator)
+  const brandStyle: React.CSSProperties = brandColor !== '#6366f1'
+    ? { '--brand': brandColor, '--brand-glow': `${brandColor}40`, '--brand-subtle': `${brandColor}20` } as React.CSSProperties
+    : {}
 
   // Scroll reveal for sections — JS fallback for browsers without animation-timeline
   useEffect(() => {
-    const sections = document.querySelectorAll('.metric-card-page__section')
+    const sections = document.querySelectorAll('.mc-page__section')
     if (!sections.length) return
 
     // Check if CSS animation-timeline is supported
-    if (CSS.supports?.('animation-timeline', 'view()')) return // CSS handles it
+    if (CSS.supports?.('animation-timeline', 'view()')) return
 
     const observer = new IntersectionObserver(
       (entries) => {
@@ -1326,441 +1108,384 @@ export default function MetricCardPage() {
   }, [])
 
   return (
-    <div className="metric-card-page" ref={pageRef} style={themeStyle}>
+    <div className="mc-page" ref={pageRef} style={brandStyle}>
+
       {/* ── 1. Hero Header ──────────────────────────────── */}
-      <div className="metric-card-page__hero">
-        <h1 className="metric-card-page__title">MetricCard</h1>
-        <p className="metric-card-page__desc">
-          Dashboard metric display with value, trend indicators, status accents, sparkline charts,
-          and loading states. A domain component built for analytics dashboards and monitoring UIs.
+      <div className="mc-page__hero">
+        <h1 className="mc-page__title">MetricCard</h1>
+        <p className="mc-page__desc">
+          Real-time stats display with trend indicators, status accents, sparkline charts,
+          and container-adaptive layout. Ships in three tiers from CSS-only lite to aurora-glow premium.
         </p>
-        <div className="metric-card-page__import-row">
-          <code className="metric-card-page__import-code">{IMPORT_STRING}</code>
-          <CopyButton text={IMPORT_STRING} />
+        <div className="mc-page__import-row">
+          <code className="mc-page__import-code">{IMPORT_STRINGS[tier]}</code>
+          <CopyButton text={IMPORT_STRINGS[tier]} />
         </div>
       </div>
 
       {/* ── 2. Live Playground ──────────────────────────── */}
-      <PlaygroundSection />
+      <PlaygroundSection tier={tier} brandColor={brandColor} />
 
-      {/* ── 3. Variants (Status) ────────────────────────── */}
-      <section className="metric-card-page__section" id="variants">
-        <h2 className="metric-card-page__section-title">
-          <a href="#variants">Variants</a>
+      {/* ── 3. Status Variants ─────────────────────────── */}
+      <section className="mc-page__section" id="statuses">
+        <h2 className="mc-page__section-title">
+          <a href="#statuses">Status Variants</a>
         </h2>
-        <p className="metric-card-page__section-desc">
-          Status variants add a colored left border accent to communicate metric health at a glance.
-          Choose from ok (green), warning (amber), and critical (red) — or leave unset for a neutral card.
+        <p className="mc-page__section-desc">
+          Three status levels with color-coded left border, ambient glow shadows, and pulsing status dot.
+          Status variants are available in standard and premium tiers.
         </p>
-        <div className="metric-card-page__preview metric-card-page__preview--grid">
+        <div className="mc-page__states-grid">
+          <div className="mc-page__state-cell">
+            <MetricCard
+              title="Uptime"
+              value="99.97%"
+              status="ok"
+              trend="up"
+              change={{ value: 0.02, period: 'last week' }}
+            />
+            <span className="mc-page__state-label">ok</span>
+          </div>
+          <div className="mc-page__state-cell">
+            <MetricCard
+              title="CPU Load"
+              value="78%"
+              status="warning"
+              trend="up"
+              change={{ value: 15, period: 'last hour' }}
+            />
+            <span className="mc-page__state-label">warning</span>
+          </div>
+          <div className="mc-page__state-cell">
+            <MetricCard
+              title="Error Rate"
+              value="4.2%"
+              status="critical"
+              trend="up"
+              change={{ value: 280, period: 'yesterday' }}
+            />
+            <span className="mc-page__state-label">critical</span>
+          </div>
+          <div className="mc-page__state-cell">
+            <MetricCard
+              title="Requests/s"
+              value="1,247"
+              trend="flat"
+            />
+            <span className="mc-page__state-label">no status</span>
+          </div>
+        </div>
+      </section>
+
+      {/* ── 4. Trend Indicators ────────────────────────── */}
+      <section className="mc-page__section" id="trends">
+        <h2 className="mc-page__section-title">
+          <a href="#trends">Trend Indicators</a>
+        </h2>
+        <p className="mc-page__section-desc">
+          Directional trend arrows with color-coded change percentages. Positive changes
+          show green, negative red, and flat shows neutral.
+        </p>
+        <div className="mc-page__preview" style={{ gap: '1.5rem' }}>
+          <div className="mc-page__labeled-item" style={{ flex: '1', minInlineSize: '180px', maxInlineSize: '260px' }}>
+            <MetricCard
+              title="Revenue"
+              value="$48,290"
+              trend="up"
+              change={{ value: 12.5, period: 'last month' }}
+            />
+            <span className="mc-page__item-label">up (+12.5%)</span>
+          </div>
+          <div className="mc-page__labeled-item" style={{ flex: '1', minInlineSize: '180px', maxInlineSize: '260px' }}>
+            <MetricCard
+              title="Churn Rate"
+              value="2.4%"
+              trend="down"
+              change={{ value: -8, period: 'last quarter' }}
+            />
+            <span className="mc-page__item-label">down (-8%)</span>
+          </div>
+          <div className="mc-page__labeled-item" style={{ flex: '1', minInlineSize: '180px', maxInlineSize: '260px' }}>
+            <MetricCard
+              title="Active Users"
+              value="12,400"
+              trend="flat"
+              change={{ value: 0, period: 'yesterday' }}
+            />
+            <span className="mc-page__item-label">flat (0%)</span>
+          </div>
+        </div>
+      </section>
+
+      {/* ── 5. Sparkline Integration ────────────────────── */}
+      <section className="mc-page__section" id="sparkline">
+        <h2 className="mc-page__section-title">
+          <a href="#sparkline">Sparkline Integration</a>
+        </h2>
+        <p className="mc-page__section-desc">
+          Pass an array of numeric data points to render a mini SVG sparkline below the value.
+          The chart auto-scales to fit the container and includes a gradient fill area.
+        </p>
+        <div className="mc-page__preview" style={{ gap: '1.5rem' }}>
+          <div style={{ flex: '1', minInlineSize: '200px', maxInlineSize: '300px' }}>
+            <MetricCard
+              title="Daily Active Users"
+              value="32,847"
+              trend="up"
+              change={{ value: 18, period: 'last week' }}
+              sparkline={[20, 25, 22, 30, 28, 35, 32, 40, 38, 45, 42, 50]}
+              status="ok"
+            />
+          </div>
+          <div style={{ flex: '1', minInlineSize: '200px', maxInlineSize: '300px' }}>
+            <MetricCard
+              title="Response Time"
+              value="142ms"
+              trend="down"
+              change={{ value: -22, period: 'last deploy' }}
+              sparkline={[180, 165, 170, 155, 160, 148, 152, 145, 142, 138, 140, 142]}
+            />
+          </div>
+          <div style={{ flex: '1', minInlineSize: '200px', maxInlineSize: '300px' }}>
+            <MetricCard
+              title="Memory Usage"
+              value="6.2 GB"
+              trend="up"
+              change={{ value: 5, period: 'last hour' }}
+              sparkline={[4.8, 5.0, 5.2, 5.1, 5.5, 5.4, 5.8, 5.7, 6.0, 5.9, 6.1, 6.2]}
+              status="warning"
+            />
+          </div>
+        </div>
+        <div style={{ marginBlockStart: '1rem' }}>
+          <CopyBlock
+            code={`<MetricCard\n  title="Daily Active Users"\n  value="32,847"\n  trend="up"\n  change={{ value: 18, period: 'last week' }}\n  sparkline={[20, 25, 22, 30, 28, 35, 32, 40, 38, 45, 42, 50]}\n  status="ok"\n/>`}
+            language="typescript"
+          />
+        </div>
+      </section>
+
+      {/* ── 6. States ──────────────────────────────────── */}
+      <section className="mc-page__section" id="states">
+        <h2 className="mc-page__section-title">
+          <a href="#states">States</a>
+        </h2>
+        <p className="mc-page__section-desc">
+          MetricCard handles loading, error, and empty states gracefully with built-in UI.
+        </p>
+        <div className="mc-page__states-grid">
+          <div className="mc-page__state-cell">
+            <MetricCard title="Revenue" value="$48,290" trend="up" change={{ value: 12, period: 'last month' }} />
+            <span className="mc-page__state-label">Default</span>
+          </div>
+          <div className="mc-page__state-cell">
+            <MetricCard title="Revenue" value="$48,290" loading />
+            <span className="mc-page__state-label">Loading</span>
+          </div>
+          <div className="mc-page__state-cell">
+            <MetricCard title="Revenue" value="" error="Failed to fetch data" />
+            <span className="mc-page__state-label">Error</span>
+          </div>
+          <div className="mc-page__state-cell">
+            <MetricCard title="Revenue" value="" empty="No data yet" />
+            <span className="mc-page__state-label">Empty</span>
+          </div>
+        </div>
+      </section>
+
+      {/* ── 7. Dashboard Grid Example ──────────────────── */}
+      <section className="mc-page__section" id="dashboard">
+        <h2 className="mc-page__section-title">
+          <a href="#dashboard">Dashboard Grid</a>
+        </h2>
+        <p className="mc-page__section-desc">
+          MetricCards work great in grid layouts. Container queries automatically adapt
+          the layout — hiding sparklines and headers in narrow containers.
+        </p>
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+          gap: '1rem',
+          padding: '1.5rem',
+          background: 'var(--bg-base)',
+          borderRadius: 'var(--radius-md)',
+        }}>
           <MetricCard
-            title="API Uptime"
-            value="99.98%"
-            status="ok"
+            title="Total Revenue"
+            value="$142,847"
             trend="up"
-            change={{ value: 0.02, period: 'last week' }}
-            icon={<Icon name="check-circle" size="sm" />}
+            status="ok"
+            change={{ value: 18, period: 'last month' }}
+            sparkline={[85, 90, 88, 95, 100, 105, 110, 115, 120, 125, 135, 142]}
           />
           <MetricCard
-            title="Response Time"
-            value="342ms"
-            status="warning"
+            title="Active Users"
+            value="8,294"
             trend="up"
-            change={{ value: 18, period: 'last hour' }}
-            icon={<Icon name="alert-triangle" size="sm" />}
+            change={{ value: 7, period: 'last week' }}
+            sparkline={[6500, 6800, 7000, 7200, 7500, 7700, 7900, 8000, 8100, 8200, 8250, 8294]}
           />
           <MetricCard
             title="Error Rate"
-            value="4.7%"
-            status="critical"
-            trend="up"
-            change={{ value: 250, period: 'last hour' }}
-            icon={<Icon name="x-circle" size="sm" />}
+            value="0.12%"
+            trend="down"
+            status="ok"
+            change={{ value: -45, period: 'last deploy' }}
           />
           <MetricCard
-            title="Requests/sec"
-            value="1,247"
-            trend="up"
-            change={{ value: 8.3, period: 'yesterday' }}
-            icon={<Icon name="activity" size="sm" />}
+            title="Avg Response"
+            value="89ms"
+            trend="down"
+            change={{ value: -12, period: 'last hour' }}
+            sparkline={[120, 115, 110, 105, 100, 98, 95, 92, 90, 89, 88, 89]}
           />
         </div>
       </section>
 
-      {/* ── 4. Size Scale (Container Queries) ───────────── */}
-      <section className="metric-card-page__section" id="sizes">
-        <h2 className="metric-card-page__section-title">
-          <a href="#sizes">Size Scale</a>
-        </h2>
-        <p className="metric-card-page__section-desc">
-          MetricCard adapts to its container width using CSS container queries.
-          At narrow widths ({'<'}160px), only the value is shown. At medium widths (160-280px),
-          the title appears. At wider sizes, sparklines and change indicators are fully visible.
-        </p>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-          <div>
-            <span className="metric-card-page__item-label" style={{ marginBlockEnd: '0.5rem', display: 'block' }}>
-              narrow ({'<'} 160px) — value only
-            </span>
-            <div style={{ inlineSize: '140px' }}>
-              <MetricCard
-                title="Users"
-                value="2,847"
-                trend="up"
-                change={{ value: 5.2 }}
-                sparkline={SAMPLE_SPARKLINE}
-              />
-            </div>
-          </div>
-          <div>
-            <span className="metric-card-page__item-label" style={{ marginBlockEnd: '0.5rem', display: 'block' }}>
-              medium (160-280px) — title + value + change
-            </span>
-            <div style={{ inlineSize: '240px' }}>
-              <MetricCard
-                title="Users"
-                value="2,847"
-                trend="up"
-                change={{ value: 5.2, period: 'last week' }}
-                sparkline={SAMPLE_SPARKLINE}
-              />
-            </div>
-          </div>
-          <div>
-            <span className="metric-card-page__item-label" style={{ marginBlockEnd: '0.5rem', display: 'block' }}>
-              wide ({'>'} 280px) — full layout with sparkline
-            </span>
-            <div style={{ inlineSize: '360px' }}>
-              <MetricCard
-                title="Users"
-                value="2,847"
-                trend="up"
-                change={{ value: 5.2, period: 'last week' }}
-                sparkline={SAMPLE_SPARKLINE}
-                icon={<Icon name="users" size="sm" />}
-              />
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ── 5. Features ─────────────────────────────────── */}
-      <section className="metric-card-page__section" id="features">
-        <h2 className="metric-card-page__section-title">
-          <a href="#features">Features</a>
-        </h2>
-        <p className="metric-card-page__section-desc">
-          MetricCard includes trend indicators, loading skeletons, custom icons,
-          sparkline charts, error states, and empty states out of the box.
-        </p>
-
-        {/* Trend Indicators */}
-        <h3 className="metric-card-page__feature-heading">Trend Indicators</h3>
-        <div className="metric-card-page__preview metric-card-page__preview--grid" style={{ marginBlockEnd: '1.5rem' }}>
-          <MetricCard
-            title="Revenue"
-            value="$48,250"
-            trend="up"
-            change={{ value: 12.5, period: 'last month' }}
-          />
-          <MetricCard
-            title="Bounce Rate"
-            value="34.2%"
-            trend="down"
-            change={{ value: -8.1, period: 'last week' }}
-          />
-          <MetricCard
-            title="Avg Session"
-            value="3m 42s"
-            trend="flat"
-            change={{ value: 0.3, period: 'yesterday' }}
-          />
-        </div>
-
-        {/* Loading Skeleton */}
-        <h3 className="metric-card-page__feature-heading">Loading Skeleton</h3>
-        <div className="metric-card-page__preview metric-card-page__preview--grid" style={{ marginBlockEnd: '1.5rem' }}>
-          <MetricCard
-            title="Revenue"
-            value=""
-            loading
-            icon={<Icon name="dollar-sign" size="sm" />}
-          />
-          <MetricCard
-            title="Users Online"
-            value=""
-            loading
-            icon={<Icon name="users" size="sm" />}
-          />
-          <MetricCard
-            title="CPU Usage"
-            value=""
-            loading
-            icon={<Icon name="cpu" size="sm" />}
-          />
-        </div>
-
-        {/* Custom Icons */}
-        <h3 className="metric-card-page__feature-heading">Custom Icons</h3>
-        <div className="metric-card-page__preview metric-card-page__preview--grid" style={{ marginBlockEnd: '1.5rem' }}>
-          <MetricCard
-            title="Downloads"
-            value="142K"
-            trend="up"
-            change={{ value: 23 }}
-            icon={<Icon name="download" size="sm" />}
-          />
-          <MetricCard
-            title="Star Rating"
-            value="4.8"
-            trend="up"
-            change={{ value: 0.2 }}
-            icon={<Icon name="star" size="sm" />}
-          />
-          <MetricCard
-            title="Time Saved"
-            value="38 hrs"
-            trend="up"
-            change={{ value: 15 }}
-            icon={<Icon name="clock" size="sm" />}
-          />
-        </div>
-
-        {/* Sparkline Charts */}
-        <h3 className="metric-card-page__feature-heading">Sparkline Charts</h3>
-        <div className="metric-card-page__preview metric-card-page__preview--grid" style={{ marginBlockEnd: '1.5rem' }}>
-          <MetricCard
-            title="Growth"
-            value="+24%"
-            trend="up"
-            sparkline={SAMPLE_SPARKLINE}
-            change={{ value: 24 }}
-          />
-          <MetricCard
-            title="Churn"
-            value="2.1%"
-            trend="down"
-            sparkline={SAMPLE_SPARKLINE_DOWN}
-            change={{ value: -1.3 }}
-          />
-          <MetricCard
-            title="Retention"
-            value="87%"
-            trend="flat"
-            sparkline={SAMPLE_SPARKLINE_FLAT}
-            change={{ value: 0.1 }}
-          />
-        </div>
-
-        {/* Error & Empty States */}
-        <h3 className="metric-card-page__feature-heading">Error and Empty States</h3>
-        <div className="metric-card-page__preview metric-card-page__preview--grid">
-          <MetricCard
-            title="API Calls"
-            value=""
-            error="Failed to load metric data"
-            icon={<Icon name="x-circle" size="sm" />}
-          />
-          <MetricCard
-            title="New Signups"
-            value=""
-            empty="No data for this period"
-            icon={<Icon name="users" size="sm" />}
-          />
-        </div>
-      </section>
-
-      {/* ── 6. Real-world Examples ──────────────────────── */}
-      <section className="metric-card-page__section" id="examples">
-        <h2 className="metric-card-page__section-title">
-          <a href="#examples">Real-world Examples</a>
-        </h2>
-        <p className="metric-card-page__section-desc">
-          Compelling dashboard compositions showing how MetricCard works in production scenarios.
-        </p>
-
-        {/* SaaS Dashboard */}
-        <h3 className="metric-card-page__feature-heading">SaaS Revenue Dashboard</h3>
-        <div className="metric-card-page__preview metric-card-page__preview--dashboard" style={{ marginBlockEnd: '2rem' }}>
-          <MetricCard
-            title="Monthly Revenue"
-            value="$127,450"
-            trend="up"
-            status="ok"
-            change={{ value: 18.2, period: 'last month' }}
-            sparkline={[85, 92, 88, 95, 102, 98, 110, 115, 108, 120, 125, 127]}
-            icon={<Icon name="dollar-sign" size="sm" />}
-          />
-          <MetricCard
-            title="Active Subscribers"
-            value="8,429"
-            trend="up"
-            change={{ value: 5.7, period: 'last month' }}
-            sparkline={[7200, 7350, 7500, 7650, 7800, 7900, 8000, 8100, 8200, 8300, 8350, 8429]}
-            icon={<Icon name="users" size="sm" />}
-          />
-          <MetricCard
-            title="Churn Rate"
-            value="2.3%"
-            trend="down"
-            status="ok"
-            change={{ value: -0.8, period: 'last month' }}
-            sparkline={[4.5, 4.2, 3.8, 3.5, 3.2, 3.0, 2.8, 2.7, 2.5, 2.4, 2.3, 2.3]}
-            icon={<Icon name="activity" size="sm" />}
-          />
-          <MetricCard
-            title="Avg. Revenue Per User"
-            value="$15.12"
-            trend="up"
-            change={{ value: 3.1, period: 'last quarter' }}
-            icon={<Icon name="trending-up" size="sm" />}
-          />
-        </div>
-
-        {/* Infrastructure Monitoring */}
-        <h3 className="metric-card-page__feature-heading">Infrastructure Monitoring</h3>
-        <div className="metric-card-page__preview metric-card-page__preview--dashboard" style={{ marginBlockEnd: '2rem' }}>
-          <MetricCard
-            title="CPU Usage"
-            value="67%"
-            status="warning"
-            trend="up"
-            change={{ value: 15, period: '1 hour ago' }}
-            sparkline={[42, 45, 48, 52, 55, 58, 60, 62, 65, 63, 66, 67]}
-            icon={<Icon name="cpu" size="sm" />}
-          />
-          <MetricCard
-            title="Memory"
-            value="12.4 GB"
-            status="ok"
-            trend="flat"
-            change={{ value: 2.1, period: 'last hour' }}
-            sparkline={[11.8, 12.0, 11.9, 12.1, 12.2, 12.0, 12.3, 12.1, 12.2, 12.3, 12.4, 12.4]}
-            icon={<Icon name="hard-drive" size="sm" />}
-          />
-          <MetricCard
-            title="Network I/O"
-            value="847 MB/s"
-            status="ok"
-            trend="up"
-            change={{ value: 32, period: '10 min ago' }}
-            sparkline={[520, 580, 620, 650, 680, 720, 750, 780, 800, 820, 835, 847]}
-            icon={<Icon name="wifi" size="sm" />}
-          />
-          <MetricCard
-            title="Error Rate"
-            value="0.03%"
-            status="critical"
-            trend="up"
-            change={{ value: 200, period: 'last 5 min' }}
-            sparkline={[0.01, 0.01, 0.01, 0.01, 0.02, 0.01, 0.01, 0.02, 0.02, 0.02, 0.03, 0.03]}
-            icon={<Icon name="alert-triangle" size="sm" />}
-          />
-        </div>
-
-        {/* E-commerce Analytics */}
-        <h3 className="metric-card-page__feature-heading">E-commerce Analytics</h3>
-        <div className="metric-card-page__preview metric-card-page__preview--dashboard">
-          <MetricCard
-            title="Orders Today"
-            value="1,847"
-            trend="up"
-            change={{ value: 22, period: 'yesterday' }}
-            sparkline={[1200, 1280, 1350, 1420, 1500, 1580, 1620, 1680, 1720, 1780, 1820, 1847]}
-            icon={<Icon name="shopping-cart" size="sm" />}
-          />
-          <MetricCard
-            title="Conversion Rate"
-            value="3.42%"
-            trend="up"
-            status="ok"
-            change={{ value: 0.28, period: 'last week' }}
-            icon={<Icon name="trending-up" size="sm" />}
-          />
-          <MetricCard
-            title="Avg. Order Value"
-            value="$68.50"
-            trend="down"
-            change={{ value: -2.1, period: 'last week' }}
-            icon={<Icon name="dollar-sign" size="sm" />}
-          />
-          <MetricCard
-            title="Cart Abandonment"
-            value="67.8%"
-            trend="down"
-            status="warning"
-            change={{ value: -3.5, period: 'last month' }}
-            icon={<Icon name="x-circle" size="sm" />}
-          />
-        </div>
-      </section>
-
-      {/* ── 7. Weight Tiers ────────────────────────────── */}
-      <section className="metric-card-page__section" id="tiers">
-        <h2 className="metric-card-page__section-title">
+      {/* ── 9. Weight Tiers ────────────────────────────── */}
+      <section className="mc-page__section" id="tiers">
+        <h2 className="mc-page__section-title">
           <a href="#tiers">Weight Tiers</a>
         </h2>
-        <p className="metric-card-page__section-desc">
-          MetricCard is a domain component — it ships as a single Standard tier with status glow,
-          sparkline, trend indicators, and container queries built in.
+        <p className="mc-page__section-desc">
+          Choose the right balance of features and bundle size. All three tiers share the same visual design.
+          Lite is CSS-only, Standard adds status/sparkline/motion, Premium adds aurora glow and spring animations.
         </p>
 
-        <div className="metric-card-page__tiers">
-          <div className="metric-card-page__tier-card">
-            <div className="metric-card-page__tier-header">
-              <span className="metric-card-page__tier-name">Standard</span>
-              <span className="metric-card-page__tier-size">~3 KB</span>
+        <div className="mc-page__tiers">
+          {/* Lite */}
+          <div
+            className={`mc-page__tier-card${tier === 'lite' ? ' mc-page__tier-card--active' : ''}`}
+            onClick={() => setTier('lite')}
+            role="button"
+            tabIndex={0}
+            onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setTier('lite') } }}
+          >
+            <div className="mc-page__tier-header">
+              <span className="mc-page__tier-name">Lite</span>
+              <span className="mc-page__tier-size">~1.2 KB</span>
             </div>
-            <p className="metric-card-page__tier-desc">
-              Domain component with status glow, pulsing dot, sparkline, trend indicators, container queries.
+            <p className="mc-page__tier-desc">
+              CSS-only stats card. Title, value, and basic trend display.
+              No sparkline, no status glow, no motion.
             </p>
-            <div className="metric-card-page__tier-import">
-              import {'{'} MetricCard {'}'} from '@annondeveloper/ui-kit'
+            <div className="mc-page__tier-import">
+              {IMPORT_STRINGS.lite}
             </div>
-            <div className="metric-card-page__tier-preview">
+            <div className="mc-page__tier-preview">
+              <MetricCard title="Revenue" value="$48,290" trend="up" change={{ value: 12, period: 'last month' }} />
+            </div>
+          </div>
+
+          {/* Standard */}
+          <div
+            className={`mc-page__tier-card${tier === 'standard' ? ' mc-page__tier-card--active' : ''}`}
+            onClick={() => setTier('standard')}
+            role="button"
+            tabIndex={0}
+            onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setTier('standard') } }}
+          >
+            <div className="mc-page__tier-header">
+              <span className="mc-page__tier-name">Standard</span>
+              <span className="mc-page__tier-size">~3.5 KB</span>
+            </div>
+            <p className="mc-page__tier-desc">
+              Full-featured MetricCard with sparkline, status glow, pulsing dot,
+              icon support, loading/error/empty states, and motion levels.
+            </p>
+            <div className="mc-page__tier-import">
+              {IMPORT_STRINGS.standard}
+            </div>
+            <div className="mc-page__tier-preview">
               <MetricCard
                 title="Revenue"
-                value="$48.2K"
+                value="$48,290"
                 trend="up"
                 status="ok"
-                change={{ value: 12.5, period: 'last month' }}
-                sparkline={[30, 45, 38, 52, 48, 60, 55, 72]}
+                change={{ value: 12, period: 'last month' }}
+                sparkline={SAMPLE_SPARKLINE}
+                icon={<Icon name="activity" size="sm" />}
               />
             </div>
-            <div className="metric-card-page__size-breakdown">
-              <div className="metric-card-page__size-row">
-                <span>Component: <strong style={{ color: 'var(--text-primary)' }}>2.8 KB</strong></span>
-                <span>+ Shared: <strong style={{ color: 'var(--text-primary)' }}>0.9 KB</strong></span>
-                <span>= <strong style={{ color: 'var(--brand)' }}>3.7 KB</strong> gzip</span>
-              </div>
+          </div>
+
+          {/* Premium */}
+          <div
+            className={`mc-page__tier-card${tier === 'premium' ? ' mc-page__tier-card--active' : ''}`}
+            onClick={() => setTier('premium')}
+            role="button"
+            tabIndex={0}
+            onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setTier('premium') } }}
+          >
+            <div className="mc-page__tier-header">
+              <span className="mc-page__tier-name">Premium</span>
+              <span className="mc-page__tier-size">~5.2 KB</span>
+            </div>
+            <p className="mc-page__tier-desc">
+              Everything in Standard plus aurora atmospheric glow, spring-based entrance
+              animation, hover lift, and cinematic motion at level 3.
+            </p>
+            <div className="mc-page__tier-import">
+              {IMPORT_STRINGS.premium}
+            </div>
+            <div className="mc-page__tier-preview">
+              <MetricCard
+                title="Revenue"
+                value="$48,290"
+                trend="up"
+                status="ok"
+                change={{ value: 12, period: 'last month' }}
+                sparkline={SAMPLE_SPARKLINE}
+                icon={<Icon name="activity" size="sm" />}
+                motion={3}
+              />
             </div>
           </div>
         </div>
       </section>
 
-      {/* ── 8. Brand Color ───────────────────────────────── */}
-      <section className="metric-card-page__section" id="brand-color">
-        <h2 className="metric-card-page__section-title">
+      {/* ── 10. Brand Color ────────────────────────────── */}
+      <section className="mc-page__section" id="brand-color">
+        <h2 className="mc-page__section-title">
           <a href="#brand-color">Brand Color</a>
         </h2>
-        <p className="metric-card-page__section-desc">
-          Pick a brand color to see all metric cards update in real-time. The theme generates
-          derived colors (light, dark, subtle, glow) automatically from your choice.
+        <p className="mc-page__section-desc">
+          Customize the accent color used across all MetricCards. The component inherits
+          brand color from CSS custom properties.
         </p>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
-          <ColorInput
-            name="brand-color"
-            value={brandColor}
-            onChange={setBrandColor}
-            size="sm"
-            swatches={['#6366f1','#f97316','#f43f5e','#0ea5e9','#10b981','#8b5cf6','#d946ef','#f59e0b','#06b6d4','#64748b']}
-          />
-          <div className="metric-card-page__color-presets">
+          <div className="mc-page__control-group">
+            <span className="mc-page__control-label">Hex Color</span>
+            <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+              <div
+                style={{
+                  inlineSize: '32px',
+                  blockSize: '32px',
+                  borderRadius: 'var(--radius-sm)',
+                  background: brandColor,
+                  border: '2px solid var(--border-default)',
+                  flexShrink: 0,
+                }}
+              />
+              <input
+                type="text"
+                value={brandColor}
+                onChange={e => {
+                  const val = e.target.value
+                  if (/^#[0-9a-fA-F]{0,6}$/.test(val)) setBrandColor(val)
+                }}
+                className="mc-page__text-input"
+                placeholder="#6366f1"
+                style={{ maxInlineSize: '120px' }}
+              />
+            </div>
+          </div>
+          <div className="mc-page__color-presets">
             {COLOR_PRESETS.map(p => (
               <button
                 key={p.hex}
                 type="button"
-                className={`metric-card-page__color-preset${brandColor === p.hex ? ' metric-card-page__color-preset--active' : ''}`}
+                className={`mc-page__color-preset${brandColor === p.hex ? ' mc-page__color-preset--active' : ''}`}
                 style={{ background: p.hex }}
                 onClick={() => setBrandColor(p.hex)}
                 title={p.name}
@@ -1776,107 +1501,101 @@ export default function MetricCardPage() {
         </div>
       </section>
 
-      {/* ── 9. Props API ───────────────────────────────── */}
-      <section className="metric-card-page__section" id="props">
-        <h2 className="metric-card-page__section-title">
+      {/* ── 11. Props API ───────────────────────────────── */}
+      <section className="mc-page__section" id="props">
+        <h2 className="mc-page__section-title">
           <a href="#props">Props API</a>
         </h2>
-        <p className="metric-card-page__section-desc">
-          All props accepted by MetricCard. It also spreads any native div HTML attributes
-          onto the underlying {'<div>'} element (excluding title, which is used as a prop).
+        <p className="mc-page__section-desc">
+          All props accepted by MetricCard. It also spreads any native HTML div attributes
+          onto the underlying container element.
         </p>
         <Card variant="default" padding="md">
-          <PropsTable props={metricCardProps} />
+          <div style={{ overflowX: 'auto' }}>
+            <table className="mc-page__props-table">
+              <thead>
+                <tr>
+                  <th>Prop</th>
+                  <th>Type</th>
+                  <th>Default</th>
+                  <th>Description</th>
+                </tr>
+              </thead>
+              <tbody>
+                {metricCardProps.map(prop => (
+                  <tr key={prop.name}>
+                    <td>{prop.name}</td>
+                    <td>{prop.type}</td>
+                    <td>{prop.default ?? '\u2014'}</td>
+                    <td>{prop.description}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </Card>
       </section>
 
-      {/* ── 10. Accessibility ──────────────────────────── */}
-      <section className="metric-card-page__section" id="accessibility">
-        <h2 className="metric-card-page__section-title">
+      {/* ── 12. Accessibility ──────────────────────────── */}
+      <section className="mc-page__section" id="accessibility">
+        <h2 className="mc-page__section-title">
           <a href="#accessibility">Accessibility</a>
         </h2>
-        <p className="metric-card-page__section-desc">
-          MetricCard follows WCAG guidelines for data visualization and live updating content.
+        <p className="mc-page__section-desc">
+          MetricCard is built with comprehensive accessibility support following WAI-ARIA best practices.
         </p>
         <Card variant="default" padding="md">
-          <ul className="metric-card-page__a11y-list">
-            <li className="metric-card-page__a11y-item">
-              <span className="metric-card-page__a11y-icon"><Icon name="check-circle" size="sm" /></span>
+          <ul className="mc-page__a11y-list">
+            <li className="mc-page__a11y-item">
+              <span className="mc-page__a11y-icon"><Icon name="check-circle" size="sm" /></span>
               <span>
-                <strong>Role:</strong> Uses <code className="metric-card-page__a11y-key">role="group"</code> with <code className="metric-card-page__a11y-key">aria-label</code> set to the title text for screen reader context.
+                <strong>Semantic:</strong> Uses <code className="mc-page__a11y-key">role="group"</code> with <code className="mc-page__a11y-key">aria-label</code> set to the card title.
               </span>
             </li>
-            <li className="metric-card-page__a11y-item">
-              <span className="metric-card-page__a11y-icon"><Icon name="check-circle" size="sm" /></span>
+            <li className="mc-page__a11y-item">
+              <span className="mc-page__a11y-icon"><Icon name="check-circle" size="sm" /></span>
               <span>
-                <strong>Live updates:</strong> Pair with <code className="metric-card-page__a11y-key">aria-live="polite"</code> on a parent container to announce value changes to screen readers.
+                <strong>Status dot:</strong> Pulsing status indicator is marked <code className="mc-page__a11y-key">aria-hidden="true"</code> since status is conveyed through the border.
               </span>
             </li>
-            <li className="metric-card-page__a11y-item">
-              <span className="metric-card-page__a11y-icon"><Icon name="check-circle" size="sm" /></span>
+            <li className="mc-page__a11y-item">
+              <span className="mc-page__a11y-icon"><Icon name="check-circle" size="sm" /></span>
               <span>
-                <strong>Trend labels:</strong> Trend arrows include <code className="metric-card-page__a11y-key">aria-label</code> text like "Trend: up" for non-visual users.
+                <strong>Trend arrows:</strong> Include <code className="mc-page__a11y-key">aria-label</code> describing the trend direction for screen readers.
               </span>
             </li>
-            <li className="metric-card-page__a11y-item">
-              <span className="metric-card-page__a11y-icon"><Icon name="check-circle" size="sm" /></span>
+            <li className="mc-page__a11y-item">
+              <span className="mc-page__a11y-icon"><Icon name="check-circle" size="sm" /></span>
               <span>
-                <strong>Sparkline:</strong> Sparkline SVGs are marked <code className="metric-card-page__a11y-key">aria-hidden="true"</code> — they are decorative; the value and change data convey the information.
+                <strong>Sparkline:</strong> SVG chart is marked <code className="mc-page__a11y-key">aria-hidden="true"</code> as it's decorative. Data is available in the value.
               </span>
             </li>
-            <li className="metric-card-page__a11y-item">
-              <span className="metric-card-page__a11y-icon"><Icon name="check-circle" size="sm" /></span>
+            <li className="mc-page__a11y-item">
+              <span className="mc-page__a11y-icon"><Icon name="check-circle" size="sm" /></span>
               <span>
-                <strong>Status accent:</strong> Color is never the sole indicator — status is always paired with the textual change value and trend direction.
+                <strong>Loading:</strong> Loading state uses <code className="mc-page__a11y-key">data-loading</code> attribute with skeleton animation.
               </span>
             </li>
-            <li className="metric-card-page__a11y-item">
-              <span className="metric-card-page__a11y-icon"><Icon name="check-circle" size="sm" /></span>
+            <li className="mc-page__a11y-item">
+              <span className="mc-page__a11y-icon"><Icon name="check-circle" size="sm" /></span>
               <span>
-                <strong>Contrast:</strong> All text meets WCAG AA contrast ratio (4.5:1 text, 3:1 UI) against the card background.
+                <strong>Motion:</strong> Respects <code className="mc-page__a11y-key">prefers-reduced-motion</code>. Status pulse animation disabled at motion level 0 and 1.
               </span>
             </li>
-            <li className="metric-card-page__a11y-item">
-              <span className="metric-card-page__a11y-icon"><Icon name="check-circle" size="sm" /></span>
+            <li className="mc-page__a11y-item">
+              <span className="mc-page__a11y-icon"><Icon name="check-circle" size="sm" /></span>
               <span>
-                <strong>Loading:</strong> Loading state uses a pulsing skeleton with <code className="metric-card-page__a11y-key">data-loading</code> attribute for programmatic detection.
+                <strong>High contrast:</strong> Supports <code className="mc-page__a11y-key">forced-colors: active</code> with visible 2px borders and hidden decorative gradients.
               </span>
             </li>
-            <li className="metric-card-page__a11y-item">
-              <span className="metric-card-page__a11y-icon"><Icon name="check-circle" size="sm" /></span>
+            <li className="mc-page__a11y-item">
+              <span className="mc-page__a11y-icon"><Icon name="check-circle" size="sm" /></span>
               <span>
-                <strong>High contrast:</strong> Supports <code className="metric-card-page__a11y-key">forced-colors: active</code> with visible 2px borders and hidden aurora gradients.
-              </span>
-            </li>
-            <li className="metric-card-page__a11y-item">
-              <span className="metric-card-page__a11y-icon"><Icon name="check-circle" size="sm" /></span>
-              <span>
-                <strong>Print:</strong> Removes shadows and decorative backgrounds, adds visible borders, and uses <code className="metric-card-page__a11y-key">break-inside: avoid</code>.
+                <strong>Print:</strong> Removes shadows and gradients, adds solid border, prevents page break inside card.
               </span>
             </li>
           </ul>
         </Card>
-      </section>
-
-      {/* ── 11. Source ──────────────────────────────────── */}
-      <section className="metric-card-page__section" id="source">
-        <h2 className="metric-card-page__section-title">
-          <a href="#source">Source</a>
-        </h2>
-        <p className="metric-card-page__section-desc">
-          View the component source code on GitHub.
-        </p>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-          <a
-            href="https://github.com/annondeveloper/ui-kit/blob/v2/src/domain/metric-card.tsx"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="metric-card-page__source-link"
-          >
-            <Icon name="code" size="sm" />
-            src/domain/metric-card.tsx
-          </a>
-        </div>
       </section>
     </div>
   )

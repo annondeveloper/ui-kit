@@ -26,7 +26,7 @@ const checkboxStyles = css`
     @scope (.ui-checkbox) {
       :scope {
         display: inline-flex;
-        align-items: flex-start;
+        align-items: center;
         gap: var(--space-sm, 0.5rem);
         position: relative;
         cursor: pointer;
