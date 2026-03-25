@@ -53,6 +53,8 @@ const HeroHighlightPage = lazy(() => import('./pages/components/HeroHighlightPag
 const InfiniteScrollPage = lazy(() => import('./pages/components/InfiniteScrollPage'))
 const InlineEditPage = lazy(() => import('./pages/components/InlineEditPage'))
 const KanbanColumnPage = lazy(() => import('./pages/components/KanbanColumnPage'))
+const KbdPage = lazy(() => import('./pages/components/KbdPage'))
+const LinkPage = lazy(() => import('./pages/components/LinkPage'))
 const LiveFeedPage = lazy(() => import('./pages/components/LiveFeedPage'))
 const LogViewerPage = lazy(() => import('./pages/components/LogViewerPage'))
 const MeteorShowerPage = lazy(() => import('./pages/components/MeteorShowerPage'))
@@ -100,6 +102,7 @@ const TracingBeamPage = lazy(() => import('./pages/components/TracingBeamPage'))
 const TreeViewPage = lazy(() => import('./pages/components/TreeViewPage'))
 const TruncatedTextPage = lazy(() => import('./pages/components/TruncatedTextPage'))
 const TypingIndicatorPage = lazy(() => import('./pages/components/TypingIndicatorPage'))
+const TypographyPage = lazy(() => import('./pages/components/TypographyPage'))
 const UpstreamDashboardPage = lazy(() => import('./pages/components/UpstreamDashboardPage'))
 const UptimeTrackerPage = lazy(() => import('./pages/components/UptimeTrackerPage'))
 const UtilizationBarPage = lazy(() => import('./pages/components/UtilizationBarPage'))
@@ -160,6 +163,8 @@ createRoot(document.getElementById('root')!).render(
             <Route path="components/infinite-scroll" element={<Suspense><InfiniteScrollPage /></Suspense>} />
             <Route path="components/inline-edit" element={<Suspense><InlineEditPage /></Suspense>} />
             <Route path="components/kanban-column" element={<Suspense><KanbanColumnPage /></Suspense>} />
+            <Route path="components/kbd" element={<Suspense><KbdPage /></Suspense>} />
+            <Route path="components/link" element={<Suspense><LinkPage /></Suspense>} />
             <Route path="components/live-feed" element={<Suspense><LiveFeedPage /></Suspense>} />
             <Route path="components/log-viewer" element={<Suspense><LogViewerPage /></Suspense>} />
             <Route path="components/meteor-shower" element={<Suspense><MeteorShowerPage /></Suspense>} />
@@ -207,6 +212,7 @@ createRoot(document.getElementById('root')!).render(
             <Route path="components/tree-view" element={<Suspense><TreeViewPage /></Suspense>} />
             <Route path="components/truncated-text" element={<Suspense><TruncatedTextPage /></Suspense>} />
             <Route path="components/typing-indicator" element={<Suspense><TypingIndicatorPage /></Suspense>} />
+            <Route path="components/typography" element={<Suspense><TypographyPage /></Suspense>} />
             <Route path="components/upstream-dashboard" element={<Suspense><UpstreamDashboardPage /></Suspense>} />
             <Route path="components/uptime-tracker" element={<Suspense><UptimeTrackerPage /></Suspense>} />
             <Route path="components/utilization-bar" element={<Suspense><UtilizationBarPage /></Suspense>} />

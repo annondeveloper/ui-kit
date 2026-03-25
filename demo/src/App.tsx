@@ -55,6 +55,9 @@ const componentGroups: ComponentGroup[] = [
       { name: 'FilterPill', path: '/components/filter-pill' },
       { name: 'EmptyState', path: '/components/empty-state' },
       { name: 'TruncatedText', path: '/components/truncated-text' },
+      { name: 'Typography', path: '/components/typography' },
+      { name: 'Kbd', path: '/components/kbd' },
+      { name: 'Link', path: '/components/link' },
     ],
   },
   {

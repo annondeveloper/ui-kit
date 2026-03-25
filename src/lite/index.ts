@@ -88,3 +88,8 @@ export { ScrollReveal, type LiteScrollRevealProps } from './scroll-reveal'
 export { InfiniteScroll, type LiteInfiniteScrollProps } from './infinite-scroll'
 export { ViewTransitionLink, type LiteViewTransitionLinkProps } from './view-transition-link'
 export { StepWizard, type LiteStepWizardProps, type LiteStep } from './step-wizard'
+
+// ─── Typography & Text ──────────────────────────────────────────────────────
+export { Typography, type LiteTypographyProps } from './typography'
+export { Kbd, type LiteKbdProps } from './kbd'
+export { Link, type LiteLinkProps } from './link'

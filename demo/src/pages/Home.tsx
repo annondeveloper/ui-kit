@@ -262,33 +262,18 @@ const homeStyles = css`
       line-height: 1.05;
       margin-block-end: 1.5rem;
       text-wrap: balance;
-      background: linear-gradient(
-        135deg,
-        var(--text-primary) 0%,
-        oklch(75% 0.15 270) 40%,
-        oklch(72% 0.18 310) 70%,
-        var(--text-primary) 100%
-      );
-      background-size: 200% 100%;
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      animation: shimmer-text 8s ease-in-out infinite alternate;
-    }
-
-    @keyframes shimmer-text {
-      0% { background-position: 0% 50%; }
-      100% { background-position: 100% 50%; }
+      color: var(--text-primary);
     }
 
     .home-hero-sub {
       font-size: clamp(1.0625rem, 2.4vw, 1.3rem);
       color: var(--text-secondary);
       line-height: 1.65;
-      max-width: 580px;
+      max-width: 680px;
       margin-inline: auto;
       margin-block-end: 2.25rem;
-      text-wrap: pretty;
+      text-align: center;
+      text-wrap: balance;
     }
 
     .home-hero-actions {
@@ -299,23 +284,18 @@ const homeStyles = css`
       align-items: center;
     }
 
-    /* Live Preview Strip (inside BorderBeam) */
+    /* Live Preview Strip */
     .home-preview-strip-inner {
       display: flex;
-      gap: 0.75rem;
+      gap: 1rem;
       justify-content: center;
       align-items: center;
       flex-wrap: wrap;
-      padding: 1.25rem 1.5rem;
-      position: relative;
-    }
-    .home-preview-strip-inner::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background-image: radial-gradient(oklch(100% 0 0 / 0.04) 1px, transparent 1px);
-      background-size: 16px 16px;
-      pointer-events: none;
+      padding: 1.5rem 2rem;
+      border-radius: var(--radius-lg, 0.75rem);
+      background: oklch(16% 0.01 270 / 0.6);
+      backdrop-filter: blur(8px);
+      border: 1px solid oklch(100% 0 0 / 0.06);
     }
 
     /* ─── Stats Bar ─── */
@@ -377,10 +357,10 @@ const homeStyles = css`
     .home-section-header p {
       font-size: clamp(0.9375rem, 2vw, 1.0625rem);
       color: var(--text-secondary);
-      max-width: 540px;
+      max-width: 640px;
       margin-inline: auto;
       line-height: 1.65;
-      text-wrap: pretty;
+      text-wrap: balance;
     }
 
     /* ─── Component Gallery ─── */
