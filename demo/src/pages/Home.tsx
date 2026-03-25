@@ -12,6 +12,11 @@ import { Sparkline } from '@ui/domain/sparkline'
 import { StatusBadge } from '@ui/components/status-badge'
 import { StatusPulse } from '@ui/components/status-pulse'
 import { CopyBlock } from '@ui/domain/copy-block'
+import { GlowCard } from '@ui/domain/glow-card'
+import { ShimmerButton } from '@ui/domain/shimmer-button'
+import { BorderBeam } from '@ui/domain/border-beam'
+import { Divider } from '@ui/components/divider'
+import { FilterPill } from '@ui/components/filter-pill'
 import { css } from '@ui/core/styles/css-tag'
 import { useStyles } from '@ui/core/styles/use-styles'
 
@@ -37,12 +42,47 @@ function useScrollReveal() {
   return ref
 }
 
-function RevealSection({ children, className = '' }: { children: React.ReactNode; className?: string }) {
+function RevealSection({ children, className = '', delay = 0 }: { children: React.ReactNode; className?: string; delay?: number }) {
   const ref = useScrollReveal()
   return (
-    <section ref={ref} className={`home-reveal ${className}`}>
+    <section
+      ref={ref}
+      className={`home-reveal ${className}`}
+      style={delay > 0 ? { transitionDelay: `${delay}ms` } : undefined}
+    >
       {children}
     </section>
+  )
+}
+
+// ─── Stagger Item ────────────────────────────────────────────────────────────
+
+function StaggerItem({ children, index, className = '' }: { children: React.ReactNode; index: number; className?: string }) {
+  const ref = useRef<HTMLDivElement>(null)
+  useEffect(() => {
+    const el = ref.current
+    if (!el) return
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          el.classList.add('home-stagger-visible')
+          observer.unobserve(el)
+        }
+      },
+      { threshold: 0.05 }
+    )
+    observer.observe(el)
+    return () => observer.disconnect()
+  }, [])
+
+  return (
+    <div
+      ref={ref}
+      className={`home-stagger-item ${className}`}
+      style={{ transitionDelay: `${index * 60}ms` }}
+    >
+      {children}
+    </div>
   )
 }
 
@@ -56,17 +96,30 @@ const homeStyles = css`
       --glow-magenta: oklch(60% 0.18 310);
       --glow-cyan: oklch(65% 0.14 200);
       --glow-emerald: oklch(70% 0.15 160);
+      --spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+      --ease: cubic-bezier(0.16, 1, 0.3, 1);
     }
 
     /* ─── Scroll Reveal ─── */
     .home-reveal {
       opacity: 0;
       transform: translateY(24px);
-      transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+      transition: opacity 0.6s var(--ease), transform 0.6s var(--ease);
     }
     .home-revealed {
       opacity: 1;
       transform: translateY(0);
+    }
+
+    /* ─── Stagger Items ─── */
+    .home-stagger-item {
+      opacity: 0;
+      transform: translateY(16px) scale(0.97);
+      transition: opacity 0.4s var(--ease), transform 0.5s var(--spring);
+    }
+    .home-stagger-visible {
+      opacity: 1;
+      transform: translateY(0) scale(1);
     }
 
     /* ─── Hero ─── */
@@ -74,7 +127,7 @@ const homeStyles = css`
       position: relative;
       text-align: center;
       padding-block: clamp(4rem, 10vw, 8rem) clamp(2rem, 5vw, 4rem);
-      max-width: 900px;
+      max-width: 920px;
       margin-inline: auto;
       overflow: visible;
     }
@@ -137,6 +190,33 @@ const homeStyles = css`
       animation-delay: -2s;
     }
 
+    /* Floating component thumbnails grid behind hero */
+    .home-hero-grid {
+      position: absolute;
+      inset: 0;
+      z-index: -1;
+      pointer-events: none;
+      display: grid;
+      grid-template-columns: repeat(8, 1fr);
+      grid-template-rows: repeat(6, 1fr);
+      gap: 1rem;
+      opacity: 0.035;
+      padding: 2rem;
+    }
+    .home-hero-grid-cell {
+      border-radius: var(--radius-sm, 0.375rem);
+      border: 1px solid oklch(100% 0 0 / 0.3);
+      animation: grid-pulse 4s ease-in-out infinite;
+    }
+    .home-hero-grid-cell:nth-child(odd) { animation-delay: -1s; }
+    .home-hero-grid-cell:nth-child(3n) { animation-delay: -2.5s; }
+    .home-hero-grid-cell:nth-child(5n) { animation-delay: -0.5s; }
+
+    @keyframes grid-pulse {
+      0%, 100% { opacity: 0.3; transform: scale(1); }
+      50% { opacity: 1; transform: scale(1.02); }
+    }
+
     @keyframes aurora-drift {
       0% { transform: translate(0, 0) scale(1) rotate(0deg); opacity: 0.7; }
       50% { transform: translate(15px, -12px) scale(1.04) rotate(1deg); opacity: 0.9; }
@@ -152,32 +232,27 @@ const homeStyles = css`
 
     @media (prefers-reduced-motion: reduce) {
       .home-hero-aurora,
-      .home-hero-orb { animation: none; }
+      .home-hero-orb,
+      .home-hero-grid-cell { animation: none; }
+      .home-stagger-item { transition: none; opacity: 1; transform: none; }
+      .home-reveal { transition: none; opacity: 1; transform: none; }
     }
 
-    .home-hero-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.5rem;
-      padding: 0.375rem 0.875rem;
-      border-radius: 999px;
-      background: oklch(50% 0.2 270 / 0.12);
-      border: 1px solid oklch(60% 0.18 270 / 0.2);
-      font-size: 0.8125rem;
-      font-weight: 600;
-      color: oklch(75% 0.15 270);
-      margin-block-end: 1.5rem;
+    /* Hero text stagger entrance */
+    .home-hero-entrance {
+      opacity: 0;
+      transform: translateY(20px);
+      animation: hero-enter 0.7s var(--ease) forwards;
     }
-    .home-hero-badge-dot {
-      width: 6px;
-      height: 6px;
-      border-radius: 50%;
-      background: oklch(70% 0.2 160);
-      animation: pulse-dot 2s ease-in-out infinite;
-    }
-    @keyframes pulse-dot {
-      0%, 100% { opacity: 1; transform: scale(1); }
-      50% { opacity: 0.5; transform: scale(0.8); }
+    .home-hero-entrance:nth-child(1) { animation-delay: 0.1s; }
+    .home-hero-entrance:nth-child(2) { animation-delay: 0.25s; }
+    .home-hero-entrance:nth-child(3) { animation-delay: 0.4s; }
+    .home-hero-entrance:nth-child(4) { animation-delay: 0.55s; }
+    .home-hero-entrance:nth-child(5) { animation-delay: 0.7s; }
+    .home-hero-entrance:nth-child(6) { animation-delay: 0.85s; }
+
+    @keyframes hero-enter {
+      to { opacity: 1; transform: translateY(0); }
     }
 
     .home-hero h1 {
@@ -221,24 +296,20 @@ const homeStyles = css`
       gap: 0.75rem;
       justify-content: center;
       flex-wrap: wrap;
+      align-items: center;
     }
 
-    /* Live Preview Strip */
-    .home-preview-strip {
+    /* Live Preview Strip (inside BorderBeam) */
+    .home-preview-strip-inner {
       display: flex;
       gap: 0.75rem;
       justify-content: center;
       align-items: center;
       flex-wrap: wrap;
-      margin-block-start: 2.5rem;
       padding: 1.25rem 1.5rem;
-      border-radius: var(--radius-lg, 0.75rem);
-      background: oklch(100% 0 0 / 0.02);
-      border: 1px solid oklch(100% 0 0 / 0.06);
       position: relative;
-      overflow: hidden;
     }
-    .home-preview-strip::before {
+    .home-preview-strip-inner::before {
       content: '';
       position: absolute;
       inset: 0;
@@ -251,11 +322,8 @@ const homeStyles = css`
     .home-stats {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
-      gap: 1px;
+      gap: 1rem;
       margin-block-start: clamp(2.5rem, 5vw, 4rem);
-      border-radius: var(--radius-lg, 0.75rem);
-      overflow: hidden;
-      background: var(--border-subtle, oklch(100% 0 0 / 0.08));
     }
 
     @media (max-width: 640px) {
@@ -264,17 +332,12 @@ const homeStyles = css`
       }
     }
 
-    .home-stat {
+    .home-stat-inner {
       display: flex;
       flex-direction: column;
       align-items: center;
       gap: 0.25rem;
-      padding: 1.5rem 1rem;
-      background: var(--bg-surface, oklch(20% 0 0));
-      transition: background 0.2s;
-    }
-    .home-stat:hover {
-      background: oklch(100% 0 0 / 0.04);
+      padding: 1.25rem 1rem;
     }
 
     .home-stat-value {
@@ -321,84 +384,36 @@ const homeStyles = css`
     }
 
     /* ─── Component Gallery ─── */
+    .home-gallery-filters {
+      display: flex;
+      gap: 0.375rem;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin-block-end: 2rem;
+    }
+
     .home-gallery-group {
       margin-block-end: 2.25rem;
-    }
-
-    .home-gallery-group-header {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      margin-block-end: 0.875rem;
-      padding-block-end: 0.5rem;
-      border-block-end: 1px solid oklch(100% 0 0 / 0.06);
-    }
-
-    .home-gallery-group-icon {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      width: 1.75rem;
-      height: 1.75rem;
-      border-radius: var(--radius-sm, 0.25rem);
-      background: oklch(55% 0.15 270 / 0.1);
-      color: oklch(70% 0.18 270);
-    }
-
-    .home-gallery-group-title {
-      font-size: 1rem;
-      font-weight: 700;
-      color: var(--text-primary);
-    }
-
-    .home-gallery-group-count {
-      margin-inline-start: auto;
-      font-size: 0.75rem;
-      color: var(--text-tertiary);
-      font-variant-numeric: tabular-nums;
     }
 
     .home-gallery-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-      gap: 0.625rem;
+      gap: 0.75rem;
     }
 
-    .home-gallery-card {
+    /* GlowCard gallery overrides */
+    .home-glow-card-link {
+      text-decoration: none;
+      color: inherit;
+      display: block;
+    }
+
+    .home-gallery-card-inner {
       display: flex;
       flex-direction: column;
       gap: 0.375rem;
-      padding: 0.875rem 1rem;
-      text-decoration: none;
-      color: inherit;
-      border-radius: var(--radius-md, 0.5rem);
-      background: var(--bg-surface, oklch(20% 0 0));
-      border: 1px solid oklch(100% 0 0 / 0.06);
-      transition: border-color 0.25s, box-shadow 0.25s, transform 0.2s;
-      position: relative;
-      overflow: hidden;
-    }
-    .home-gallery-card::after {
-      content: '';
-      position: absolute;
-      inset: 0;
-      border-radius: inherit;
-      opacity: 0;
-      transition: opacity 0.3s;
-      background: radial-gradient(
-        300px circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
-        oklch(60% 0.15 270 / 0.06),
-        transparent 60%
-      );
-      pointer-events: none;
-    }
-    .home-gallery-card:hover {
-      border-color: oklch(60% 0.15 270 / 0.3);
-      box-shadow: 0 0 20px oklch(55% 0.18 270 / 0.08);
-      transform: translateY(-2px);
-    }
-    .home-gallery-card:hover::after {
-      opacity: 1;
+      padding: 0.25rem 0;
     }
 
     .home-gallery-card-top {
@@ -408,45 +423,51 @@ const homeStyles = css`
     }
 
     .home-gallery-card-name {
-      font-size: 0.8125rem;
+      font-size: 0.875rem;
       font-weight: 600;
       color: var(--text-primary);
     }
 
     .home-gallery-card-tiers {
       display: flex;
-      gap: 0.1875rem;
+      gap: 0.25rem;
       margin-inline-start: auto;
     }
 
-    .home-gallery-tier {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      width: 1.125rem;
-      height: 1.125rem;
-      border-radius: 3px;
-      font-size: 0.5rem;
-      font-weight: 700;
-      line-height: 1;
+    .home-gallery-card-arrow {
+      opacity: 0;
+      transform: translateX(-4px);
+      transition: opacity 0.2s, transform 0.3s var(--spring);
+      color: var(--text-tertiary);
+      flex-shrink: 0;
     }
-    .home-gallery-tier--L {
-      background: oklch(70% 0.12 150 / 0.15);
-      color: oklch(75% 0.15 150);
-    }
-    .home-gallery-tier--S {
-      background: oklch(65% 0.12 250 / 0.15);
-      color: oklch(70% 0.15 250);
-    }
-    .home-gallery-tier--P {
-      background: oklch(65% 0.15 310 / 0.15);
-      color: oklch(72% 0.18 310);
+
+    .home-glow-card-link:hover .home-gallery-card-arrow {
+      opacity: 1;
+      transform: translateX(0);
     }
 
     .home-gallery-card-desc {
-      font-size: 0.6875rem;
+      font-size: 0.75rem;
       color: var(--text-tertiary);
       line-height: 1.45;
+      text-wrap: pretty;
+    }
+
+    .home-gallery-view-all {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.375rem;
+      margin-block-start: 0.75rem;
+      font-size: 0.8125rem;
+      font-weight: 500;
+      color: oklch(70% 0.15 270);
+      text-decoration: none;
+      transition: color 0.15s, gap 0.2s var(--spring);
+    }
+    .home-gallery-view-all:hover {
+      color: oklch(80% 0.18 270);
+      gap: 0.625rem;
     }
 
     /* ─── Feature Grid ─── */
@@ -456,17 +477,9 @@ const homeStyles = css`
       gap: 1rem;
     }
 
-    .home-feature-card {
-      position: relative;
-      padding: 1.5rem;
-      border-radius: var(--radius-md, 0.5rem);
-      background: var(--bg-surface, oklch(20% 0 0));
-      border: 1px solid oklch(100% 0 0 / 0.06);
-      transition: border-color 0.25s, box-shadow 0.25s;
-    }
-    .home-feature-card:hover {
-      border-color: oklch(60% 0.15 270 / 0.25);
-      box-shadow: 0 0 24px oklch(55% 0.18 270 / 0.06);
+    .home-feature-inner {
+      display: flex;
+      flex-direction: column;
     }
 
     .home-feature-icon {
@@ -508,12 +521,14 @@ const homeStyles = css`
       font-size: 1rem;
       margin-block-end: 0.375rem;
       color: var(--text-primary);
+      text-wrap: balance;
     }
 
     .home-feature-desc {
       font-size: 0.875rem;
       color: var(--text-secondary);
       line-height: 1.6;
+      text-wrap: pretty;
     }
 
     /* ─── Getting Started Tiers ─── */
@@ -521,28 +536,14 @@ const homeStyles = css`
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
       gap: 1rem;
+      align-items: stretch;
     }
 
-    .home-tier-card {
-      padding: 1.75rem;
-      border-radius: var(--radius-md, 0.5rem);
-      background: var(--bg-surface, oklch(20% 0 0));
-      border: 1px solid oklch(100% 0 0 / 0.06);
+    .home-tier-inner {
       display: flex;
       flex-direction: column;
       gap: 0.75rem;
-      transition: border-color 0.25s;
-    }
-    .home-tier-card:hover {
-      border-color: oklch(100% 0 0 / 0.12);
-    }
-    .home-tier-card--premium {
-      border-color: oklch(60% 0.15 310 / 0.2);
-      background: linear-gradient(
-        160deg,
-        oklch(20% 0.01 310 / 0.4) 0%,
-        var(--bg-surface, oklch(20% 0 0)) 40%
-      );
+      height: 100%;
     }
 
     .home-tier-header {
@@ -560,12 +561,7 @@ const homeStyles = css`
     .home-tier-count {
       font-size: 0.8125rem;
       color: var(--text-secondary);
-    }
-
-    .home-tier-desc {
-      font-size: 0.875rem;
-      color: var(--text-secondary);
-      line-height: 1.55;
+      text-wrap: pretty;
     }
 
     .home-tier-features {
@@ -573,6 +569,7 @@ const homeStyles = css`
       flex-direction: column;
       gap: 0.375rem;
       margin-block: 0.25rem;
+      flex: 1;
     }
 
     .home-tier-feature {
@@ -590,22 +587,15 @@ const homeStyles = css`
       border-radius: 50%;
       display: grid;
       place-items: center;
-    }
-    .home-tier-check--green {
       background: oklch(65% 0.14 160 / 0.15);
       color: oklch(72% 0.16 160);
     }
 
     /* ─── Dashboard Preview ─── */
-    .home-dashboard-wrap {
-      position: relative;
+    .home-dashboard-inner {
       padding: 1.5rem;
-      border-radius: var(--radius-lg, 0.75rem);
-      background: var(--bg-surface, oklch(20% 0 0));
-      border: 1px solid oklch(100% 0 0 / 0.06);
-      overflow: hidden;
     }
-    .home-dashboard-wrap::before {
+    .home-dashboard-inner::before {
       content: '';
       position: absolute;
       inset: 0;
@@ -652,6 +642,12 @@ const homeStyles = css`
       white-space: nowrap;
     }
 
+    /* ─── Code Example ─── */
+    .home-code-wrap {
+      max-width: 640px;
+      margin-inline: auto;
+    }
+
     /* ─── Footer ─── */
     .home-footer {
       display: flex;
@@ -660,23 +656,18 @@ const homeStyles = css`
       flex-wrap: wrap;
       gap: 1.25rem;
       padding-block: 2.5rem;
-      border-block-start: 1px solid oklch(100% 0 0 / 0.06);
     }
 
     .home-footer a {
       font-size: 0.875rem;
       color: var(--text-secondary);
       text-decoration: none;
-      transition: color 0.15s;
+      transition: color 0.2s var(--spring), transform 0.2s var(--spring);
+      display: inline-block;
     }
     .home-footer a:hover {
       color: var(--text-primary);
-    }
-
-    .home-footer-sep {
-      width: 1px;
-      height: 1rem;
-      background: oklch(100% 0 0 / 0.08);
+      transform: translateY(-1px);
     }
 
     .home-footer-built {
@@ -926,36 +917,43 @@ function App() {
   )
 }`
 
-// ─── Gallery Card with Mouse Glow ───────────────────────────────────────────
+// ─── Tier Badge Variant Map ─────────────────────────────────────────────────
+
+const tierVariant: Record<TierBadge, 'success' | 'info' | 'primary'> = {
+  L: 'success',
+  S: 'info',
+  P: 'primary',
+}
+
+const tierStyle: Record<TierBadge, React.CSSProperties> = {
+  L: {},
+  S: {},
+  P: { background: 'oklch(65% 0.18 310 / 0.12)', color: 'oklch(72% 0.18 310)', borderColor: 'oklch(65% 0.18 310 / 0.2)' },
+}
+
+// ─── Gallery Card ────────────────────────────────────────────────────────────
 
 function GalleryCard({ item }: { item: GalleryItem }) {
-  const ref = useRef<HTMLAnchorElement>(null)
-
-  const handleMouseMove = (e: React.MouseEvent) => {
-    const rect = ref.current?.getBoundingClientRect()
-    if (!rect) return
-    const x = ((e.clientX - rect.left) / rect.width) * 100
-    const y = ((e.clientY - rect.top) / rect.height) * 100
-    ref.current?.style.setProperty('--mouse-x', `${x}%`)
-    ref.current?.style.setProperty('--mouse-y', `${y}%`)
-  }
-
   return (
-    <Link
-      ref={ref}
-      to={item.path}
-      className="home-gallery-card"
-      onMouseMove={handleMouseMove}
-    >
-      <div className="home-gallery-card-top">
-        <span className="home-gallery-card-name">{item.name}</span>
-        <span className="home-gallery-card-tiers">
-          {item.tiers.map(t => (
-            <span key={t} className={`home-gallery-tier home-gallery-tier--${t}`}>{t}</span>
-          ))}
-        </span>
-      </div>
-      <span className="home-gallery-card-desc">{item.desc}</span>
+    <Link to={item.path} className="home-glow-card-link">
+      <GlowCard glowColor="oklch(60% 0.15 270 / 0.2)">
+        <div className="home-gallery-card-inner">
+          <div className="home-gallery-card-top">
+            <span className="home-gallery-card-name">{item.name}</span>
+            <span className="home-gallery-card-tiers">
+              {item.tiers.map(t => (
+                <Badge key={t} variant={tierVariant[t]} size="xs" style={tierStyle[t]}>
+                  {t}
+                </Badge>
+              ))}
+            </span>
+            <span className="home-gallery-card-arrow">
+              <Icon name="arrow-right" size={14} />
+            </span>
+          </div>
+          <span className="home-gallery-card-desc">{item.desc}</span>
+        </div>
+      </GlowCard>
     </Link>
   )
 }
@@ -982,72 +980,104 @@ export default function Home() {
         <div className="home-hero-orb home-hero-orb--3" aria-hidden="true" />
         <div className="home-hero-orb home-hero-orb--4" aria-hidden="true" />
 
-        <div className="home-hero-badge">
-          <span className="home-hero-badge-dot" />
-          v2.0 -- Aurora Fluid Design System
+        {/* Floating decorative grid behind text */}
+        <div className="home-hero-grid" aria-hidden="true">
+          {Array.from({ length: 48 }, (_, i) => (
+            <div key={i} className="home-hero-grid-cell" />
+          ))}
         </div>
 
-        <h1>
-          The component library<br />
-          that needs nothing else
-        </h1>
+        {/* Staggered hero entrance */}
+        <div className="home-hero-entrance">
+          <Badge variant="primary" size="sm" dot pulse>
+            v2.0 -- Aurora Fluid Design System
+          </Badge>
+        </div>
 
-        <p className="home-hero-sub">
-          {totalComponents} components. Physics-based animations. OKLCH color system.
-          Aurora Fluid design language. 3 weight tiers. Zero dependencies.
-        </p>
+        <div className="home-hero-entrance" style={{ marginBlockStart: '1.5rem' }}>
+          <h1>
+            The component library<br />
+            that needs nothing else
+          </h1>
+        </div>
 
-        <div className="home-hero-actions">
-          <Link to="/components/button" style={{ textDecoration: 'none' }}>
-            <Button variant="primary" size="lg" icon={<Icon name="zap" size="sm" />}>
-              Explore Components
+        <div className="home-hero-entrance">
+          <p className="home-hero-sub">
+            {totalComponents} components. Physics-based animations. OKLCH color system.
+            Aurora Fluid design language. 3 weight tiers. Zero dependencies.
+          </p>
+        </div>
+
+        <div className="home-hero-entrance">
+          <div className="home-hero-actions">
+            <Link to="/components/button" style={{ textDecoration: 'none' }}>
+              <ShimmerButton size="lg" shimmerColor="oklch(70% 0.2 270)">
+                <Icon name="zap" size="sm" />
+                Explore Components
+              </ShimmerButton>
+            </Link>
+            <Button
+              variant="secondary"
+              size="lg"
+              icon={<Icon name="code" size="sm" />}
+              onClick={() => window.open('https://github.com/annondeveloper/ui-kit', '_blank')}
+            >
+              GitHub
             </Button>
-          </Link>
-          <Button
-            variant="secondary"
-            size="lg"
-            icon={<Icon name="code" size="sm" />}
-            onClick={() => window.open('https://github.com/annondeveloper/ui-kit', '_blank')}
-          >
-            GitHub
-          </Button>
+          </div>
         </div>
 
-        {/* Live component preview strip */}
-        <div className="home-preview-strip">
-          <Button variant="primary" size="sm">Primary</Button>
-          <Button variant="secondary" size="sm">Ghost</Button>
-          <Badge variant="primary" size="md">New</Badge>
-          <Badge variant="default" size="sm">v2.0</Badge>
-          <Tooltip content="All systems operational" position="top">
-            <StatusBadge status="ok" label="Healthy" pulse />
-          </Tooltip>
-          <StatusBadge status="warning" label="Degraded" />
-          <StatusPulse status="ok" size="sm" />
-          <Progress value={72} size="sm" style={{ width: 80 }} />
+        {/* Live component preview strip with BorderBeam */}
+        <div className="home-hero-entrance" style={{ marginBlockStart: '2.5rem' }}>
+          <BorderBeam duration={4} color="oklch(70% 0.18 270)">
+            <div className="home-preview-strip-inner">
+              <Button variant="primary" size="sm">Primary</Button>
+              <Button variant="secondary" size="sm">Secondary</Button>
+              <Badge variant="primary" size="md" dot pulse>New</Badge>
+              <Badge variant="default" size="sm">v2.0</Badge>
+              <Tooltip content="All systems operational" placement="top">
+                <StatusBadge status="ok" label="Healthy" pulse />
+              </Tooltip>
+              <StatusBadge status="warning" label="Degraded" />
+              <StatusPulse status="ok" size="sm" />
+              <Progress value={72} size="sm" style={{ width: 80 }} />
+            </div>
+          </BorderBeam>
         </div>
 
-        {/* Stats */}
-        <div className="home-stats">
-          <div className="home-stat">
-            <span className="home-stat-value">
-              <AnimatedCounter value={totalComponents} />
-            </span>
-            <span className="home-stat-label">Components</span>
-          </div>
-          <div className="home-stat">
-            <span className="home-stat-value">
-              <AnimatedCounter value={premiumCount} />
-            </span>
-            <span className="home-stat-label">Premium</span>
-          </div>
-          <div className="home-stat">
-            <span className="home-stat-value">3</span>
-            <span className="home-stat-label">Weight Tiers</span>
-          </div>
-          <div className="home-stat">
-            <span className="home-stat-value">0</span>
-            <span className="home-stat-label">Dependencies</span>
+        {/* Stats inside Card components with hover glow */}
+        <div className="home-hero-entrance">
+          <div className="home-stats">
+            <Card variant="default" interactive padding="none">
+              <div className="home-stat-inner">
+                <span className="home-stat-value">
+                  <AnimatedCounter value={totalComponents} />
+                </span>
+                <span className="home-stat-label">Components</span>
+              </div>
+            </Card>
+            <Card variant="default" interactive padding="none">
+              <div className="home-stat-inner">
+                <span className="home-stat-value">
+                  <AnimatedCounter value={premiumCount} />
+                </span>
+                <span className="home-stat-label">Premium</span>
+              </div>
+            </Card>
+            <Card variant="default" interactive padding="none">
+              <div className="home-stat-inner">
+                <span className="home-stat-value">
+                  <AnimatedCounter value={3} />
+                </span>
+                <span className="home-stat-label">Weight Tiers</span>
+              </div>
+            </Card>
+            <Card variant="default" interactive padding="none">
+              <div className="home-stat-inner">
+                <span className="home-stat-value">0</span>
+                <span className="home-stat-label">Dependencies</span>
+              </div>
+            </Card>
           </div>
         </div>
       </section>
@@ -1062,41 +1092,43 @@ export default function Home() {
           </p>
         </div>
 
-        {/* Category filter pills */}
-        <div style={{ display: 'flex', gap: '0.375rem', flexWrap: 'wrap', justifyContent: 'center', marginBlockEnd: '2rem' }}>
-          <Button
-            variant={galleryFilter === null ? 'primary' : 'secondary'}
-            size="sm"
+        {/* Category filter pills using FilterPill */}
+        <div className="home-gallery-filters">
+          <FilterPill
+            label={`All (${totalComponents})`}
+            active={galleryFilter === null}
             onClick={() => setGalleryFilter(null)}
-          >
-            All ({totalComponents})
-          </Button>
+          />
           {galleryGroups.map(g => (
-            <Button
+            <FilterPill
               key={g.label}
-              variant={galleryFilter === g.label ? 'primary' : 'secondary'}
-              size="sm"
+              label={`${g.label} (${g.items.length})`}
+              active={galleryFilter === g.label}
               onClick={() => setGalleryFilter(galleryFilter === g.label ? null : g.label)}
-            >
-              {g.label} ({g.items.length})
-            </Button>
+            />
           ))}
         </div>
 
         {filteredGroups.map(group => (
           <div key={group.label} className="home-gallery-group">
-            <div className="home-gallery-group-header">
-              <span className="home-gallery-group-icon">
+            <Divider label={
+              <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }}>
                 <Icon name={group.icon} size={14} />
+                {group.label}
+                <Badge variant="default" size="xs">{group.items.length}</Badge>
               </span>
-              <span className="home-gallery-group-title">{group.label}</span>
-              <span className="home-gallery-group-count">{group.items.length} components</span>
-            </div>
-            <div className="home-gallery-grid">
-              {group.items.map(item => (
-                <GalleryCard key={item.name} item={item} />
+            } spacing="lg" />
+            <div className="home-gallery-grid" style={{ marginBlockStart: '1rem' }}>
+              {group.items.map((item, i) => (
+                <StaggerItem key={item.name} index={i}>
+                  <GalleryCard item={item} />
+                </StaggerItem>
               ))}
             </div>
+            <Link to={group.items[0].path} className="home-gallery-view-all">
+              View all {group.items.length} {group.label.toLowerCase()} components
+              <Icon name="arrow-right" size={14} />
+            </Link>
           </div>
         ))}
       </RevealSection>
@@ -1111,14 +1143,18 @@ export default function Home() {
         </div>
 
         <div className="home-features">
-          {features.map(f => (
-            <div key={f.title} className="home-feature-card">
-              <div className={`home-feature-icon home-feature-icon--${f.color}`}>
-                <Icon name={f.icon} size="md" />
-              </div>
-              <div className="home-feature-title">{f.title}</div>
-              <div className="home-feature-desc">{f.desc}</div>
-            </div>
+          {features.map((f, i) => (
+            <StaggerItem key={f.title} index={i}>
+              <Card variant="elevated" interactive padding="lg">
+                <div className="home-feature-inner">
+                  <div className={`home-feature-icon home-feature-icon--${f.color}`}>
+                    <Icon name={f.icon} size="md" />
+                  </div>
+                  <div className="home-feature-title">{f.title}</div>
+                  <div className="home-feature-desc">{f.desc}</div>
+                </div>
+              </Card>
+            </StaggerItem>
           ))}
         </div>
       </RevealSection>
@@ -1134,74 +1170,86 @@ export default function Home() {
         </div>
 
         <div className="home-tiers">
-          <div className="home-tier-card">
-            <div className="home-tier-header">
-              <Badge variant="default" size="sm" style={{ background: 'oklch(70% 0.12 150 / 0.15)', color: 'oklch(75% 0.15 150)' }}>Lite</Badge>
-              <span className="home-tier-name">Lite</span>
-            </div>
-            <span className="home-tier-count">Core primitives, forms, basic data display</span>
-            <div className="home-tier-features">
-              <span className="home-tier-feature">
-                <span className="home-tier-check home-tier-check--green"><Icon name="check" size={10} /></span>
-                All primitive components
-              </span>
-              <span className="home-tier-feature">
-                <span className="home-tier-check home-tier-check--green"><Icon name="check" size={10} /></span>
-                Basic form controls
-              </span>
-              <span className="home-tier-feature">
-                <span className="home-tier-check home-tier-check--green"><Icon name="check" size={10} /></span>
-                Smallest bundle size
-              </span>
-            </div>
-            <CopyBlock code="import { Button } from '@annondeveloper/ui-kit/lite'" language="typescript" />
-          </div>
+          <StaggerItem index={0}>
+            <Card variant="default" padding="lg">
+              <div className="home-tier-inner">
+                <div className="home-tier-header">
+                  <Badge variant="success" size="sm">Lite</Badge>
+                  <span className="home-tier-name">Lite</span>
+                </div>
+                <span className="home-tier-count">Core primitives, forms, basic data display</span>
+                <div className="home-tier-features">
+                  <span className="home-tier-feature">
+                    <span className="home-tier-check"><Icon name="check" size={10} /></span>
+                    All primitive components
+                  </span>
+                  <span className="home-tier-feature">
+                    <span className="home-tier-check"><Icon name="check" size={10} /></span>
+                    Basic form controls
+                  </span>
+                  <span className="home-tier-feature">
+                    <span className="home-tier-check"><Icon name="check" size={10} /></span>
+                    Smallest bundle size
+                  </span>
+                </div>
+                <CopyBlock code="import { Button } from '@annondeveloper/ui-kit/lite'" language="typescript" />
+              </div>
+            </Card>
+          </StaggerItem>
 
-          <div className="home-tier-card">
-            <div className="home-tier-header">
-              <Badge variant="primary" size="sm">Standard</Badge>
-              <span className="home-tier-name">Standard</span>
-            </div>
-            <span className="home-tier-count">Everything in Lite plus overlays, navigation, advanced forms</span>
-            <div className="home-tier-features">
-              <span className="home-tier-feature">
-                <span className="home-tier-check home-tier-check--green"><Icon name="check" size={10} /></span>
-                All Lite components
-              </span>
-              <span className="home-tier-feature">
-                <span className="home-tier-check home-tier-check--green"><Icon name="check" size={10} /></span>
-                Overlays, navigation, AI components
-              </span>
-              <span className="home-tier-feature">
-                <span className="home-tier-check home-tier-check--green"><Icon name="check" size={10} /></span>
-                Physics-based animations
-              </span>
-            </div>
-            <CopyBlock code="import { Button } from '@annondeveloper/ui-kit'" language="typescript" />
-          </div>
+          <StaggerItem index={1}>
+            <Card variant="elevated" padding="lg">
+              <div className="home-tier-inner">
+                <div className="home-tier-header">
+                  <Badge variant="info" size="sm">Standard</Badge>
+                  <span className="home-tier-name">Standard</span>
+                </div>
+                <span className="home-tier-count">Everything in Lite plus overlays, navigation, advanced forms</span>
+                <div className="home-tier-features">
+                  <span className="home-tier-feature">
+                    <span className="home-tier-check"><Icon name="check" size={10} /></span>
+                    All Lite components
+                  </span>
+                  <span className="home-tier-feature">
+                    <span className="home-tier-check"><Icon name="check" size={10} /></span>
+                    Overlays, navigation, AI components
+                  </span>
+                  <span className="home-tier-feature">
+                    <span className="home-tier-check"><Icon name="check" size={10} /></span>
+                    Physics-based animations
+                  </span>
+                </div>
+                <CopyBlock code="import { Button } from '@annondeveloper/ui-kit'" language="typescript" />
+              </div>
+            </Card>
+          </StaggerItem>
 
-          <div className="home-tier-card home-tier-card--premium">
-            <div className="home-tier-header">
-              <Badge variant="primary" size="sm" style={{ background: 'oklch(65% 0.18 310)' }}>Premium</Badge>
-              <span className="home-tier-name">Premium</span>
-            </div>
-            <span className="home-tier-count">Full library with monitoring, visual effects, cinematic motion</span>
-            <div className="home-tier-features">
-              <span className="home-tier-feature">
-                <span className="home-tier-check home-tier-check--green"><Icon name="check" size={10} /></span>
-                All Standard components
-              </span>
-              <span className="home-tier-feature">
-                <span className="home-tier-check home-tier-check--green"><Icon name="check" size={10} /></span>
-                Visual effects, dashboards, geo map
-              </span>
-              <span className="home-tier-feature">
-                <span className="home-tier-check home-tier-check--green"><Icon name="check" size={10} /></span>
-                Cinematic spring physics
-              </span>
-            </div>
-            <CopyBlock code="import { Button } from '@annondeveloper/ui-kit/premium'" language="typescript" />
-          </div>
+          <StaggerItem index={2}>
+            <BorderBeam duration={6} color="oklch(68% 0.18 310)">
+              <div className="home-tier-inner" style={{ padding: '1.75rem' }}>
+                <div className="home-tier-header">
+                  <Badge variant="primary" size="sm" style={{ background: 'oklch(65% 0.18 310)', color: 'oklch(100% 0 0)' }}>Premium</Badge>
+                  <span className="home-tier-name">Premium</span>
+                </div>
+                <span className="home-tier-count">Full library with monitoring, visual effects, cinematic motion</span>
+                <div className="home-tier-features">
+                  <span className="home-tier-feature">
+                    <span className="home-tier-check"><Icon name="check" size={10} /></span>
+                    All Standard components
+                  </span>
+                  <span className="home-tier-feature">
+                    <span className="home-tier-check"><Icon name="check" size={10} /></span>
+                    Visual effects, dashboards, geo map
+                  </span>
+                  <span className="home-tier-feature">
+                    <span className="home-tier-check"><Icon name="check" size={10} /></span>
+                    Cinematic spring physics
+                  </span>
+                </div>
+                <CopyBlock code="import { Button } from '@annondeveloper/ui-kit/premium'" language="typescript" />
+              </div>
+            </BorderBeam>
+          </StaggerItem>
         </div>
       </RevealSection>
 
@@ -1214,56 +1262,58 @@ export default function Home() {
           </p>
         </div>
 
-        <div className="home-dashboard-wrap">
-          <div className="home-dashboard-grid">
-            <MetricCard
-              title="CPU Usage"
-              value="87.4%"
-              trend="up"
-              status="warning"
-              sparkline={[45, 52, 49, 63, 72, 68, 75, 82, 87]}
-            />
-            <MetricCard
-              title="Memory"
-              value="62.1%"
-              trend="flat"
-              status="ok"
-              sparkline={[58, 60, 59, 61, 62, 61, 63, 62, 62]}
-            />
-            <MetricCard
-              title="Network I/O"
-              value="1,247 req/s"
-              trend="up"
-              status="ok"
-              sparkline={[800, 920, 1050, 1100, 1180, 1200, 1247]}
-            />
-            <MetricCard
-              title="Error Rate"
-              value="0.03%"
-              trend="down"
-              status="ok"
-              sparkline={[0.12, 0.08, 0.06, 0.05, 0.04, 0.03]}
-            />
-          </div>
-
-          <div className="home-dashboard-bar">
-            <div className="home-dashboard-statuses">
-              <StatusBadge status="ok" label="API Gateway" pulse />
-              <StatusBadge status="ok" label="Database" />
-              <StatusBadge status="warning" label="Worker Pool" />
-              <StatusPulse status="ok" size="sm" label="All systems operational" />
-            </div>
-            <div className="home-dashboard-sparkline-wrap">
-              <span className="home-dashboard-sparkline-label">24h throughput</span>
-              <Sparkline
-                data={[120, 135, 142, 128, 156, 178, 195, 210, 198, 225, 240, 232]}
-                width={120}
-                height={32}
-                gradient
+        <BorderBeam duration={8} color="oklch(65% 0.14 200)">
+          <Card variant="default" padding="lg">
+            <div className="home-dashboard-grid">
+              <MetricCard
+                title="CPU Usage"
+                value="87.4%"
+                trend="up"
+                status="warning"
+                sparkline={[45, 52, 49, 63, 72, 68, 75, 82, 87]}
+              />
+              <MetricCard
+                title="Memory"
+                value="62.1%"
+                trend="flat"
+                status="ok"
+                sparkline={[58, 60, 59, 61, 62, 61, 63, 62, 62]}
+              />
+              <MetricCard
+                title="Network I/O"
+                value="1,247 req/s"
+                trend="up"
+                status="ok"
+                sparkline={[800, 920, 1050, 1100, 1180, 1200, 1247]}
+              />
+              <MetricCard
+                title="Error Rate"
+                value="0.03%"
+                trend="down"
+                status="ok"
+                sparkline={[0.12, 0.08, 0.06, 0.05, 0.04, 0.03]}
               />
             </div>
-          </div>
-        </div>
+
+            <div className="home-dashboard-bar">
+              <div className="home-dashboard-statuses">
+                <StatusBadge status="ok" label="API Gateway" pulse />
+                <StatusBadge status="ok" label="Database" />
+                <StatusBadge status="warning" label="Worker Pool" />
+                <StatusPulse status="ok" size="sm" label="All systems operational" />
+              </div>
+              <div className="home-dashboard-sparkline-wrap">
+                <span className="home-dashboard-sparkline-label">24h throughput</span>
+                <Sparkline
+                  data={[120, 135, 142, 128, 156, 178, 195, 210, 198, 225, 240, 232]}
+                  width={120}
+                  height={32}
+                  gradient
+                />
+              </div>
+            </div>
+          </Card>
+        </BorderBeam>
       </RevealSection>
 
       {/* ── Code Example ── */}
@@ -1273,32 +1323,35 @@ export default function Home() {
           <p>Import what you need. Wrap in UIProvider. Ship.</p>
         </div>
 
-        <div style={{ maxWidth: 640, marginInline: 'auto' }}>
-          <CopyBlock
-            code={codeExample}
-            language="typescript"
-            showLineNumbers
-            title="App.tsx"
-          />
+        <div className="home-code-wrap">
+          <Card variant="ghost" padding="none">
+            <CopyBlock
+              code={codeExample}
+              language="typescript"
+              showLineNumbers
+              title="App.tsx"
+            />
+          </Card>
         </div>
       </RevealSection>
 
       {/* ── Footer ── */}
+      <Divider spacing="lg" />
       <footer className="home-footer">
         <a href="https://github.com/annondeveloper/ui-kit" target="_blank" rel="noopener noreferrer">
           GitHub
         </a>
-        <div className="home-footer-sep" />
+        <Divider orientation="vertical" />
         <a href="https://www.npmjs.com/package/@annondeveloper/ui-kit" target="_blank" rel="noopener noreferrer">
           npm
         </a>
-        <div className="home-footer-sep" />
+        <Divider orientation="vertical" />
         <a href="https://jsr.io/@annondeveloper/ui-kit" target="_blank" rel="noopener noreferrer">
           JSR
         </a>
-        <div className="home-footer-sep" />
+        <Divider orientation="vertical" />
         <Link to="/docs">Documentation</Link>
-        <div className="home-footer-sep" />
+        <Divider orientation="vertical" />
         <Badge variant="default" size="sm">v2.0.1</Badge>
         <div className="home-footer-built">
           Built with zero dependencies. Powered by Aurora Fluid design.

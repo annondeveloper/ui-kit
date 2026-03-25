@@ -63,13 +63,7 @@ const PROPS: PropDef[] = [
   { name: 'onSummaryClick', type: '() => void', default: '\u2014', description: 'Called when the hero card or summary area is clicked.' },
 ]
 
-// ─── Tier Constants ──────────────────────────────────────────────────────────
-
-const TIERS: { id: Tier; label: string }[] = [
-  { id: 'lite', label: 'Lite' },
-  { id: 'standard', label: 'Standard' },
-  { id: 'premium', label: 'Premium' },
-]
+// ─── Constants ──────────────────────────────────────────────────────────────
 
 const IMPORT_STRINGS: Record<Tier, string> = {
   lite: "import { UpstreamDashboard } from '@annondeveloper/ui-kit/lite'",
@@ -1232,15 +1226,15 @@ export default function UpstreamDashboardPage() {
             </div>
             <ul className="ud-page__tier-features">
               <li className="ud-page__tier-feature">
-                <span className="ud-page__tier-feature-icon"><Icon name="check" size="xs" /></span>
+                <span className="ud-page__tier-feature-icon"><Icon name="check" size={12} /></span>
                 3-4 simple metric cards with traffic values
               </li>
               <li className="ud-page__tier-feature">
-                <span className="ud-page__tier-feature-icon"><Icon name="check" size="xs" /></span>
+                <span className="ud-page__tier-feature-icon"><Icon name="check" size={12} /></span>
                 Hero/compact/table layout modes
               </li>
               <li className="ud-page__tier-feature">
-                <span className="ud-page__tier-feature-icon"><Icon name="check" size="xs" /></span>
+                <span className="ud-page__tier-feature-icon"><Icon name="check" size={12} /></span>
                 Status dot indicators (ok/warning/critical)
               </li>
             </ul>
@@ -1274,19 +1268,19 @@ export default function UpstreamDashboardPage() {
             </div>
             <ul className="ud-page__tier-features">
               <li className="ud-page__tier-feature">
-                <span className="ud-page__tier-feature-icon"><Icon name="check" size="xs" /></span>
+                <span className="ud-page__tier-feature-icon"><Icon name="check" size={12} /></span>
                 All metric cards with sparkline trends
               </li>
               <li className="ud-page__tier-feature">
-                <span className="ud-page__tier-feature-icon"><Icon name="check" size="xs" /></span>
+                <span className="ud-page__tier-feature-icon"><Icon name="check" size={12} /></span>
                 Interactive filters and click handlers
               </li>
               <li className="ud-page__tier-feature">
-                <span className="ud-page__tier-feature-icon"><Icon name="check" size="xs" /></span>
+                <span className="ud-page__tier-feature-icon"><Icon name="check" size={12} /></span>
                 Utilization bars with capacity/burst markers
               </li>
               <li className="ud-page__tier-feature">
-                <span className="ud-page__tier-feature-icon"><Icon name="check" size="xs" /></span>
+                <span className="ud-page__tier-feature-icon"><Icon name="check" size={12} /></span>
                 Vendor/location grouping with collapsible headers
               </li>
             </ul>
@@ -1321,23 +1315,23 @@ export default function UpstreamDashboardPage() {
             </div>
             <ul className="ud-page__tier-features">
               <li className="ud-page__tier-feature">
-                <span className="ud-page__tier-feature-icon"><Icon name="check" size="xs" /></span>
+                <span className="ud-page__tier-feature-icon"><Icon name="check" size={12} /></span>
                 Aurora glow effects on metric cards
               </li>
               <li className="ud-page__tier-feature">
-                <span className="ud-page__tier-feature-icon"><Icon name="check" size="xs" /></span>
+                <span className="ud-page__tier-feature-icon"><Icon name="check" size={12} /></span>
                 Spring animations on data value changes
               </li>
               <li className="ud-page__tier-feature">
-                <span className="ud-page__tier-feature-icon"><Icon name="check" size="xs" /></span>
+                <span className="ud-page__tier-feature-icon"><Icon name="check" size={12} /></span>
                 Particle burst effects on threshold breaches
               </li>
               <li className="ud-page__tier-feature">
-                <span className="ud-page__tier-feature-icon"><Icon name="check" size="xs" /></span>
+                <span className="ud-page__tier-feature-icon"><Icon name="check" size={12} /></span>
                 Ambient glow pulsing on critical status
               </li>
               <li className="ud-page__tier-feature">
-                <span className="ud-page__tier-feature-icon"><Icon name="check" size="xs" /></span>
+                <span className="ud-page__tier-feature-icon"><Icon name="check" size={12} /></span>
                 Cinematic entrance/exit transitions
               </li>
             </ul>

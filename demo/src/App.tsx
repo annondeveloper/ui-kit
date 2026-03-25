@@ -1,8 +1,12 @@
 'use client'
-import { useState, useCallback, Suspense, createContext, useContext } from 'react'
+import { useState, useCallback, useMemo, useEffect, useRef, Suspense, createContext, useContext } from 'react'
 import { NavLink, Outlet, useLocation } from 'react-router-dom'
 import { UIProvider } from '@ui/components/ui-provider'
 import { Drawer } from '@ui/components/drawer'
+import { SearchInput } from '@ui/components/search-input'
+import { Badge } from '@ui/components/badge'
+import { Divider } from '@ui/components/divider'
+import { ToggleSwitch } from '@ui/components/toggle-switch'
 import { Icon, type IconName } from '@ui/core/icons/icon'
 import { Skeleton } from '@ui/components/skeleton'
 import { css } from '@ui/core/styles/css-tag'
@@ -24,6 +28,7 @@ const pages: { path: string; label: string; icon: IconName }[] = [
 interface ComponentEntry {
   name: string
   path: string | null // null = no page yet (dimmed)
+  premium?: boolean   // has premium tier features
 }
 
 interface ComponentGroup {
@@ -61,7 +66,7 @@ const componentGroups: ComponentGroup[] = [
       { name: 'Slider', path: '/components/slider' },
       { name: 'RadioGroup', path: '/components/radio-group' },
       { name: 'ComboBox', path: '/components/combobox' },
-      { name: 'DatePicker', path: '/components/date-picker' },
+      { name: 'DatePicker', path: '/components/date-picker', premium: true },
       { name: 'TagInput', path: '/components/tag-input' },
       { name: 'OtpInput', path: '/components/otp-input' },
       { name: 'FileUpload', path: '/components/file-upload' },
@@ -76,9 +81,9 @@ const componentGroups: ComponentGroup[] = [
     icon: 'menu',
     items: [
       { name: 'Dialog', path: '/components/dialog' },
-      { name: 'Drawer', path: '/components/drawer' },
+      { name: 'Drawer', path: '/components/drawer', premium: true },
       { name: 'Tooltip', path: '/components/tooltip' },
-      { name: 'Alert', path: '/components/alert' },
+      { name: 'Alert', path: '/components/alert', premium: true },
       { name: 'Toast', path: '/components/toast' },
       { name: 'Sheet', path: '/components/sheet' },
       { name: 'Popover', path: '/components/popover' },
@@ -106,8 +111,8 @@ const componentGroups: ComponentGroup[] = [
     icon: 'bar-chart',
     items: [
       { name: 'DataTable', path: '/components/data-table' },
-      { name: 'SmartTable', path: '/components/smart-table' },
-      { name: 'MetricCard', path: '/components/metric-card' },
+      { name: 'SmartTable', path: '/components/smart-table', premium: true },
+      { name: 'MetricCard', path: '/components/metric-card', premium: true },
       { name: 'UpstreamDashboard', path: '/components/upstream-dashboard' },
       { name: 'Progress', path: '/components/progress' },
       { name: 'Sparkline', path: '/components/sparkline' },
@@ -126,7 +131,7 @@ const componentGroups: ComponentGroup[] = [
     label: 'Monitoring',
     icon: 'activity',
     items: [
-      { name: 'LogViewer', path: '/components/log-viewer' },
+      { name: 'LogViewer', path: '/components/log-viewer', premium: true },
       { name: 'LiveFeed', path: '/components/live-feed' },
       { name: 'PipelineStage', path: '/components/pipeline-stage' },
       { name: 'UptimeTracker', path: '/components/uptime-tracker' },
@@ -175,17 +180,9 @@ const componentGroups: ComponentGroup[] = [
       { name: 'ViewTransitionLink', path: '/components/view-transition-link' },
     ],
   },
-  {
-    label: 'Domain',
-    icon: 'terminal',
-    items: [
-      { name: 'LogViewer', path: '/components/log-viewer' },
-      { name: 'EmptyState', path: '/components/empty-state' },
-      { name: 'CopyBlock', path: '/components/copy-block' },
-    ],
-  },
 ]
 
+// ─── Styles ───────────────────────────────────────────────────────────────────
 const layoutStyles = css`
   @layer demo {
     /* ─── Root layout ─── */
@@ -196,53 +193,106 @@ const layoutStyles = css`
 
     /* ─── Desktop sidebar ─── */
     .site-sidebar {
-      width: 220px;
+      width: 260px;
       flex-shrink: 0;
       position: sticky;
       top: 0;
       height: 100dvh;
-      overflow-y: auto;
       display: flex;
       flex-direction: column;
       background: var(--bg-surface);
       border-inline-end: 1px solid var(--border-subtle);
     }
 
-    .site-sidebar-brand {
+    /* ─── Brand header ─── */
+    .site-brand {
+      padding: 1.25rem 1rem 0.75rem;
       display: flex;
       align-items: center;
-      gap: 0.625rem;
-      padding: 1rem 1rem 0.75rem;
+      gap: 0.75rem;
     }
 
-    .site-sidebar-brand-icon {
-      width: 28px;
-      height: 28px;
-      border-radius: var(--radius-sm);
-      background: var(--brand);
+    .site-brand__logo {
+      position: relative;
+      width: 34px;
+      height: 34px;
+      border-radius: var(--radius-md, 0.5rem);
+      background: var(--brand, oklch(65% 0.2 270));
       display: grid;
       place-items: center;
       flex-shrink: 0;
     }
-
-    .site-sidebar-brand-name {
-      font-size: 0.8125rem;
-      font-weight: 700;
-      color: var(--text-primary);
-      line-height: 1.2;
+    .site-brand__logo::after {
+      content: '';
+      position: absolute;
+      inset: -4px;
+      border-radius: var(--radius-md, 0.5rem);
+      background: oklch(from var(--brand, oklch(65% 0.2 270)) l c h / 0.15);
+      z-index: -1;
+      filter: blur(8px);
     }
 
-    .site-sidebar-brand-sub {
+    .site-brand__text {
+      display: flex;
+      flex-direction: column;
+      gap: 0.125rem;
+    }
+
+    .site-brand__name {
+      font-size: 0.875rem;
+      font-weight: 800;
+      color: var(--text-primary);
+      line-height: 1.1;
+      letter-spacing: -0.01em;
+    }
+
+    .site-brand__tagline {
       font-size: 0.5625rem;
       color: var(--text-tertiary);
-      letter-spacing: 0.04em;
+      letter-spacing: 0.06em;
       text-transform: uppercase;
+      font-weight: 500;
+    }
+
+    .site-brand__version {
+      margin-inline-start: auto;
+    }
+
+    /* ─── Search wrapper ─── */
+    .site-search {
+      padding: 0 0.75rem 0.5rem;
+      position: relative;
+    }
+
+    .site-search__hint {
+      position: absolute;
+      inset-inline-end: 1.25rem;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 0.625rem;
+      font-family: monospace;
+      color: var(--text-tertiary);
+      background: oklch(50% 0 0 / 0.1);
+      padding: 0.0625rem 0.3125rem;
+      border-radius: var(--radius-sm, 0.25rem);
+      border: 1px solid var(--border-subtle);
+      pointer-events: none;
+      line-height: 1.4;
+    }
+
+    /* ─── Scrollable nav region ─── */
+    .site-nav-scroll {
+      flex: 1;
+      overflow-y: auto;
+      overflow-x: hidden;
+      overscroll-behavior: contain;
+      scrollbar-width: thin;
+      scrollbar-color: oklch(50% 0 0 / 0.2) transparent;
     }
 
     /* Nav links */
     .site-nav {
-      flex: 1;
-      padding: 0.5rem 0.5rem;
+      padding: 0.25rem 0.5rem;
       display: flex;
       flex-direction: column;
       gap: 1px;
@@ -257,7 +307,7 @@ const layoutStyles = css`
       font-size: 0.8125rem;
       color: var(--text-secondary);
       text-decoration: none;
-      transition: background 0.1s, color 0.1s;
+      transition: background 0.15s, color 0.15s;
       line-height: 1;
     }
     .site-nav-link:hover {
@@ -265,109 +315,181 @@ const layoutStyles = css`
       color: var(--text-primary);
     }
     .site-nav-link--active {
-      background: var(--brand-subtle);
+      background: oklch(from var(--brand, oklch(65% 0.2 270)) l c h / 0.08);
       color: var(--brand);
       font-weight: 600;
     }
 
-    /* Component nav section */
-    .site-nav-divider {
-      height: 1px;
-      background: var(--border-subtle);
-      margin-block: 0.5rem;
+    /* ─── Component groups ─── */
+    .site-groups {
+      padding: 0 0.5rem 0.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
     }
 
-    .site-nav-section-label {
+    .site-group {
+      border-radius: var(--radius-sm);
+    }
+
+    .site-group__header {
       display: flex;
       align-items: center;
       gap: 0.375rem;
-      padding: 0.375rem 0.625rem;
+      padding: 0.375rem 0.5rem;
       font-size: 0.6875rem;
       font-weight: 700;
       color: var(--text-tertiary);
       text-transform: uppercase;
-      letter-spacing: 0.06em;
+      letter-spacing: 0.05em;
       cursor: pointer;
       border: none;
       background: none;
       width: 100%;
       text-align: start;
       border-radius: var(--radius-sm);
-      transition: color 0.1s;
+      transition: color 0.15s, background 0.15s;
+      line-height: 1;
     }
-    .site-nav-section-label:hover {
+    .site-group__header:hover {
+      color: var(--text-secondary);
+      background: oklch(100% 0 0 / 0.03);
+    }
+    .site-group__header--active {
       color: var(--text-secondary);
     }
-    .site-nav-section-chevron {
-      margin-inline-start: auto;
-      transition: transform 0.2s;
-    }
-    .site-nav-section-chevron--open {
-      transform: rotate(90deg);
-    }
 
-    .site-nav-group-label {
+    .site-group__count {
+      margin-inline-start: auto;
       display: flex;
       align-items: center;
       gap: 0.375rem;
-      padding: 0.3125rem 0.625rem 0.3125rem 1rem;
-      font-size: 0.6875rem;
-      font-weight: 600;
-      color: var(--text-tertiary);
-      cursor: pointer;
-      border: none;
-      background: none;
-      width: 100%;
-      text-align: start;
-      border-radius: var(--radius-sm);
-      transition: color 0.1s;
     }
-    .site-nav-group-label:hover {
-      color: var(--text-secondary);
+
+    .site-group__chevron {
+      display: flex;
+      transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
     }
-    .site-nav-group-chevron {
-      margin-inline-start: auto;
-      transition: transform 0.15s;
-    }
-    .site-nav-group-chevron--open {
+    .site-group__chevron--open {
       transform: rotate(90deg);
     }
 
-    .site-nav-component-link {
+    @media (prefers-reduced-motion: reduce) {
+      .site-group__chevron {
+        transition: transform 0.01s;
+      }
+    }
+
+    /* Animated collapse container */
+    .site-group__body {
+      display: grid;
+      grid-template-rows: 0fr;
+      transition: grid-template-rows 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    .site-group__body--open {
+      grid-template-rows: 1fr;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .site-group__body {
+        transition: grid-template-rows 0.01s;
+      }
+    }
+
+    .site-group__inner {
+      overflow: hidden;
+    }
+
+    .site-group__list {
+      padding: 0.125rem 0;
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
+
+    /* Component links */
+    .site-clink {
       display: flex;
       align-items: center;
       gap: 0.375rem;
-      padding: 0.25rem 0.625rem 0.25rem 1.75rem;
+      padding: 0.3125rem 0.5rem 0.3125rem 1.625rem;
       font-size: 0.75rem;
       color: var(--text-secondary);
       text-decoration: none;
       border-radius: var(--radius-sm);
-      transition: background 0.1s, color 0.1s;
+      border-inline-start: 2px solid transparent;
+      transition: background 0.15s, color 0.15s, border-color 0.15s;
       line-height: 1;
+      position: relative;
     }
-    .site-nav-component-link:hover {
+    .site-clink:hover {
       background: oklch(100% 0 0 / 0.04);
       color: var(--text-primary);
     }
-    .site-nav-component-link--active {
-      background: var(--brand-subtle);
+    .site-clink--active {
+      background: oklch(from var(--brand, oklch(65% 0.2 270)) l c h / 0.08);
       color: var(--brand);
       font-weight: 600;
+      border-inline-start-color: var(--brand);
     }
-    .site-nav-component-link--disabled {
+    .site-clink--disabled {
       color: var(--text-tertiary);
-      opacity: 0.45;
+      opacity: 0.4;
       pointer-events: none;
       cursor: default;
     }
 
-    /* Sidebar footer with controls */
+    .site-clink__premium {
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: oklch(75% 0.18 60);
+      flex-shrink: 0;
+      margin-inline-start: auto;
+    }
+
+    /* ─── Search results mode ─── */
+    .site-search-results {
+      padding: 0 0.5rem 0.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .site-search-results__group {
+      font-size: 0.625rem;
+      font-weight: 700;
+      color: var(--text-tertiary);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      padding: 0.5rem 0.5rem 0.25rem;
+    }
+
+    .site-search-results__empty {
+      padding: 2rem 1rem;
+      text-align: center;
+      color: var(--text-tertiary);
+      font-size: 0.8125rem;
+    }
+    .site-search-results__empty-icon {
+      font-size: 1.5rem;
+      margin-block-end: 0.5rem;
+      opacity: 0.4;
+    }
+
+    /* Match highlight */
+    .site-clink__match {
+      color: var(--brand);
+      font-weight: 700;
+    }
+
+    /* ─── Sidebar footer ─── */
     .site-sidebar-footer {
       padding: 0.75rem;
       border-block-start: 1px solid var(--border-subtle);
       display: flex;
       flex-direction: column;
-      gap: 0.5rem;
+      gap: 0.625rem;
     }
 
     .site-control-row {
@@ -382,50 +504,92 @@ const layoutStyles = css`
       min-width: 2.5rem;
       text-transform: uppercase;
       letter-spacing: 0.05em;
+      font-weight: 600;
     }
 
-    .site-motion-btn {
-      width: 24px;
-      height: 24px;
+    /* Motion segmented control */
+    .site-motion-seg {
+      display: flex;
+      gap: 0;
+      background: oklch(50% 0 0 / 0.08);
       border-radius: var(--radius-sm);
+      padding: 2px;
+      flex: 1;
+    }
+
+    .site-motion-seg__btn {
+      flex: 1;
+      height: 22px;
+      border-radius: calc(var(--radius-sm) - 1px);
+      border: none;
+      background: transparent;
+      color: var(--text-tertiary);
+      font-size: 0.625rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+      display: grid;
+      place-items: center;
+    }
+    .site-motion-seg__btn:hover {
+      color: var(--text-secondary);
+    }
+    .site-motion-seg__btn--active {
+      background: var(--brand);
+      color: oklch(100% 0 0);
+      box-shadow: 0 1px 3px oklch(0% 0 0 / 0.2);
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .site-motion-seg__btn {
+        transition: none;
+      }
+    }
+
+    /* Tier pills */
+    .site-tier-pills {
+      display: flex;
+      gap: 0.25rem;
+      flex: 1;
+    }
+
+    .site-tier-pill {
+      flex: 1;
+      height: 24px;
+      border-radius: var(--radius-full, 9999px);
       border: 1px solid var(--border-default);
       background: transparent;
       color: var(--text-tertiary);
-      font-size: 0.6875rem;
-      font-weight: 600;
+      font-size: 0.625rem;
+      font-weight: 700;
       cursor: pointer;
-      display: grid;
-      place-items: center;
-      transition: all 0.1s;
+      transition: all 0.15s;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
     }
-    .site-motion-btn:hover {
+    .site-tier-pill:hover {
       border-color: var(--border-strong);
-      color: var(--text-primary);
+      color: var(--text-secondary);
     }
-    .site-motion-btn--active {
+    .site-tier-pill--active {
       background: var(--brand);
       color: oklch(100% 0 0);
       border-color: var(--brand);
     }
 
-    .site-theme-btn {
-      width: 100%;
-      padding: 0.375rem 0.625rem;
-      border-radius: var(--radius-sm);
-      border: 1px solid var(--border-default);
-      background: transparent;
-      color: var(--text-secondary);
-      font-size: 0.75rem;
-      cursor: pointer;
+    /* Theme toggle row */
+    .site-theme-row {
       display: flex;
       align-items: center;
-      gap: 0.375rem;
-      justify-content: center;
-      transition: all 0.1s;
+      gap: 0.5rem;
     }
-    .site-theme-btn:hover {
-      border-color: var(--border-strong);
-      background: oklch(100% 0 0 / 0.03);
+
+    .site-theme-label {
+      font-size: 0.6875rem;
+      color: var(--text-tertiary);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      font-weight: 600;
     }
 
     /* ─── Mobile header ─── */
@@ -440,9 +604,10 @@ const layoutStyles = css`
       align-items: center;
       padding: 0 0.75rem;
       gap: 0.5rem;
-      background: var(--bg-surface);
+      background: oklch(from var(--bg-surface) l c h / 0.85);
       border-bottom: 1px solid var(--border-subtle);
-      backdrop-filter: blur(12px);
+      backdrop-filter: blur(16px) saturate(1.4);
+      -webkit-backdrop-filter: blur(16px) saturate(1.4);
     }
 
     .site-hamburger {
@@ -478,11 +643,9 @@ const layoutStyles = css`
       min-width: 0;
       padding: 2rem 3rem;
       overflow-y: auto;
-      /* overflow-x: clip instead of hidden — doesn't create stacking context that clips popovers */
       overflow-x: clip;
     }
 
-    /* On large screens, add MORE padding to push content toward center */
     @media (min-width: 1400px) {
       .site-main {
         padding-inline: clamp(3rem, 8vw, 12rem);
@@ -511,132 +674,363 @@ const layoutStyles = css`
   }
 `
 
-function ComponentNav({ onClick }: { onClick?: () => void }) {
-  const [sectionOpen, setSectionOpen] = useState(true)
-  const [openGroups, setOpenGroups] = useState<Record<string, boolean>>(() =>
-    Object.fromEntries(componentGroups.map(g => [g.label, true]))
-  )
+// ─── Sidebar Content (shared desktop + mobile) ───────────────────────────────
 
-  const toggleGroup = (label: string) =>
-    setOpenGroups(prev => ({ ...prev, [label]: !prev[label] }))
+interface SidebarContentProps {
+  searchQuery: string
+  onSearchChange: (v: string) => void
+  openGroups: Record<string, boolean>
+  toggleGroup: (label: string) => void
+  onClick?: () => void
+  motion: number
+  setMotion: (n: number) => void
+  light: boolean
+  toggleLight: () => void
+  tier: Tier
+  setTier: (t: Tier) => void
+  searchInputRef?: React.RefObject<HTMLInputElement | null>
+}
+
+function SidebarContent({
+  searchQuery,
+  onSearchChange,
+  openGroups,
+  toggleGroup,
+  onClick,
+  motion,
+  setMotion,
+  light,
+  toggleLight,
+  tier,
+  setTier,
+  searchInputRef,
+}: SidebarContentProps) {
+  const location = useLocation()
+  const isSearching = searchQuery.length > 0
+
+  // Filtered results when searching
+  const searchResults = useMemo(() => {
+    if (!isSearching) return null
+    const q = searchQuery.toLowerCase()
+    const results: { group: ComponentGroup; items: ComponentEntry[] }[] = []
+    for (const group of componentGroups) {
+      const matched = group.items.filter(item =>
+        item.name.toLowerCase().includes(q)
+      )
+      if (matched.length > 0) {
+        results.push({ group, items: matched })
+      }
+    }
+    return results
+  }, [searchQuery, isSearching])
+
+  const totalResults = searchResults?.reduce((s, r) => s + r.items.length, 0) ?? 0
+
+  // Highlight matching text
+  const highlightMatch = (name: string) => {
+    if (!isSearching) return name
+    const q = searchQuery.toLowerCase()
+    const idx = name.toLowerCase().indexOf(q)
+    if (idx === -1) return name
+    return (
+      <>
+        {name.slice(0, idx)}
+        <span className="site-clink__match">{name.slice(idx, idx + searchQuery.length)}</span>
+        {name.slice(idx + searchQuery.length)}
+      </>
+    )
+  }
+
+  // Detect which group the current path belongs to
+  const activeGroup = useMemo(() => {
+    for (const group of componentGroups) {
+      for (const item of group.items) {
+        if (item.path && location.pathname === item.path) {
+          return group.label
+        }
+      }
+    }
+    return null
+  }, [location.pathname])
 
   return (
     <>
-      <div className="site-nav-divider" />
-      <button
-        className="site-nav-section-label"
-        onClick={() => setSectionOpen(o => !o)}
-      >
-        <Icon name="code" size={12} />
-        Components
-        <span className={`site-nav-section-chevron${sectionOpen ? ' site-nav-section-chevron--open' : ''}`}>
-          <Icon name="chevron-right" size={10} />
+      {/* Brand */}
+      <div className="site-brand">
+        <div className="site-brand__logo">
+          <Icon name="zap" size={16} style={{ color: 'white' }} />
+        </div>
+        <div className="site-brand__text">
+          <div className="site-brand__name">ui-kit</div>
+          <div className="site-brand__tagline">Aurora Fluid v2</div>
+        </div>
+        <span className="site-brand__version">
+          <Badge variant="primary" size="xs">v2.0</Badge>
         </span>
-      </button>
-      {sectionOpen && componentGroups.map(group => (
-        <div key={group.label}>
-          <button
-            className="site-nav-group-label"
-            onClick={() => toggleGroup(group.label)}
-          >
-            <Icon name={group.icon} size={11} />
-            {group.label}
-            <span className={`site-nav-group-chevron${openGroups[group.label] ? ' site-nav-group-chevron--open' : ''}`}>
-              <Icon name="chevron-right" size={9} />
-            </span>
-          </button>
-          {openGroups[group.label] && group.items.map(item =>
-            item.path ? (
+      </div>
+
+      {/* Search */}
+      <div className="site-search">
+        <SearchInput
+          ref={searchInputRef}
+          value={searchQuery}
+          onChange={onSearchChange}
+          onClear={() => onSearchChange('')}
+          placeholder="Search components..."
+          size="xs"
+          debounce={0}
+        />
+        {!isSearching && <span className="site-search__hint">/</span>}
+      </div>
+
+      <Divider spacing="sm" />
+
+      {/* Scrollable nav area */}
+      <div className="site-nav-scroll">
+        {/* Top-level pages */}
+        {!isSearching && (
+          <nav className="site-nav">
+            {pages.map(p => (
               <NavLink
-                key={item.name}
-                to={item.path}
+                key={p.path}
+                to={p.path}
+                end={p.path === '/'}
                 onClick={onClick}
                 className={({ isActive }) =>
-                  `site-nav-component-link${isActive ? ' site-nav-component-link--active' : ''}`
+                  `site-nav-link${isActive ? ' site-nav-link--active' : ''}`
                 }
               >
-                {item.name}
+                <Icon name={p.icon} size={14} />
+                {p.label}
               </NavLink>
+            ))}
+          </nav>
+        )}
+
+        {!isSearching && <Divider spacing="sm" />}
+
+        {/* Search results */}
+        {isSearching && (
+          <div className="site-search-results">
+            {totalResults > 0 ? (
+              <>
+                {searchResults!.map(({ group, items }) => (
+                  <div key={group.label}>
+                    <div className="site-search-results__group">
+                      {group.label} ({items.length})
+                    </div>
+                    {items.map(item =>
+                      item.path ? (
+                        <NavLink
+                          key={item.name}
+                          to={item.path}
+                          onClick={onClick}
+                          className={({ isActive }) =>
+                            `site-clink${isActive ? ' site-clink--active' : ''}`
+                          }
+                        >
+                          {highlightMatch(item.name)}
+                          {item.premium && <span className="site-clink__premium" title="Premium tier" />}
+                        </NavLink>
+                      ) : (
+                        <span key={item.name} className="site-clink site-clink--disabled">
+                          {highlightMatch(item.name)}
+                        </span>
+                      )
+                    )}
+                  </div>
+                ))}
+              </>
             ) : (
-              <span key={item.name} className="site-nav-component-link site-nav-component-link--disabled">
-                {item.name}
-              </span>
-            )
-          )}
+              <div className="site-search-results__empty">
+                <div className="site-search-results__empty-icon">
+                  <Icon name="search" size={24} />
+                </div>
+                No components match &ldquo;{searchQuery}&rdquo;
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Component groups (accordion) */}
+        {!isSearching && (
+          <div className="site-groups">
+            {componentGroups.map(group => {
+              const isOpen = openGroups[group.label] ?? false
+              const isActiveGroup = activeGroup === group.label
+              return (
+                <div className="site-group" key={group.label}>
+                  <button
+                    className={`site-group__header${isActiveGroup ? ' site-group__header--active' : ''}`}
+                    onClick={() => toggleGroup(group.label)}
+                    aria-expanded={isOpen}
+                  >
+                    <Icon name={group.icon} size={11} />
+                    {group.label}
+                    <span className="site-group__count">
+                      <Badge variant={isActiveGroup ? 'primary' : 'default'} size="xs">{group.items.length}</Badge>
+                      <span className={`site-group__chevron${isOpen ? ' site-group__chevron--open' : ''}`}>
+                        <Icon name="chevron-right" size={9} />
+                      </span>
+                    </span>
+                  </button>
+                  <div className={`site-group__body${isOpen ? ' site-group__body--open' : ''}`}>
+                    <div className="site-group__inner">
+                      <div className="site-group__list">
+                        {group.items.map(item =>
+                          item.path ? (
+                            <NavLink
+                              key={item.name}
+                              to={item.path}
+                              onClick={onClick}
+                              className={({ isActive }) =>
+                                `site-clink${isActive ? ' site-clink--active' : ''}`
+                              }
+                            >
+                              {item.name}
+                              {item.premium && <span className="site-clink__premium" title="Premium tier" />}
+                            </NavLink>
+                          ) : (
+                            <span key={item.name} className="site-clink site-clink--disabled">
+                              {item.name}
+                            </span>
+                          )
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+        )}
+      </div>
+
+      {/* Footer controls */}
+      <div className="site-sidebar-footer">
+        {/* Tier */}
+        <div className="site-control-row">
+          <span className="site-control-label">Tier</span>
+          <div className="site-tier-pills">
+            {(['lite', 'standard', 'premium'] as const).map(t => (
+              <button
+                key={t}
+                className={`site-tier-pill${tier === t ? ' site-tier-pill--active' : ''}`}
+                onClick={() => setTier(t)}
+              >
+                {t === 'lite' ? 'Lite' : t === 'standard' ? 'Std' : 'Pro'}
+              </button>
+            ))}
+          </div>
         </div>
-      ))}
+
+        {/* Motion */}
+        <div className="site-control-row">
+          <span className="site-control-label">Motion</span>
+          <div className="site-motion-seg">
+            {[0, 1, 2, 3].map(n => (
+              <button
+                key={n}
+                className={`site-motion-seg__btn${motion === n ? ' site-motion-seg__btn--active' : ''}`}
+                onClick={() => setMotion(n)}
+                aria-label={`Motion level ${n}`}
+              >{n}</button>
+            ))}
+          </div>
+        </div>
+
+        {/* Theme toggle */}
+        <div className="site-theme-row">
+          <ToggleSwitch
+            size="xs"
+            checked={light}
+            onChange={() => toggleLight()}
+            label={light ? 'Light' : 'Dark'}
+          />
+        </div>
+      </div>
     </>
   )
 }
 
-function NavLinks({ onClick }: { onClick?: () => void }) {
-  return (
-    <>
-      {pages.map(p => (
-        <NavLink
-          key={p.path}
-          to={p.path}
-          end={p.path === '/'}
-          onClick={onClick}
-          className={({ isActive }) =>
-            `site-nav-link${isActive ? ' site-nav-link--active' : ''}`
-          }
-        >
-          <Icon name={p.icon} size={14} />
-          {p.label}
-        </NavLink>
-      ))}
-      <ComponentNav onClick={onClick} />
-    </>
-  )
-}
-
-function Controls({ motion, setMotion, light, toggleLight, tier, setTier }: {
-  motion: number; setMotion: (n: number) => void
-  light: boolean; toggleLight: () => void
-  tier: Tier; setTier: (t: Tier) => void
-}) {
-  return (
-    <>
-      <div className="site-control-row">
-        <span className="site-control-label">Tier</span>
-        {(['lite', 'standard', 'premium'] as const).map(t => (
-          <button
-            key={t}
-            className={`site-motion-btn${tier === t ? ' site-motion-btn--active' : ''}`}
-            onClick={() => setTier(t)}
-            style={{ fontSize: '0.5625rem', width: 'auto', paddingInline: '0.375rem' }}
-          >{t === 'lite' ? 'L' : t === 'standard' ? 'S' : 'P'}</button>
-        ))}
-      </div>
-      <div className="site-control-row">
-        <span className="site-control-label">Motion</span>
-        {[0, 1, 2, 3].map(n => (
-          <button
-            key={n}
-            className={`site-motion-btn${motion === n ? ' site-motion-btn--active' : ''}`}
-            onClick={() => setMotion(n)}
-          >{n}</button>
-        ))}
-      </div>
-      <button className="site-theme-btn" onClick={toggleLight}>
-        <Icon name={light ? 'eye-off' : 'eye'} size={14} />
-        {light ? 'Dark mode' : 'Light mode'}
-      </button>
-    </>
-  )
-}
+// ─── App ──────────────────────────────────────────────────────────────────────
 
 export default function App() {
   const [light, setLight] = useState(false)
   const [motion, setMotion] = useState(3)
   const [tier, setTier] = useState<Tier>('standard')
   const [drawerOpen, setDrawerOpen] = useState(false)
+  const [searchQuery, setSearchQuery] = useState('')
   const location = useLocation()
+  const searchInputRef = useRef<HTMLInputElement>(null)
 
   useStyles('site-layout', layoutStyles)
   const toggleLight = useCallback(() => setLight(l => !l), [])
   const closeDrawer = useCallback(() => setDrawerOpen(false), [])
+
+  // Determine which group should be open based on current route
+  const [openGroups, setOpenGroups] = useState<Record<string, boolean>>(() => {
+    const initial: Record<string, boolean> = {}
+    for (const group of componentGroups) {
+      initial[group.label] = false
+    }
+    return initial
+  })
+
+  // Auto-open the group containing the active route
+  useEffect(() => {
+    for (const group of componentGroups) {
+      for (const item of group.items) {
+        if (item.path && location.pathname === item.path) {
+          setOpenGroups(prev => {
+            if (prev[group.label]) return prev
+            return { ...prev, [group.label]: true }
+          })
+          return
+        }
+      }
+    }
+  }, [location.pathname])
+
+  const toggleGroup = useCallback((label: string) => {
+    setOpenGroups(prev => ({ ...prev, [label]: !prev[label] }))
+  }, [])
+
+  // Keyboard shortcut: / or Cmd+K to focus search
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      // Don't intercept if user is typing in an input/textarea
+      const tag = (e.target as HTMLElement)?.tagName
+      if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') {
+        // Allow Escape to blur from search
+        if (e.key === 'Escape' && searchInputRef.current === e.target) {
+          searchInputRef.current?.blur()
+          setSearchQuery('')
+          e.preventDefault()
+        }
+        return
+      }
+      if (e.key === '/' || (e.key === 'k' && (e.metaKey || e.ctrlKey))) {
+        e.preventDefault()
+        searchInputRef.current?.focus()
+      }
+    }
+    document.addEventListener('keydown', handler)
+    return () => document.removeEventListener('keydown', handler)
+  }, [])
+
+  const sharedProps = {
+    searchQuery,
+    onSearchChange: setSearchQuery,
+    openGroups,
+    toggleGroup,
+    motion,
+    setMotion,
+    light,
+    toggleLight,
+    tier,
+    setTier,
+  }
 
   return (
     <UIProvider motion={motion as 0|1|2|3} mode={light ? 'light' : 'dark'}>
@@ -644,54 +1038,33 @@ export default function App() {
       <div className="site">
         {/* Desktop sidebar */}
         <aside className="site-sidebar">
-          <div className="site-sidebar-brand">
-            <div className="site-sidebar-brand-icon">
-              <Icon name="zap" size={14} style={{ color: 'white' }} />
-            </div>
-            <div>
-              <div className="site-sidebar-brand-name">ui-kit</div>
-              <div className="site-sidebar-brand-sub">Aurora Fluid v2</div>
-            </div>
-          </div>
-          <nav className="site-nav">
-            <NavLinks />
-          </nav>
-          <div className="site-sidebar-footer">
-            <Controls motion={motion} setMotion={setMotion} light={light} toggleLight={toggleLight} tier={tier} setTier={setTier} />
-          </div>
+          <SidebarContent
+            {...sharedProps}
+            searchInputRef={searchInputRef}
+          />
         </aside>
 
         {/* Mobile header */}
         <div className="site-mobile-header">
-          <button className="site-hamburger" onClick={() => setDrawerOpen(true)}>
+          <button className="site-hamburger" onClick={() => setDrawerOpen(true)} aria-label="Open navigation">
             <Icon name="menu" size={18} />
           </button>
           <span className="site-mobile-title">ui-kit v2</span>
           <div className="site-mobile-actions">
-            <button className="site-hamburger" onClick={toggleLight}>
+            <button className="site-hamburger" onClick={toggleLight} aria-label="Toggle theme">
               <Icon name={light ? 'eye-off' : 'eye'} size={16} />
             </button>
           </div>
         </div>
 
-        {/* Mobile drawer */}
+        {/* Mobile drawer — same sidebar content */}
         <Drawer open={drawerOpen} onClose={closeDrawer} side="left" size="sm">
-          <div style={{ padding: '0.75rem' }}>
-            <div className="site-sidebar-brand" style={{ marginBottom: '0.5rem' }}>
-              <div className="site-sidebar-brand-icon">
-                <Icon name="zap" size={14} style={{ color: 'white' }} />
-              </div>
-              <div>
-                <div className="site-sidebar-brand-name">ui-kit</div>
-                <div className="site-sidebar-brand-sub">Aurora Fluid v2</div>
-              </div>
-            </div>
-            <nav className="site-nav" style={{ padding: 0 }}>
-              <NavLinks onClick={closeDrawer} />
-            </nav>
-            <div style={{ marginTop: '1rem', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-              <Controls motion={motion} setMotion={setMotion} light={light} toggleLight={() => { toggleLight(); closeDrawer() }} tier={tier} setTier={setTier} />
-            </div>
+          <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+            <SidebarContent
+              {...sharedProps}
+              onClick={closeDrawer}
+              toggleLight={() => { toggleLight(); closeDrawer() }}
+            />
           </div>
         </Drawer>
 
