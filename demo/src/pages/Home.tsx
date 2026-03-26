@@ -1,24 +1,52 @@
-import { useEffect, useRef, useState } from 'react'
+import { lazy, Suspense, useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
+// Above-the-fold: load eagerly (hero section)
 import { Button } from '@ui/components/button'
-import { Card } from '@ui/components/card'
 import { Badge } from '@ui/components/badge'
 import { Progress } from '@ui/components/progress'
-// Tooltip removed — causes render delay on landing page
-import { Icon, type IconName } from '@ui/core/icons/icon'
-import { AnimatedCounter } from '@ui/components/animated-counter'
-import { MetricCard } from '@ui/domain/metric-card'
-import { Sparkline } from '@ui/domain/sparkline'
 import { StatusBadge } from '@ui/components/status-badge'
 import { StatusPulse } from '@ui/components/status-pulse'
-import { CopyBlock } from '@ui/domain/copy-block'
-import { GlowCard } from '@ui/domain/glow-card'
-import { ShimmerButton } from '@ui/domain/shimmer-button'
-import { BorderBeam } from '@ui/domain/border-beam'
-import { Divider } from '@ui/components/divider'
-import { FilterPill } from '@ui/components/filter-pill'
+import { Icon, type IconName } from '@ui/core/icons/icon'
 import { css } from '@ui/core/styles/css-tag'
 import { useStyles } from '@ui/core/styles/use-styles'
+
+// Below-the-fold: lazy-loaded (gallery, dashboard, getting started)
+const Card = lazy(() => import('@ui/components/card').then(m => ({ default: m.Card })))
+// AnimatedCounter removed — stats use plain numbers for instant render
+const MetricCard = lazy(() => import('@ui/domain/metric-card').then(m => ({ default: m.MetricCard })))
+const Sparkline = lazy(() => import('@ui/domain/sparkline').then(m => ({ default: m.Sparkline })))
+const CopyBlock = lazy(() => import('@ui/domain/copy-block').then(m => ({ default: m.CopyBlock })))
+const GlowCard = lazy(() => import('@ui/domain/glow-card').then(m => ({ default: m.GlowCard })))
+const ShimmerButton = lazy(() => import('@ui/domain/shimmer-button').then(m => ({ default: m.ShimmerButton })))
+const BorderBeam = lazy(() => import('@ui/domain/border-beam').then(m => ({ default: m.BorderBeam })))
+const Divider = lazy(() => import('@ui/components/divider').then(m => ({ default: m.Divider })))
+const FilterPill = lazy(() => import('@ui/components/filter-pill').then(m => ({ default: m.FilterPill })))
+
+// ─── Lazy Section: Only renders when near viewport ──────────────────────────
+
+function LazySection({ children, height = 400, className = '' }: { children: React.ReactNode; height?: number; className?: string }) {
+  const ref = useRef<HTMLDivElement>(null)
+  const [visible, setVisible] = useState(false)
+  useEffect(() => {
+    const el = ref.current
+    if (!el) return
+    const observer = new IntersectionObserver(
+      ([entry]) => { if (entry.isIntersecting) { setVisible(true); observer.unobserve(el) } },
+      { rootMargin: '500px 0px' } // 500px buffer ahead
+    )
+    observer.observe(el)
+    return () => observer.disconnect()
+  }, [])
+  return (
+    <div ref={ref} className={className} style={visible ? undefined : { minHeight: height }}>
+      {visible ? (
+        <Suspense fallback={<div style={{ minHeight: height }} />}>
+          {children}
+        </Suspense>
+      ) : null}
+    </div>
+  )
+}
 
 // ─── Scroll Reveal Hook ─────────────────────────────────────────────────────
 
@@ -304,6 +332,17 @@ const homeStyles = css`
       grid-template-columns: repeat(4, 1fr);
       gap: 1rem;
       margin-block-start: clamp(2.5rem, 5vw, 4rem);
+    }
+
+    .home-stat-cell {
+      background: var(--bg-elevated);
+      border: 1px solid var(--border-default);
+      border-radius: var(--radius-md, 0.5rem);
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .home-stat-cell:hover {
+      border-color: var(--border-strong);
+      box-shadow: var(--shadow-sm);
     }
 
     @media (max-width: 640px) {
@@ -1062,62 +1101,54 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Live component preview strip with BorderBeam */}
+        {/* Live component preview strip — eagerly loaded components only */}
         <div className="home-hero-entrance" style={{ marginBlockStart: '2.5rem' }}>
-          <BorderBeam duration={4} color="oklch(70% 0.18 270)">
-            <div className="home-preview-strip-inner">
-              <Button variant="primary" size="md">Primary</Button>
-              <Button variant="secondary" size="md">Secondary</Button>
-              <Button variant="ghost" size="md">Ghost</Button>
-              <Badge variant="success" size="md">Online</Badge>
-              <Badge variant="primary" size="md" dot pulse>New</Badge>
-              <StatusBadge status="ok" label="Healthy" pulse />
-              <StatusBadge status="warning" label="Degraded" />
-              <StatusPulse status="ok" size="md" />
-              <Progress value={72} size="md" style={{ width: 120 }} />
-            </div>
-          </BorderBeam>
+          <div className="home-preview-strip-inner">
+            <Button variant="primary" size="md">Primary</Button>
+            <Button variant="secondary" size="md">Secondary</Button>
+            <Button variant="ghost" size="md">Ghost</Button>
+            <Badge variant="success" size="md">Online</Badge>
+            <Badge variant="primary" size="md" dot pulse>New</Badge>
+            <StatusBadge status="ok" label="Healthy" pulse />
+            <StatusBadge status="warning" label="Degraded" />
+            <StatusPulse status="ok" size="md" />
+            <Progress value={72} size="md" style={{ width: 120 }} />
+          </div>
         </div>
 
-        {/* Stats inside Card components with hover glow */}
+        {/* Stats — plain HTML for instant render */}
         <div className="home-hero-entrance">
           <div className="home-stats">
-            <Card variant="default" interactive padding="none">
+            <div className="home-stat-cell">
               <div className="home-stat-inner">
-                <span className="home-stat-value">
-                  <AnimatedCounter value={totalComponents} />
-                </span>
+                <span className="home-stat-value">{totalComponents}</span>
                 <span className="home-stat-label">Components</span>
               </div>
-            </Card>
-            <Card variant="default" interactive padding="none">
+            </div>
+            <div className="home-stat-cell">
               <div className="home-stat-inner">
-                <span className="home-stat-value">
-                  <AnimatedCounter value={premiumCount} />
-                </span>
+                <span className="home-stat-value">{premiumCount}</span>
                 <span className="home-stat-label">Premium</span>
               </div>
-            </Card>
-            <Card variant="default" interactive padding="none">
+            </div>
+            <div className="home-stat-cell">
               <div className="home-stat-inner">
-                <span className="home-stat-value">
-                  <AnimatedCounter value={3} />
-                </span>
+                <span className="home-stat-value">3</span>
                 <span className="home-stat-label">Weight Tiers</span>
               </div>
-            </Card>
-            <Card variant="default" interactive padding="none">
+            </div>
+            <div className="home-stat-cell">
               <div className="home-stat-inner">
                 <span className="home-stat-value">0</span>
                 <span className="home-stat-label">Dependencies</span>
               </div>
-            </Card>
+            </div>
           </div>
         </div>
       </section>
 
       {/* ── Component Gallery ── */}
-      <RevealSection className="home-section">
+      <LazySection height={800}><RevealSection className="home-section">
         <div className="home-section-header">
           <h2>All {totalComponents} Components</h2>
           <p>
@@ -1165,10 +1196,10 @@ export default function Home() {
             </Link>
           </div>
         ))}
-      </RevealSection>
+      </RevealSection></LazySection>
 
       {/* ── Feature Highlights ── */}
-      <RevealSection className="home-section">
+      <LazySection height={500}><RevealSection className="home-section">
         <div className="home-section-header">
           <h2>What makes this different</h2>
           <p>
@@ -1191,10 +1222,10 @@ export default function Home() {
             </StaggerItem>
           ))}
         </div>
-      </RevealSection>
+      </RevealSection></LazySection>
 
       {/* ── Getting Started ── */}
-      <RevealSection className="home-section">
+      <LazySection height={600}><RevealSection className="home-section">
         <div className="home-section-header">
           <h2>Getting Started</h2>
           <p>
@@ -1285,10 +1316,10 @@ export default function Home() {
             </BorderBeam>
           </StaggerItem>
         </div>
-      </RevealSection>
+      </RevealSection></LazySection>
 
       {/* ── Live Dashboard Preview ── */}
-      <RevealSection className="home-section">
+      <LazySection height={400}><RevealSection className="home-section">
         <div className="home-section-header">
           <h2>Built for real interfaces</h2>
           <p>
@@ -1348,10 +1379,10 @@ export default function Home() {
             </div>
           </Card>
         </BorderBeam>
-      </RevealSection>
+      </RevealSection></LazySection>
 
       {/* ── Code Example ── */}
-      <RevealSection className="home-section">
+      <LazySection height={300}><RevealSection className="home-section">
         <div className="home-section-header">
           <h2>Simple to use</h2>
           <p>Import what you need. Wrap in UIProvider. Ship.</p>
@@ -1367,10 +1398,10 @@ export default function Home() {
             />
           </Card>
         </div>
-      </RevealSection>
+      </RevealSection></LazySection>
 
       {/* ── Footer ── */}
-      <Divider spacing="lg" />
+      <LazySection height={100}><Divider spacing="lg" />
       <footer className="home-footer">
         <a href="https://github.com/annondeveloper/ui-kit" target="_blank" rel="noopener noreferrer">
           GitHub
@@ -1390,7 +1421,7 @@ export default function Home() {
         <div className="home-footer-built">
           Built with zero dependencies. Powered by Aurora Fluid design.
         </div>
-      </footer>
+      </footer></LazySection>
     </div>
   )
 }
