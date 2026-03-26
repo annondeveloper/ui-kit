@@ -2,11 +2,11 @@
 
 ## Project Overview
 
-`@annondeveloper/ui-kit` — A zero-dependency React component library with 62 components, physics-based animations, OKLCH color system, and Aurora Fluid design identity.
+`@annondeveloper/ui-kit` — A zero-dependency React component library with 111 components across 3 weight tiers (Lite/Standard/Premium), physics-based animations, OKLCH color system, and Aurora Fluid design identity.
 
 **Repository:** https://github.com/annondeveloper/ui-kit
-**Current stable:** v0.4.1 on `main` branch
-**Next-gen rebuild:** v2.0.0 on `v2` branch
+**Current:** v2.3.0 on `main` branch
+**Legacy:** v0.4.1 on `v1` branch (archived)
 
 ## Development Philosophy
 
@@ -36,8 +36,8 @@
 
 ## Branch Strategy
 
-- `main` — current stable v0.4.x (do not modify during v2 development)
-- `v2` — next-gen rebuild branch (all v2 work happens here)
+- `main` — active development branch (v2.x)
+- `v1` — archived v0.4.x legacy (read-only)
 
 ## Build & Test
 
@@ -59,8 +59,10 @@ Automated via GitHub Actions on `v*` tag push:
 
 ```
 src/core/          # Foundation: styles, motion, tokens, a11y, icons, forms, utils
-src/components/    # General-purpose (~25): Button, Card, Dialog, Tabs, etc.
-src/domain/        # Specialized (~37): MetricCard, LogViewer, StreamingText, etc.
+src/components/    # General-purpose (47): Button, Card, Dialog, Tabs, Typography, etc.
+src/domain/        # Specialized (64): MetricCard, LogViewer, TimeSeriesChart, RackDiagram, etc.
+src/lite/          # Lite tier (109): minimal wrappers, no motion, ~20-30 lines each
+src/premium/       # Premium tier (109): aurora glow, spring animations, shimmer effects
 ```
 
 ## Style Conventions
