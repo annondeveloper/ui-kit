@@ -57,6 +57,7 @@ const KbdPage = lazy(() => import('./pages/components/KbdPage'))
 const LinkPage = lazy(() => import('./pages/components/LinkPage'))
 const LiveFeedPage = lazy(() => import('./pages/components/LiveFeedPage'))
 const LogViewerPage = lazy(() => import('./pages/components/LogViewerPage'))
+const MetricCardPage = lazy(() => import('./pages/components/MetricCardPage'))
 const MeteorShowerPage = lazy(() => import('./pages/components/MeteorShowerPage'))
 const NavbarPage = lazy(() => import('./pages/components/NavbarPage'))
 const NetworkTrafficCardPage = lazy(() => import('./pages/components/NetworkTrafficCardPage'))
@@ -168,6 +169,7 @@ createRoot(document.getElementById('root')!).render(
             <Route path="components/live-feed" element={<Suspense><LiveFeedPage /></Suspense>} />
             <Route path="components/log-viewer" element={<Suspense><LogViewerPage /></Suspense>} />
             <Route path="components/meteor-shower" element={<Suspense><MeteorShowerPage /></Suspense>} />
+            <Route path="components/metric-card" element={<Suspense><MetricCardPage /></Suspense>} />
             <Route path="components/navbar" element={<Suspense><NavbarPage /></Suspense>} />
             <Route path="components/network-traffic-card" element={<Suspense><NetworkTrafficCardPage /></Suspense>} />
             <Route path="components/notification-stack" element={<Suspense><NotificationStackPage /></Suspense>} />
