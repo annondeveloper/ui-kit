@@ -4,7 +4,7 @@ import { Button } from '@ui/components/button'
 import { Card } from '@ui/components/card'
 import { Badge } from '@ui/components/badge'
 import { Progress } from '@ui/components/progress'
-import { Tooltip } from '@ui/components/tooltip'
+// Tooltip removed — causes render delay on landing page
 import { Icon, type IconName } from '@ui/core/icons/icon'
 import { AnimatedCounter } from '@ui/components/animated-counter'
 import { MetricCard } from '@ui/domain/metric-card'
@@ -287,15 +287,15 @@ const homeStyles = css`
     /* Live Preview Strip */
     .home-preview-strip-inner {
       display: flex;
-      gap: 1rem;
+      gap: 1.25rem;
       justify-content: center;
       align-items: center;
       flex-wrap: wrap;
-      padding: 1.5rem 2rem;
+      padding: 1.75rem 2.5rem;
       border-radius: var(--radius-lg, 0.75rem);
-      background: var(--bg-surface, oklch(16% 0.01 270 / 0.6));
-      backdrop-filter: blur(8px);
-      border: 1px solid var(--border-subtle, oklch(100% 0 0 / 0.06));
+      background: var(--bg-elevated);
+      border: 1px solid var(--border-default);
+      box-shadow: var(--shadow-md);
     }
 
     /* ─── Stats Bar ─── */
@@ -670,10 +670,9 @@ const homeStyles = css`
         opacity: 0.2;
       }
       .home-preview-strip-inner {
-        background: var(--bg-surface, oklch(100% 0 0));
-        border-color: var(--border-default, oklch(0% 0 0 / 0.08));
-        box-shadow: var(--shadow-md, 0 4px 12px oklch(0% 0 0 / 0.08));
-        backdrop-filter: none;
+        background: var(--bg-elevated);
+        border-color: var(--border-default);
+        box-shadow: var(--shadow-lg);
       }
       .home-stats-bar > div {
         background: var(--bg-surface, oklch(100% 0 0));
@@ -1067,16 +1066,15 @@ export default function Home() {
         <div className="home-hero-entrance" style={{ marginBlockStart: '2.5rem' }}>
           <BorderBeam duration={4} color="oklch(70% 0.18 270)">
             <div className="home-preview-strip-inner">
-              <Button variant="primary" size="sm">Primary</Button>
-              <Button variant="secondary" size="sm">Secondary</Button>
+              <Button variant="primary" size="md">Primary</Button>
+              <Button variant="secondary" size="md">Secondary</Button>
+              <Button variant="ghost" size="md">Ghost</Button>
+              <Badge variant="success" size="md">Online</Badge>
               <Badge variant="primary" size="md" dot pulse>New</Badge>
-              <Badge variant="default" size="sm">v2.0</Badge>
-              <Tooltip content="All systems operational" placement="top">
-                <StatusBadge status="ok" label="Healthy" pulse />
-              </Tooltip>
+              <StatusBadge status="ok" label="Healthy" pulse />
               <StatusBadge status="warning" label="Degraded" />
-              <StatusPulse status="ok" size="sm" />
-              <Progress value={72} size="sm" style={{ width: 80 }} />
+              <StatusPulse status="ok" size="md" />
+              <Progress value={72} size="md" style={{ width: 120 }} />
             </div>
           </BorderBeam>
         </div>
