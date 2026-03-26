@@ -299,13 +299,13 @@ import { DataTable } from '@annondeveloper/ui-kit'
 
 | Tier | Components |
 |------|-----------|
-| Lite | 100 components |
-| Standard | 102 components (all) |
-| Premium | 100 components (every component except ui-provider and native-tooltip) |
+| Lite | 109 components |
+| Standard | 111 components (all) |
+| Premium | 109 components (every component except ui-provider and native-tooltip) |
 
 ## Removed Components
 
-None. All 62 components from v1 are present in v2, plus 40 new additions including:
+None. All 62 components from v1 are present in v2, plus 49 new additions including:
 
 - `Typography` — semantic text with 11 variants and fluid sizing
 - `Kbd` — keyboard shortcut display
@@ -317,7 +317,14 @@ None. All 62 components from v1 are present in v2, plus 40 new additions includi
 - `CommandBar` — Cmd+K command palette
 - `StreamingText` — LLM token-by-token rendering
 - `BackgroundBeams`, `MeteorShower`, `GlowCard` — visual effects
-- And 25+ more monitoring, data display, and AI components
+- `TimeSeriesChart` — full SVG line chart with multi-series, axes, crosshair
+- `RingChart` — donut/ring chart for resource utilization
+- `CoreChart` — CPU core utilization grid
+- `StorageBar` — segmented storage usage bar with labels
+- `RackDiagram` — data center rack visualization
+- `SwitchFaceplate` — network switch port grid
+- `DensitySelector`, `ColumnVisibilityToggle`, `CSVExportButton` — table utilities
+- And 20+ more monitoring, data display, and AI components
 
 ## Renamed Exports
 
