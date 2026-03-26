@@ -299,9 +299,9 @@ import { DataTable } from '@annondeveloper/ui-kit'
 
 | Tier | Components |
 |------|-----------|
-| Lite | 75 components |
-| Standard | 97 components (all) |
-| Premium | 14 components (Button, Card, Dialog, Tabs, Badge, Select, Tooltip, Checkbox, ToggleSwitch, Progress, Accordion, Alert, Drawer, MetricCard) |
+| Lite | 100 components |
+| Standard | 102 components (all) |
+| Premium | 100 components (every component except ui-provider and native-tooltip) |
 
 ## Removed Components
 
