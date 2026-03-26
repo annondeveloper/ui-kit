@@ -63,7 +63,7 @@ const inlineEditStyles = css`
       }
 
       .ui-inline-edit__display:hover {
-        background: oklch(100% 0 0 / 0.04);
+        background: var(--bg-hover);
         border-color: var(--border-default, oklch(100% 0 0 / 0.08));
       }
 

@@ -265,7 +265,7 @@ const selectStyles = css`
       }
 
       .ui-select__option:not([data-disabled]):hover {
-        background: oklch(100% 0 0 / 0.04);
+        background: var(--bg-hover);
       }
 
       .ui-select__option[data-active]:not([data-disabled]):hover {
@@ -308,7 +308,7 @@ const selectStyles = css`
         gap: 0.25rem;
         padding-block: 0.0625rem;
         padding-inline: 0.375rem;
-        background: oklch(100% 0 0 / 0.08);
+        background: var(--bg-active);
         border-radius: var(--radius-sm, 0.25rem);
         font-size: var(--text-xs, 0.75rem);
         line-height: 1.5;

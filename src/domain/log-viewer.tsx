@@ -81,7 +81,7 @@ const logViewerStyles = css`
       }
 
       .ui-log-viewer__line:hover {
-        background: oklch(100% 0 0 / 0.03);
+        background: var(--bg-hover);
       }
 
       /* Timestamp */
@@ -116,10 +116,10 @@ const logViewerStyles = css`
 
       /* Error lines get subtle bg */
       .ui-log-viewer__line[data-line-level="error"] {
-        background: oklch(62% 0.22 25 / 0.06);
+        background: oklch(from var(--status-critical, oklch(62% 0.22 25)) l c h / 0.06);
       }
       .ui-log-viewer__line[data-line-level="warn"] {
-        background: oklch(80% 0.18 85 / 0.04);
+        background: oklch(from var(--status-warning, oklch(80% 0.18 85)) l c h / 0.04);
       }
 
       /* Search highlight */

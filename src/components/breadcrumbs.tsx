@@ -68,7 +68,7 @@ const breadcrumbsStyles = css`
       }
       a:hover {
         color: var(--text-primary, oklch(90% 0 0));
-        background: oklch(100% 0 0 / 0.04);
+        background: var(--bg-hover);
       }
       a:focus-visible {
         outline: 2px solid var(--brand, oklch(65% 0.2 270));

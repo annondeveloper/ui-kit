@@ -251,7 +251,7 @@ const datePickerStyles = css`
       }
       .ui-date-picker__nav-btn:hover {
         color: var(--text-primary, oklch(90% 0 0));
-        background: oklch(100% 0 0 / 0.06);
+        background: var(--bg-hover);
       }
       .ui-date-picker__nav-btn:focus-visible {
         outline: 2px solid var(--brand, oklch(65% 0.2 270));
@@ -297,7 +297,7 @@ const datePickerStyles = css`
         transition: background 0.1s, color 0.1s;
       }
       .ui-date-picker__day:hover:not(:disabled):not([data-selected]) {
-        background: oklch(100% 0 0 / 0.08);
+        background: var(--bg-active);
       }
       .ui-date-picker__day:focus-visible {
         outline: 2px solid var(--brand, oklch(65% 0.2 270));
@@ -312,7 +312,7 @@ const datePickerStyles = css`
       /* Selected */
       .ui-date-picker__day[data-selected] {
         background: var(--brand, oklch(65% 0.2 270));
-        color: oklch(100% 0 0);
+        color: var(--text-on-brand);
         font-weight: 600;
       }
 

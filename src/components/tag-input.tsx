@@ -109,7 +109,7 @@ const tagInputStyles = css`
         padding-block: 0.125rem;
         padding-inline: 0.5rem;
         border-radius: var(--radius-full, 9999px);
-        background: oklch(100% 0 0 / 0.08);
+        background: var(--bg-active);
         color: var(--text-primary, oklch(90% 0 0));
         font-size: var(--text-xs, 0.75rem);
         font-weight: 500;

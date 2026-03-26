@@ -272,7 +272,8 @@ const pageStyles = css`
         background: var(--bg-base);
         border-radius: var(--radius-md);
         position: relative;
-        overflow: hidden;
+        overflow-x: auto;
+        overflow-y: hidden;
       }
 
       .pipeline-stage-page__playground-result::before {

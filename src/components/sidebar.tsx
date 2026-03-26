@@ -109,7 +109,7 @@ const sidebarStyles = css`
         padding: 0;
       }
       .ui-sidebar__toggle:hover {
-        background: oklch(100% 0 0 / 0.08);
+        background: var(--bg-active);
         color: var(--text-primary, oklch(90% 0 0));
       }
       .ui-sidebar__toggle:focus-visible {
@@ -137,7 +137,7 @@ const sidebarStyles = css`
         transition: background 0.15s, color 0.15s;
       }
       .ui-sidebar__item:hover {
-        background: oklch(100% 0 0 / 0.06);
+        background: var(--bg-hover);
         color: var(--text-primary, oklch(90% 0 0));
       }
       .ui-sidebar__item:focus-visible {

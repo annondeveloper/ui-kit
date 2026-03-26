@@ -134,7 +134,7 @@ const radioGroupStyles = css`
         inline-size: 45%;
         block-size: 45%;
         border-radius: var(--radius-full, 9999px);
-        background: oklch(100% 0 0);
+        background: var(--text-on-brand);
         transform: scale(0);
         transition: transform 0.15s var(--ease-out, ease-out);
       }

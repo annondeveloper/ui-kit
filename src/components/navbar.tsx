@@ -101,7 +101,7 @@ const navbarStyles = css`
         margin-inline-start: auto;
       }
       .ui-navbar__hamburger:hover {
-        background: oklch(100% 0 0 / 0.06);
+        background: var(--bg-hover);
       }
       .ui-navbar__hamburger:focus-visible {
         outline: 2px solid var(--brand, oklch(65% 0.2 270));

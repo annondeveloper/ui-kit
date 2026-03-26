@@ -240,7 +240,7 @@ const comboboxStyles = css`
       }
 
       .ui-combobox__option:not([data-disabled]):hover {
-        background: oklch(100% 0 0 / 0.04);
+        background: var(--bg-hover);
       }
 
       .ui-combobox__option[data-active]:not([data-disabled]):hover {
@@ -313,7 +313,7 @@ const comboboxStyles = css`
       .ui-combobox__spinner {
         inline-size: 1rem;
         block-size: 1rem;
-        border: 2px solid oklch(100% 0 0 / 0.1);
+        border: 2px solid var(--border-default);
         border-block-start-color: var(--brand, oklch(65% 0.2 270));
         border-radius: 50%;
         animation: ui-combobox-spin 0.6s linear infinite;

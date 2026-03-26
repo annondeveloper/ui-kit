@@ -188,7 +188,7 @@ const commandBarStyles = css`
       }
 
       .ui-command-bar__item:not([aria-disabled="true"]):hover {
-        background: oklch(100% 0 0 / 0.04);
+        background: var(--bg-hover);
       }
 
       .ui-command-bar__item[data-active]:not([aria-disabled="true"]):hover {
@@ -243,7 +243,7 @@ const commandBarStyles = css`
         block-size: 1.25rem;
         border: 1px solid var(--border-subtle, oklch(100% 0 0 / 0.08));
         border-radius: var(--radius-sm, 0.25rem);
-        background: oklch(100% 0 0 / 0.04);
+        background: var(--bg-hover);
         font-size: var(--text-2xs, 0.625rem);
         font-family: inherit;
         color: var(--text-secondary, oklch(70% 0 0));

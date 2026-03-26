@@ -229,10 +229,10 @@ const tabsStyles = css`
       }
       :scope[data-variant="pills"] .ui-tabs__tab[aria-selected="true"] {
         background: var(--brand, oklch(65% 0.2 270));
-        color: oklch(100% 0 0);
+        color: var(--text-on-brand);
       }
       :scope[data-variant="pills"] .ui-tabs__tab:hover:not([aria-selected="true"]):not([aria-disabled="true"]) {
-        background: oklch(100% 0 0 / 0.06);
+        background: var(--bg-hover);
       }
 
       /* ── Enclosed Variant ──────────────────────────────── */
@@ -251,7 +251,7 @@ const tabsStyles = css`
         box-shadow: var(--shadow-sm, 0 1px 3px oklch(0% 0 0 / 0.12));
       }
       :scope[data-variant="enclosed"] .ui-tabs__tab:hover:not([aria-selected="true"]):not([aria-disabled="true"]) {
-        background: oklch(100% 0 0 / 0.04);
+        background: var(--bg-hover);
       }
 
       /* ── Panel ─────────────────────────────────────────── */

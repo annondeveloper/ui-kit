@@ -111,7 +111,7 @@ const csvExportStyles = css`
       :scope[data-exported="true"] {
         background: var(--status-healthy, oklch(65% 0.2 150));
         border-color: var(--status-healthy, oklch(65% 0.2 150));
-        color: oklch(100% 0 0);
+        color: var(--text-on-brand, oklch(100% 0 0));
       }
 
       /* Icon */

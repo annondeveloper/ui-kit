@@ -95,7 +95,7 @@ const buttonStyles = css`
       /* Variants */
       :scope[data-variant="primary"] {
         background: var(--brand);
-        color: oklch(100% 0 0);
+        color: var(--text-on-brand);
         border-color: transparent;
         box-shadow: var(--shadow-sm);
       }
@@ -126,7 +126,7 @@ const buttonStyles = css`
 
       :scope[data-variant="danger"] {
         background: var(--status-critical);
-        color: oklch(100% 0 0);
+        color: var(--text-on-brand);
         border-color: transparent;
       }
       :scope[data-variant="danger"]:hover:not(:disabled) {

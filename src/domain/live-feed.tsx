@@ -76,14 +76,14 @@ const liveFeedStyles = css`
       }
 
       [data-connection="connected"] .ui-live-feed__status-dot {
-        background: oklch(72% 0.19 155);
+        background: var(--status-ok, oklch(72% 0.19 155));
       }
       [data-connection="reconnecting"] .ui-live-feed__status-dot {
-        background: oklch(80% 0.18 85);
+        background: var(--status-warning, oklch(80% 0.18 85));
         animation: ui-live-feed-pulse 1.5s ease-in-out infinite;
       }
       [data-connection="offline"] .ui-live-feed__status-dot {
-        background: oklch(62% 0.22 25);
+        background: var(--status-critical, oklch(62% 0.22 25));
       }
 
       :scope[data-motion="0"] [data-connection="reconnecting"] .ui-live-feed__status-dot {
@@ -122,7 +122,7 @@ const liveFeedStyles = css`
         font-size: var(--text-sm, 0.875rem);
         line-height: 1.5;
         color: var(--text-primary, oklch(90% 0 0));
-        border-block-end: 1px solid oklch(100% 0 0 / 0.03);
+        border-block-end: 1px solid var(--border-subtle, oklch(100% 0 0 / 0.03));
       }
 
       /* New item flash animation */

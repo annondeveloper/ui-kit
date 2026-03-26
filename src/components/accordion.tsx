@@ -75,7 +75,7 @@ const accordionStyles = css`
         content: '';
       }
       summary:hover {
-        background: oklch(100% 0 0 / 0.04);
+        background: var(--bg-hover);
       }
       summary:focus-visible {
         outline: 2px solid var(--brand, oklch(65% 0.2 270));

@@ -109,11 +109,11 @@ const formInputStyles = css`
 
       /* Filled variant */
       :scope[data-variant="filled"] .ui-form-input__field {
-        background: oklch(100% 0 0 / 0.04);
+        background: var(--bg-hover);
         border-color: transparent;
       }
       :scope[data-variant="filled"] .ui-form-input__field:hover:not(:disabled) {
-        background: oklch(100% 0 0 / 0.06);
+        background: var(--bg-active);
       }
       :scope[data-variant="filled"] .ui-form-input__field:focus {
         background: transparent;

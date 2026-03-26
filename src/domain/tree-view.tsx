@@ -66,7 +66,7 @@ const treeViewStyles = css`
       }
 
       .ui-tree-view__row:hover {
-        background: oklch(100% 0 0 / 0.04);
+        background: var(--bg-hover);
       }
 
       .ui-tree-view__row[data-selected] {
@@ -101,7 +101,7 @@ const treeViewStyles = css`
 
       .ui-tree-view__toggle:hover {
         color: var(--text-primary, oklch(90% 0 0));
-        background: oklch(100% 0 0 / 0.06);
+        background: var(--bg-hover);
       }
 
       .ui-tree-view__toggle svg {
@@ -201,7 +201,7 @@ const treeViewStyles = css`
       .ui-tree-view__spinner {
         inline-size: 0.875rem;
         block-size: 0.875rem;
-        border: 2px solid oklch(100% 0 0 / 0.1);
+        border: 2px solid var(--border-default, oklch(100% 0 0 / 0.1));
         border-block-start-color: var(--brand, oklch(65% 0.2 270));
         border-radius: 50%;
         animation: ui-tree-spin 0.6s linear infinite;

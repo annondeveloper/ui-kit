@@ -121,14 +121,14 @@ const stepWizardStyles = css`
       .ui-step-wizard__indicator[data-state="active"] {
         background: var(--brand, oklch(65% 0.2 270));
         border-color: var(--brand, oklch(65% 0.2 270));
-        color: oklch(100% 0 0);
+        color: var(--text-on-brand, oklch(100% 0 0));
         box-shadow: 0 0 0 3px oklch(from var(--brand, oklch(65% 0.2 270)) l c h / 0.2);
       }
 
       .ui-step-wizard__indicator[data-state="completed"] {
         background: var(--brand, oklch(65% 0.2 270));
         border-color: var(--brand, oklch(65% 0.2 270));
-        color: oklch(100% 0 0);
+        color: var(--text-on-brand, oklch(100% 0 0));
       }
 
       .ui-step-wizard__indicator[data-state="upcoming"] {

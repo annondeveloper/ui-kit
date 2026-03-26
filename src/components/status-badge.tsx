@@ -25,7 +25,7 @@ const statusBadgeStyles = css`
         padding-block: 0.125rem;
         padding-inline: 0.5rem;
         border-radius: var(--radius-full, 9999px);
-        background: oklch(100% 0 0 / 0.06);
+        background: var(--bg-hover);
         border: 1px solid var(--border-default, oklch(100% 0 0 / 0.1));
         font-size: var(--text-xs, 0.75rem);
         font-weight: 500;

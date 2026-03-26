@@ -106,7 +106,7 @@ const densitySelectorStyles = css`
         color: var(--text-primary, oklch(90% 0 0));
       }
       .ui-density-selector__option[data-active="true"] {
-        color: oklch(100% 0 0);
+        color: var(--text-on-brand, oklch(100% 0 0));
       }
       .ui-density-selector__option:focus-visible {
         outline: 2px solid var(--brand, oklch(65% 0.2 270));

@@ -114,7 +114,7 @@ const dashboardGridStyles = css`
       }
 
       .ui-dashboard-grid__group-header:hover {
-        background: oklch(100% 0 0 / 0.04);
+        background: var(--bg-hover);
       }
 
       .ui-dashboard-grid__group-header:focus-visible {

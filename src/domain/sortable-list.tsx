@@ -71,7 +71,7 @@ const sortableListStyles = css`
       }
 
       .ui-sortable-list__item:hover:not([aria-disabled="true"]) {
-        background: oklch(100% 0 0 / 0.04);
+        background: var(--bg-hover);
       }
 
       .ui-sortable-list__item[data-grabbed="true"] {

@@ -107,7 +107,7 @@ const fileUploadStyles = css`
 
       .ui-file-upload__dropzone:hover {
         border-color: var(--border-strong, oklch(100% 0 0 / 0.2));
-        background: oklch(100% 0 0 / 0.02);
+        background: var(--bg-hover);
       }
 
       .ui-file-upload__dropzone:focus-visible {
@@ -167,7 +167,7 @@ const fileUploadStyles = css`
         padding: var(--space-xs, 0.25rem) var(--space-sm, 0.5rem);
         border: 1px solid var(--border-default, oklch(100% 0 0 / 0.08));
         border-radius: var(--radius-md, 0.375rem);
-        background: oklch(100% 0 0 / 0.02);
+        background: var(--bg-hover);
       }
 
       /* Entry animation */

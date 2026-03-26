@@ -81,7 +81,7 @@ const dropdownMenuStyles = css`
 
       .ui-dropdown-menu__item:hover:not([aria-disabled="true"]),
       .ui-dropdown-menu__item:focus-visible:not([aria-disabled="true"]) {
-        background: oklch(100% 0 0 / 0.06);
+        background: var(--bg-hover);
       }
 
       .ui-dropdown-menu__item:focus-visible {

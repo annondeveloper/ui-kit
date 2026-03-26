@@ -194,7 +194,7 @@ const toastStyles = css`
         font-family: inherit;
       }
       .ui-toast__action:hover {
-        background: oklch(100% 0 0 / 0.06);
+        background: var(--bg-hover);
       }
       .ui-toast__action:focus-visible {
         outline: 2px solid var(--brand, oklch(65% 0.2 270));
@@ -220,7 +220,7 @@ const toastStyles = css`
         line-height: 1;
       }
       .ui-toast__close:hover {
-        background: oklch(100% 0 0 / 0.08);
+        background: var(--bg-active);
         color: var(--text-primary, oklch(90% 0 0));
       }
       .ui-toast__close:focus-visible {

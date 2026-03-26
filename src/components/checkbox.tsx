@@ -100,7 +100,7 @@ const checkboxStyles = css`
       .ui-checkbox__check {
         inline-size: 100%;
         block-size: 100%;
-        color: oklch(100% 0 0);
+        color: var(--text-on-brand);
         opacity: 0;
         transform: scale(0.5);
         transition: opacity 0.1s, transform 0.15s var(--ease-out, ease-out);
@@ -126,7 +126,7 @@ const checkboxStyles = css`
       .ui-checkbox__dash {
         inline-size: 60%;
         block-size: 2px;
-        background: oklch(100% 0 0);
+        background: var(--text-on-brand);
         border-radius: 1px;
         opacity: 0;
         transition: opacity 0.1s;

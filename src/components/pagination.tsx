@@ -50,9 +50,9 @@ const paginationStyles = css`
         padding: 0;
       }
       button:hover:not(:disabled) {
-        background: oklch(100% 0 0 / 0.06);
+        background: var(--bg-hover);
         color: var(--text-primary, oklch(90% 0 0));
-        border-color: oklch(100% 0 0 / 0.15);
+        border-color: var(--border-default);
       }
       button:focus-visible {
         outline: 2px solid var(--brand, oklch(65% 0.2 270));
@@ -66,7 +66,7 @@ const paginationStyles = css`
       /* Current page */
       button[aria-current="page"] {
         background: var(--brand, oklch(65% 0.2 270));
-        color: oklch(100% 0 0);
+        color: var(--text-on-brand);
         border-color: var(--brand, oklch(65% 0.2 270));
         cursor: default;
       }
