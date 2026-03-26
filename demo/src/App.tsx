@@ -1317,15 +1317,31 @@ function SidebarContent({
 // ─── App ──────────────────────────────────────────────────────────────────────
 
 export default function App() {
-  const [light, setLight] = useState(false)
-  const [motion, setMotion] = useState(3)
-  const [tier, setTier] = useState<Tier>('standard')
+  const [light, setLight] = useState(() => {
+    try { return localStorage.getItem('ui-kit-light') === 'true' } catch { return false }
+  })
+  const [motion, setMotion] = useState(() => {
+    try { return Number(localStorage.getItem('ui-kit-motion') ?? '3') } catch { return 3 }
+  })
+  const [tier, setTier] = useState<Tier>(() => {
+    try { return (localStorage.getItem('ui-kit-tier') as Tier) || 'standard' } catch { return 'standard' }
+  })
   const [drawerOpen, setDrawerOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
   const location = useLocation()
   const searchInputRef = useRef<HTMLInputElement>(null)
 
   useStyles('site-layout', layoutStyles)
+
+  // Persist settings to localStorage
+  useEffect(() => {
+    try {
+      localStorage.setItem('ui-kit-light', String(light))
+      localStorage.setItem('ui-kit-motion', String(motion))
+      localStorage.setItem('ui-kit-tier', tier)
+    } catch {}
+  }, [light, motion, tier])
+
   const toggleLight = useCallback(() => setLight(l => !l), [])
   const closeDrawer = useCallback(() => setDrawerOpen(false), [])
 
@@ -1396,7 +1412,7 @@ export default function App() {
   return (
     <UIProvider motion={motion as 0|1|2|3} mode={light ? 'light' : 'dark'}>
       <TierContext.Provider value={{ tier, setTier }}>
-      <div className="site">
+      <div className="site" data-tier={tier}>
         {/* Desktop sidebar */}
         <aside className="site-sidebar" data-tier={tier}>
           <SidebarContent

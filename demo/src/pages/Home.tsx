@@ -293,9 +293,9 @@ const homeStyles = css`
       flex-wrap: wrap;
       padding: 1.5rem 2rem;
       border-radius: var(--radius-lg, 0.75rem);
-      background: oklch(16% 0.01 270 / 0.6);
+      background: var(--bg-surface, oklch(16% 0.01 270 / 0.6));
       backdrop-filter: blur(8px);
-      border: 1px solid oklch(100% 0 0 / 0.06);
+      border: 1px solid var(--border-subtle, oklch(100% 0 0 / 0.06));
     }
 
     /* ─── Stats Bar ─── */
@@ -579,7 +579,7 @@ const homeStyles = css`
       content: '';
       position: absolute;
       inset: 0;
-      background-image: radial-gradient(oklch(100% 0 0 / 0.03) 1px, transparent 1px);
+      background-image: radial-gradient(oklch(50% 0 0 / 0.06) 1px, transparent 1px);
       background-size: 20px 20px;
       pointer-events: none;
     }
@@ -598,7 +598,7 @@ const homeStyles = css`
       gap: 1rem;
       margin-block-start: 1rem;
       padding-block-start: 1rem;
-      border-block-start: 1px solid oklch(100% 0 0 / 0.06);
+      border-block-start: 1px solid var(--border-subtle, oklch(100% 0 0 / 0.06));
       flex-wrap: wrap;
       position: relative;
     }
@@ -656,6 +656,50 @@ const homeStyles = css`
       font-size: 0.75rem;
       color: var(--text-tertiary);
       margin-block-start: 0.5rem;
+    }
+  }
+
+  /* ─── Light Mode Overrides ────────────────────────────────── */
+  @layer demo {
+    html.light .home {
+      .home-hero-aurora {
+        opacity: 0.15;
+        filter: blur(80px);
+      }
+      .home-hero-orb {
+        opacity: 0.2;
+      }
+      .home-preview-strip-inner {
+        background: var(--bg-surface, oklch(100% 0 0));
+        border-color: var(--border-default, oklch(0% 0 0 / 0.08));
+        box-shadow: var(--shadow-md, 0 4px 12px oklch(0% 0 0 / 0.08));
+        backdrop-filter: none;
+      }
+      .home-stats-bar > div {
+        background: var(--bg-surface, oklch(100% 0 0));
+        border-color: var(--border-default, oklch(0% 0 0 / 0.08));
+        box-shadow: var(--shadow-sm, 0 1px 2px oklch(0% 0 0 / 0.06));
+      }
+      .home-gallery-card {
+        background: var(--bg-surface, oklch(100% 0 0));
+        border-color: var(--border-default, oklch(0% 0 0 / 0.08));
+        box-shadow: var(--shadow-sm);
+      }
+      .home-feature-card {
+        background: var(--bg-surface, oklch(100% 0 0));
+        border-color: var(--border-default, oklch(0% 0 0 / 0.08));
+        box-shadow: var(--shadow-sm);
+      }
+      .home-tier-card {
+        background: var(--bg-surface, oklch(100% 0 0));
+        border-color: var(--border-default, oklch(0% 0 0 / 0.08));
+        box-shadow: var(--shadow-sm);
+      }
+      .home-dashboard-wrap {
+        background: var(--bg-surface, oklch(100% 0 0));
+        border-color: var(--border-default, oklch(0% 0 0 / 0.08));
+        box-shadow: var(--shadow-md, 0 4px 12px oklch(0% 0 0 / 0.08));
+      }
     }
   }
 `

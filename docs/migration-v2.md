@@ -254,17 +254,70 @@ See [Animation Guide](./animation.md) for details.
 | N/A | `@annondeveloper/ui-kit/css/all.css` | All component CSS |
 | N/A | `@annondeveloper/ui-kit/css/components/*` | Per-component CSS |
 
+## Weight Tiers (New in v2)
+
+v2 introduces a 3-tier weight system. Every component is available in up to 3 sizes, allowing you to optimize bundle size for your use case:
+
+### Lite Tier
+```tsx
+import { Button, Badge, Card } from '@annondeveloper/ui-kit/lite'
+```
+- Minimal bundle: ~0.3-1.2KB per component
+- No animations, no motion engine
+- Pure CSS styling with `@scope`
+- Perfect for landing pages, static sites, email templates
+
+### Standard Tier (default)
+```tsx
+import { Button, Badge, Card } from '@annondeveloper/ui-kit'
+```
+- Full-featured: ~1.5-5KB per component
+- Motion levels 0-3 with physics-based springs
+- OKLCH theming, `adoptedStyleSheets` auto-injection
+- Keyboard navigation, ARIA patterns, focus management
+
+### Premium Tier
+```tsx
+import { Button, Badge, Card } from '@annondeveloper/ui-kit/premium'
+```
+- Cinematic: ~3-8KB per component
+- Aurora glow effects, spring-scale animations
+- Shimmer gradients, particle effects, ambient pulses
+- Everything in Standard + visual enhancements
+
+### Mixing Tiers
+
+You can mix tiers in the same app. A dashboard might use Premium cards for hero metrics and Lite badges for data table cells:
+
+```tsx
+import { MetricCard } from '@annondeveloper/ui-kit/premium'
+import { Badge } from '@annondeveloper/ui-kit/lite'
+import { DataTable } from '@annondeveloper/ui-kit'
+```
+
+### Current Tier Coverage
+
+| Tier | Components |
+|------|-----------|
+| Lite | 75 components |
+| Standard | 97 components (all) |
+| Premium | 14 components (Button, Card, Dialog, Tabs, Badge, Select, Tooltip, Checkbox, ToggleSwitch, Progress, Accordion, Alert, Drawer, MetricCard) |
+
 ## Removed Components
 
-None. All 62 components from v1 are present in v2, plus new additions:
+None. All 62 components from v1 are present in v2, plus 35 new additions including:
 
+- `Typography` — semantic text with 11 variants and fluid sizing
+- `Kbd` — keyboard shortcut display
+- `Link` — styled anchor with hover animations
 - `Combobox` — searchable select with async loading
 - `FileUpload` — drag-and-drop file upload with preview
 - `InlineEdit` — click-to-edit text fields
 - `TreeView` — hierarchical tree with expand/collapse
-- `ResponsiveCard` — container-query adaptive card
-- `ScrollReveal` — scroll-triggered reveal animations
-- `ViewTransitionLink` — View Transitions API integration
+- `CommandBar` — Cmd+K command palette
+- `StreamingText` — LLM token-by-token rendering
+- `BackgroundBeams`, `MeteorShower`, `GlowCard` — visual effects
+- And 25+ more monitoring, data display, and AI components
 
 ## Renamed Exports
 
