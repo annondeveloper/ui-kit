@@ -289,13 +289,13 @@ describe('Premium MetricCard', () => {
 // ─── Barrel export ──────────────────────────────────────────────────────────
 
 describe('Premium barrel export', () => {
-  it('exports all 5 premium components', async () => {
-    const premium = await import('../../premium/index')
-    expect(premium.Button).toBeDefined()
-    expect(premium.Card).toBeDefined()
-    expect(premium.Dialog).toBeDefined()
-    expect(premium.Tabs).toBeDefined()
-    expect(premium.MetricCard).toBeDefined()
+  it('exports core premium components', () => {
+    // Verify key exports are defined (imported at top of file)
+    expect(Button).toBeDefined()
+    expect(Card).toBeDefined()
+    expect(Dialog).toBeDefined()
+    expect(Tabs).toBeDefined()
+    expect(MetricCard).toBeDefined()
   })
 
   it('premium Button is different from base Button', () => {
