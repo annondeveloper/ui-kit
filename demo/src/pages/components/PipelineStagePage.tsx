@@ -219,13 +219,14 @@ const pageStyles = css`
         border-radius: var(--radius-md);
         background: var(--bg-base);
         position: relative;
-        overflow: hidden;
+        overflow-x: auto;
+        overflow-y: hidden;
         display: flex;
-        flex-wrap: wrap;
+        flex-wrap: nowrap;
         align-items: center;
-        justify-content: center;
         gap: 1.25rem;
         min-block-size: 80px;
+        -webkit-overflow-scrolling: touch;
       }
 
       .pipeline-stage-page__preview::before {

@@ -115,9 +115,13 @@ function RealtimeValueInner({
   useStyles('realtime-value', realtimeValueStyles)
   const motionLevel = useMotionLevel(motionProp)
 
+  // Smooth number interpolation
+  const [displayValue, setDisplayValue] = useState(value)
+  const prevValueRef = useRef(value)
+  const rafRef = useRef<number | null>(null)
+
   // Flash state
   const [flash, setFlash] = useState<'up' | 'down' | null>(null)
-  const prevValueRef = useRef(value)
   const flashTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   useEffect(() => {
@@ -125,19 +129,42 @@ function RealtimeValueInner({
     prevValueRef.current = value
 
     if (prev === value) return
-    if (!flashOnChange || motionLevel === 0) {
-      setFlash(null)
+
+    // Flash effect
+    if (flashOnChange && motionLevel > 0) {
+      setFlash(value > prev ? 'up' : 'down')
+      if (flashTimerRef.current) clearTimeout(flashTimerRef.current)
+      flashTimerRef.current = setTimeout(() => setFlash(null), 600)
+    }
+
+    // Smooth interpolation (motion 0 = instant)
+    if (motionLevel === 0) {
+      setDisplayValue(value)
       return
     }
 
-    setFlash(value > prev ? 'up' : 'down')
+    const duration = motionLevel >= 2 ? 400 : 200
+    const startTime = performance.now()
+    const startVal = prev
 
-    // Clear flash after animation
-    if (flashTimerRef.current) clearTimeout(flashTimerRef.current)
-    flashTimerRef.current = setTimeout(() => setFlash(null), 600)
+    const animate = (now: number) => {
+      const elapsed = now - startTime
+      const progress = Math.min(elapsed / duration, 1)
+      // Ease-out cubic
+      const eased = 1 - Math.pow(1 - progress, 3)
+      const current = startVal + (value - startVal) * eased
+      setDisplayValue(current)
+      if (progress < 1) {
+        rafRef.current = requestAnimationFrame(animate)
+      }
+    }
+
+    if (rafRef.current) cancelAnimationFrame(rafRef.current)
+    rafRef.current = requestAnimationFrame(animate)
 
     return () => {
       if (flashTimerRef.current) clearTimeout(flashTimerRef.current)
+      if (rafRef.current) cancelAnimationFrame(rafRef.current)
     }
   }, [value, flashOnChange, motionLevel])
 
@@ -166,7 +193,7 @@ function RealtimeValueInner({
       {...rest}
     >
       <span className="ui-realtime-value__number">
-        {format(value)}
+        {format(displayValue)}
       </span>
       {showDelta && delta !== undefined && (
         <span

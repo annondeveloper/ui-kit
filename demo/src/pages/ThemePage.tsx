@@ -350,7 +350,7 @@ const css = themeToCSS(theme)
             </span>
             <ToggleSwitch
               checked={darkMode}
-              onChange={setDarkMode}
+              onChange={(e) => setDarkMode(e.target.checked)}
               label={darkMode ? 'Dark' : 'Light'}
             />
           </div>
@@ -386,7 +386,7 @@ const css = themeToCSS(theme)
                 <Badge variant="primary">Primary</Badge>
                 <Badge variant="success">Success</Badge>
                 <Badge variant="warning">Warning</Badge>
-                <Badge variant="error">Error</Badge>
+                <Badge variant="danger">Error</Badge>
               </div>
             </div>
 
@@ -413,8 +413,8 @@ const css = themeToCSS(theme)
             <div className="theme-page__preview-cell">
               <span className="theme-page__preview-label">Checkbox & Toggle</span>
               <div className="theme-page__preview-row">
-                <Checkbox checked={checked} onChange={setChecked} label="Checked" />
-                <ToggleSwitch checked={toggle} onChange={setToggle} label="Enabled" />
+                <Checkbox checked={checked} onChange={(e) => setChecked(e.target.checked)} label="Checked" />
+                <ToggleSwitch checked={toggle} onChange={(e) => setToggle(e.target.checked)} label="Enabled" />
               </div>
             </div>
 
@@ -445,6 +445,7 @@ const css = themeToCSS(theme)
             <div className="theme-page__preview-cell">
               <span className="theme-page__preview-label">Form Input</span>
               <FormInput
+                name="email"
                 label="Email address"
                 placeholder="you@example.com"
                 type="email"
