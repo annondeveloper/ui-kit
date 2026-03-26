@@ -63,6 +63,10 @@ export { MetricCard, type LiteMetricCardProps } from './metric-card'
 export { Sparkline, type LiteSparklineProps } from './sparkline'
 export { ThresholdGauge, type LiteThresholdGaugeProps } from './threshold-gauge'
 export { UtilizationBar, type LiteUtilizationBarProps, type LiteUtilizationSegment } from './utilization-bar'
+export { RingChart, type LiteRingChartProps } from './ring-chart'
+export { CoreChart, type LiteCoreChartProps, type LiteCoreChartCore } from './core-chart'
+export { StorageBar, type LiteStorageBarProps, type LiteStorageBarSegment } from './storage-bar'
+export { RackDiagram, type LiteRackDiagramProps, type LiteRackDevice } from './rack-diagram'
 export { StatusBadge, type LiteStatusBadgeProps } from './status-badge'
 export { StatusPulse, type LiteStatusPulseProps } from './status-pulse'
 export { LogViewer, type LiteLogViewerProps, type LiteLogLine } from './log-viewer'
@@ -72,6 +76,8 @@ export { TimeRangeSelector, type LiteTimeRangeSelectorProps, type LiteTimeRangeP
 export { HeatmapCalendar, type LiteHeatmapCalendarProps, type LiteHeatmapData } from './heatmap-calendar'
 export { SeverityTimeline, type LiteSeverityTimelineProps, type LiteTimelineEvent } from './severity-timeline'
 export { PortStatusGrid, type LitePortStatusGridProps, type LitePortStatus } from './port-status-grid'
+export { TimeSeriesChart, type LiteTimeSeriesChartProps, type LiteTimeSeriesData, type LiteTimeSeriesSeries } from './time-series-chart'
+export { SwitchFaceplate, type LiteSwitchFaceplateProps, type LiteSwitchPort } from './switch-faceplate'
 export { NotificationStack, type LiteNotificationStackProps, type LiteNotification } from './notification-stack'
 
 // ─── AI / Real-time ──────────────────────────────────────────────────────────
@@ -117,3 +123,8 @@ export { TextReveal, type LiteTextRevealProps } from './text-reveal'
 export { TracingBeam, type LiteTracingBeamProps } from './tracing-beam'
 export { UpstreamDashboard, type LiteUpstreamDashboardProps, type LiteUpstreamLink } from './upstream-dashboard'
 export { WavyBackground, type LiteWavyBackgroundProps } from './wavy-background'
+
+// ─── Netrak Monitoring ──────────────────────────────────────────────────────
+export { DensitySelector, type LiteDensitySelectorProps } from './density-selector'
+export { ColumnVisibilityToggle, type LiteColumnVisibilityToggleProps } from './column-visibility-toggle'
+export { CSVExportButton, type LiteCSVExportButtonProps } from './csv-export'
