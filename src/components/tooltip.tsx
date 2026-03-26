@@ -49,7 +49,7 @@ const tooltipStyles = css`
         padding-inline: 0.625rem;
         border: 1px solid var(--border-subtle, oklch(100% 0 0 / 0.1));
         border-radius: var(--radius-sm, 0.25rem);
-        box-shadow: 0 4px 16px oklch(0% 0 0 / 0.35), 0 0 0 1px oklch(100% 0 0 / 0.04);
+        box-shadow: 0 4px 16px oklch(0% 0 0 / 0.35), 0 0 0 1px var(--border-subtle);
         text-wrap: pretty;
         word-break: break-word;
       }

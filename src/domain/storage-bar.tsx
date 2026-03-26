@@ -69,7 +69,7 @@ const storageBarStyles = css`
         justify-content: center;
         font-size: var(--text-xs, 0.75rem);
         font-variant-numeric: tabular-nums;
-        color: oklch(100% 0 0);
+        color: var(--text-on-brand);
         text-shadow: 0 1px 2px oklch(0% 0 0 / 0.5);
         pointer-events: none;
         overflow: hidden;

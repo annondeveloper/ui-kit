@@ -1146,7 +1146,7 @@ const filterPortalStyles = css`
 
   .ui-data-table__filter-actions button:last-child {
     background: var(--brand, oklch(65% 0.2 270));
-    color: oklch(100% 0 0);
+    color: var(--text-on-brand);
     border-color: var(--brand, oklch(65% 0.2 270));
   }
 

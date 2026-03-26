@@ -41,7 +41,7 @@ const faceplateStyles = css`
         position: relative;
         display: inline-block;
         background: var(--bg-surface, oklch(20% 0.01 270));
-        border: 1px solid oklch(100% 0 0 / 0.08);
+        border: 1px solid var(--border-default);
         border-radius: var(--radius-md, 0.5rem);
         padding: 0.75rem;
         font-family: var(--font-mono, ui-monospace, monospace);
@@ -130,8 +130,8 @@ const faceplateStyles = css`
       }
 
       .ui-switch-faceplate__port[data-status="unused"] {
-        background: oklch(100% 0 0 / 0.04);
-        border: 1px solid oklch(100% 0 0 / 0.08);
+        background: var(--bg-hover);
+        border: 1px solid var(--border-default);
         color: var(--text-tertiary, oklch(45% 0 0));
       }
 

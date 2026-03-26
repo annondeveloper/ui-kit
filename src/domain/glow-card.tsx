@@ -38,7 +38,7 @@ const glowCardStyles = css`
       }
 
       :scope:hover {
-        border-color: oklch(100% 0 0 / 0.15);
+        border-color: var(--border-strong);
       }
 
       /* Glow pseudo-element following cursor */

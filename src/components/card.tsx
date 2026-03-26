@@ -66,12 +66,12 @@ const cardStyles = css`
       :scope[data-variant="glass"] {
         background: oklch(from var(--bg-elevated) l c h / 0.5);
         backdrop-filter: blur(20px) saturate(1.8);
-        border: 1px solid oklch(100% 0 0 / 0.12);
-        box-shadow: 0 4px 24px oklch(0% 0 0 / 0.15), inset 0 1px 0 oklch(100% 0 0 / 0.06);
+        border: 1px solid var(--border-strong);
+        box-shadow: 0 4px 24px oklch(0% 0 0 / 0.15), inset 0 1px 0 var(--border-subtle);
       }
       :scope[data-variant="gradient"] {
         background: linear-gradient(135deg, var(--bg-elevated) 0%, oklch(from var(--brand) calc(l - 0.3) 0.05 h) 100%);
-        border: 1px solid oklch(100% 0 0 / 0.06);
+        border: 1px solid var(--border-subtle);
       }
 
       /* ── Header area ── */

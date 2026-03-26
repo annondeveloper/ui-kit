@@ -71,7 +71,7 @@ const chartStyles = css`
       }
 
       .ui-time-series-chart__grid-line {
-        stroke: oklch(100% 0 0 / 0.06);
+        stroke: var(--border-subtle);
         stroke-width: 1;
       }
 
@@ -99,7 +99,7 @@ const chartStyles = css`
       }
 
       .ui-time-series-chart__crosshair {
-        stroke: oklch(100% 0 0 / 0.15);
+        stroke: var(--border-strong);
         stroke-width: 1;
         stroke-dasharray: 3 3;
         pointer-events: none;

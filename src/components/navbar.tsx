@@ -44,7 +44,7 @@ const navbarStyles = css`
         position: sticky;
         inset-block-start: 0;
         backdrop-filter: blur(12px) saturate(1.5);
-        background: oklch(18% 0.01 270 / 0.85);
+        background: var(--bg-surface);
       }
 
       /* Bordered */
@@ -57,7 +57,7 @@ const navbarStyles = css`
         background: transparent;
       }
       :scope[data-transparent="true"][data-sticky="true"] {
-        background: oklch(18% 0.01 270 / 0.4);
+        background: var(--bg-overlay);
       }
 
       /* Logo */

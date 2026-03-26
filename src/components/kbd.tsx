@@ -62,7 +62,7 @@ const kbdStyles = css`
         border: 1px solid var(--border-default, oklch(50% 0 0 / 0.2));
         box-shadow:
           0 1px 0 0 oklch(0% 0 0 / 0.15),
-          inset 0 1px 0 0 oklch(100% 0 0 / 0.04);
+          inset 0 1px 0 0 var(--border-subtle);
       }
       :scope[data-variant="ghost"] {
         background: transparent;
@@ -77,7 +77,7 @@ const kbdStyles = css`
           transform: translateY(-1px);
           box-shadow:
             0 2px 2px 0 oklch(0% 0 0 / 0.12),
-            inset 0 1px 0 0 oklch(100% 0 0 / 0.06);
+            inset 0 1px 0 0 var(--border-subtle);
         }
       }
 

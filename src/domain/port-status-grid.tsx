@@ -78,8 +78,8 @@ const gridStyles = css`
         border: 1px solid oklch(62% 0.22 25 / 0.3);
       }
       .ui-port-status-grid__item[data-status="unknown"] {
-        background: oklch(100% 0 0 / 0.05);
-        border: 1px solid oklch(100% 0 0 / 0.08);
+        background: var(--bg-hover);
+        border: 1px solid var(--border-default);
         color: var(--text-tertiary, oklch(55% 0 0));
       }
 

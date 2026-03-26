@@ -42,7 +42,7 @@ const orbitingCirclesStyles = css`
         inline-size: calc(var(--orbit-radius, 100px) * 2);
         block-size: calc(var(--orbit-radius, 100px) * 2);
         transform: translate(-50%, -50%);
-        border: 1px solid oklch(100% 0 0 / 0.06);
+        border: 1px solid var(--border-subtle);
         border-radius: 50%;
         pointer-events: none;
       }

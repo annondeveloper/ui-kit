@@ -36,7 +36,7 @@ const tracingBeamStyles = css`
       .ui-tracing-beam--track {
         position: relative;
         inline-size: 2px;
-        background: oklch(100% 0 0 / 0.08);
+        background: var(--bg-active);
         border-radius: 1px;
       }
 

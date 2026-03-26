@@ -97,7 +97,7 @@ const heatmapStyles = css`
       }
 
       .ui-heatmap-calendar__cell:hover {
-        outline: 1px solid oklch(100% 0 0 / 0.3);
+        outline: 1px solid var(--border-strong);
         outline-offset: -1px;
       }
 

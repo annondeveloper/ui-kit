@@ -75,7 +75,7 @@ const uptimeStyles = css`
         background: oklch(62% 0.22 25);
       }
       .ui-uptime-tracker__day[data-day-status="unknown"] {
-        background: oklch(100% 0 0 / 0.08);
+        background: var(--bg-active);
       }
 
       /* SLA section */

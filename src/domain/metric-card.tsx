@@ -230,7 +230,7 @@ const metricCardStyles = css`
 
       /* Loading skeleton */
       :scope[data-loading] .ui-metric-card__value {
-        background: oklch(100% 0 0 / 0.06);
+        background: var(--bg-hover);
         border-radius: var(--radius-sm, 0.375rem);
         min-inline-size: 4rem;
         min-block-size: 1.5rem;
