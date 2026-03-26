@@ -305,7 +305,7 @@ import { DataTable } from '@annondeveloper/ui-kit'
 
 ## Removed Components
 
-None. All 62 components from v1 are present in v2, plus 35 new additions including:
+None. All 62 components from v1 are present in v2, plus 40 new additions including:
 
 - `Typography` — semantic text with 11 variants and fluid sizing
 - `Kbd` — keyboard shortcut display
