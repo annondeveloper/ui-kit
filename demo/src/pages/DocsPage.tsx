@@ -9,7 +9,7 @@ import formsMd from '../../../docs/forms.md?raw'
 import animationMd from '../../../docs/animation.md?raw'
 
 const docTabs = [
-  { id: 'migration', label: 'Migration Guide' },
+  { id: 'migration', label: 'Overview & API' },
   { id: 'theming', label: 'Theming' },
   { id: 'forms', label: 'Form Engine' },
   { id: 'animation', label: 'Animation' },

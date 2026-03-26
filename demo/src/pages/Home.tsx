@@ -737,6 +737,9 @@ const galleryGroups: GalleryGroup[] = [
       { name: 'FilterPill', desc: 'Dismissible filter tokens', path: '/components/filter-pill', tiers: ['L', 'S', 'P'] },
       { name: 'EmptyState', desc: 'Zero-data placeholder with CTA', path: '/components/empty-state', tiers: ['L', 'S', 'P'] },
       { name: 'TruncatedText', desc: 'Overflow text with expand toggle', path: '/components/truncated-text', tiers: ['L', 'S', 'P'] },
+      { name: 'Typography', desc: 'Semantic text with 11 variants and fluid sizing', path: '/components/typography', tiers: ['L', 'S', 'P'] },
+      { name: 'Kbd', desc: 'Keyboard shortcut display', path: '/components/kbd', tiers: ['L', 'S', 'P'] },
+      { name: 'Link', desc: 'Styled anchor with hover animations', path: '/components/link', tiers: ['L', 'S', 'P'] },
     ],
   },
   {
@@ -809,6 +812,10 @@ const galleryGroups: GalleryGroup[] = [
       { name: 'DiffViewer', desc: 'Side-by-side code diff', path: '/components/diff-viewer', tiers: ['S', 'P'] },
       { name: 'TreeView', desc: 'Collapsible tree structure', path: '/components/tree-view', tiers: ['S', 'P'] },
       { name: 'UpstreamDashboard', desc: 'Service monitoring layout', path: '/components/upstream-dashboard', tiers: ['P'] },
+      { name: 'TimeSeriesChart', desc: 'SVG line chart with multi-series and crosshair', path: '/components/time-series-chart', tiers: ['L', 'S', 'P'] },
+      { name: 'RingChart', desc: 'Donut chart for resource utilization', path: '/components/ring-chart', tiers: ['L', 'S', 'P'] },
+      { name: 'CoreChart', desc: 'CPU core utilization grid', path: '/components/core-chart', tiers: ['L', 'S', 'P'] },
+      { name: 'StorageBar', desc: 'Segmented storage usage bar', path: '/components/storage-bar', tiers: ['L', 'S', 'P'] },
     ],
   },
   {
@@ -825,6 +832,11 @@ const galleryGroups: GalleryGroup[] = [
       { name: 'RealtimeValue', desc: 'Live-updating metric display', path: '/components/realtime-value', tiers: ['S', 'P'] },
       { name: 'GeoMap', desc: 'Geographic data visualization', path: '/components/geo-map', tiers: ['P'] },
       { name: 'DashboardGrid', desc: 'Draggable dashboard layout', path: '/components/dashboard-grid', tiers: ['P'] },
+      { name: 'RackDiagram', desc: 'Data center rack visualization', path: '/components/rack-diagram', tiers: ['L', 'S', 'P'] },
+      { name: 'SwitchFaceplate', desc: 'Network switch port grid', path: '/components/switch-faceplate', tiers: ['L', 'S', 'P'] },
+      { name: 'DensitySelector', desc: 'Table density toggle control', path: '/components/density-selector', tiers: ['L', 'S', 'P'] },
+      { name: 'ColumnVisibilityToggle', desc: 'Column show/hide dropdown', path: '/components/column-visibility-toggle', tiers: ['L', 'S', 'P'] },
+      { name: 'CSVExportButton', desc: 'One-click CSV download', path: '/components/csv-export', tiers: ['L', 'S', 'P'] },
     ],
   },
   {
