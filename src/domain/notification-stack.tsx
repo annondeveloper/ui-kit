@@ -88,7 +88,7 @@ const notificationStackStyles = css`
         transition: background 0.15s, color 0.15s;
       }
       .ui-notification-stack__action-btn:hover {
-        background: oklch(100% 0 0 / 0.06);
+        background: var(--border-subtle, oklch(100% 0 0 / 0.06));
         color: var(--text-primary, oklch(90% 0 0));
       }
       .ui-notification-stack__action-btn:focus-visible {
@@ -137,7 +137,7 @@ const notificationStackStyles = css`
       }
 
       .ui-notification:hover {
-        background: oklch(100% 0 0 / 0.03);
+        background: var(--border-subtle, oklch(100% 0 0 / 0.03));
       }
 
       /* Unread highlight */
@@ -250,7 +250,7 @@ const notificationStackStyles = css`
         font-family: inherit;
       }
       .ui-notification__action:hover {
-        background: oklch(100% 0 0 / 0.06);
+        background: var(--border-subtle, oklch(100% 0 0 / 0.06));
       }
       .ui-notification__action:focus-visible {
         outline: 2px solid var(--brand, oklch(65% 0.2 270));
@@ -278,7 +278,7 @@ const notificationStackStyles = css`
         opacity: 1;
       }
       .ui-notification__dismiss:hover {
-        background: oklch(100% 0 0 / 0.08);
+        background: var(--border-default, oklch(100% 0 0 / 0.08));
         color: var(--text-primary, oklch(90% 0 0));
       }
       .ui-notification__dismiss:focus-visible {

@@ -843,7 +843,7 @@ const upstreamDashboardStyles = css`
         flex: 1;
         height: 2px;
         border-radius: 1px;
-        background: oklch(100% 0 0 / 0.06);
+        background: var(--border-subtle, oklch(100% 0 0 / 0.06));
         overflow: hidden;
       }
 
@@ -928,13 +928,13 @@ const upstreamDashboardStyles = css`
 
       @media (hover: hover) {
         .ui-upstream-dashboard__table tbody tr:hover {
-          background: oklch(100% 0 0 / 0.03);
+          background: var(--border-subtle, oklch(100% 0 0 / 0.03));
         }
       }
 
       .ui-upstream-dashboard__table td {
         padding: 0.5rem 0.75rem;
-        border-block-end: 1px solid oklch(100% 0 0 / 0.04);
+        border-block-end: 1px solid var(--border-subtle, oklch(100% 0 0 / 0.04));
         font-variant-numeric: tabular-nums;
         white-space: nowrap;
         vertical-align: middle;
@@ -961,7 +961,7 @@ const upstreamDashboardStyles = css`
         width: 60px;
         height: 3px;
         border-radius: 2px;
-        background: oklch(100% 0 0 / 0.06);
+        background: var(--border-subtle, oklch(100% 0 0 / 0.06));
         overflow: hidden;
       }
 
@@ -1195,7 +1195,7 @@ const upstreamDashboardStyles = css`
       }
 
       .ui-upstream-dashboard__group-header:hover {
-        background: oklch(100% 0 0 / 0.04);
+        background: var(--border-subtle, oklch(100% 0 0 / 0.04));
       }
 
       .ui-upstream-dashboard__group-header:focus-visible {
@@ -1316,7 +1316,7 @@ const upstreamDashboardStyles = css`
         transition: background 0.15s;
       }
       .ui-upstream-dashboard__group-card-header[data-clickable]:hover {
-        background: oklch(100% 0 0 / 0.04);
+        background: var(--border-subtle, oklch(100% 0 0 / 0.04));
       }
       .ui-upstream-dashboard__group-card-header[data-clickable]:focus-visible {
         outline: 2px solid var(--focus-ring, oklch(65% 0.2 270));
@@ -1327,10 +1327,10 @@ const upstreamDashboardStyles = css`
         cursor: pointer;
       }
       .ui-upstream-dashboard__table tbody tr[data-clickable]:hover {
-        background: oklch(100% 0 0 / 0.06);
+        background: var(--border-subtle, oklch(100% 0 0 / 0.06));
       }
       .ui-upstream-dashboard__table tbody tr[data-clickable]:active {
-        background: oklch(100% 0 0 / 0.08);
+        background: var(--border-default, oklch(100% 0 0 / 0.08));
       }
 
       .ui-upstream-dashboard__summary[data-clickable],

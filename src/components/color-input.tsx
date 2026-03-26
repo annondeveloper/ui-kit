@@ -328,7 +328,7 @@ const colorInputStyles = css`
       }
 
       .ui-color-input__preset-swatch:hover {
-        border-color: oklch(100% 0 0 / 0.4);
+        border-color: var(--border-strong, oklch(100% 0 0 / 0.4));
         transform: scale(1.1);
       }
 

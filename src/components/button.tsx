@@ -105,12 +105,12 @@ const buttonStyles = css`
       }
 
       :scope[data-variant="secondary"] {
-        background: oklch(100% 0 0 / 0.06);
+        background: var(--bg-elevated, oklch(100% 0 0 / 0.06));
         color: var(--text-primary);
         border-color: var(--border-default);
       }
       :scope[data-variant="secondary"]:hover:not(:disabled) {
-        background: oklch(100% 0 0 / 0.1);
+        background: var(--bg-hover, oklch(100% 0 0 / 0.1));
         border-color: var(--border-strong);
       }
 
@@ -120,7 +120,7 @@ const buttonStyles = css`
         border-color: transparent;
       }
       :scope[data-variant="ghost"]:hover:not(:disabled) {
-        background: oklch(100% 0 0 / 0.06);
+        background: var(--bg-hover, oklch(100% 0 0 / 0.06));
         color: var(--text-primary);
       }
 
@@ -161,8 +161,8 @@ const buttonStyles = css`
         inset-block-start: 50%;
         inset-inline-start: 50%;
         translate: -50% -50%;
-        border: 2px solid oklch(100% 0 0 / 0.3);
-        border-block-start-color: oklch(100% 0 0 / 0.9);
+        border: 2px solid var(--border-strong, oklch(100% 0 0 / 0.3));
+        border-block-start-color: var(--text-primary, oklch(100% 0 0 / 0.9));
         border-radius: 50%;
         animation: ui-button-spin 0.65s linear infinite;
       }

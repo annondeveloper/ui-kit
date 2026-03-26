@@ -52,7 +52,7 @@ const sheetStyles = css`
 
       /* Backdrop */
       dialog::backdrop {
-        background: oklch(0% 0 0 / 0.6);
+        background: var(--bg-overlay, oklch(0% 0 0 / 0.6));
         backdrop-filter: blur(4px);
       }
 
@@ -217,7 +217,7 @@ const sheetStyles = css`
         line-height: 1;
       }
       .ui-sheet__close:hover {
-        background: oklch(100% 0 0 / 0.08);
+        background: var(--bg-hover, oklch(100% 0 0 / 0.08));
         color: var(--text-primary, oklch(90% 0 0));
       }
       .ui-sheet__close:focus-visible {
@@ -264,18 +264,18 @@ const sheetStyles = css`
         inline-size: 32px;
         block-size: 4px;
         border-radius: var(--radius-full, 9999px);
-        background: oklch(100% 0 0 / 0.2);
+        background: var(--border-strong, oklch(100% 0 0 / 0.2));
       }
 
       /* Shadow for depth */
       dialog[data-side="right"] {
-        box-shadow: -4px 0 16px oklch(0% 0 0 / 0.2);
+        box-shadow: var(--shadow-md, -4px 0 16px oklch(0% 0 0 / 0.2));
       }
       dialog[data-side="left"] {
-        box-shadow: 4px 0 16px oklch(0% 0 0 / 0.2);
+        box-shadow: var(--shadow-md, 4px 0 16px oklch(0% 0 0 / 0.2));
       }
       dialog[data-side="bottom"] {
-        box-shadow: 0 -4px 16px oklch(0% 0 0 / 0.2);
+        box-shadow: var(--shadow-md, 0 -4px 16px oklch(0% 0 0 / 0.2));
       }
 
       /* Touch targets */

@@ -79,8 +79,8 @@ const pipelineStyles = css`
 
       /* Status colors */
       .ui-pipeline-stage__indicator[data-status="pending"] {
-        background: oklch(100% 0 0 / 0.06);
-        border: 2px dashed oklch(100% 0 0 / 0.15);
+        background: var(--border-subtle, oklch(100% 0 0 / 0.06));
+        border: 2px dashed var(--border-strong, oklch(100% 0 0 / 0.15));
         color: var(--text-tertiary, oklch(55% 0 0));
       }
       .ui-pipeline-stage__indicator[data-status="running"] {
@@ -100,8 +100,8 @@ const pipelineStyles = css`
         color: oklch(62% 0.22 25);
       }
       .ui-pipeline-stage__indicator[data-status="skipped"] {
-        background: oklch(100% 0 0 / 0.04);
-        border: 2px solid oklch(100% 0 0 / 0.1);
+        background: var(--border-subtle, oklch(100% 0 0 / 0.04));
+        border: 2px solid var(--border-default, oklch(100% 0 0 / 0.1));
         color: var(--text-tertiary, oklch(55% 0 0));
       }
 

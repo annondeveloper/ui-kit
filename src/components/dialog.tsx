@@ -42,16 +42,16 @@ const dialogStyles = css`
   .ui-dialog dialog:not([open]) { display: none; }
 
   .ui-dialog dialog {
-    border: 1px solid oklch(100% 0 0 / 0.08);
+    border: 1px solid var(--border-default, oklch(100% 0 0 / 0.08));
     border-radius: 1rem;
     padding: 0;
     outline: none;
     color: var(--text-primary, oklch(90% 0 0));
     background: var(--bg-elevated, oklch(22% 0.01 270));
     box-shadow:
-      0 24px 80px oklch(0% 0 0 / 0.4),
+      var(--shadow-lg, 0 24px 80px oklch(0% 0 0 / 0.4)),
       0 8px 32px oklch(0% 0 0 / 0.2),
-      inset 0 1px 0 oklch(100% 0 0 / 0.06);
+      inset 0 1px 0 var(--border-subtle, oklch(100% 0 0 / 0.06));
   }
 
   .ui-dialog dialog[open] {
@@ -85,7 +85,7 @@ const dialogStyles = css`
   .ui-dialog .ui-dialog__header {
     display: flex; align-items: flex-start; justify-content: space-between;
     gap: 0.5rem; padding: 1.25rem 1.25rem 0.75rem; flex-shrink: 0;
-    border-block-end: 1px solid oklch(100% 0 0 / 0.06); position: relative;
+    border-block-end: 1px solid var(--border-subtle, oklch(100% 0 0 / 0.06)); position: relative;
   }
   .ui-dialog .ui-dialog__header-text {
     display: flex; flex-direction: column; gap: 0.25rem; min-inline-size: 0; flex: 1;
@@ -103,14 +103,14 @@ const dialogStyles = css`
   .ui-dialog .ui-dialog__close {
     display: inline-flex; align-items: center; justify-content: center;
     inline-size: 2rem; block-size: 2rem; padding: 0;
-    border: 1px solid oklch(100% 0 0 / 0.06); border-radius: 9999px;
-    background: oklch(100% 0 0 / 0.04); color: oklch(55% 0 0);
+    border: 1px solid var(--border-subtle, oklch(100% 0 0 / 0.06)); border-radius: 9999px;
+    background: var(--border-subtle, oklch(100% 0 0 / 0.04)); color: var(--text-tertiary, oklch(55% 0 0));
     cursor: pointer; flex-shrink: 0; font-size: 1rem; line-height: 1;
     transition: background 0.15s, color 0.15s, border-color 0.15s, box-shadow 0.15s;
   }
   .ui-dialog .ui-dialog__close:hover {
-    background: oklch(100% 0 0 / 0.1); color: var(--text-primary, oklch(90% 0 0));
-    border-color: oklch(100% 0 0 / 0.12); box-shadow: 0 0 12px oklch(100% 0 0 / 0.06);
+    background: var(--border-default, oklch(100% 0 0 / 0.1)); color: var(--text-primary, oklch(90% 0 0));
+    border-color: var(--border-strong, oklch(100% 0 0 / 0.12)); box-shadow: 0 0 12px var(--border-subtle, oklch(100% 0 0 / 0.06));
   }
   .ui-dialog .ui-dialog__close:active { transform: scale(0.92); }
   .ui-dialog .ui-dialog__close:focus-visible {
@@ -120,7 +120,7 @@ const dialogStyles = css`
   /* Body — scrollable */
   .ui-dialog .ui-dialog__body {
     padding: 1.25rem; overflow-y: auto; flex: 1; min-block-size: 0;
-    scrollbar-width: thin; scrollbar-color: oklch(100% 0 0 / 0.12) transparent;
+    scrollbar-width: thin; scrollbar-color: var(--border-strong, oklch(100% 0 0 / 0.12)) transparent;
   }
 
   /* Mobile */
@@ -145,11 +145,11 @@ const dialogStyles = css`
       dialog[open] {
         border-color: oklch(from var(--brand, oklch(65% 0.2 270)) l c h / 0.15);
         box-shadow:
-          0 24px 80px oklch(0% 0 0 / 0.4),
+          var(--shadow-lg, 0 24px 80px oklch(0% 0 0 / 0.4)),
           0 8px 32px oklch(0% 0 0 / 0.2),
           0 0 0 1px oklch(from var(--brand, oklch(65% 0.2 270)) l c h / 0.08),
           0 0 60px -12px oklch(from var(--brand, oklch(65% 0.2 270)) l c h / 0.12),
-          inset 0 1px 0 oklch(100% 0 0 / 0.06);
+          inset 0 1px 0 var(--border-subtle, oklch(100% 0 0 / 0.06));
       }
 
       /* Entry animation — motion 1+ */

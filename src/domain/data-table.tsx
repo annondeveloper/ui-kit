@@ -207,7 +207,7 @@ const dataTableStyles = css`
 
       .ui-data-table__search-clear:hover {
         color: var(--text-primary, oklch(90% 0 0));
-        background: oklch(100% 0 0 / 0.06);
+        background: var(--border-subtle, oklch(100% 0 0 / 0.06));
       }
 
       .ui-data-table__result-count {
@@ -242,7 +242,7 @@ const dataTableStyles = css`
       }
 
       .ui-data-table__toolbar-btn:hover {
-        background: oklch(100% 0 0 / 0.06);
+        background: var(--border-subtle, oklch(100% 0 0 / 0.06));
         color: var(--text-primary, oklch(90% 0 0));
       }
 
@@ -289,7 +289,7 @@ const dataTableStyles = css`
       }
 
       .ui-data-table__col-dropdown-actions button:hover {
-        background: oklch(100% 0 0 / 0.06);
+        background: var(--border-subtle, oklch(100% 0 0 / 0.06));
         color: var(--text-primary, oklch(90% 0 0));
       }
 
@@ -307,7 +307,7 @@ const dataTableStyles = css`
       }
 
       .ui-data-table__col-item:hover {
-        background: oklch(100% 0 0 / 0.06);
+        background: var(--border-subtle, oklch(100% 0 0 / 0.06));
       }
 
       .ui-data-table__col-checkbox {
@@ -349,7 +349,7 @@ const dataTableStyles = css`
       }
 
       .ui-data-table__export-item:hover {
-        background: oklch(100% 0 0 / 0.06);
+        background: var(--border-subtle, oklch(100% 0 0 / 0.06));
       }
 
       /* ── Scroll wrapper ──────────────────────────────── */
@@ -567,15 +567,15 @@ const dataTableStyles = css`
       }
 
       .ui-data-table__tr:hover {
-        background: oklch(100% 0 0 / 0.03);
+        background: var(--border-subtle, oklch(100% 0 0 / 0.03));
       }
 
       :scope[data-striped] .ui-data-table__tr:nth-child(even) {
-        background: oklch(100% 0 0 / 0.02);
+        background: var(--border-subtle, oklch(100% 0 0 / 0.02));
       }
 
       :scope[data-striped] .ui-data-table__tr:nth-child(even):hover {
-        background: oklch(100% 0 0 / 0.05);
+        background: var(--border-subtle, oklch(100% 0 0 / 0.05));
       }
 
       .ui-data-table__tr[data-selected] {
@@ -720,7 +720,7 @@ const dataTableStyles = css`
       }
 
       .ui-data-table__page-btn:hover:not(:disabled) {
-        background: oklch(100% 0 0 / 0.06);
+        background: var(--border-subtle, oklch(100% 0 0 / 0.06));
         color: var(--text-primary, oklch(90% 0 0));
       }
 
@@ -914,7 +914,7 @@ const dataTableStyles = css`
       }
 
       .ui-data-table__filter-actions button:hover {
-        background: oklch(100% 0 0 / 0.06);
+        background: var(--border-subtle, oklch(100% 0 0 / 0.06));
       }
 
       .ui-data-table__filter-select-list {
@@ -936,7 +936,7 @@ const dataTableStyles = css`
       }
 
       .ui-data-table__filter-select-item:hover {
-        background: oklch(100% 0 0 / 0.06);
+        background: var(--border-subtle, oklch(100% 0 0 / 0.06));
       }
 
       /* ── Cell editing ──────────────────────────────────── */
@@ -975,7 +975,7 @@ const dataTableStyles = css`
       }
 
       .ui-data-table__group-row:hover {
-        background: oklch(100% 0 0 / 0.05);
+        background: var(--border-subtle, oklch(100% 0 0 / 0.05));
       }
 
       .ui-data-table__group-cell {

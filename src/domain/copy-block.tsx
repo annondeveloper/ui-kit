@@ -360,7 +360,7 @@ const copyBlockStyles = css`
         color: var(--text-tertiary, oklch(55% 0 0));
         padding-inline: var(--space-xs, 0.25rem);
         padding-block: var(--space-2xs, 0.125rem);
-        background: oklch(100% 0 0 / 0.05);
+        background: var(--border-subtle, oklch(100% 0 0 / 0.05));
         border-radius: var(--radius-sm, 0.25rem);
       }
 

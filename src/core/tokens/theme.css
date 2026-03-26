@@ -89,6 +89,9 @@ html.light {
   --border-default: oklch(0% 0 0 / 0.08);
   --border-strong: oklch(0% 0 0 / 0.14);
 
+  --surface-default: oklch(97% 0.005 270);
+  --bg-hover: oklch(0% 0 0 / 0.03);
+
   --text-primary: oklch(15% 0.01 270);
   --text-secondary: oklch(40% 0 0);
   --text-tertiary: oklch(60% 0 0);

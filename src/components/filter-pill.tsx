@@ -43,7 +43,7 @@ const filterPillStyles = css`
         gap: var(--space-xs, 0.25rem);
         border: 1px solid var(--border-default, oklch(100% 0 0 / 0.12));
         border-radius: var(--radius-full, 9999px);
-        background: oklch(100% 0 0 / 0.04);
+        background: var(--border-subtle, oklch(100% 0 0 / 0.04));
         color: var(--text-primary, oklch(90% 0 0));
         font-family: inherit;
         font-weight: 500;
@@ -73,7 +73,7 @@ const filterPillStyles = css`
 
       /* Hover */
       :scope:hover {
-        background: oklch(100% 0 0 / 0.08);
+        background: var(--bg-hover, oklch(100% 0 0 / 0.08));
         border-color: var(--border-strong, oklch(100% 0 0 / 0.2));
       }
 
@@ -116,7 +116,7 @@ const filterPillStyles = css`
         block-size: 1.25em;
         padding-inline: 0.25em;
         border-radius: var(--radius-full, 9999px);
-        background: oklch(100% 0 0 / 0.1);
+        background: var(--bg-hover, oklch(100% 0 0 / 0.1));
         font-size: 0.8em;
         font-weight: 600;
         font-variant-numeric: tabular-nums;
@@ -147,7 +147,7 @@ const filterPillStyles = css`
 
       .ui-filter-pill__remove:hover {
         opacity: 1;
-        background: oklch(100% 0 0 / 0.1);
+        background: var(--bg-hover, oklch(100% 0 0 / 0.1));
       }
 
       .ui-filter-pill__remove:focus-visible {
@@ -266,7 +266,7 @@ const filterPillGroupStyles = css`
 
       .ui-filter-pill-group__clear:hover {
         color: var(--text-primary, oklch(90% 0 0));
-        background: oklch(100% 0 0 / 0.04);
+        background: var(--border-subtle, oklch(100% 0 0 / 0.04));
       }
 
       .ui-filter-pill-group__clear:focus-visible {

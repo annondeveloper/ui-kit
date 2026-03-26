@@ -95,7 +95,7 @@ const kanbanColumnStyles = css`
         block-size: 1.5rem;
         padding-inline: 0.25rem;
         border-radius: var(--radius-full, 9999px);
-        background: oklch(100% 0 0 / 0.06);
+        background: var(--border-subtle, oklch(100% 0 0 / 0.06));
         font-size: var(--text-xs, 0.75rem);
         font-weight: 600;
         color: var(--text-secondary, oklch(70% 0 0));
@@ -124,7 +124,7 @@ const kanbanColumnStyles = css`
       }
 
       .ui-kanban-column__collapse-btn:hover {
-        background: oklch(100% 0 0 / 0.06);
+        background: var(--border-subtle, oklch(100% 0 0 / 0.06));
         color: var(--text-primary, oklch(90% 0 0));
       }
 
@@ -157,7 +157,7 @@ const kanbanColumnStyles = css`
       }
 
       .ui-kanban-column__card:hover {
-        background: oklch(100% 0 0 / 0.04);
+        background: var(--border-subtle, oklch(100% 0 0 / 0.04));
         box-shadow: var(--shadow-sm, 0 2px 6px oklch(0% 0 0 / 0.15));
       }
 
@@ -216,7 +216,7 @@ const kanbanColumnStyles = css`
         padding-block: 0.0625rem;
         padding-inline: 0.375rem;
         border-radius: var(--radius-full, 9999px);
-        background: oklch(100% 0 0 / 0.06);
+        background: var(--border-subtle, oklch(100% 0 0 / 0.06));
         font-size: var(--text-2xs, 0.625rem);
         color: var(--text-secondary, oklch(70% 0 0));
         line-height: 1.6;

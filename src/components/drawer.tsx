@@ -41,7 +41,7 @@ const drawerStyles = css`
       .ui-drawer__overlay {
         position: absolute;
         inset: 0;
-        background: oklch(0% 0 0 / 0.5);
+        background: var(--bg-overlay, oklch(0% 0 0 / 0.5));
         pointer-events: auto;
       }
 
@@ -61,28 +61,28 @@ const drawerStyles = css`
         inset-block: 0;
         inset-inline-start: 0;
         border-inline-end: 1px solid var(--border-subtle, oklch(100% 0 0 / 0.08));
-        box-shadow: 4px 0 16px oklch(0% 0 0 / 0.2);
+        box-shadow: var(--shadow-md, 4px 0 16px oklch(0% 0 0 / 0.2));
       }
       /* Right */
       .ui-drawer__panel[data-side="right"] {
         inset-block: 0;
         inset-inline-end: 0;
         border-inline-start: 1px solid var(--border-subtle, oklch(100% 0 0 / 0.08));
-        box-shadow: -4px 0 16px oklch(0% 0 0 / 0.2);
+        box-shadow: var(--shadow-md, -4px 0 16px oklch(0% 0 0 / 0.2));
       }
       /* Top */
       .ui-drawer__panel[data-side="top"] {
         inset-inline: 0;
         inset-block-start: 0;
         border-block-end: 1px solid var(--border-subtle, oklch(100% 0 0 / 0.08));
-        box-shadow: 0 4px 16px oklch(0% 0 0 / 0.2);
+        box-shadow: var(--shadow-md, 0 4px 16px oklch(0% 0 0 / 0.2));
       }
       /* Bottom */
       .ui-drawer__panel[data-side="bottom"] {
         inset-inline: 0;
         inset-block-end: 0;
         border-block-start: 1px solid var(--border-subtle, oklch(100% 0 0 / 0.08));
-        box-shadow: 0 -4px 16px oklch(0% 0 0 / 0.2);
+        box-shadow: var(--shadow-md, 0 -4px 16px oklch(0% 0 0 / 0.2));
       }
 
       /* Left/Right sizes */
