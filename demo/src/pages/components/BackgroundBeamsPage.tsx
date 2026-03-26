@@ -1140,7 +1140,7 @@ export default function BackgroundBeamsPage() {
                 height: '120px',
                 borderRadius: 'var(--radius-md)',
                 overflow: 'hidden',
-                background: 'oklch(15% 0.02 270)',
+                background: 'var(--bg-base)',
                 position: 'relative',
               }}>
                 <BackgroundBeams count={n} motion={2}>
@@ -1177,7 +1177,7 @@ export default function BackgroundBeamsPage() {
                 height: '100px',
                 borderRadius: 'var(--radius-md)',
                 overflow: 'hidden',
-                background: 'oklch(15% 0.02 270)',
+                background: 'var(--bg-base)',
                 position: 'relative',
               }}>
                 <BackgroundBeams count={4} color={p.color} motion={2} />
@@ -1206,7 +1206,7 @@ export default function BackgroundBeamsPage() {
                 height: '100px',
                 borderRadius: 'var(--radius-md)',
                 overflow: 'hidden',
-                background: 'oklch(15% 0.02 270)',
+                background: 'var(--bg-base)',
                 position: 'relative',
               }}>
                 <BackgroundBeams count={6} motion={m}>
@@ -1233,7 +1233,7 @@ export default function BackgroundBeamsPage() {
           remain accessible while beams animate behind them. Perfect for hero sections and landing pages.
         </p>
         <div className="bgbeams-page__preview bgbeams-page__preview--tall" style={{ padding: 0 }}>
-          <BackgroundBeams count={8} style={{ width: '100%', minHeight: '300px', background: 'oklch(15% 0.02 270)', borderRadius: 'var(--radius-md)' }}>
+          <BackgroundBeams count={8} style={{ width: '100%', minHeight: '300px', background: 'var(--bg-base)', borderRadius: 'var(--radius-md)' }}>
             <div style={{
               display: 'flex',
               flexDirection: 'column',
@@ -1268,7 +1268,7 @@ export default function BackgroundBeamsPage() {
           <div style={{
             borderRadius: 'var(--radius-lg)',
             overflow: 'hidden',
-            background: 'oklch(12% 0.03 270)',
+            background: 'var(--bg-base)',
             position: 'relative',
           }}>
             <BackgroundBeams count={4} color="oklch(60% 0.25 300 / 0.4)" style={{ minHeight: '200px' }}>
@@ -1283,7 +1283,7 @@ export default function BackgroundBeamsPage() {
           <div style={{
             borderRadius: 'var(--radius-lg)',
             overflow: 'hidden',
-            background: 'oklch(10% 0.04 180)',
+            background: 'var(--bg-base)',
             position: 'relative',
           }}>
             <BackgroundBeams count={5} color="oklch(70% 0.15 180 / 0.3)" style={{ minHeight: '200px' }}>
@@ -1335,7 +1335,7 @@ export default function BackgroundBeamsPage() {
                 height: '80px',
                 borderRadius: 'var(--radius-sm)',
                 overflow: 'hidden',
-                background: 'oklch(15% 0.02 270)',
+                background: 'var(--bg-base)',
                 position: 'relative',
               }}>
                 <BackgroundBeams count={3} motion={2} />
@@ -1376,7 +1376,7 @@ export default function BackgroundBeamsPage() {
                 height: '80px',
                 borderRadius: 'var(--radius-sm)',
                 overflow: 'hidden',
-                background: 'oklch(15% 0.02 270)',
+                background: 'var(--bg-base)',
                 position: 'relative',
               }}>
                 <BackgroundBeams count={6} motion={3} />
@@ -1417,7 +1417,7 @@ export default function BackgroundBeamsPage() {
                 height: '80px',
                 borderRadius: 'var(--radius-sm)',
                 overflow: 'hidden',
-                background: 'oklch(15% 0.02 270)',
+                background: 'var(--bg-base)',
                 position: 'relative',
               }}>
                 <BackgroundBeams count={10} motion={3} color="oklch(70% 0.2 280 / 0.4)" />

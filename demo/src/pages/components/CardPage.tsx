@@ -1589,7 +1589,7 @@ export default function CardPage() {
             Glass and gradient cards for hero sections and premium UI.
           </p>
           {/* Glass card needs a colorful background behind it to show the blur */}
-          <div className="card-page__preview" style={{ background: 'linear-gradient(135deg, oklch(20% 0.08 250), oklch(15% 0.06 300), oklch(18% 0.07 200))', position: 'relative' }}>
+          <div className="card-page__preview" style={{ background: 'var(--bg-base)', position: 'relative' }}>
             <CardComponent variant="glass" padding="lg" style={{ width: '100%', maxWidth: 320 }}>
               <h3 style={{ margin: '0 0 0.5rem', fontSize: '1rem', fontWeight: 700, color: 'var(--text-primary)' }}>Glass Card</h3>
               <p style={{ margin: 0, fontSize: '0.875rem', color: 'var(--text-secondary)', lineHeight: 1.6 }}>

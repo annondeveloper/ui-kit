@@ -318,7 +318,7 @@ const layoutStyles = css`
        PREMIUM TIER — glassmorphism, aurora glows, shimmer
        ════════════════════════════════════════════════════════════ */
     .site-sidebar[data-tier="premium"] {
-      background: oklch(15% 0.02 270 / 0.7);
+      background: var(--bg-surface);
       border-inline-end: 1px solid oklch(100% 0 0 / 0.1);
       backdrop-filter: blur(16px) saturate(1.4);
       -webkit-backdrop-filter: blur(16px) saturate(1.4);
@@ -459,7 +459,7 @@ const layoutStyles = css`
 
     /* Premium: glass footer */
     .site-sidebar[data-tier="premium"] .site-sidebar-footer {
-      background: oklch(15% 0.02 270 / 0.4);
+      background: var(--bg-surface);
       border-block-start: 1px solid oklch(100% 0 0 / 0.08);
     }
 

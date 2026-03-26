@@ -251,7 +251,7 @@ const pageStyles = css`
         display: grid;
         place-items: center;
         padding: 3rem;
-        background: oklch(10% 0.02 270);
+        background: var(--bg-base);
         border-radius: var(--radius-md);
         position: relative;
         overflow: hidden;
@@ -1070,7 +1070,7 @@ export default function MeteorShowerPage() {
           <div style={{
             borderRadius: 'var(--radius-lg)',
             overflow: 'hidden',
-            background: 'linear-gradient(180deg, oklch(8% 0.03 270), oklch(12% 0.05 300))',
+            background: 'var(--bg-base)',
             position: 'relative',
           }}>
             <MeteorShower count={15} style={{ minHeight: '200px' }}>

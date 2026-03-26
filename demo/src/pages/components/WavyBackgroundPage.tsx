@@ -1072,7 +1072,7 @@ export default function WavyBackgroundPage() {
                 height: '120px',
                 borderRadius: 'var(--radius-md)',
                 overflow: 'hidden',
-                background: 'oklch(15% 0.02 270)',
+                background: 'var(--bg-base)',
                 position: 'relative',
               }}>
                 <WavyBackground waveCount={n} speed={10} motion={3} />
@@ -1106,7 +1106,7 @@ export default function WavyBackgroundPage() {
                 height: '100px',
                 borderRadius: 'var(--radius-md)',
                 overflow: 'hidden',
-                background: 'oklch(15% 0.02 270)',
+                background: 'var(--bg-base)',
                 position: 'relative',
               }}>
                 <WavyBackground waveCount={5} color={p.color} speed={10} motion={3} />
@@ -1138,7 +1138,7 @@ export default function WavyBackgroundPage() {
                 height: '120px',
                 borderRadius: 'var(--radius-md)',
                 overflow: 'hidden',
-                background: 'oklch(15% 0.02 270)',
+                background: 'var(--bg-base)',
                 position: 'relative',
               }}>
                 <WavyBackground waveCount={5} speed={p.speed} motion={3} />
@@ -1166,7 +1166,7 @@ export default function WavyBackgroundPage() {
                 height: '100px',
                 borderRadius: 'var(--radius-md)',
                 overflow: 'hidden',
-                background: 'oklch(15% 0.02 270)',
+                background: 'var(--bg-base)',
                 position: 'relative',
               }}>
                 <WavyBackground waveCount={5} speed={10} motion={m}>
@@ -1193,7 +1193,7 @@ export default function WavyBackgroundPage() {
           Ideal for hero sections, pricing pages, and feature showcases.
         </p>
         <div className="wavy-page__preview wavy-page__preview--tall" style={{ padding: 0 }}>
-          <WavyBackground waveCount={6} speed={12} color="oklch(65% 0.15 210)" style={{ width: '100%', minHeight: '320px', background: 'oklch(12% 0.03 240)', borderRadius: 'var(--radius-md)' }}>
+          <WavyBackground waveCount={6} speed={12} color="oklch(65% 0.15 210)" style={{ width: '100%', minHeight: '320px', background: 'var(--bg-base)', borderRadius: 'var(--radius-md)' }}>
             <div style={{
               display: 'flex',
               flexDirection: 'column',
@@ -1253,7 +1253,7 @@ export default function WavyBackgroundPage() {
                 height: '80px',
                 borderRadius: 'var(--radius-sm)',
                 overflow: 'hidden',
-                background: 'oklch(15% 0.02 270)',
+                background: 'var(--bg-base)',
                 position: 'relative',
               }}>
                 <WavyBackground waveCount={3} speed={10} motion={2} />
@@ -1294,7 +1294,7 @@ export default function WavyBackgroundPage() {
                 height: '80px',
                 borderRadius: 'var(--radius-sm)',
                 overflow: 'hidden',
-                background: 'oklch(15% 0.02 270)',
+                background: 'var(--bg-base)',
                 position: 'relative',
               }}>
                 <WavyBackground waveCount={5} speed={10} motion={3} />
@@ -1335,7 +1335,7 @@ export default function WavyBackgroundPage() {
                 height: '80px',
                 borderRadius: 'var(--radius-sm)',
                 overflow: 'hidden',
-                background: 'oklch(15% 0.02 270)',
+                background: 'var(--bg-base)',
                 position: 'relative',
               }}>
                 <WavyBackground waveCount={7} speed={8} motion={3} color="oklch(65% 0.15 210)" />
