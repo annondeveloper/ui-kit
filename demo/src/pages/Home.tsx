@@ -1077,7 +1077,7 @@ export default function Home() {
 
         <div className="home-hero-entrance">
           <p className="home-hero-sub">
-            {totalComponents} components. Physics-based animations. OKLCH color system.
+            111 components. Physics-based animations. OKLCH color system.
             Aurora Fluid design language. 3 weight tiers. Zero dependencies.
           </p>
         </div>
@@ -1121,13 +1121,13 @@ export default function Home() {
           <div className="home-stats">
             <div className="home-stat-cell">
               <div className="home-stat-inner">
-                <span className="home-stat-value">{totalComponents}</span>
+                <span className="home-stat-value">111</span>
                 <span className="home-stat-label">Components</span>
               </div>
             </div>
             <div className="home-stat-cell">
               <div className="home-stat-inner">
-                <span className="home-stat-value">{premiumCount}</span>
+                <span className="home-stat-value">109</span>
                 <span className="home-stat-label">Premium</span>
               </div>
             </div>
