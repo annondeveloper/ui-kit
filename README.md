@@ -1,6 +1,6 @@
 # @annondeveloper/ui-kit v2
 
-> Zero-dependency React component library with 62 components, physics-based animations, OKLCH color system, and Aurora Fluid design.
+> Zero-dependency React component library with 146 components, physics-based animations, OKLCH color system, and Aurora Fluid design.
 
 ## Quick Start
 
@@ -26,10 +26,14 @@ function App() {
 ## Features
 
 - **Zero dependencies** — only `react` and `react-dom` peer deps
-- **62 components** — primitives, forms, overlays, data, monitoring, AI/real-time
+- **146 components** — 72 general-purpose + 74 domain-specific across 3 weight tiers
+- **3 weight tiers** — Lite (144), Standard (146), Premium (144) — optimize your bundle
 - **Aurora Fluid design** — deep atmospheric surfaces, ambient glows, OKLCH colors
 - **Physics animations** — real spring solver, configurable motion levels (0-3)
 - **Built-in form engine** — `createForm`, `useForm`, validators, zero external deps
+- **15 pre-built themes** — including 5 new themes added in v2.4
+- **MCP server** — Model Context Protocol integration for AI-assisted workflows
+- **`classNames` prop** — deep customization of internal component elements
 - **Accessibility** — WAI-ARIA patterns, keyboard navigation, screen reader support
 - **Responsive** — container queries, fluid typography, touch/mouse/gamepad support
 - **Theme generator** — generate complete theme from single brand color
@@ -44,78 +48,169 @@ function App() {
 
 ## Component List
 
-### Core Components (31)
+### General-Purpose Components (72)
 
 | Component | Description |
 |-----------|-------------|
+| `ActionIcon` | Icon-only button with tooltip |
+| `Accordion` | Collapsible sections with single/multiple mode |
+| `Affix` | Fixed-position wrapper for floating elements |
+| `Alert` | Inline status messages with variants |
 | `AnimatedCounter` | Smooth number animation with easing |
+| `AppShell` | Full application layout scaffold |
 | `Avatar` | Image/initials avatar with status dot |
+| `AvatarUpload` | Avatar with upload/crop functionality |
+| `BackToTop` | Scroll-to-top floating button |
 | `Badge` | Pill-shaped label with color presets |
+| `Breadcrumbs` | Hierarchical navigation trail |
 | `Button` | Primary action with variants and loading |
+| `ButtonGroup` | Grouped button container |
+| `Calendar` | Standalone calendar display |
 | `Card` | Styled container with subcomponents |
+| `Carousel` | Image/content carousel with navigation |
 | `Checkbox` | Themed checkbox with indeterminate state |
+| `Chip` | Compact interactive tag element |
 | `ColorInput` | Color picker with hue/saturation panel |
 | `Combobox` | Searchable select with async loading |
+| `CommandBar` | Universal command palette (Cmd+K) |
 | `ConfirmDialog` | Confirmation modal with danger variant |
+| `CopyButton` | One-click copy to clipboard |
+| `DatePicker` | Calendar-based date selection |
+| `DateRangePicker` | Date range selection with presets |
 | `Dialog` | Native dialog with animated entry/exit |
+| `Divider` | Horizontal/vertical separator |
+| `Drawer` | Slide-out panel from any edge |
 | `DropdownMenu` | Action menu with submenus and shortcuts |
+| `EmptyState` | Decorative placeholder with icon and actions |
 | `FileUpload` | Drag-and-drop file upload with preview |
 | `FilterPill` | Rounded filter toggle with count |
 | `FormInput` | Themed input with label and validation |
+| `Highlight` | Text highlighting with search match |
+| `Indicator` | Dot/badge indicator overlay |
 | `InlineEdit` | Click-to-edit text field |
+| `Kbd` | Keyboard shortcut display |
+| `Link` | Styled anchor with underline animation |
+| `MultiSelect` | Multi-value select dropdown |
+| `Navbar` | Top-level application navigation bar |
 | `NativeTooltip` | Lightweight tooltip using title attribute |
+| `NotificationStack` | Toast notification cards with auto-dismiss |
+| `NumberInput` | Numeric input with increment/decrement |
+| `OtpInput` | One-time password code entry |
+| `Pagination` | Page navigation with controls |
+| `PasswordInput` | Password field with visibility toggle |
+| `PinInput` | PIN code entry with auto-advance |
 | `Popover` | Anchored popover with arrow and focus management |
 | `Progress` | Progress bar with indeterminate mode |
 | `RadioGroup` | Radio button group with descriptions |
+| `Rating` | Star rating input with half-star support |
 | `ScrollReveal` | Scroll-triggered reveal animation |
+| `SearchInput` | Search field with debounce and clear |
+| `SegmentedControl` | Segmented toggle selector |
 | `Select` | Themed dropdown select |
 | `Sheet` | Slide-over drawer with swipe dismiss |
+| `Sidebar` | Collapsible side navigation |
 | `Skeleton` | Shimmer loading placeholder |
 | `Slider` | Range slider with keyboard support |
+| `Spoiler` | Collapsible content with show more/less |
+| `Spotlight` | Spotlight search overlay |
 | `StatusBadge` | Status indicator with colored dot |
 | `StatusPulse` | Animated status dot with pulse ring |
+| `Stepper` | Step indicator with progress |
 | `SuccessCheckmark` | Animated SVG checkmark |
 | `Tabs` | Tabbed interface with animated indicator |
+| `TagInput` | Multi-value input with tag chips |
+| `Textarea` | Auto-growing text area |
+| `Toast` | Pre-themed toast notifications |
 | `ToggleSwitch` | Boolean toggle switch |
 | `Tooltip` | Popover-based tooltip with positioning |
+| `Typography` | Semantic text with fluid sizing |
 | `UIProvider` | Theme, motion, and density provider |
 
-### Domain Components (34)
+### Domain-Specific Components (74)
 
 | Component | Description |
 |-----------|-------------|
-| `CommandBar` | Universal command palette (Cmd+K) |
+| `BackgroundBeams` | Animated sweeping light beams |
+| `BackgroundBoxes` | Floating animated grid boxes |
+| `BorderBeam` | Animated conic-gradient border |
+| `Card3D` | 3D perspective tilt with glare |
+| `CodeEditor` | Code editor with syntax highlighting |
 | `ConfidenceBar` | Probability bar with threshold zones |
+| `ConnectionTestPanel` | Step-by-step connectivity test UI |
 | `CopyBlock` | Code display with one-click copy |
+| `CoreChart` | CPU core utilization grid |
+| `Cropper` | Image cropping tool |
+| `CSVExportButton` | One-click CSV generation and download |
+| `ColumnVisibilityToggle` | Column show/hide dropdown |
+| `DashboardGrid` | Draggable dashboard layout |
 | `DataTable` | Full-featured data grid with search, sort, filter |
+| `DensitySelector` | Compact/comfortable/spacious control |
 | `DiffViewer` | Side-by-side/inline diff viewer |
-| `EmptyState` | Decorative placeholder with icon and actions |
+| `DiskMountBar` | Disk mount utilization bars |
+| `EncryptedText` | Matrix-style character scramble/reveal |
+| `EntityCard` | Infrastructure resource card |
+| `EvervaultCard` | Matrix-style encrypted card |
+| `FlipWords` | Rotating word animation |
+| `GeoMap` | SVG geographic visualization |
+| `GlowCard` | Mouse-tracking radial glow card |
 | `HeatmapCalendar` | GitHub-style contribution heatmap |
+| `HeroHighlight` | Gradient text highlight effect |
 | `InfiniteScroll` | Virtualized infinite-scroll list |
+| `JsonViewer` | Interactive JSON tree viewer |
 | `KanbanColumn` | Kanban board column with cards |
 | `LiveFeed` | Real-time event feed with auto-scroll |
 | `LogViewer` | Log stream viewer with severity colors |
+| `MeteorShower` | Falling meteor streak animation |
 | `MetricCard` | Dashboard stat tile with sparkline |
-| `NotificationStack` | Toast notification cards with auto-dismiss |
+| `NetworkTrafficCard` | Network throughput display |
+| `NumberTicker` | Rolling digit counter |
+| `OrbitingCircles` | Orbiting icon animation |
 | `PipelineStage` | Horizontal pipeline visualization |
 | `PortStatusGrid` | Network port status indicator grid |
+| `PropertyList` | Key-value detail panel |
+| `RackDiagram` | Data center rack visualization |
 | `RealtimeValue` | Live data display with freshness tracking |
 | `ResponsiveCard` | Container-query adaptive card |
+| `RichTextEditor` | WYSIWYG rich text editor |
+| `RingChart` | SVG donut chart with center label |
+| `Ripple` | Click ripple effect |
 | `SeverityTimeline` | Event timeline with severity dots |
+| `ServiceStrip` | Horizontal service badge strip |
+| `ShimmerButton` | Shimmering gradient button |
 | `SmartTable` | DataTable with auto-generated filter suggestions |
 | `SortableList` | Drag-and-drop reorderable list |
 | `Sparkline` | Inline SVG sparkline chart |
+| `SpotlightCard` | Spotlight hover effect card |
 | `StepWizard` | Multi-step form wizard |
+| `StorageBar` | Segmented horizontal bar |
 | `StreamingText` | AI/LLM streaming text with cursor |
+| `SwitchFaceplate` | Network switch port grid |
+| `TableOfContents` | Auto-generated page navigation |
+| `TextReveal` | Scroll-triggered character-by-character unveil |
 | `ThresholdGauge` | Semicircular gauge with threshold zones |
+| `TimePicker` | Time selection input |
 | `TimeRangeSelector` | Compact time range pill selector |
-| `Toast` | Pre-themed toast notifications |
+| `Timeline` | Vertical event timeline |
+| `TimeSeriesChart` | Full SVG line chart with multi-series |
+| `Tour` | Guided product tour with step highlights |
+| `TracingBeam` | Scroll-tracing side beam |
+| `TransferList` | Dual-list item transfer |
 | `TreeView` | Hierarchical tree with expand/collapse |
 | `TruncatedText` | Auto-truncating text with tooltip |
 | `TypingIndicator` | "Someone is typing" animation |
+| `UpstreamDashboard` | Service monitoring layout |
 | `UptimeTracker` | Daily uptime bar strip |
 | `UtilizationBar` | Horizontal bar with threshold colors |
 | `ViewTransitionLink` | View Transitions API integration |
+| `WavyBackground` | Animated SVG sine waves |
+
+### New in v2.4 (30 components)
+
+The following components were added in the v2.4 release:
+
+**General-purpose:** ActionIcon, Affix, AvatarUpload, BackToTop, ButtonGroup, Calendar, Carousel, Chip, CopyButton, DateRangePicker, Highlight, Indicator, MultiSelect, NumberInput, PasswordInput, PinInput, SegmentedControl, Spoiler, Spotlight, Stepper, TableOfContents, Textarea, TimePicker, Timeline, TransferList
+
+**Domain-specific:** CodeEditor, Cropper, JsonViewer, RichTextEditor, Tour
 
 ### Core Engine Modules
 
@@ -134,10 +229,30 @@ function App() {
 
 ```typescript
 import { Button, Dialog, DataTable } from '@annondeveloper/ui-kit'
+import { Button as LiteButton } from '@annondeveloper/ui-kit/lite'
+import { Button as PremiumButton } from '@annondeveloper/ui-kit/premium'
 import { createForm, useForm, v } from '@annondeveloper/ui-kit/form'
 import { generateTheme, themeToCSS } from '@annondeveloper/ui-kit/theme'
 import '@annondeveloper/ui-kit/css/theme.css'  // Standalone CSS (optional)
 ```
+
+## Weight Tiers
+
+| Tier | Components | Description |
+|------|-----------|-------------|
+| Standard | 146 | Full-featured with motion, theming, a11y |
+| Lite | 144 | Minimal wrappers, no motion (~0.3-1.2 KB each) |
+| Premium | 144 | Aurora glow, spring animations, shimmer effects |
+
+## Bundle Size
+
+| Metric | Value |
+|--------|-------|
+| Total (gzipped) | 330.9 KB |
+| Budget | 350 KB |
+| Tree-shaking | Full ESM — import only what you use |
+
+Typical app importing ~20 components: **~15-25 KB gzipped** after tree-shaking.
 
 ## Motion Levels
 

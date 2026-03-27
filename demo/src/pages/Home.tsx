@@ -22,31 +22,7 @@ const BorderBeam = lazy(() => import('@ui/domain/border-beam').then(m => ({ defa
 const Divider = lazy(() => import('@ui/components/divider').then(m => ({ default: m.Divider })))
 const FilterPill = lazy(() => import('@ui/components/filter-pill').then(m => ({ default: m.FilterPill })))
 
-// ─── Lazy Section: Only renders when near viewport ──────────────────────────
-
-function LazySection({ children, height = 400, className = '' }: { children: React.ReactNode; height?: number; className?: string }) {
-  const ref = useRef<HTMLDivElement>(null)
-  const [visible, setVisible] = useState(false)
-  useEffect(() => {
-    const el = ref.current
-    if (!el) return
-    const observer = new IntersectionObserver(
-      ([entry]) => { if (entry.isIntersecting) { setVisible(true); observer.unobserve(el) } },
-      { rootMargin: '500px 0px' } // 500px buffer ahead
-    )
-    observer.observe(el)
-    return () => observer.disconnect()
-  }, [])
-  return (
-    <div ref={ref} className={className} style={visible ? undefined : { minHeight: height }}>
-      {visible ? (
-        <Suspense fallback={<div style={{ minHeight: height }} />}>
-          {children}
-        </Suspense>
-      ) : null}
-    </div>
-  )
-}
+// LazySection removed — all sections now render eagerly with lazy() imports
 
 // ─── Scroll Reveal Hook ─────────────────────────────────────────────────────
 
@@ -778,6 +754,13 @@ const galleryGroups: GalleryGroup[] = [
       { name: 'Typography', desc: 'Semantic text with 11 variants and fluid sizing', path: '/components/typography', tiers: ['L', 'S', 'P'] },
       { name: 'Kbd', desc: 'Keyboard shortcut display', path: '/components/kbd', tiers: ['L', 'S', 'P'] },
       { name: 'Link', desc: 'Styled anchor with hover animations', path: '/components/link', tiers: ['L', 'S', 'P'] },
+      { name: 'Chip', desc: 'Removable tag chip', path: '/components/chip', tiers: ['L', 'S', 'P'] },
+      { name: 'ActionIcon', desc: 'Icon-only action button', path: '/components/action-icon', tiers: ['L', 'S', 'P'] },
+      { name: 'CopyButton', desc: 'One-click copy to clipboard', path: '/components/copy-button', tiers: ['L', 'S', 'P'] },
+      { name: 'Indicator', desc: 'Notification dot overlay', path: '/components/indicator', tiers: ['L', 'S', 'P'] },
+      { name: 'Highlight', desc: 'Text search highlight', path: '/components/highlight', tiers: ['L', 'S', 'P'] },
+      { name: 'Spoiler', desc: 'Show more/less content', path: '/components/spoiler', tiers: ['L', 'S', 'P'] },
+      { name: 'AvatarUpload', desc: 'Avatar with upload capability', path: '/components/avatar-upload', tiers: ['L', 'S', 'P'] },
     ],
   },
   {
@@ -799,6 +782,14 @@ const galleryGroups: GalleryGroup[] = [
       { name: 'SearchInput', desc: 'Search with debounce and clear', path: '/components/search-input', tiers: ['L', 'S', 'P'] },
       { name: 'Rating', desc: 'Star or custom icon rating input', path: '/components/rating', tiers: ['L', 'S', 'P'] },
       { name: 'InlineEdit', desc: 'Click-to-edit text fields', path: '/components/inline-edit', tiers: ['S', 'P'] },
+      { name: 'Textarea', desc: 'Multi-line text input', path: '/components/textarea', tiers: ['L', 'S', 'P'] },
+      { name: 'NumberInput', desc: 'Numeric input with increment/decrement', path: '/components/number-input', tiers: ['L', 'S', 'P'] },
+      { name: 'PasswordInput', desc: 'Password field with show/hide toggle', path: '/components/password-input', tiers: ['L', 'S', 'P'] },
+      { name: 'PinInput', desc: 'PIN code entry field', path: '/components/pin-input', tiers: ['L', 'S', 'P'] },
+      { name: 'MultiSelect', desc: 'Multi-select dropdown', path: '/components/multi-select', tiers: ['L', 'S', 'P'] },
+      { name: 'DateRangePicker', desc: 'Date range selection', path: '/components/date-range-picker', tiers: ['L', 'S', 'P'] },
+      { name: 'TimePicker', desc: 'Time selection input', path: '/components/time-picker', tiers: ['L', 'S', 'P'] },
+      { name: 'Calendar', desc: 'Full calendar date view', path: '/components/calendar', tiers: ['L', 'S', 'P'] },
     ],
   },
   {
@@ -829,6 +820,16 @@ const galleryGroups: GalleryGroup[] = [
       { name: 'Sidebar', desc: 'Collapsible side navigation', path: '/components/sidebar', tiers: ['S', 'P'] },
       { name: 'AppShell', desc: 'Full app layout scaffold', path: '/components/app-shell', tiers: ['S', 'P'] },
       { name: 'StepWizard', desc: 'Multi-step guided flows', path: '/components/step-wizard', tiers: ['S', 'P'] },
+      { name: 'Stepper', desc: 'Multi-step progress indicator', path: '/components/stepper', tiers: ['L', 'S', 'P'] },
+      { name: 'Timeline', desc: 'Vertical event timeline', path: '/components/timeline', tiers: ['L', 'S', 'P'] },
+      { name: 'SegmentedControl', desc: 'Segmented toggle control', path: '/components/segmented-control', tiers: ['L', 'S', 'P'] },
+      { name: 'TableOfContents', desc: 'Document section navigation', path: '/components/table-of-contents', tiers: ['L', 'S', 'P'] },
+      { name: 'BackToTop', desc: 'Scroll-to-top button', path: '/components/back-to-top', tiers: ['L', 'S', 'P'] },
+      { name: 'Affix', desc: 'Sticky position wrapper', path: '/components/affix', tiers: ['L', 'S', 'P'] },
+      { name: 'ButtonGroup', desc: 'Grouped action buttons', path: '/components/button-group', tiers: ['L', 'S', 'P'] },
+      { name: 'Spotlight', desc: 'Search spotlight overlay', path: '/components/spotlight', tiers: ['L', 'S', 'P'] },
+      { name: 'Carousel', desc: 'Image and content slider', path: '/components/carousel', tiers: ['L', 'S', 'P'] },
+      { name: 'TransferList', desc: 'Dual-list item transfer', path: '/components/transfer-list', tiers: ['L', 'S', 'P'] },
     ],
   },
   {
@@ -854,6 +855,12 @@ const galleryGroups: GalleryGroup[] = [
       { name: 'RingChart', desc: 'Donut chart for resource utilization', path: '/components/ring-chart', tiers: ['L', 'S', 'P'] },
       { name: 'CoreChart', desc: 'CPU core utilization grid', path: '/components/core-chart', tiers: ['L', 'S', 'P'] },
       { name: 'StorageBar', desc: 'Segmented storage usage bar', path: '/components/storage-bar', tiers: ['L', 'S', 'P'] },
+      { name: 'CodeEditor', desc: 'Syntax-highlighted code editor', path: '/components/code-editor', tiers: ['L', 'S', 'P'] },
+      { name: 'JsonViewer', desc: 'Interactive JSON tree viewer', path: '/components/json-viewer', tiers: ['L', 'S', 'P'] },
+      { name: 'RichTextEditor', desc: 'Rich text WYSIWYG editor', path: '/components/rich-text-editor', tiers: ['L', 'S', 'P'] },
+      { name: 'Cropper', desc: 'Image crop and resize tool', path: '/components/cropper', tiers: ['L', 'S', 'P'] },
+      { name: 'Tour', desc: 'Onboarding guided tour', path: '/components/tour', tiers: ['L', 'S', 'P'] },
+      { name: 'ConfirmDialog', desc: 'Confirmation prompt dialog', path: '/components/confirm-dialog', tiers: ['L', 'S', 'P'] },
     ],
   },
   {
@@ -922,11 +929,6 @@ const galleryGroups: GalleryGroup[] = [
 ]
 
 const totalComponents = galleryGroups.reduce((sum, g) => sum + g.items.length, 0)
-const premiumCount = galleryGroups.reduce(
-  (sum, g) => sum + g.items.filter(i => i.tiers.includes('P')).length,
-  0
-)
-
 // ─── Feature Data ───────────────────────────────────────────────────────────
 
 interface Feature {
@@ -1082,7 +1084,7 @@ export default function Home() {
 
         <div className="home-hero-entrance">
           <p className="home-hero-sub">
-            116 components. Physics-based animations. OKLCH color system.
+            146 components. Physics-based animations. OKLCH color system.
             Aurora Fluid design language. 3 weight tiers. Zero dependencies.
           </p>
         </div>
@@ -1126,13 +1128,13 @@ export default function Home() {
           <div className="home-stats">
             <div className="home-stat-cell">
               <div className="home-stat-inner">
-                <span className="home-stat-value">116</span>
+                <span className="home-stat-value">146</span>
                 <span className="home-stat-label">Components</span>
               </div>
             </div>
             <div className="home-stat-cell">
               <div className="home-stat-inner">
-                <span className="home-stat-value">114</span>
+                <span className="home-stat-value">144</span>
                 <span className="home-stat-label">Premium</span>
               </div>
             </div>
