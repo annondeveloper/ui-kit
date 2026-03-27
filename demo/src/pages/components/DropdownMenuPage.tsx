@@ -192,7 +192,7 @@ const pageStyles = css`
         border-radius: var(--radius-md);
         background: var(--bg-base);
         position: relative;
-        overflow: hidden;
+        overflow: visible;
         display: flex;
         flex-wrap: wrap;
         align-items: center;
@@ -244,14 +244,14 @@ const pageStyles = css`
       }
 
       .dropdown-menu-page__playground-result {
-        min-block-size: 200px;
+        min-block-size: 300px;
         display: grid;
         place-items: center;
         padding: 3rem;
         background: var(--bg-base);
         border-radius: var(--radius-md);
         position: relative;
-        overflow: hidden;
+        overflow: visible;
       }
 
       .dropdown-menu-page__playground-result::before {
@@ -528,7 +528,7 @@ const pageStyles = css`
 
         .dropdown-menu-page__playground-result {
           padding: 2rem;
-          min-block-size: 120px;
+          min-block-size: 300px;
         }
 
         .dropdown-menu-page__tiers {
@@ -1369,14 +1369,13 @@ export default function DropdownMenuPage() {
           >
             <div className="dropdown-menu-page__tier-header">
               <span className="dropdown-menu-page__tier-name">Premium</span>
-              <span className="dropdown-menu-page__tier-size">~3 KB</span>
+              <span className="dropdown-menu-page__tier-size">~3-5 KB</span>
             </div>
             <p className="dropdown-menu-page__tier-desc">
-              Same as Standard for DropdownMenu. No premium tier exists yet &mdash;
-              falls back to the Standard implementation.
+              Aurora glow effects, spring-scale animations, shimmer gradients, particle effects at motion level 3.
             </p>
             <div className="dropdown-menu-page__tier-import">
-              import {'{'} DropdownMenu {'}'} from '@annondeveloper/ui-kit'
+              import {'{'} DropdownMenu {'}'} from '@annondeveloper/ui-kit/premium'
             </div>
             <div className="dropdown-menu-page__tier-preview">
               <Button variant="primary" size="sm">Premium Menu</Button>

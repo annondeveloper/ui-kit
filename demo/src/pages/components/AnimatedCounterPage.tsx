@@ -682,7 +682,7 @@ const FORMAT_STYLES: FormatStyle[] = ['default', 'currency', 'percent', 'compact
 const IMPORT_STRINGS: Record<Tier, string> = {
   lite: "import { AnimatedCounter } from '@annondeveloper/ui-kit/lite'",
   standard: "import { AnimatedCounter } from '@annondeveloper/ui-kit'",
-  premium: "import { AnimatedCounter } from '@annondeveloper/ui-kit'",
+  premium: "import { AnimatedCounter } from '@annondeveloper/ui-kit/premium'",
 }
 
 const COLOR_PRESETS = [
@@ -1326,21 +1326,22 @@ export default function AnimatedCounterPage() {
           >
             <div className="animated-counter-page__tier-header">
               <span className="animated-counter-page__tier-name">Premium</span>
-              <span className="animated-counter-page__tier-size">~1.5 KB</span>
+              <span className="animated-counter-page__tier-size">~3-5 KB</span>
             </div>
             <p className="animated-counter-page__tier-desc">
-              Uses the Standard tier component. AnimatedCounter is fully featured
-              at the Standard level -- no additional premium wrapper needed.
+              Aurora glow effects, spring-scale animations, shimmer gradients, particle effects at motion level 3.
             </p>
             <div className="animated-counter-page__tier-import">
-              import {'{'} AnimatedCounter {'}'} from '@annondeveloper/ui-kit'
+              import {'{'} AnimatedCounter {'}'} from '@annondeveloper/ui-kit/premium'
             </div>
             <div className="animated-counter-page__tier-preview">
               <AnimatedCounter value={99942} format={currencyFormat} />
             </div>
             <div className="animated-counter-page__size-breakdown">
               <div className="animated-counter-page__size-row">
-                <span>Same as Standard: <strong style={{ color: 'var(--brand)' }}>2.4 KB</strong> gzip</span>
+                <span>Component: <strong style={{ color: 'var(--text-primary)' }}>3.5 KB</strong></span>
+                <span>+ Shared: <strong style={{ color: 'var(--text-primary)' }}>0.9 KB</strong></span>
+                <span>= <strong style={{ color: 'var(--brand)' }}>4.4 KB</strong> gzip</span>
               </div>
             </div>
           </div>

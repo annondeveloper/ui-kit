@@ -1148,7 +1148,7 @@ export default function BreadcrumbsPage() {
     return () => observer.disconnect()
   }, [])
 
-  // No premium for Breadcrumbs — maps to standard
+  // Premium tier available at @annondeveloper/ui-kit/premium
   const BreadcrumbsComponent = tier === 'lite' ? LiteBreadcrumbs : Breadcrumbs
 
   return (
@@ -1318,7 +1318,7 @@ function MyPage() {
         </h2>
         <p className={`${P}section-desc`}>
           Choose the right balance of features and bundle size. Breadcrumbs ships as Lite (CSS-only) and Standard (full-featured).
-          Premium maps to Standard for this component.
+          Premium adds aurora glow effects and spring animations.
         </p>
 
         <div className={`${P}tiers`}>
@@ -1382,7 +1382,7 @@ function MyPage() {
             </div>
           </div>
 
-          {/* Premium (maps to Standard) */}
+          {/* Premium */}
           <div
             className={`${P}tier-card${tier === 'premium' ? ` ${P}tier-card--active` : ''}`}
             onClick={() => setTier('premium')}
@@ -1392,13 +1392,13 @@ function MyPage() {
           >
             <div className={`${P}tier-header`}>
               <span className={`${P}tier-name`}>Premium</span>
-              <span className={`${P}tier-size`}>~1.4 KB</span>
+              <span className={`${P}tier-size`}>~3-5 KB</span>
             </div>
             <p className={`${P}tier-desc`}>
-              Maps to Standard for Breadcrumbs. No additional premium features for this component — Standard already includes all functionality.
+              Aurora glow effects, spring-scale animations, shimmer gradients, particle effects at motion level 3.
             </p>
             <div className={`${P}tier-import`}>
-              import {'{'} Breadcrumbs {'}'} from '@annondeveloper/ui-kit'
+              import {'{'} Breadcrumbs {'}'} from '@annondeveloper/ui-kit/premium'
             </div>
             <div className={`${P}tier-preview`}>
               <Breadcrumbs items={SAMPLE_ITEMS_SHORT} />

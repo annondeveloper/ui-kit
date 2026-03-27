@@ -686,7 +686,7 @@ const VARIANTS: Variant[] = ['text', 'circular', 'rectangular']
 const IMPORT_STRINGS: Record<Tier, string> = {
   lite: "import { Skeleton } from '@annondeveloper/ui-kit/lite'",
   standard: "import { Skeleton } from '@annondeveloper/ui-kit'",
-  premium: "import { Skeleton } from '@annondeveloper/ui-kit'",
+  premium: "import { Skeleton } from '@annondeveloper/ui-kit/premium'",
 }
 
 const P = 'skeleton-page__'
@@ -1114,7 +1114,7 @@ export default function SkeletonPage() {
     return () => observer.disconnect()
   }, [])
 
-  // No premium for Skeleton — maps to standard
+  // Premium tier available at @annondeveloper/ui-kit/premium
   const SkeletonComponent = tier === 'lite' ? LiteSkeleton : Skeleton
 
   return (
@@ -1292,7 +1292,7 @@ export default function SkeletonPage() {
         </h2>
         <p className={`${P}section-desc`}>
           Choose the right balance of features and bundle size. Skeleton ships as Lite (CSS-only) and Standard (full-featured).
-          Premium maps to Standard for this component.
+          Premium adds aurora glow effects and spring animations.
         </p>
 
         <div className={`${P}tiers`}>
@@ -1356,7 +1356,7 @@ export default function SkeletonPage() {
             </div>
           </div>
 
-          {/* Premium (maps to Standard) */}
+          {/* Premium */}
           <div
             className={`${P}tier-card${tier === 'premium' ? ` ${P}tier-card--active` : ''}`}
             onClick={() => setTier('premium')}
@@ -1366,13 +1366,13 @@ export default function SkeletonPage() {
           >
             <div className={`${P}tier-header`}>
               <span className={`${P}tier-name`}>Premium</span>
-              <span className={`${P}tier-size`}>~1.2 KB</span>
+              <span className={`${P}tier-size`}>~3-5 KB</span>
             </div>
             <p className={`${P}tier-desc`}>
-              Maps to Standard for Skeleton. No additional premium features for this component — Standard already includes all functionality.
+              Aurora glow effects, spring-scale animations, shimmer gradients, particle effects at motion level 3.
             </p>
             <div className={`${P}tier-import`}>
-              import {'{'} Skeleton {'}'} from '@annondeveloper/ui-kit'
+              import {'{'} Skeleton {'}'} from '@annondeveloper/ui-kit/premium'
             </div>
             <div className={`${P}tier-preview`}>
               <Skeleton variant="rectangular" width={120} height={40} />

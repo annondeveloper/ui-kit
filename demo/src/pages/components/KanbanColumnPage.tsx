@@ -597,7 +597,7 @@ const TIERS: { id: Tier; label: string }[] = [
 const IMPORT_STRINGS: Record<Tier, string> = {
   lite: "import { KanbanColumn } from '@annondeveloper/ui-kit/lite'",
   standard: "import { KanbanColumn } from '@annondeveloper/ui-kit'",
-  premium: "import { KanbanColumn } from '@annondeveloper/ui-kit'",
+  premium: "import { KanbanColumn } from '@annondeveloper/ui-kit/premium'",
 }
 
 type Priority = 'low' | 'medium' | 'high' | 'critical'
@@ -1296,14 +1296,13 @@ export default function KanbanColumnPage() {
           >
             <div className="kanban-column-page__tier-header">
               <span className="kanban-column-page__tier-name">Premium</span>
-              <span className="kanban-column-page__tier-size">~2.8 KB</span>
+              <span className="kanban-column-page__tier-size">~3-5 KB</span>
             </div>
             <p className="kanban-column-page__tier-desc">
-              Same as Standard — KanbanColumn is a layout component where additional
-              premium effects (glow, particles) are not applicable. Use Standard tier.
+              Aurora glow effects, spring-scale animations, shimmer gradients, particle effects at motion level 3.
             </p>
             <div className="kanban-column-page__tier-import">
-              import {'{'} KanbanColumn {'}'} from '@annondeveloper/ui-kit'
+              import {'{'} KanbanColumn {'}'} from '@annondeveloper/ui-kit/premium'
             </div>
             <div className="kanban-column-page__tier-preview">
               <KanbanColumn

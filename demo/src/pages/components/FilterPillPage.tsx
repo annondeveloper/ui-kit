@@ -1404,21 +1404,22 @@ export default function FilterPillPage() {
           >
             <div className="filter-pill-page__tier-header">
               <span className="filter-pill-page__tier-name">Premium</span>
-              <span className="filter-pill-page__tier-size">~1.8 KB</span>
+              <span className="filter-pill-page__tier-size">~3-5 KB</span>
             </div>
             <p className="filter-pill-page__tier-desc">
-              Uses the Standard tier component. FilterPill is fully featured
-              at the Standard level -- no additional premium wrapper needed.
+              Aurora glow effects, spring-scale animations, shimmer gradients, particle effects at motion level 3.
             </p>
             <div className="filter-pill-page__tier-import">
-              import {'{'} FilterPill, FilterPillGroup {'}'} from '@annondeveloper/ui-kit'
+              import {'{'} FilterPill, FilterPillGroup {'}'} from '@annondeveloper/ui-kit/premium'
             </div>
             <div className="filter-pill-page__tier-preview">
               <FilterPill label="Premium" active icon={<Icon name="zap" size="sm" />} count={99} />
             </div>
             <div className="filter-pill-page__size-breakdown">
               <div className="filter-pill-page__size-row">
-                <span>Same as Standard: <strong style={{ color: 'var(--brand)' }}>2.7 KB</strong> gzip</span>
+                <span>Component: <strong style={{ color: 'var(--text-primary)' }}>3.5 KB</strong></span>
+                <span>+ Shared: <strong style={{ color: 'var(--text-primary)' }}>0.9 KB</strong></span>
+                <span>= <strong style={{ color: 'var(--brand)' }}>4.4 KB</strong> gzip</span>
               </div>
             </div>
           </div>

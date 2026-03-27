@@ -1139,17 +1139,24 @@ export default function DashboardGridPage() {
             </div>
           </div>
 
+          {/* Premium */}
           <div
-            className="dashboard-grid-page__tier-card"
-            style={{ opacity: 0.5, pointerEvents: 'none' }}
+            className={`dashboard-grid-page__tier-card${tier === 'premium' ? ' dashboard-grid-page__tier-card--active' : ''}`}
+            onClick={() => setTier('premium')}
+            role="button"
+            tabIndex={0}
+            onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setTier('premium') } }}
           >
             <div className="dashboard-grid-page__tier-header">
               <span className="dashboard-grid-page__tier-name">Premium</span>
-              <span className="dashboard-grid-page__tier-size">= Standard</span>
+              <span className="dashboard-grid-page__tier-size">~3-5 KB</span>
             </div>
             <p className="dashboard-grid-page__tier-desc">
-              No separate premium tier. Standard includes all features.
+              Aurora glow effects, spring-scale animations, shimmer gradients, particle effects at motion level 3.
             </p>
+            <div className="dashboard-grid-page__tier-import">
+              import {'{'} DashboardGrid {'}'} from '@annondeveloper/ui-kit/premium'
+            </div>
           </div>
         </div>
       </section>

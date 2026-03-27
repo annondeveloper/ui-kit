@@ -1422,14 +1422,13 @@ export default function SheetPage() {
           >
             <div className="sheet-page__tier-header">
               <span className="sheet-page__tier-name">Premium</span>
-              <span className="sheet-page__tier-size">~3 KB</span>
+              <span className="sheet-page__tier-size">~3-5 KB</span>
             </div>
             <p className="sheet-page__tier-desc">
-              Same as Standard for Sheet. No premium tier exists yet &mdash;
-              falls back to the Standard implementation.
+              Aurora glow effects, spring-scale animations, shimmer gradients, particle effects at motion level 3.
             </p>
             <div className="sheet-page__tier-import">
-              import {'{'} Sheet {'}'} from '@annondeveloper/ui-kit'
+              import {'{'} Sheet {'}'} from '@annondeveloper/ui-kit/premium'
             </div>
             <div className="sheet-page__tier-preview">
               <Button variant="primary" size="sm">Premium Sheet</Button>

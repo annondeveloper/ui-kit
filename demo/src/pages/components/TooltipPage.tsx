@@ -198,7 +198,7 @@ const pageStyles = css`
         border-radius: var(--radius-md);
         background: var(--bg-base);
         position: relative;
-        overflow: hidden;
+        overflow: visible;
         display: flex;
         flex-wrap: wrap;
         align-items: center;
@@ -260,14 +260,14 @@ const pageStyles = css`
       }
 
       .tooltip-page__playground-result {
-        min-block-size: 200px;
+        min-block-size: 300px;
         display: grid;
         place-items: center;
         padding: 3rem;
         background: var(--bg-base);
         border-radius: var(--radius-md);
         position: relative;
-        overflow: hidden;
+        overflow: visible;
       }
 
       /* Dot grid for playground result */
@@ -624,7 +624,7 @@ const pageStyles = css`
 
         .tooltip-page__playground-result {
           padding: 2rem;
-          min-block-size: 120px;
+          min-block-size: 300px;
         }
 
         .tooltip-page__labeled-row {

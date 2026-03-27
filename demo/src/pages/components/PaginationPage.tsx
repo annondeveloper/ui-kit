@@ -1156,7 +1156,7 @@ export default function PaginationPage() {
     return () => observer.disconnect()
   }, [])
 
-  // No premium exists for Pagination — premium maps to standard
+  // Premium tier now available at @annondeveloper/ui-kit/premium
   const PaginationComponent = tier === 'lite' ? LitePagination : Pagination
 
   return (
@@ -1279,7 +1279,7 @@ export default function PaginationPage() {
         </h2>
         <p className={`${P}section-desc`}>
           Choose the right balance of features and bundle size. Pagination ships as Lite (CSS-only) and Standard (full-featured).
-          Premium maps to Standard for this component.
+          Premium adds aurora glow effects and spring animations.
         </p>
 
         <div className={`${P}tiers`}>
@@ -1343,7 +1343,7 @@ export default function PaginationPage() {
             </div>
           </div>
 
-          {/* Premium (maps to Standard) */}
+          {/* Premium */}
           <div
             className={`${P}tier-card${tier === 'premium' ? ` ${P}tier-card--active` : ''}`}
             onClick={() => setTier('premium')}
@@ -1353,13 +1353,13 @@ export default function PaginationPage() {
           >
             <div className={`${P}tier-header`}>
               <span className={`${P}tier-name`}>Premium</span>
-              <span className={`${P}tier-size`}>~1.8 KB</span>
+              <span className={`${P}tier-size`}>~3-5 KB</span>
             </div>
             <p className={`${P}tier-desc`}>
-              Maps to Standard for Pagination. No additional premium features for this component — Standard already includes all functionality.
+              Aurora glow effects, spring-scale animations, shimmer gradients, particle effects at motion level 3.
             </p>
             <div className={`${P}tier-import`}>
-              import {'{'} Pagination {'}'} from '@annondeveloper/ui-kit'
+              import {'{'} Pagination {'}'} from '@annondeveloper/ui-kit/premium'
             </div>
             <div className={`${P}tier-preview`}>
               <Pagination page={3} totalPages={10} onChange={() => {}} showFirst />

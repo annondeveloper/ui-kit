@@ -1217,14 +1217,13 @@ export default function EmptyStatePage() {
           >
             <div className="empty-state-page__tier-header">
               <span className="empty-state-page__tier-name">Premium</span>
-              <span className="empty-state-page__tier-size">~1.5 KB</span>
+              <span className="empty-state-page__tier-size">~3-5 KB</span>
             </div>
             <p className="empty-state-page__tier-desc">
-              Same as Standard — EmptyState is a layout component where additional
-              premium effects are not applicable. Use Standard tier.
+              Aurora glow effects, spring-scale animations, shimmer gradients, particle effects at motion level 3.
             </p>
             <div className="empty-state-page__tier-import">
-              import {'{'} EmptyState {'}'} from '@annondeveloper/ui-kit'
+              import {'{'} EmptyState {'}'} from '@annondeveloper/ui-kit/premium'
             </div>
             <div className="empty-state-page__tier-preview">
               <EmptyState icon={<Icon name="inbox" size="sm" />} title="Empty" description="Nothing here" size="sm" />

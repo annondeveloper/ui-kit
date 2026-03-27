@@ -1386,14 +1386,13 @@ export default function RadioGroupPage() {
           >
             <div className="radio-group-page__tier-header">
               <span className="radio-group-page__tier-name">Premium</span>
-              <span className="radio-group-page__tier-size">~2 KB</span>
+              <span className="radio-group-page__tier-size">~3-5 KB</span>
             </div>
             <p className="radio-group-page__tier-desc">
-              Same as Standard. Premium tier shares the full RadioGroup implementation
-              with all features included.
+              Aurora glow effects, spring-scale animations, shimmer gradients, particle effects at motion level 3.
             </p>
             <div className="radio-group-page__tier-import">
-              import {'{'} RadioGroup {'}'} from '@annondeveloper/ui-kit'
+              import {'{'} RadioGroup {'}'} from '@annondeveloper/ui-kit/premium'
             </div>
             <div className="radio-group-page__tier-preview">
               <RadioGroup

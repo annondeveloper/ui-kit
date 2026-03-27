@@ -1252,14 +1252,13 @@ export default function StatusPulsePage() {
           >
             <div className="status-pulse-page__tier-header">
               <span className="status-pulse-page__tier-name">Premium</span>
-              <span className="status-pulse-page__tier-size">~1 KB</span>
+              <span className="status-pulse-page__tier-size">~3-5 KB</span>
             </div>
             <p className="status-pulse-page__tier-desc">
-              Uses the Standard tier component. StatusPulse is fully featured
-              at the Standard level -- no additional premium wrapper needed.
+              Aurora glow effects, spring-scale animations, shimmer gradients, particle effects at motion level 3.
             </p>
             <div className="status-pulse-page__tier-import">
-              import {'{'} StatusPulse {'}'} from '@annondeveloper/ui-kit'
+              import {'{'} StatusPulse {'}'} from '@annondeveloper/ui-kit/premium'
             </div>
             <div className="status-pulse-page__tier-preview">
               <StatusPulse status="ok" label="OK" size="lg" />
@@ -1267,7 +1266,9 @@ export default function StatusPulsePage() {
             </div>
             <div className="status-pulse-page__size-breakdown">
               <div className="status-pulse-page__size-row">
-                <span>Same as Standard: <strong style={{ color: 'var(--brand)' }}>1.9 KB</strong> gzip</span>
+                <span>Component: <strong style={{ color: 'var(--text-primary)' }}>3.5 KB</strong></span>
+                <span>+ Shared: <strong style={{ color: 'var(--text-primary)' }}>0.9 KB</strong></span>
+                <span>= <strong style={{ color: 'var(--brand)' }}>4.4 KB</strong> gzip</span>
               </div>
             </div>
           </div>

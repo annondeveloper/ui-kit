@@ -1260,14 +1260,13 @@ export default function SparklinePage() {
           >
             <div className="sparkline-page__tier-header">
               <span className="sparkline-page__tier-name">Premium</span>
-              <span className="sparkline-page__tier-size">~1.2 KB</span>
+              <span className="sparkline-page__tier-size">~3-5 KB</span>
             </div>
             <p className="sparkline-page__tier-desc">
-              Same as Standard — Sparkline is a data visualization component where additional
-              premium effects (glow, particles) are not applicable. Use Standard tier.
+              Aurora glow effects, spring-scale animations, shimmer gradients, particle effects at motion level 3.
             </p>
             <div className="sparkline-page__tier-import">
-              import {'{'} Sparkline {'}'} from '@annondeveloper/ui-kit'
+              import {'{'} Sparkline {'}'} from '@annondeveloper/ui-kit/premium'
             </div>
             <div className="sparkline-page__tier-preview">
               <Sparkline data={SAMPLE_DATA} height={32} width={160} showTooltip gradient />

@@ -1319,28 +1319,29 @@ export default function AppShellPage() {
             </div>
           </div>
 
-          {/* Premium (maps to standard) */}
+          {/* Premium */}
           <div
             className={`app-shell-page__tier-card${tier === 'premium' ? ' app-shell-page__tier-card--active' : ''}`}
-            onClick={() => setTier('standard')}
+            onClick={() => setTier('premium')}
             role="button"
             tabIndex={0}
-            onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setTier('standard') } }}
+            onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setTier('premium') } }}
           >
             <div className="app-shell-page__tier-header">
               <span className="app-shell-page__tier-name">Premium</span>
-              <span className="app-shell-page__tier-size">= Standard</span>
+              <span className="app-shell-page__tier-size">~3-5 KB</span>
             </div>
             <p className="app-shell-page__tier-desc">
-              No separate premium tier for AppShell. The standard version includes all layout
-              features. Premium maps directly to Standard.
+              Aurora glow effects, spring-scale animations, shimmer gradients, particle effects at motion level 3.
             </p>
             <div className="app-shell-page__tier-import">
-              import {'{'} AppShell {'}'} from '@annondeveloper/ui-kit'
+              import {'{'} AppShell {'}'} from '@annondeveloper/ui-kit/premium'
             </div>
             <div className="app-shell-page__size-breakdown">
               <div className="app-shell-page__size-row">
-                <span style={{ fontStyle: 'italic', color: 'var(--text-tertiary)' }}>Same as Standard tier</span>
+                <span>Component: <strong style={{ color: 'var(--text-primary)' }}>3.5 KB</strong></span>
+                <span>+ Shared: <strong style={{ color: 'var(--text-primary)' }}>0.9 KB</strong></span>
+                <span>= <strong style={{ color: 'var(--brand)' }}>4.4 KB</strong> gzip</span>
               </div>
             </div>
           </div>

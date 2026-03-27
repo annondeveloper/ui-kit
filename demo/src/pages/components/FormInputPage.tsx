@@ -1391,7 +1391,7 @@ export default function FormInputPage() {
             </div>
           </div>
 
-          {/* Premium (maps to Standard) */}
+          {/* Premium */}
           <div
             className={`form-input-page__tier-card${tier === 'premium' ? ' form-input-page__tier-card--active' : ''}`}
             onClick={() => setTier('premium')}
@@ -1401,18 +1401,17 @@ export default function FormInputPage() {
           >
             <div className="form-input-page__tier-header">
               <span className="form-input-page__tier-name">Premium</span>
-              <span className="form-input-page__tier-size">~2 KB</span>
+              <span className="form-input-page__tier-size">~3-5 KB</span>
             </div>
             <p className="form-input-page__tier-desc">
-              Uses Standard tier (no premium variant exists yet). Same full feature set
-              with icons, variants, descriptions, and form context integration.
+              Aurora glow effects, spring-scale animations, shimmer gradients, particle effects at motion level 3.
             </p>
             <div className="form-input-page__tier-import">
-              import {'{'} FormInput {'}'} from '@annondeveloper/ui-kit'
+              import {'{'} FormInput {'}'} from '@annondeveloper/ui-kit/premium'
             </div>
             <div className="form-input-page__tier-preview">
               <div style={{ inlineSize: '100%' }}>
-                <FormInput name="prem-preview" label="Premium Input" placeholder="Same as Standard..." iconEnd={<Icon name="check" size="sm" />} />
+                <FormInput name="prem-preview" label="Premium Input" placeholder="Premium tier..." iconEnd={<Icon name="check" size="sm" />} />
               </div>
             </div>
             <div className="form-input-page__size-breakdown">

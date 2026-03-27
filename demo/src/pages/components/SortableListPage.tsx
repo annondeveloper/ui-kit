@@ -523,7 +523,7 @@ const ORIENTATIONS: Orientation[] = ['vertical', 'horizontal']
 const IMPORT_STRINGS: Record<Tier, string> = {
   lite: "import { SortableList } from '@annondeveloper/ui-kit/lite'",
   standard: "import { SortableList } from '@annondeveloper/ui-kit'",
-  premium: "import { SortableList } from '@annondeveloper/ui-kit'",
+  premium: "import { SortableList } from '@annondeveloper/ui-kit/premium'",
 }
 
 function createInitialItems(): SortableItem[] {

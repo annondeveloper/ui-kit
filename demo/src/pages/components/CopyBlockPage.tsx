@@ -1247,14 +1247,13 @@ export default function CopyBlockPage() {
           >
             <div className="copy-block-page__tier-header">
               <span className="copy-block-page__tier-name">Premium</span>
-              <span className="copy-block-page__tier-size">~3.5 KB</span>
+              <span className="copy-block-page__tier-size">~3-5 KB</span>
             </div>
             <p className="copy-block-page__tier-desc">
-              Same as Standard — CopyBlock is a content display component where
-              premium effects are not applicable. Use Standard tier.
+              Aurora glow effects, spring-scale animations, shimmer gradients, particle effects at motion level 3.
             </p>
             <div className="copy-block-page__tier-import">
-              import {'{'} CopyBlock {'}'} from '@annondeveloper/ui-kit'
+              import {'{'} CopyBlock {'}'} from '@annondeveloper/ui-kit/premium'
             </div>
             <div className="copy-block-page__tier-preview">
               <CopyBlock code="const x = 42" language="typescript" title="example.ts" />

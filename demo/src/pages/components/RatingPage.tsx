@@ -903,12 +903,12 @@ export default function RatingPage() {
           >
             <div className="rating-page__tier-header">
               <span className="rating-page__tier-name">Premium</span>
-              <span className="rating-page__tier-size">~2.2 KB</span>
+              <span className="rating-page__tier-size">~3-5 KB</span>
             </div>
             <p className="rating-page__tier-desc">
-              Same as Standard. Premium tier shares the full Rating implementation with all features included.
+              Aurora glow effects, spring-scale animations, shimmer gradients, particle effects at motion level 3.
             </p>
-            <div className="rating-page__tier-import">import {'{'} Rating {'}'} from '@annondeveloper/ui-kit'</div>
+            <div className="rating-page__tier-import">import {'{'} Rating {'}'} from '@annondeveloper/ui-kit/premium'</div>
             <div className="rating-page__tier-preview">
               <Rating defaultValue={4} size="xl" />
             </div>

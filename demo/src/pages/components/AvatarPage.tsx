@@ -990,12 +990,12 @@ export default function AvatarPage() {
           >
             <div className="avatar-page__tier-header">
               <span className="avatar-page__tier-name">Premium</span>
-              <span className="avatar-page__tier-size">~1.5 KB</span>
+              <span className="avatar-page__tier-size">~3-5 KB</span>
             </div>
             <p className="avatar-page__tier-desc">
-              Same as Standard. Premium tier shares the full Avatar implementation with all features included.
+              Aurora glow effects, spring-scale animations, shimmer gradients, particle effects at motion level 3.
             </p>
-            <div className="avatar-page__tier-import">import {'{'} Avatar {'}'} from '@annondeveloper/ui-kit'</div>
+            <div className="avatar-page__tier-import">import {'{'} Avatar {'}'} from '@annondeveloper/ui-kit/premium'</div>
             <div className="avatar-page__tier-preview">
               <Avatar size="xl" name="Premium User" status="away" />
             </div>

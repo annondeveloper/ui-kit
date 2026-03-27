@@ -641,7 +641,7 @@ const sidebarItemProps: PropDef[] = [
 const IMPORT_STRINGS: Record<Tier, string> = {
   lite: "import { Sidebar, SidebarItem } from '@annondeveloper/ui-kit/lite'",
   standard: "import { Sidebar, SidebarItem } from '@annondeveloper/ui-kit'",
-  premium: "import { Sidebar, SidebarItem } from '@annondeveloper/ui-kit'",
+  premium: "import { Sidebar, SidebarItem } from '@annondeveloper/ui-kit/premium'",
 }
 
 const COLOR_PRESETS = [
@@ -1452,14 +1452,13 @@ export default function SidebarPage() {
           >
             <div className="sidebar-page__tier-header">
               <span className="sidebar-page__tier-name">Premium</span>
-              <span className="sidebar-page__tier-size">~1.8 KB</span>
+              <span className="sidebar-page__tier-size">~3-5 KB</span>
             </div>
             <p className="sidebar-page__tier-desc">
-              Same as Standard for Sidebar. Premium animations apply to child items
-              and interactive elements within the sidebar for enhanced visual feedback.
+              Aurora glow effects, spring-scale animations, shimmer gradients, particle effects at motion level 3.
             </p>
             <div className="sidebar-page__tier-import">
-              import {'{'} Sidebar {'}'} from '@annondeveloper/ui-kit'
+              import {'{'} Sidebar {'}'} from '@annondeveloper/ui-kit/premium'
             </div>
             <div className="sidebar-page__tier-preview">
               <Sidebar collapsed={false} width={120} collapsedWidth={48} motion={0}>

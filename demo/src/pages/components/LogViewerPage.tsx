@@ -192,7 +192,8 @@ const pageStyles = css`
         border-radius: var(--radius-md);
         background: var(--bg-base);
         position: relative;
-        overflow: hidden;
+        overflow-x: auto;
+        overflow-y: hidden;
         display: flex;
         flex-wrap: wrap;
         align-items: center;
@@ -1209,14 +1210,13 @@ export default function LogViewerPage() {
           >
             <div className="log-viewer-page__tier-header">
               <span className="log-viewer-page__tier-name">Premium</span>
-              <span className="log-viewer-page__tier-size">~2.5 KB</span>
+              <span className="log-viewer-page__tier-size">~3-5 KB</span>
             </div>
             <p className="log-viewer-page__tier-desc">
-              Same as Standard — LogViewer is a data display component where
-              premium effects are not applicable. Use Standard tier.
+              Aurora glow effects, spring-scale animations, shimmer gradients, particle effects at motion level 3.
             </p>
             <div className="log-viewer-page__tier-import">
-              import {'{'} LogViewer {'}'} from '@annondeveloper/ui-kit'
+              import {'{'} LogViewer {'}'} from '@annondeveloper/ui-kit/premium'
             </div>
             <div className="log-viewer-page__tier-preview">
               <LogViewer lines={SHORT_LINES} showLevel showTimestamp height="100px" />

@@ -1219,14 +1219,13 @@ export default function DiffViewerPage() {
           >
             <div className="diff-viewer-page__tier-header">
               <span className="diff-viewer-page__tier-name">Premium</span>
-              <span className="diff-viewer-page__tier-size">~3.2 KB</span>
+              <span className="diff-viewer-page__tier-size">~3-5 KB</span>
             </div>
             <p className="diff-viewer-page__tier-desc">
-              Same as Standard — DiffViewer is a code analysis component where additional
-              premium effects are not applicable. Use Standard tier.
+              Aurora glow effects, spring-scale animations, shimmer gradients, particle effects at motion level 3.
             </p>
             <div className="diff-viewer-page__tier-import">
-              import {'{'} DiffViewer {'}'} from '@annondeveloper/ui-kit'
+              import {'{'} DiffViewer {'}'} from '@annondeveloper/ui-kit/premium'
             </div>
             <div className="diff-viewer-page__tier-preview" style={{ maxHeight: '120px', overflow: 'hidden' }}>
               <DiffViewer oldValue="const x = 1;" newValue="const x: number = 1;" oldTitle="Old" newTitle="New" />

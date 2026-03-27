@@ -488,7 +488,7 @@ const LENGTHS = [4, 5, 6, 8] as const
 const IMPORT_STRINGS: Record<Tier, string> = {
   lite: "import { OtpInput } from '@annondeveloper/ui-kit/lite'",
   standard: "import { OtpInput } from '@annondeveloper/ui-kit'",
-  premium: "import { OtpInput } from '@annondeveloper/ui-kit'",
+  premium: "import { OtpInput } from '@annondeveloper/ui-kit/premium'",
 }
 
 function CopyButton({ text }: { text: string }) {
@@ -1114,26 +1114,27 @@ export default function OtpInputPage() {
 
           <div
             className={`otp-input-page__tier-card${tier === 'premium' ? ' otp-input-page__tier-card--active' : ''}`}
-            onClick={() => setTier('standard')} role="button" tabIndex={0}
-            onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setTier('standard') } }}
+            onClick={() => setTier('premium')} role="button" tabIndex={0}
+            onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setTier('premium') } }}
           >
             <div className="otp-input-page__tier-header">
               <span className="otp-input-page__tier-name">Premium</span>
-              <span className="otp-input-page__tier-size">--</span>
+              <span className="otp-input-page__tier-size">~3-5 KB</span>
             </div>
             <p className="otp-input-page__tier-desc">
-              No premium tier yet. Uses the Standard tier. Future premium may add
-              success animations and digit reveal effects.
+              Aurora glow effects, spring-scale animations, shimmer gradients, particle effects at motion level 3.
             </p>
             <div className="otp-input-page__tier-import">
-              import {'{'} OtpInput {'}'} from '@annondeveloper/ui-kit'
+              import {'{'} OtpInput {'}'} from '@annondeveloper/ui-kit/premium'
             </div>
             <div className="otp-input-page__tier-preview">
               <OtpInput length={4} size="sm" value="42" aria-label="Premium preview" />
             </div>
             <div className="otp-input-page__size-breakdown">
               <div className="otp-input-page__size-row">
-                <span>Same as Standard tier</span>
+                <span>Component: <strong style={{ color: 'var(--text-primary)' }}>3.5 KB</strong></span>
+                <span>+ Shared: <strong style={{ color: 'var(--text-primary)' }}>0.9 KB</strong></span>
+                <span>= <strong style={{ color: 'var(--brand)' }}>4.4 KB</strong> gzip</span>
               </div>
             </div>
           </div>

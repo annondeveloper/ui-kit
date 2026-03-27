@@ -1346,7 +1346,7 @@ export default function SliderPage() {
             </div>
           </div>
 
-          {/* Premium (maps to Standard) */}
+          {/* Premium */}
           <div
             className={`slider-page__tier-card${tier === 'premium' ? ' slider-page__tier-card--active' : ''}`}
             onClick={() => setTier('premium')}
@@ -1356,14 +1356,13 @@ export default function SliderPage() {
           >
             <div className="slider-page__tier-header">
               <span className="slider-page__tier-name">Premium</span>
-              <span className="slider-page__tier-size">~1.8 KB</span>
+              <span className="slider-page__tier-size">~3-5 KB</span>
             </div>
             <p className="slider-page__tier-desc">
-              Same as Standard. Premium tier shares the full slider implementation
-              with all features included.
+              Aurora glow effects, spring-scale animations, shimmer gradients, particle effects at motion level 3.
             </p>
             <div className="slider-page__tier-import">
-              import {'{'} Slider {'}'} from '@annondeveloper/ui-kit'
+              import {'{'} Slider {'}'} from '@annondeveloper/ui-kit/premium'
             </div>
             <div className="slider-page__tier-preview">
               <div style={{ inlineSize: '100%' }}>

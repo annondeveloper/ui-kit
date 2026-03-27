@@ -673,7 +673,7 @@ const TIERS: { id: Tier; label: string }[] = [
 const IMPORT_STRINGS: Record<Tier, string> = {
   lite: "import { StatusBadge } from '@annondeveloper/ui-kit/lite'",
   standard: "import { StatusBadge } from '@annondeveloper/ui-kit'",
-  premium: "import { StatusBadge } from '@annondeveloper/ui-kit'",
+  premium: "import { StatusBadge } from '@annondeveloper/ui-kit/premium'",
 }
 
 const COLOR_PRESETS = [
@@ -1294,21 +1294,22 @@ export default function StatusBadgePage() {
           >
             <div className="status-badge-page__tier-header">
               <span className="status-badge-page__tier-name">Premium</span>
-              <span className="status-badge-page__tier-size">~1.2 KB</span>
+              <span className="status-badge-page__tier-size">~3-5 KB</span>
             </div>
             <p className="status-badge-page__tier-desc">
-              Uses the Standard tier component. StatusBadge is fully featured
-              at the Standard level -- no additional premium wrapper needed.
+              Aurora glow effects, spring-scale animations, shimmer gradients, particle effects at motion level 3.
             </p>
             <div className="status-badge-page__tier-import">
-              import {'{'} StatusBadge {'}'} from '@annondeveloper/ui-kit'
+              import {'{'} StatusBadge {'}'} from '@annondeveloper/ui-kit/premium'
             </div>
             <div className="status-badge-page__tier-preview">
               <StatusBadge status="critical" label="Premium" pulse icon={<Icon name="alert-circle" size="sm" />} />
             </div>
             <div className="status-badge-page__size-breakdown">
               <div className="status-badge-page__size-row">
-                <span>Same as Standard: <strong style={{ color: 'var(--brand)' }}>2.1 KB</strong> gzip</span>
+                <span>Component: <strong style={{ color: 'var(--text-primary)' }}>3.5 KB</strong></span>
+                <span>+ Shared: <strong style={{ color: 'var(--text-primary)' }}>0.9 KB</strong></span>
+                <span>= <strong style={{ color: 'var(--brand)' }}>4.4 KB</strong> gzip</span>
               </div>
             </div>
           </div>

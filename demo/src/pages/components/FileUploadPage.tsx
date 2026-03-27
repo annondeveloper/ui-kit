@@ -1449,7 +1449,7 @@ export default function FileUploadPage() {
             </div>
           </div>
 
-          {/* Premium (maps to standard) */}
+          {/* Premium */}
           <div
             className={`file-upload-page__tier-card${tier === 'premium' ? ' file-upload-page__tier-card--active' : ''}`}
             onClick={() => setTier('premium')}
@@ -1459,14 +1459,13 @@ export default function FileUploadPage() {
           >
             <div className="file-upload-page__tier-header">
               <span className="file-upload-page__tier-name">Premium</span>
-              <span className="file-upload-page__tier-size">~3.5 KB</span>
+              <span className="file-upload-page__tier-size">~3-5 KB</span>
             </div>
             <p className="file-upload-page__tier-desc">
-              Same as Standard for FileUpload. No premium tier exists yet &mdash;
-              falls back to the Standard implementation.
+              Aurora glow effects, spring-scale animations, shimmer gradients, particle effects at motion level 3.
             </p>
             <div className="file-upload-page__tier-import">
-              import {'{'} FileUpload {'}'} from '@annondeveloper/ui-kit'
+              import {'{'} FileUpload {'}'} from '@annondeveloper/ui-kit/premium'
             </div>
             <div className="file-upload-page__tier-preview">
               <Button variant="primary" size="sm">Premium Upload</Button>

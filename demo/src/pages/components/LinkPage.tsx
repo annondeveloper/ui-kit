@@ -1188,7 +1188,7 @@ export default function LinkPage() {
         </h2>
         <p className="link-page__section-desc">
           Choose the right balance of features and bundle size. Lite provides CSS-only rendering.
-          Standard adds motion-aware animated underlines and embedded scoped CSS. No premium tier exists -- premium maps to standard.
+          Standard adds motion-aware animated underlines and embedded scoped CSS. Premium adds aurora glow effects and spring animations.
         </p>
 
         <div className="link-page__tiers">
@@ -1256,30 +1256,32 @@ export default function LinkPage() {
             </div>
           </div>
 
-          {/* Premium (maps to Standard) */}
+          {/* Premium */}
           <div
             className={`link-page__tier-card${tier === 'premium' ? ' link-page__tier-card--active' : ''}`}
-            onClick={() => setTier('standard')}
+            onClick={() => setTier('premium')}
             role="button"
             tabIndex={0}
-            onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setTier('standard') } }}
+            onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setTier('premium') } }}
           >
             <div className="link-page__tier-header">
               <span className="link-page__tier-name">Premium</span>
-              <span className="link-page__tier-size">= Standard</span>
+              <span className="link-page__tier-size">~3-5 KB</span>
             </div>
             <p className="link-page__tier-desc">
-              No separate premium tier for Link. Premium import maps directly to the Standard component.
+              Aurora glow effects, spring-scale animations, shimmer gradients, particle effects at motion level 3.
             </p>
             <div className="link-page__tier-import">
-              import {'{'} Link {'}'} from '@annondeveloper/ui-kit'
+              import {'{'} Link {'}'} from '@annondeveloper/ui-kit/premium'
             </div>
             <div className="link-page__tier-preview">
               <Link href="#" variant="brand" onClick={e => e.preventDefault()}>Standard</Link>
             </div>
             <div className="link-page__size-breakdown">
               <div className="link-page__size-row">
-                <span>Same as Standard tier</span>
+                <span>Component: <strong style={{ color: 'var(--text-primary)' }}>3.0 KB</strong></span>
+                <span>+ Shared: <strong style={{ color: 'var(--text-primary)' }}>0.9 KB</strong></span>
+                <span>= <strong style={{ color: 'var(--brand)' }}>3.9 KB</strong> gzip</span>
               </div>
             </div>
           </div>

@@ -1039,17 +1039,16 @@ export default function InfiniteScrollPage() {
           >
             <div className="infinite-scroll-page__tier-header">
               <span className="infinite-scroll-page__tier-name">Premium</span>
-              <span className="infinite-scroll-page__tier-size">~1.8 KB</span>
+              <span className="infinite-scroll-page__tier-size">~3-5 KB</span>
             </div>
             <p className="infinite-scroll-page__tier-desc">
-              Same as Standard — InfiniteScroll is a behavioral component where additional
-              premium effects are not applicable. Use Standard tier.
+              Aurora glow effects, spring-scale animations, shimmer gradients, particle effects at motion level 3.
             </p>
             <div className="infinite-scroll-page__tier-import">
-              import {'{'} InfiniteScroll {'}'} from '@annondeveloper/ui-kit'
+              import {'{'} InfiniteScroll {'}'} from '@annondeveloper/ui-kit/premium'
             </div>
             <div className="infinite-scroll-page__tier-preview">
-              <span style={{ fontSize: 'var(--text-xs)', color: 'var(--text-tertiary)' }}>Same as Standard</span>
+              <span style={{ fontSize: 'var(--text-xs)', color: 'var(--text-tertiary)' }}>Premium preview</span>
             </div>
             <div className="infinite-scroll-page__size-breakdown">
               <div className="infinite-scroll-page__size-row">

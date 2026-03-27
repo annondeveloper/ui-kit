@@ -1017,26 +1017,27 @@ export default function InlineEditPage() {
 
           <div
             className={`inline-edit-page__tier-card${tier === 'premium' ? ' inline-edit-page__tier-card--active' : ''}`}
-            onClick={() => setTier('standard')} role="button" tabIndex={0}
-            onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setTier('standard') } }}
+            onClick={() => setTier('premium')} role="button" tabIndex={0}
+            onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setTier('premium') } }}
           >
             <div className="inline-edit-page__tier-header">
               <span className="inline-edit-page__tier-name">Premium</span>
-              <span className="inline-edit-page__tier-size">--</span>
+              <span className="inline-edit-page__tier-size">~3-5 KB</span>
             </div>
             <p className="inline-edit-page__tier-desc">
-              No premium tier yet. Uses the Standard tier. Future premium may add
-              rich text editing, auto-save, and change highlighting.
+              Aurora glow effects, spring-scale animations, shimmer gradients, particle effects at motion level 3.
             </p>
             <div className="inline-edit-page__tier-import">
-              import {'{'} InlineEdit {'}'} from '@annondeveloper/ui-kit'
+              import {'{'} InlineEdit {'}'} from '@annondeveloper/ui-kit/premium'
             </div>
             <div className="inline-edit-page__tier-preview">
               <InlineEdit value="Standard edit" onChange={() => {}} size="sm" />
             </div>
             <div className="inline-edit-page__size-breakdown">
               <div className="inline-edit-page__size-row">
-                <span>Same as Standard tier</span>
+                <span>Component: <strong style={{ color: 'var(--text-primary)' }}>3.5 KB</strong></span>
+                <span>+ Shared: <strong style={{ color: 'var(--text-primary)' }}>0.9 KB</strong></span>
+                <span>= <strong style={{ color: 'var(--brand)' }}>4.4 KB</strong> gzip</span>
               </div>
             </div>
           </div>

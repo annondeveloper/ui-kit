@@ -1122,26 +1122,27 @@ export default function ColorInputPage() {
 
           <div
             className={`color-input-page__tier-card${tier === 'premium' ? ' color-input-page__tier-card--active' : ''}`}
-            onClick={() => setTier('standard')} role="button" tabIndex={0}
-            onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setTier('standard') } }}
+            onClick={() => setTier('premium')} role="button" tabIndex={0}
+            onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setTier('premium') } }}
           >
             <div className="color-input-page__tier-header">
               <span className="color-input-page__tier-name">Premium</span>
-              <span className="color-input-page__tier-size">--</span>
+              <span className="color-input-page__tier-size">~3-5 KB</span>
             </div>
             <p className="color-input-page__tier-desc">
-              No premium tier yet. Uses the Standard tier. Future premium may add
-              OKLCH mode, alpha channel, gradient builder, and eyedropper.
+              Aurora glow effects, spring-scale animations, shimmer gradients, particle effects at motion level 3.
             </p>
             <div className="color-input-page__tier-import">
-              import {'{'} ColorInput {'}'} from '@annondeveloper/ui-kit'
+              import {'{'} ColorInput {'}'} from '@annondeveloper/ui-kit/premium'
             </div>
             <div className="color-input-page__tier-preview">
               <ColorInput name="tier-prem" size="sm" defaultValue="#6366f1" />
             </div>
             <div className="color-input-page__size-breakdown">
               <div className="color-input-page__size-row">
-                <span>Same as Standard tier</span>
+                <span>Component: <strong style={{ color: 'var(--text-primary)' }}>3.5 KB</strong></span>
+                <span>+ Shared: <strong style={{ color: 'var(--text-primary)' }}>0.9 KB</strong></span>
+                <span>= <strong style={{ color: 'var(--brand)' }}>4.4 KB</strong> gzip</span>
               </div>
             </div>
           </div>

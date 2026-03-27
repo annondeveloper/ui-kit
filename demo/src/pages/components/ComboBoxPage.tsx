@@ -182,7 +182,7 @@ const pageStyles = css`
         border-radius: var(--radius-md);
         background: var(--bg-base);
         position: relative;
-        overflow: hidden;
+        overflow: visible;
         display: flex;
         flex-wrap: wrap;
         align-items: center;
@@ -231,14 +231,14 @@ const pageStyles = css`
       }
 
       .combobox-page__playground-result {
-        min-block-size: 200px;
+        min-block-size: 300px;
         display: grid;
         place-items: center;
         padding: 3rem;
         background: var(--bg-base);
         border-radius: var(--radius-md);
         position: relative;
-        overflow: hidden;
+        overflow: visible;
       }
 
       .combobox-page__playground-result::before {
@@ -491,7 +491,7 @@ const pageStyles = css`
         .combobox-page__title { font-size: 1.75rem; }
         .combobox-page__preview { padding: 1.75rem; }
         .combobox-page__playground { grid-template-columns: 1fr; }
-        .combobox-page__playground-result { padding: 2rem; min-block-size: 120px; }
+        .combobox-page__playground-result { padding: 2rem; min-block-size: 300px; }
         .combobox-page__states-grid { grid-template-columns: 1fr; }
         .combobox-page__tiers { grid-template-columns: 1fr; }
         .combobox-page__section { padding: 1.25rem; }
@@ -1212,7 +1212,7 @@ export default function ComboBoxPage() {
             </div>
           </div>
 
-          {/* Premium (maps to Standard) */}
+          {/* Premium */}
           <div
             className={`combobox-page__tier-card${tier === 'premium' ? ' combobox-page__tier-card--active' : ''}`}
             onClick={() => setTier('premium')}
@@ -1222,13 +1222,13 @@ export default function ComboBoxPage() {
           >
             <div className="combobox-page__tier-header">
               <span className="combobox-page__tier-name">Premium</span>
-              <span className="combobox-page__tier-size">~4 KB</span>
+              <span className="combobox-page__tier-size">~3-5 KB</span>
             </div>
             <p className="combobox-page__tier-desc">
-              Uses Standard tier (no premium variant exists yet). Same full feature set with search, groups, and create-new.
+              Aurora glow effects, spring-scale animations, shimmer gradients, particle effects at motion level 3.
             </p>
             <div className="combobox-page__tier-import">
-              import {'{'} Combobox {'}'} from '@annondeveloper/ui-kit'
+              import {'{'} Combobox {'}'} from '@annondeveloper/ui-kit/premium'
             </div>
             <div className="combobox-page__tier-preview">
               <div style={{ inlineSize: '100%' }}>
