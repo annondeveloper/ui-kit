@@ -111,19 +111,34 @@ const timelineStyles = css`
         flex-shrink: 0;
         position: relative;
         z-index: 1;
+        animation: ui-severity-dot-pulse 2.5s ease-in-out infinite;
+      }
+
+      @keyframes ui-severity-dot-pulse {
+        0%, 100% { opacity: 1; box-shadow: 0 0 0 0 currentColor; }
+        50% { opacity: 0.8; box-shadow: 0 0 0 4px oklch(from currentColor l c h / 0.15); }
+      }
+
+      :scope[data-motion="0"] .ui-severity-timeline__dot { animation: none; }
+      @media (prefers-reduced-motion: reduce) {
+        .ui-severity-timeline__dot { animation: none; }
       }
 
       .ui-severity-timeline__dot[data-severity="info"] {
-        background: oklch(65% 0.2 270);
+        background: var(--status-info, oklch(65% 0.2 270));
+        color: var(--status-info, oklch(65% 0.2 270));
       }
       .ui-severity-timeline__dot[data-severity="warning"] {
-        background: oklch(80% 0.18 85);
+        background: var(--status-warning, oklch(80% 0.18 85));
+        color: var(--status-warning, oklch(80% 0.18 85));
       }
       .ui-severity-timeline__dot[data-severity="critical"] {
-        background: oklch(62% 0.22 25);
+        background: var(--status-critical, oklch(62% 0.22 25));
+        color: var(--status-critical, oklch(62% 0.22 25));
       }
       .ui-severity-timeline__dot[data-severity="ok"] {
-        background: oklch(72% 0.19 155);
+        background: var(--status-ok, oklch(72% 0.19 155));
+        color: var(--status-ok, oklch(72% 0.19 155));
       }
 
       /* Content */
