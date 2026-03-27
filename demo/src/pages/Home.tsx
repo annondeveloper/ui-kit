@@ -1148,7 +1148,7 @@ export default function Home() {
       </section>
 
       {/* ── Component Gallery ── */}
-      <LazySection height={800}><RevealSection className="home-section">
+      <Suspense fallback={null}><RevealSection className="home-section">
         <div className="home-section-header">
           <h2>All {totalComponents} Components</h2>
           <p>
@@ -1196,10 +1196,10 @@ export default function Home() {
             </Link>
           </div>
         ))}
-      </RevealSection></LazySection>
+      </RevealSection></Suspense>
 
       {/* ── Feature Highlights ── */}
-      <LazySection height={500}><RevealSection className="home-section">
+      <Suspense fallback={null}><RevealSection className="home-section">
         <div className="home-section-header">
           <h2>What makes this different</h2>
           <p>
@@ -1222,10 +1222,10 @@ export default function Home() {
             </StaggerItem>
           ))}
         </div>
-      </RevealSection></LazySection>
+      </RevealSection></Suspense>
 
       {/* ── Getting Started ── */}
-      <LazySection height={600}><RevealSection className="home-section">
+      <Suspense fallback={null}><RevealSection className="home-section">
         <div className="home-section-header">
           <h2>Getting Started</h2>
           <p>
@@ -1316,10 +1316,10 @@ export default function Home() {
             </BorderBeam>
           </StaggerItem>
         </div>
-      </RevealSection></LazySection>
+      </RevealSection></Suspense>
 
       {/* ── Live Dashboard Preview ── */}
-      <LazySection height={400}><RevealSection className="home-section">
+      <Suspense fallback={null}><RevealSection className="home-section">
         <div className="home-section-header">
           <h2>Built for real interfaces</h2>
           <p>
@@ -1379,10 +1379,10 @@ export default function Home() {
             </div>
           </Card>
         </BorderBeam>
-      </RevealSection></LazySection>
+      </RevealSection></Suspense>
 
       {/* ── Code Example ── */}
-      <LazySection height={300}><RevealSection className="home-section">
+      <Suspense fallback={null}><RevealSection className="home-section">
         <div className="home-section-header">
           <h2>Simple to use</h2>
           <p>Import what you need. Wrap in UIProvider. Ship.</p>
@@ -1398,10 +1398,10 @@ export default function Home() {
             />
           </Card>
         </div>
-      </RevealSection></LazySection>
+      </RevealSection></Suspense>
 
       {/* ── Footer ── */}
-      <LazySection height={100}><Divider spacing="lg" />
+      <Suspense fallback={null}><Divider spacing="lg" />
       <footer className="home-footer">
         <a href="https://github.com/annondeveloper/ui-kit" target="_blank" rel="noopener noreferrer">
           GitHub
@@ -1421,7 +1421,7 @@ export default function Home() {
         <div className="home-footer-built">
           Built with zero dependencies. Powered by Aurora Fluid design.
         </div>
-      </footer></LazySection>
+      </footer></Suspense>
     </div>
   )
 }

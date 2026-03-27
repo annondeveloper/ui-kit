@@ -32,9 +32,10 @@ const glowCardStyles = css`
         overflow: hidden;
         border-radius: var(--radius-lg, 0.75rem);
         background: var(--bg-surface, oklch(22% 0.02 270));
-        border: 1px solid var(--border-subtle, oklch(100% 0 0 / 0.08));
+        border: 1px solid var(--border-default, oklch(100% 0 0 / 0.08));
         padding: var(--space-md, 1rem);
-        transition: border-color 0.2s var(--ease-out, ease-out);
+        box-shadow: var(--shadow-sm, none);
+        transition: border-color 0.2s var(--ease-out, ease-out), box-shadow 0.2s;
       }
 
       :scope:hover {
