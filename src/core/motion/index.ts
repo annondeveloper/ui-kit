@@ -36,3 +36,15 @@ export type { SkeletonTransitionResult } from './use-skeleton-transition'
 
 export { useScrollScene } from './scroll-scene'
 export type { ScrollSceneConfig } from './scroll-scene'
+
+export { useViewTransition } from './use-view-transition'
+export type { ViewTransitionOptions, ViewTransitionResult } from './use-view-transition'
+
+export { getTransitionCSS } from './view-transition-presets'
+export type { TransitionPreset } from './view-transition-presets'
+
+export { Choreography, choreography } from './choreography'
+export type { ChoreographyStep, ChoreographyConfig } from './choreography'
+
+export { getChoreographyPreset } from './choreography-presets'
+export type { ChoreographyPreset } from './choreography-presets'

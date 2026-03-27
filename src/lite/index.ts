@@ -166,3 +166,4 @@ export { ConnectionTestPanel, type LiteConnectionTestPanelProps, type LiteTestSt
 export { PropertyList, type LitePropertyListProps, type LitePropertyItem } from './property-list'
 export { EntityCard, type LiteEntityCardProps } from './entity-card'
 export { ServiceStrip, type LiteServiceStripProps, type LiteServiceItem } from './service-strip'
+export { ContainerQuery, type LiteContainerQueryProps } from './container-query'
