@@ -4,6 +4,7 @@ import { PortStatusGrid as BasePortStatusGrid, type PortStatusGridProps } from '
 import { useMotionLevel } from '../core/motion/use-motion-level'
 import { css } from '../core/styles/css-tag'
 import { useStyles } from '../core/styles/use-styles'
+import { sharedPremiumCSS } from './shared-effects'
 
 const premiumPortStatusGridStyles = css`
   @layer premium {
@@ -11,6 +12,10 @@ const premiumPortStatusGridStyles = css`
       :scope {
         display: contents;
       }
+
+      /* Shared premium effects */
+      ${sharedPremiumCSS}
+
 
       /* Aurora glow per status */
       :scope .ui-port-status-grid__item[data-status="ok"] {

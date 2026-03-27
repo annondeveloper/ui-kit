@@ -5,6 +5,7 @@ import { BackgroundBoxes as BaseBackgroundBoxes, type BackgroundBoxesProps } fro
 import { useMotionLevel } from '../core/motion/use-motion-level'
 import { css } from '../core/styles/css-tag'
 import { useStyles } from '../core/styles/use-styles'
+import { sharedPremiumCSS } from './shared-effects'
 
 const premiumBackgroundBoxesStyles = css`
   @layer premium {
@@ -12,6 +13,10 @@ const premiumBackgroundBoxesStyles = css`
       :scope {
         position: relative;
       }
+
+      /* Shared premium effects */
+      ${sharedPremiumCSS}
+
 
       /* Aurora glow on hover for individual boxes */
       :scope .ui-background-boxes--box {

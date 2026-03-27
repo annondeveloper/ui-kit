@@ -4,6 +4,7 @@ import { StorageBar as BaseStorageBar, type StorageBarProps } from '../domain/st
 import { useMotionLevel } from '../core/motion/use-motion-level'
 import { css } from '../core/styles/css-tag'
 import { useStyles } from '../core/styles/use-styles'
+import { sharedPremiumCSS } from './shared-effects'
 
 const premiumStorageBarStyles = css`
   @layer premium {
@@ -11,6 +12,10 @@ const premiumStorageBarStyles = css`
       :scope {
         position: relative;
       }
+
+      /* Shared premium effects */
+      ${sharedPremiumCSS}
+
 
       /* Segment grow-in animation */
       :scope:not([data-motion="0"]) .ui-storage-bar__segment {

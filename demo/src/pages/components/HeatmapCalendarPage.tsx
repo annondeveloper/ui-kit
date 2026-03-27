@@ -989,7 +989,7 @@ export default function HeatmapCalendarPage() {
               <span className="heatmap-calendar-page__tier-size">~3-5 KB</span>
             </div>
             <p className="heatmap-calendar-page__tier-desc">
-              Aurora glow effects, spring-scale animations, shimmer gradients, particle effects at motion level 3.
+              Aurora glow on hover, shimmer fill on data cells, spring-scale tooltip entrance, and staggered cell entrance.
             </p>
             <div className="heatmap-calendar-page__tier-import">
               import {'{'} HeatmapCalendar {'}'} from '@annondeveloper/ui-kit/premium'

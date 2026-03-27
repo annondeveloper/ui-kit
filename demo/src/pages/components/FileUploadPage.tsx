@@ -1464,7 +1464,7 @@ export default function FileUploadPage() {
               <span className="file-upload-page__tier-size">~3-5 KB</span>
             </div>
             <p className="file-upload-page__tier-desc">
-              Aurora glow effects, spring-scale animations, shimmer gradients, particle effects at motion level 3.
+              Aurora glow on drag-over, spring-bounce on file add, and shimmer sweep across the dropzone.
             </p>
             <div className="file-upload-page__tier-import">
               import {'{'} FileUpload {'}'} from '@annondeveloper/ui-kit/premium'

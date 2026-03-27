@@ -6,6 +6,7 @@ import { useMotionLevel } from '../core/motion/use-motion-level'
 import { useEntrance } from '../core/motion/use-entrance'
 import { css } from '../core/styles/css-tag'
 import { useStyles } from '../core/styles/use-styles'
+import { sharedPremiumCSS } from './shared-effects'
 
 const premiumDensitySelectorStyles = css`
   @layer premium {
@@ -13,6 +14,10 @@ const premiumDensitySelectorStyles = css`
       :scope {
         position: relative;
       }
+
+      /* Shared premium effects */
+      ${sharedPremiumCSS}
+
       /* Glow pulse on segment change */
       :scope[data-glow="true"] .ui-density-selector__indicator {
         box-shadow: 0 0 16px oklch(65% 0.2 270 / 0.4);

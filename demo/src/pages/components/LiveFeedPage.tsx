@@ -1196,7 +1196,7 @@ export default function LiveFeedPage() {
               <span className="live-feed-page__tier-size">~3-5 KB</span>
             </div>
             <p className="live-feed-page__tier-desc">
-              Aurora glow effects, spring-scale animations, shimmer gradients, particle effects at motion level 3.
+              Spring-slide entrance for new items, aurora glow on the newest entry, and shimmer loading state.
             </p>
             <div className="live-feed-page__tier-import">
               import {'{'} LiveFeed {'}'} from '@annondeveloper/ui-kit/premium'

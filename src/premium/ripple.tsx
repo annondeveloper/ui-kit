@@ -4,6 +4,7 @@ import { Ripple as BaseRipple, type RippleProps } from '../domain/ripple'
 import { useMotionLevel } from '../core/motion/use-motion-level'
 import { css } from '../core/styles/css-tag'
 import { useStyles } from '../core/styles/use-styles'
+import { sharedPremiumCSS } from './shared-effects'
 
 const premiumRippleStyles = css`
   @layer premium {
@@ -11,6 +12,10 @@ const premiumRippleStyles = css`
       :scope {
         display: contents;
       }
+
+      /* Shared premium effects */
+      ${sharedPremiumCSS}
+
 
       /* Aurora-colored ripple circles */
       :scope .ui-ripple--circle {

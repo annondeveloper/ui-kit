@@ -1224,7 +1224,7 @@ export default function DiffViewerPage() {
               <span className="diff-viewer-page__tier-size">~3-5 KB</span>
             </div>
             <p className="diff-viewer-page__tier-desc">
-              Aurora glow effects, spring-scale animations, shimmer gradients, particle effects at motion level 3.
+              Aurora glow on changed lines, shimmer on additions, spring-slide staggered line entrance, and fold toggle hover glow.
             </p>
             <div className="diff-viewer-page__tier-import">
               import {'{'} DiffViewer {'}'} from '@annondeveloper/ui-kit/premium'

@@ -5,6 +5,7 @@ import { RadioGroup as BaseRadioGroup, type RadioGroupProps } from '../component
 import { useMotionLevel } from '../core/motion/use-motion-level'
 import { css } from '../core/styles/css-tag'
 import { useStyles } from '../core/styles/use-styles'
+import { sharedPremiumCSS } from './shared-effects'
 
 
 // ─── Premium styles ──────────────────────────────────────────────────────────
@@ -15,6 +16,10 @@ const premiumRadioGroupStyles = css`
       :scope {
         display: contents;
       }
+
+      /* Shared premium effects */
+      ${sharedPremiumCSS}
+
 
       /* ── Spring-scale on selection ── */
       :scope .ui-radio-group__input:checked ~ .ui-radio-group__circle {

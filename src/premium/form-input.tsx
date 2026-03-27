@@ -5,14 +5,20 @@ import { FormInput as BaseFormInput, type FormInputProps } from '../components/f
 import { useMotionLevel } from '../core/motion/use-motion-level'
 import { css } from '../core/styles/css-tag'
 import { useStyles } from '../core/styles/use-styles'
+import { sharedPremiumCSS } from './shared-effects'
 
 const premiumFormInputStyles = css`
   @layer premium {
     @scope (.ui-premium-form-input) {
       :scope {
+        position: relative;
         display: flex;
         flex-direction: column;
       }
+
+      /* Shared premium effects */
+      ${sharedPremiumCSS}
+
 
       /* Aurora glow focus ring */
       :scope .ui-form-input__field:focus {

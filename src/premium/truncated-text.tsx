@@ -5,6 +5,7 @@ import { TruncatedText as BaseTruncatedText, type TruncatedTextProps } from '../
 import { useMotionLevel } from '../core/motion/use-motion-level'
 import { css } from '../core/styles/css-tag'
 import { useStyles } from '../core/styles/use-styles'
+import { sharedPremiumCSS } from './shared-effects'
 
 const premiumTruncatedStyles = css`
   @layer premium {
@@ -13,6 +14,10 @@ const premiumTruncatedStyles = css`
         position: relative;
         display: inline-flex;
       }
+
+      /* Shared premium effects */
+      ${sharedPremiumCSS}
+
 
       /* Spring-expand on show more/less toggle */
       :scope:not([data-motion="0"]) .ui-truncated-text__content {

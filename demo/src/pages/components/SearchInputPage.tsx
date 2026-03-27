@@ -1006,7 +1006,7 @@ export default function SearchInputPage() {
               <span className="search-input-page__tier-name">Premium</span>
               <span className="search-input-page__tier-size">~3-5 KB</span>
             </div>
-            <p className="search-input-page__tier-desc">Aurora glow effects, spring-scale animations, shimmer gradients, particle effects at motion level 3.</p>
+            <p className="search-input-page__tier-desc">Aurora glow focus ring, spring-bounce clear button, and shimmer loading state.</p>
             <div className="search-input-page__tier-import">import {'{'} SearchInput {'}'} from '@annondeveloper/ui-kit/premium'</div>
             <div className="search-input-page__tier-preview">
               <div style={{ inlineSize: '100%' }}>

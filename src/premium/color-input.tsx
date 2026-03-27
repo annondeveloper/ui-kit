@@ -5,6 +5,7 @@ import { ColorInput as BaseColorInput, type ColorInputProps } from '../component
 import { useMotionLevel } from '../core/motion/use-motion-level'
 import { css } from '../core/styles/css-tag'
 import { useStyles } from '../core/styles/use-styles'
+import { sharedPremiumCSS } from './shared-effects'
 
 const premiumColorInputStyles = css`
   @layer premium {
@@ -12,6 +13,10 @@ const premiumColorInputStyles = css`
       :scope {
         display: contents;
       }
+
+      /* Shared premium effects */
+      ${sharedPremiumCSS}
+
 
       /* Aurora glow on focus for trigger */
       :scope .ui-color-input__trigger:focus-visible {

@@ -1407,7 +1407,7 @@ export default function FormInputPage() {
               <span className="form-input-page__tier-size">~3-5 KB</span>
             </div>
             <p className="form-input-page__tier-desc">
-              Aurora glow effects, spring-scale animations, shimmer gradients, particle effects at motion level 3.
+              Aurora glow focus ring, spring-shake on validation error, and shimmer sweep on valid focus.
             </p>
             <div className="form-input-page__tier-import">
               import {'{'} FormInput {'}'} from '@annondeveloper/ui-kit/premium'

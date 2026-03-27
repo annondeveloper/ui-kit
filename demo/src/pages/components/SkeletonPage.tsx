@@ -1371,7 +1371,7 @@ export default function SkeletonPage() {
               <span className={`${P}tier-size`}>~3-5 KB</span>
             </div>
             <p className={`${P}tier-desc`}>
-              Aurora glow effects, spring-scale animations, shimmer gradients, particle effects at motion level 3.
+              Aurora brand-tinted shimmer gradient, ambient glow on skeleton blocks, and spring-fade transition to content.
             </p>
             <div className={`${P}tier-import`}>
               import {'{'} Skeleton {'}'} from '@annondeveloper/ui-kit/premium'

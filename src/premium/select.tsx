@@ -5,6 +5,7 @@ import { Select as BaseSelect, type SelectProps } from '../components/select'
 import { useMotionLevel } from '../core/motion/use-motion-level'
 import { css } from '../core/styles/css-tag'
 import { useStyles } from '../core/styles/use-styles'
+import { sharedPremiumCSS } from './shared-effects'
 
 const premiumSelectStyles = css`
   @layer premium {
@@ -12,6 +13,10 @@ const premiumSelectStyles = css`
       :scope {
         display: contents;
       }
+
+      /* Shared premium effects */
+      ${sharedPremiumCSS}
+
 
       /* Aurora glow on trigger when focused */
       :scope .ui-select__trigger:focus-visible {

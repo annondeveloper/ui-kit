@@ -5,6 +5,7 @@ import { Slider as BaseSlider, type SliderProps } from '../components/slider'
 import { useMotionLevel } from '../core/motion/use-motion-level'
 import { css } from '../core/styles/css-tag'
 import { useStyles } from '../core/styles/use-styles'
+import { sharedPremiumCSS } from './shared-effects'
 
 
 // ─── Premium styles ──────────────────────────────────────────────────────────
@@ -15,6 +16,10 @@ const premiumSliderStyles = css`
       :scope {
         display: contents;
       }
+
+      /* Shared premium effects */
+      ${sharedPremiumCSS}
+
 
       /* ── Aurora glow thumb — WebKit ── */
       :scope .ui-slider__input::-webkit-slider-thumb {

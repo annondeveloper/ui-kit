@@ -4,13 +4,19 @@ import { RealtimeValue as BaseRealtimeValue, type RealtimeValueProps } from '../
 import { useMotionLevel } from '../core/motion/use-motion-level'
 import { css } from '../core/styles/css-tag'
 import { useStyles } from '../core/styles/use-styles'
+import { sharedPremiumCSS } from './shared-effects'
 
 const premiumRealtimeValueStyles = css`
   @layer premium {
     @scope (.ui-premium-realtime-value) {
       :scope {
+        position: relative;
         display: inline-flex;
       }
+
+      /* Shared premium effects */
+      ${sharedPremiumCSS}
+
 
       /* Aurora glow on flash-up */
       :scope .ui-realtime-value[data-flash="up"] {

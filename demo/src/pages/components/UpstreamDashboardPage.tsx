@@ -774,7 +774,7 @@ function generateReactCode(
   if (utilizationDisplay !== 'bar') props.push(`  utilizationDisplay="${utilizationDisplay}"`)
   if (motion !== 3 && tier !== 'lite') props.push(`  motion={${motion}}`)
   if (tier === 'premium') {
-    props.push('  // Premium: aurora glow, spring animations, particle effects')
+    props.push('  // Premium: glass morphism cards, aurora glow on status, spring-scale entrance')
   }
   props.push('  onLinkClick={(link) => console.log(link)}')
 
@@ -1308,9 +1308,7 @@ export default function UpstreamDashboardPage() {
               <span className="ud-page__tier-size">~7 KB</span>
             </div>
             <p className="ud-page__tier-desc">
-              Everything in Standard plus aurora glow effects on cards, spring
-              animations on data changes, particle effects on threshold breaches,
-              and ambient glow pulsing.
+              Everything in Standard plus glass morphism cards, aurora glow on status indicators, spring-pulse on status dot, and spring-scale card entrance animation.
             </p>
             <div className="ud-page__tier-import">
               {IMPORT_STRINGS.premium}

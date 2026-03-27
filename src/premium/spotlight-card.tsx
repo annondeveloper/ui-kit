@@ -4,6 +4,7 @@ import { type SpotlightCardProps, SpotlightCard as BaseSpotlightCard } from '../
 import { useMotionLevel } from '../core/motion/use-motion-level'
 import { css } from '../core/styles/css-tag'
 import { useStyles } from '../core/styles/use-styles'
+import { sharedPremiumCSS } from './shared-effects'
 
 const premiumSpotlightCardStyles = css`
   @layer premium {
@@ -11,6 +12,10 @@ const premiumSpotlightCardStyles = css`
       :scope {
         position: relative;
       }
+
+      /* Shared premium effects */
+      ${sharedPremiumCSS}
+
 
       /* Enhanced spotlight radius */
       :scope .ui-spotlight-card {

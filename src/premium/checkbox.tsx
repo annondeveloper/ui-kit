@@ -5,6 +5,7 @@ import { Checkbox as BaseCheckbox, type CheckboxProps } from '../components/chec
 import { useMotionLevel } from '../core/motion/use-motion-level'
 import { css } from '../core/styles/css-tag'
 import { useStyles } from '../core/styles/use-styles'
+import { sharedPremiumCSS } from './shared-effects'
 
 
 // ─── Premium styles ──────────────────────────────────────────────────────────
@@ -15,6 +16,10 @@ const premiumCheckboxStyles = css`
       :scope {
         display: contents;
       }
+
+      /* Shared premium effects */
+      ${sharedPremiumCSS}
+
 
       /* ── Spring-scale check animation ── */
       :scope .ui-checkbox__input:checked ~ .ui-checkbox__box {

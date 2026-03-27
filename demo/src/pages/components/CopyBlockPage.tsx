@@ -1251,7 +1251,7 @@ export default function CopyBlockPage() {
               <span className="copy-block-page__tier-size">~3-5 KB</span>
             </div>
             <p className="copy-block-page__tier-desc">
-              Aurora glow effects, spring-scale animations, shimmer gradients, particle effects at motion level 3.
+              Aurora glow on copy button and container hover, spring-scale click feedback, and shimmer on highlighted lines.
             </p>
             <div className="copy-block-page__tier-import">
               import {'{'} CopyBlock {'}'} from '@annondeveloper/ui-kit/premium'

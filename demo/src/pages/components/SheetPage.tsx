@@ -1427,7 +1427,7 @@ export default function SheetPage() {
               <span className="sheet-page__tier-size">~3-5 KB</span>
             </div>
             <p className="sheet-page__tier-desc">
-              Aurora glow effects, spring-scale animations, shimmer gradients, particle effects at motion level 3.
+              Spring-slide entrance with overshoot, aurora glow edge on open, and glass morphism backdrop blur.
             </p>
             <div className="sheet-page__tier-import">
               import {'{'} Sheet {'}'} from '@annondeveloper/ui-kit/premium'

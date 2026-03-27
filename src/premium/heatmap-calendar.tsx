@@ -4,6 +4,7 @@ import { HeatmapCalendar as BaseHeatmapCalendar, type HeatmapCalendarProps } fro
 import { useMotionLevel } from '../core/motion/use-motion-level'
 import { css } from '../core/styles/css-tag'
 import { useStyles } from '../core/styles/use-styles'
+import { sharedPremiumCSS } from './shared-effects'
 
 const premiumHeatmapStyles = css`
   @layer premium {
@@ -11,6 +12,10 @@ const premiumHeatmapStyles = css`
       :scope {
         position: relative;
       }
+
+      /* Shared premium effects */
+      ${sharedPremiumCSS}
+
 
       /* Aurora glow on hover cell */
       :scope .ui-heatmap-calendar__cell:hover {

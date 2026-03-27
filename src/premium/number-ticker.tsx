@@ -4,13 +4,19 @@ import { NumberTicker as BaseNumberTicker, type NumberTickerProps } from '../dom
 import { useMotionLevel } from '../core/motion/use-motion-level'
 import { css } from '../core/styles/css-tag'
 import { useStyles } from '../core/styles/use-styles'
+import { sharedPremiumCSS } from './shared-effects'
 
 const premiumNumberTickerStyles = css`
   @layer premium {
     @scope (.ui-premium-number-ticker) {
       :scope {
+        position: relative;
         display: inline-flex;
       }
+
+      /* Shared premium effects */
+      ${sharedPremiumCSS}
+
 
       /* Aurora glow on the ticker */
       :scope .ui-number-ticker {

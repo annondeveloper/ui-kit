@@ -5,6 +5,7 @@ import { Skeleton as BaseSkeleton, type SkeletonProps } from '../components/skel
 import { useMotionLevel } from '../core/motion/use-motion-level'
 import { css } from '../core/styles/css-tag'
 import { useStyles } from '../core/styles/use-styles'
+import { sharedPremiumCSS } from './shared-effects'
 
 
 // ─── Premium styles ──────────────────────────────────────────────────────────
@@ -15,6 +16,10 @@ const premiumSkeletonStyles = css`
       :scope {
         display: contents;
       }
+
+      /* Shared premium effects */
+      ${sharedPremiumCSS}
+
 
       /* ── Aurora brand-tinted shimmer gradient ── */
       :scope .ui-skeleton::after,

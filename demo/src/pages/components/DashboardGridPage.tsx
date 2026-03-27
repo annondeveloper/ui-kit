@@ -1154,7 +1154,7 @@ export default function DashboardGridPage() {
               <span className="dashboard-grid-page__tier-size">~3-5 KB</span>
             </div>
             <p className="dashboard-grid-page__tier-desc">
-              Aurora glow effects, spring-scale animations, shimmer gradients, particle effects at motion level 3.
+              Glass morphism cells, aurora glow on drag, spring-snap positioning, and staggered entrance animation.
             </p>
             <div className="dashboard-grid-page__tier-import">
               import {'{'} DashboardGrid {'}'} from '@annondeveloper/ui-kit/premium'

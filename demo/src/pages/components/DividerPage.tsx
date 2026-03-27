@@ -1340,7 +1340,7 @@ export default function DividerPage() {
               <span className={`${P}tier-size`}>~3-5 KB</span>
             </div>
             <p className={`${P}tier-desc`}>
-              Aurora glow effects, spring-scale animations, shimmer gradients, particle effects at motion level 3.
+              Shimmer gradient sweep along the divider line, and aurora glow on the label text.
             </p>
             <div className={`${P}tier-import`}>
               import {'{'} Divider {'}'} from '@annondeveloper/ui-kit/premium'

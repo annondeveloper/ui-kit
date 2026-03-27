@@ -4,6 +4,7 @@ import { ResponsiveCard as BaseResponsiveCard, type ResponsiveCardProps } from '
 import { useMotionLevel } from '../core/motion/use-motion-level'
 import { css } from '../core/styles/css-tag'
 import { useStyles } from '../core/styles/use-styles'
+import { sharedPremiumCSS } from './shared-effects'
 
 const premiumResponsiveCardStyles = css`
   @layer premium {
@@ -11,6 +12,10 @@ const premiumResponsiveCardStyles = css`
       :scope {
         display: contents;
       }
+
+      /* Shared premium effects */
+      ${sharedPremiumCSS}
+
 
       /* Enhanced aurora glow on card */
       :scope .ui-responsive-card {

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useMemo, useRef, useEffect } from 'react'
+import { useState, useMemo, useRef, useEffect, useCallback } from 'react'
 import { css } from '@ui/core/styles/css-tag'
 import { useStyles } from '@ui/core/styles/use-styles'
 import { Pagination } from '@ui/components/pagination'
@@ -1358,7 +1358,7 @@ export default function PaginationPage() {
               <span className={`${P}tier-size`}>~3-5 KB</span>
             </div>
             <p className={`${P}tier-desc`}>
-              Aurora glow effects, spring-scale animations, shimmer gradients, particle effects at motion level 3.
+              Aurora glow on current page, spring-scale page pop animation, shimmer on page change, and hover glow.
             </p>
             <div className={`${P}tier-import`}>
               import {'{'} Pagination {'}'} from '@annondeveloper/ui-kit/premium'

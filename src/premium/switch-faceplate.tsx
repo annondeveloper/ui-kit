@@ -4,6 +4,7 @@ import { type SwitchFaceplateProps, SwitchFaceplate as BaseSwitchFaceplate } fro
 import { useMotionLevel } from '../core/motion/use-motion-level'
 import { css } from '../core/styles/css-tag'
 import { useStyles } from '../core/styles/use-styles'
+import { sharedPremiumCSS } from './shared-effects'
 
 const premiumSwitchFaceplateStyles = css`
   @layer premium {
@@ -11,6 +12,10 @@ const premiumSwitchFaceplateStyles = css`
       :scope {
         display: contents;
       }
+
+      /* Shared premium effects */
+      ${sharedPremiumCSS}
+
 
       /* Aurora glow per status */
       :scope .ui-switch-faceplate__port[data-status="up"] {

@@ -5,6 +5,7 @@ import { Dialog as BaseDialog, type DialogProps } from '../components/dialog'
 import { useMotionLevel } from '../core/motion/use-motion-level'
 import { css } from '../core/styles/css-tag'
 import { useStyles } from '../core/styles/use-styles'
+import { sharedPremiumCSS } from './shared-effects'
 
 const premiumDialogStyles = css`
   @layer premium {
@@ -12,6 +13,10 @@ const premiumDialogStyles = css`
       :scope {
         display: contents;
       }
+
+      /* Shared premium effects */
+      ${sharedPremiumCSS}
+
 
       /* Spring scale entrance — dramatic overshoot */
       :scope dialog[open] {

@@ -4,6 +4,7 @@ import { HeroHighlight as BaseHeroHighlight, Highlight as BaseHighlight, type He
 import { useMotionLevel } from '../core/motion/use-motion-level'
 import { css } from '../core/styles/css-tag'
 import { useStyles } from '../core/styles/use-styles'
+import { sharedPremiumCSS } from './shared-effects'
 
 const premiumHeroStyles = css`
   @layer premium {
@@ -11,6 +12,10 @@ const premiumHeroStyles = css`
       :scope {
         position: relative;
       }
+
+      /* Shared premium effects */
+      ${sharedPremiumCSS}
+
 
       /* Enhanced gradient with aurora tones */
       :scope .ui-hero-highlight {

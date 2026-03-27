@@ -1125,7 +1125,7 @@ export default function OtpInputPage() {
               <span className="otp-input-page__tier-size">~3-5 KB</span>
             </div>
             <p className="otp-input-page__tier-desc">
-              Aurora glow effects, spring-scale animations, shimmer gradients, particle effects at motion level 3.
+              Aurora glow focus ring, spring-scale pop on digit entry, and celebration burst on completion.
             </p>
             <div className="otp-input-page__tier-import">
               import {'{'} OtpInput {'}'} from '@annondeveloper/ui-kit/premium'

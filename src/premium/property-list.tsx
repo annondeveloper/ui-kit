@@ -6,6 +6,7 @@ import { useMotionLevel } from '../core/motion/use-motion-level'
 import { useEntrance } from '../core/motion/use-entrance'
 import { css } from '../core/styles/css-tag'
 import { useStyles } from '../core/styles/use-styles'
+import { sharedPremiumCSS } from './shared-effects'
 
 const premiumPropertyListStyles = css`
   @layer premium {
@@ -13,6 +14,10 @@ const premiumPropertyListStyles = css`
       :scope {
         position: relative;
       }
+
+      /* Shared premium effects */
+      ${sharedPremiumCSS}
+
       /* Shimmer highlight on row hover */
       :scope .ui-property-list__row {
         position: relative;

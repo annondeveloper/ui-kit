@@ -1028,7 +1028,7 @@ export default function InlineEditPage() {
               <span className="inline-edit-page__tier-size">~3-5 KB</span>
             </div>
             <p className="inline-edit-page__tier-desc">
-              Aurora glow effects, spring-scale animations, shimmer gradients, particle effects at motion level 3.
+              Spring-scale on edit mode enter, aurora glow border on the edit field, and shimmer sweep on save.
             </p>
             <div className="inline-edit-page__tier-import">
               import {'{'} InlineEdit {'}'} from '@annondeveloper/ui-kit/premium'

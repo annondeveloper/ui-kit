@@ -4,6 +4,7 @@ import { Sheet as BaseSheet, type SheetProps } from '../components/sheet'
 import { useMotionLevel } from '../core/motion/use-motion-level'
 import { css } from '../core/styles/css-tag'
 import { useStyles } from '../core/styles/use-styles'
+import { sharedPremiumCSS } from './shared-effects'
 
 
 // ─── Premium styles ──────────────────────────────────────────────────────────
@@ -14,6 +15,10 @@ const premiumSheetStyles = css`
       :scope {
         display: contents;
       }
+
+      /* Shared premium effects */
+      ${sharedPremiumCSS}
+
 
       /* ── Spring-slide entrance with overshoot ── */
       :scope dialog:not([data-motion="0"]) {

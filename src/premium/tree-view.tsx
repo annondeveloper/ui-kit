@@ -5,6 +5,7 @@ import { TreeView as BaseTreeView, type TreeViewProps } from '../domain/tree-vie
 import { useMotionLevel } from '../core/motion/use-motion-level'
 import { css } from '../core/styles/css-tag'
 import { useStyles } from '../core/styles/use-styles'
+import { sharedPremiumCSS } from './shared-effects'
 
 const premiumTreeStyles = css`
   @layer premium {
@@ -12,6 +13,10 @@ const premiumTreeStyles = css`
       :scope {
         position: relative;
       }
+
+      /* Shared premium effects */
+      ${sharedPremiumCSS}
+
 
       /* Spring expand/collapse on group toggle */
       :scope:not([data-motion="0"]) .ui-tree-view__group:not([data-motion="0"]) {

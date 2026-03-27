@@ -5,6 +5,7 @@ import { ThresholdGauge as BaseThresholdGauge, type ThresholdGaugeProps } from '
 import { useMotionLevel } from '../core/motion/use-motion-level'
 import { css } from '../core/styles/css-tag'
 import { useStyles } from '../core/styles/use-styles'
+import { sharedPremiumCSS } from './shared-effects'
 
 const premiumGaugeStyles = css`
   @layer premium {
@@ -13,6 +14,10 @@ const premiumGaugeStyles = css`
         position: relative;
         display: inline-flex;
       }
+
+      /* Shared premium effects */
+      ${sharedPremiumCSS}
+
 
       /* Aurora glow per zone status */
       :scope[data-status="ok"] .ui-threshold-gauge {

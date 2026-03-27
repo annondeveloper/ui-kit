@@ -4,6 +4,7 @@ import { DiskMountBar as BaseDiskMountBar, type DiskMountBarProps } from '../dom
 import { useMotionLevel } from '../core/motion/use-motion-level'
 import { css } from '../core/styles/css-tag'
 import { useStyles } from '../core/styles/use-styles'
+import { sharedPremiumCSS } from './shared-effects'
 
 const premiumDiskMountBarStyles = css`
   @layer premium {
@@ -11,6 +12,10 @@ const premiumDiskMountBarStyles = css`
       :scope {
         position: relative;
       }
+
+      /* Shared premium effects */
+      ${sharedPremiumCSS}
+
 
       /* Fill bar grow-in animation */
       :scope:not([data-motion="0"]) .ui-disk-mount-bar__fill {

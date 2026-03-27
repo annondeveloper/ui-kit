@@ -1332,7 +1332,7 @@ export default function AnimatedCounterPage() {
               <span className="animated-counter-page__tier-size">~3-5 KB</span>
             </div>
             <p className="animated-counter-page__tier-desc">
-              Aurora glow effects, spring-scale animations, shimmer gradients, particle effects at motion level 3.
+              Spring-scale entrance, aurora glow on value change, and shimmer sweep across digits.
             </p>
             <div className="animated-counter-page__tier-import">
               import {'{'} AnimatedCounter {'}'} from '@annondeveloper/ui-kit/premium'

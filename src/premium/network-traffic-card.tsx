@@ -5,6 +5,7 @@ import { NetworkTrafficCard as BaseNetworkTrafficCard, type NetworkTrafficCardPr
 import { useMotionLevel } from '../core/motion/use-motion-level'
 import { css } from '../core/styles/css-tag'
 import { useStyles } from '../core/styles/use-styles'
+import { sharedPremiumCSS } from './shared-effects'
 
 const premiumTrafficStyles = css`
   @layer premium {
@@ -12,6 +13,10 @@ const premiumTrafficStyles = css`
       :scope {
         display: contents;
       }
+
+      /* Shared premium effects */
+      ${sharedPremiumCSS}
+
 
       /* Aurora glow per status */
       :scope .ui-network-traffic-card[data-status="ok"] {

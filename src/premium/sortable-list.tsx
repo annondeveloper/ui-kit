@@ -4,6 +4,7 @@ import { type SortableListProps, SortableList as BaseSortableList } from '../dom
 import { useMotionLevel } from '../core/motion/use-motion-level'
 import { css } from '../core/styles/css-tag'
 import { useStyles } from '../core/styles/use-styles'
+import { sharedPremiumCSS } from './shared-effects'
 
 const premiumSortableListStyles = css`
   @layer premium {
@@ -11,6 +12,10 @@ const premiumSortableListStyles = css`
       :scope {
         position: relative;
       }
+
+      /* Shared premium effects */
+      ${sharedPremiumCSS}
+
 
       /* Spring-snap on drop */
       :scope:not([data-motion="0"]) .ui-sortable-list__item {

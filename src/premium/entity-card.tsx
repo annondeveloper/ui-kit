@@ -6,6 +6,7 @@ import { useMotionLevel } from '../core/motion/use-motion-level'
 import { useEntrance } from '../core/motion/use-entrance'
 import { css } from '../core/styles/css-tag'
 import { useStyles } from '../core/styles/use-styles'
+import { sharedPremiumCSS } from './shared-effects'
 
 const premiumEntityCardStyles = css`
   @layer premium {
@@ -13,6 +14,10 @@ const premiumEntityCardStyles = css`
       :scope {
         position: relative;
       }
+
+      /* Shared premium effects */
+      ${sharedPremiumCSS}
+
       /* Aurora border glow on hover */
       :scope:not([data-motion="0"])::after {
         content: '';

@@ -1271,7 +1271,7 @@ export default function LinkPage() {
               <span className="link-page__tier-size">~3-5 KB</span>
             </div>
             <p className="link-page__tier-desc">
-              Aurora glow effects, spring-scale animations, shimmer gradients, particle effects at motion level 3.
+              Aurora underline glow on hover, spring-slide underline animation, and shimmer text effect.
             </p>
             <div className="link-page__tier-import">
               import {'{'} Link {'}'} from '@annondeveloper/ui-kit/premium'

@@ -4,6 +4,7 @@ import { GlowCard as BaseGlowCard, type GlowCardProps } from '../domain/glow-car
 import { useMotionLevel } from '../core/motion/use-motion-level'
 import { css } from '../core/styles/css-tag'
 import { useStyles } from '../core/styles/use-styles'
+import { sharedPremiumCSS } from './shared-effects'
 
 const premiumGlowCardStyles = css`
   @layer premium {
@@ -11,6 +12,10 @@ const premiumGlowCardStyles = css`
       :scope {
         position: relative;
       }
+
+      /* Shared premium effects */
+      ${sharedPremiumCSS}
+
 
       /* Multi-layer glow enhancement */
       :scope .ui-glow-card {

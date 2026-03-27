@@ -5,6 +5,7 @@ import { ConfidenceBar as BaseConfidenceBar, type ConfidenceBarProps } from '../
 import { useMotionLevel } from '../core/motion/use-motion-level'
 import { css } from '../core/styles/css-tag'
 import { useStyles } from '../core/styles/use-styles'
+import { sharedPremiumCSS } from './shared-effects'
 
 const premiumConfidenceBarStyles = css`
   @layer premium {
@@ -12,6 +13,10 @@ const premiumConfidenceBarStyles = css`
       :scope {
         position: relative;
       }
+
+      /* Shared premium effects */
+      ${sharedPremiumCSS}
+
 
       /* Shimmer on filled segments */
       :scope:not([data-motion="0"]) .ui-confidence-bar__fill {

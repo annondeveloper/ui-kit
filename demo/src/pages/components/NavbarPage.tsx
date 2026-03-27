@@ -1517,7 +1517,7 @@ export default function NavbarPage() {
               <span className="navbar-page__tier-size">~3-5 KB</span>
             </div>
             <p className="navbar-page__tier-desc">
-              Aurora glow effects, spring-scale animations, shimmer gradients, particle effects at motion level 3.
+              Glass morphism surface, aurora glow on active items, spring hover transitions, and slide entrance animation.
             </p>
             <div className="navbar-page__tier-import">
               import {'{'} Navbar {'}'} from '@annondeveloper/ui-kit/premium'

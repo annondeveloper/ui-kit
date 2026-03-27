@@ -5,6 +5,7 @@ import { PipelineStage as BasePipelineStage, type PipelineStageProps } from '../
 import { useMotionLevel } from '../core/motion/use-motion-level'
 import { css } from '../core/styles/css-tag'
 import { useStyles } from '../core/styles/use-styles'
+import { sharedPremiumCSS } from './shared-effects'
 
 const premiumPipelineStyles = css`
   @layer premium {
@@ -12,6 +13,10 @@ const premiumPipelineStyles = css`
       :scope {
         display: contents;
       }
+
+      /* Shared premium effects */
+      ${sharedPremiumCSS}
+
 
       /* Aurora glow on active/running stage */
       :scope .ui-pipeline-stage__indicator[data-status="running"] {

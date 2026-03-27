@@ -1457,7 +1457,7 @@ export default function SidebarPage() {
               <span className="sidebar-page__tier-size">~3-5 KB</span>
             </div>
             <p className="sidebar-page__tier-desc">
-              Aurora glow effects, spring-scale animations, shimmer gradients, particle effects at motion level 3.
+              Glass morphism background, aurora glow on active item, spring collapse/expand animation, and glass toggle button.
             </p>
             <div className="sidebar-page__tier-import">
               import {'{'} Sidebar {'}'} from '@annondeveloper/ui-kit/premium'

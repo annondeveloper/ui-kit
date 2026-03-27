@@ -1362,7 +1362,7 @@ export default function TypographyPage() {
               <span className="typography-page__tier-size">~3-5 KB</span>
             </div>
             <p className="typography-page__tier-desc">
-              Aurora glow effects, spring-scale animations, shimmer gradients, particle effects at motion level 3.
+              Shimmer gradient text on headings, aurora glow on code variant, and spring-fade entrance animation.
             </p>
             <div className="typography-page__tier-import">
               import {'{'} Typography {'}'} from '@annondeveloper/ui-kit/premium'

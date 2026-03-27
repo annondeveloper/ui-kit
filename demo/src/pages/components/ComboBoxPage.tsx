@@ -1228,7 +1228,7 @@ export default function ComboBoxPage() {
               <span className="combobox-page__tier-size">~3-5 KB</span>
             </div>
             <p className="combobox-page__tier-desc">
-              Aurora glow effects, spring-scale animations, shimmer gradients, particle effects at motion level 3.
+              Aurora glow on focus, spring-animated dropdown entrance, and shimmer on selected option.
             </p>
             <div className="combobox-page__tier-import">
               import {'{'} Combobox {'}'} from '@annondeveloper/ui-kit/premium'

@@ -1374,7 +1374,7 @@ export default function DropdownMenuPage() {
               <span className="dropdown-menu-page__tier-size">~3-5 KB</span>
             </div>
             <p className="dropdown-menu-page__tier-desc">
-              Aurora glow effects, spring-scale animations, shimmer gradients, particle effects at motion level 3.
+              Spring-scale panel entrance, aurora glow on active item, and shimmer gradient on hover.
             </p>
             <div className="dropdown-menu-page__tier-import">
               import {'{'} DropdownMenu {'}'} from '@annondeveloper/ui-kit/premium'

@@ -5,6 +5,7 @@ import { Tabs as BaseTabs, TabPanel, type TabsProps, type TabPanelProps } from '
 import { useMotionLevel } from '../core/motion/use-motion-level'
 import { css } from '../core/styles/css-tag'
 import { useStyles } from '../core/styles/use-styles'
+import { sharedPremiumCSS } from './shared-effects'
 
 const premiumTabsStyles = css`
   @layer premium {
@@ -12,6 +13,10 @@ const premiumTabsStyles = css`
       :scope {
         position: relative;
       }
+
+      /* Shared premium effects */
+      ${sharedPremiumCSS}
+
       /* Morphing underline indicator */
       .ui-premium-tabs__indicator {
         position: absolute;

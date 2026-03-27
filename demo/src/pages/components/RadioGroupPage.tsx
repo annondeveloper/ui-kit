@@ -1392,7 +1392,7 @@ export default function RadioGroupPage() {
               <span className="radio-group-page__tier-size">~3-5 KB</span>
             </div>
             <p className="radio-group-page__tier-desc">
-              Aurora glow effects, spring-scale animations, shimmer gradients, particle effects at motion level 3.
+              Spring-scale pop on selection, aurora glow on checked radio, and shimmer on the checked dot indicator.
             </p>
             <div className="radio-group-page__tier-import">
               import {'{'} RadioGroup {'}'} from '@annondeveloper/ui-kit/premium'

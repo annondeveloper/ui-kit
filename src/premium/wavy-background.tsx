@@ -5,6 +5,7 @@ import { WavyBackground as BaseWavyBackground, type WavyBackgroundProps } from '
 import { useMotionLevel } from '../core/motion/use-motion-level'
 import { css } from '../core/styles/css-tag'
 import { useStyles } from '../core/styles/use-styles'
+import { sharedPremiumCSS } from './shared-effects'
 
 const premiumWavyBackgroundStyles = css`
   @layer premium {
@@ -12,6 +13,10 @@ const premiumWavyBackgroundStyles = css`
       :scope {
         position: relative;
       }
+
+      /* Shared premium effects */
+      ${sharedPremiumCSS}
+
 
       /* Enhanced aurora wave colors — multi-layer glow */
       :scope .ui-wavy-background--wave:nth-child(1) {

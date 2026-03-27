@@ -5,6 +5,7 @@ import { Card3D as BaseCard3D, type Card3DProps } from '../domain/card-3d'
 import { useMotionLevel } from '../core/motion/use-motion-level'
 import { css } from '../core/styles/css-tag'
 import { useStyles } from '../core/styles/use-styles'
+import { sharedPremiumCSS } from './shared-effects'
 
 const premiumCard3DStyles = css`
   @layer premium {
@@ -12,6 +13,10 @@ const premiumCard3DStyles = css`
       :scope {
         position: relative;
       }
+
+      /* Shared premium effects */
+      ${sharedPremiumCSS}
+
 
       /* Enhanced glare overlay */
       :scope .ui-card-3d--glare {

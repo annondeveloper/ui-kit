@@ -1410,7 +1410,7 @@ export default function FilterPillPage() {
               <span className="filter-pill-page__tier-size">~3-5 KB</span>
             </div>
             <p className="filter-pill-page__tier-desc">
-              Aurora glow effects, spring-scale animations, shimmer gradients, particle effects at motion level 3.
+              Spring-scale on select/deselect, aurora glow on active pill, and shimmer sweep on active state.
             </p>
             <div className="filter-pill-page__tier-import">
               import {'{'} FilterPill, FilterPillGroup {'}'} from '@annondeveloper/ui-kit/premium'

@@ -1043,7 +1043,7 @@ export default function InfiniteScrollPage() {
               <span className="infinite-scroll-page__tier-size">~3-5 KB</span>
             </div>
             <p className="infinite-scroll-page__tier-desc">
-              Aurora glow effects, spring-scale animations, shimmer gradients, particle effects at motion level 3.
+              Spring entrance per item with stagger, aurora loading glow, and fade edge for seamless scrolling.
             </p>
             <div className="infinite-scroll-page__tier-import">
               import {'{'} InfiniteScroll {'}'} from '@annondeveloper/ui-kit/premium'

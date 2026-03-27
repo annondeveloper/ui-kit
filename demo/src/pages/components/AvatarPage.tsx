@@ -996,7 +996,7 @@ export default function AvatarPage() {
               <span className="avatar-page__tier-size">~3-5 KB</span>
             </div>
             <p className="avatar-page__tier-desc">
-              Aurora glow effects, spring-scale animations, shimmer gradients, particle effects at motion level 3.
+              Ambient aurora glow ring, spring-scale on hover, shimmer on loading state, and status dot glow.
             </p>
             <div className="avatar-page__tier-import">import {'{'} Avatar {'}'} from '@annondeveloper/ui-kit/premium'</div>
             <div className="avatar-page__tier-preview">

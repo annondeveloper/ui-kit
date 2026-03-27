@@ -1017,7 +1017,7 @@ export default function TagInputPage() {
               <span className="tag-input-page__tier-name">Premium</span>
               <span className="tag-input-page__tier-size">~3-5 KB</span>
             </div>
-            <p className="tag-input-page__tier-desc">Aurora glow effects, spring-scale animations, shimmer gradients, particle effects at motion level 3.</p>
+            <p className="tag-input-page__tier-desc">Aurora glow on tag pills, spring-scale on tag add, and shimmer sweep on newest tag.</p>
             <div className="tag-input-page__tier-import">import {'{'} TagInput {'}'} from '@annondeveloper/ui-kit/premium'</div>
             <div className="tag-input-page__tier-preview">
               <div style={{ inlineSize: '100%' }}>

@@ -4,6 +4,7 @@ import { type StreamingTextProps, StreamingText as BaseStreamingText } from '../
 import { useMotionLevel } from '../core/motion/use-motion-level'
 import { css } from '../core/styles/css-tag'
 import { useStyles } from '../core/styles/use-styles'
+import { sharedPremiumCSS } from './shared-effects'
 
 const premiumStreamingTextStyles = css`
   @layer premium {
@@ -11,6 +12,10 @@ const premiumStreamingTextStyles = css`
       :scope {
         position: relative;
       }
+
+      /* Shared premium effects */
+      ${sharedPremiumCSS}
+
 
       /* Aurora glow cursor */
       :scope:not([data-motion="0"]) .ui-streaming-text__cursor {

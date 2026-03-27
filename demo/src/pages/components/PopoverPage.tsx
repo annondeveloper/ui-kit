@@ -1364,7 +1364,7 @@ export default function PopoverPage() {
               <span className="popover-page__tier-size">~3-5 KB</span>
             </div>
             <p className="popover-page__tier-desc">
-              Aurora glow effects, spring-scale animations, shimmer gradients, particle effects at motion level 3.
+              Aurora glow shadow on panel, animated shimmer border, and spring-scale entrance with blur.
             </p>
             <div className="popover-page__tier-import">
               import {'{'} Popover {'}'} from '@annondeveloper/ui-kit/premium'

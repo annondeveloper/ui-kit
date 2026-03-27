@@ -1258,7 +1258,7 @@ export default function StatusPulsePage() {
               <span className="status-pulse-page__tier-size">~3-5 KB</span>
             </div>
             <p className="status-pulse-page__tier-desc">
-              Aurora glow effects, spring-scale animations, shimmer gradients, particle effects at motion level 3.
+              Spring-scale entrance, ambient aurora glow behind the dot, multi-ring pulse, and glow breathing effect.
             </p>
             <div className="status-pulse-page__tier-import">
               import {'{'} StatusPulse {'}'} from '@annondeveloper/ui-kit/premium'

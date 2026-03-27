@@ -909,7 +909,7 @@ export default function RatingPage() {
               <span className="rating-page__tier-size">~3-5 KB</span>
             </div>
             <p className="rating-page__tier-desc">
-              Aurora glow effects, spring-scale animations, shimmer gradients, particle effects at motion level 3.
+              Spring-scale on star hover, aurora glow trail on filled stars, and radial burst on max rating.
             </p>
             <div className="rating-page__tier-import">import {'{'} Rating {'}'} from '@annondeveloper/ui-kit/premium'</div>
             <div className="rating-page__tier-preview">

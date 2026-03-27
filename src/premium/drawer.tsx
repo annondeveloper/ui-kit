@@ -5,6 +5,7 @@ import { Drawer as BaseDrawer, type DrawerProps } from '../components/drawer'
 import { useMotionLevel } from '../core/motion/use-motion-level'
 import { css } from '../core/styles/css-tag'
 import { useStyles } from '../core/styles/use-styles'
+import { sharedPremiumCSS } from './shared-effects'
 
 const premiumDrawerStyles = css`
   @layer premium {
@@ -12,6 +13,10 @@ const premiumDrawerStyles = css`
       :scope {
         display: contents;
       }
+
+      /* Shared premium effects */
+      ${sharedPremiumCSS}
+
 
       /* ── Spring-scale slide entrance per side ─────────────────────── */
 

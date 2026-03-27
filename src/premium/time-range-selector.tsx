@@ -5,6 +5,7 @@ import { TimeRangeSelector as BaseTimeRangeSelector, type TimeRangeSelectorProps
 import { useMotionLevel } from '../core/motion/use-motion-level'
 import { css } from '../core/styles/css-tag'
 import { useStyles } from '../core/styles/use-styles'
+import { sharedPremiumCSS } from './shared-effects'
 
 const premiumStyles = css`
   @layer premium {
@@ -13,6 +14,10 @@ const premiumStyles = css`
         position: relative;
         display: inline-flex;
       }
+
+      /* Shared premium effects */
+      ${sharedPremiumCSS}
+
 
       /* Aurora glow on preset handles */
       :scope:not([data-motion="0"]) .ui-time-range-selector__preset[data-active="true"] {

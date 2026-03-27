@@ -6,6 +6,7 @@ import { useMotionLevel } from '../core/motion/use-motion-level'
 import { useEntrance } from '../core/motion/use-entrance'
 import { css } from '../core/styles/css-tag'
 import { useStyles } from '../core/styles/use-styles'
+import { sharedPremiumCSS } from './shared-effects'
 
 const premiumColumnVisibilityStyles = css`
   @layer premium {
@@ -13,6 +14,10 @@ const premiumColumnVisibilityStyles = css`
       :scope {
         position: relative;
       }
+
+      /* Shared premium effects */
+      ${sharedPremiumCSS}
+
       /* Staggered item entrance */
       .ui-column-visibility__dropdown[data-open="true"] .ui-column-visibility__item {
         animation: ui-premium-col-item-in 0.2s ease-out backwards;

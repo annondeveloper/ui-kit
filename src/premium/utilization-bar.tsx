@@ -5,6 +5,7 @@ import { UtilizationBar as BaseUtilizationBar, type UtilizationBarProps } from '
 import { useMotionLevel } from '../core/motion/use-motion-level'
 import { css } from '../core/styles/css-tag'
 import { useStyles } from '../core/styles/use-styles'
+import { sharedPremiumCSS } from './shared-effects'
 
 const premiumUtilizationBarStyles = css`
   @layer premium {
@@ -12,6 +13,10 @@ const premiumUtilizationBarStyles = css`
       :scope {
         position: relative;
       }
+
+      /* Shared premium effects */
+      ${sharedPremiumCSS}
+
 
       /* Aurora glow fill */
       :scope .ui-utilization-bar__fill {

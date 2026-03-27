@@ -6,6 +6,7 @@ import { useMotionLevel } from '../core/motion/use-motion-level'
 import { useEntrance } from '../core/motion/use-entrance'
 import { css } from '../core/styles/css-tag'
 import { useStyles } from '../core/styles/use-styles'
+import { sharedPremiumCSS } from './shared-effects'
 
 const premiumServiceStripStyles = css`
   @layer premium {
@@ -13,6 +14,10 @@ const premiumServiceStripStyles = css`
       :scope {
         position: relative;
       }
+
+      /* Shared premium effects */
+      ${sharedPremiumCSS}
+
       /* Badge entrance stagger at motion 2+ */
       :scope:not([data-motion="0"]):not([data-motion="1"])
         .ui-service-strip__badge {

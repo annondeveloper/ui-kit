@@ -4,6 +4,7 @@ import { forwardRef } from 'react'
 import { Divider as BaseDivider, type DividerProps } from '../components/divider'
 import { css } from '../core/styles/css-tag'
 import { useStyles } from '../core/styles/use-styles'
+import { sharedPremiumCSS } from './shared-effects'
 
 const premiumDividerStyles = css`
   @layer premium {
@@ -11,6 +12,10 @@ const premiumDividerStyles = css`
       :scope {
         display: contents;
       }
+
+      /* Shared premium effects */
+      ${sharedPremiumCSS}
+
 
       /* Shimmer gradient sweep along the line */
       :scope .ui-divider {

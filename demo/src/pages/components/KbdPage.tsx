@@ -1207,7 +1207,7 @@ export default function KbdPage() {
               <span className="kbd-page__tier-size">~3-5 KB</span>
             </div>
             <p className="kbd-page__tier-desc">
-              Aurora glow effects, spring-scale animations, shimmer gradients, particle effects at motion level 3.
+              Spring-scale hover lift, subtle aurora glow shadow, shimmer on keypress, and press depression effect.
             </p>
             <div className="kbd-page__tier-import">
               import {'{'} Kbd {'}'} from '@annondeveloper/ui-kit/premium'

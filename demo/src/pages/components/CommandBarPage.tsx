@@ -1243,7 +1243,7 @@ export default function CommandBarPage() {
               <span className="command-bar-page__tier-size">~3-5 KB</span>
             </div>
             <p className="command-bar-page__tier-desc">
-              Aurora glow effects, spring-scale animations, shimmer gradients, particle effects at motion level 3.
+              Glass morphism container, aurora glow on active item, spring entrance animation, and hover glow.
             </p>
             <div className="command-bar-page__tier-import">
               import {'{'} CommandBar {'}'} from '@annondeveloper/ui-kit/premium'

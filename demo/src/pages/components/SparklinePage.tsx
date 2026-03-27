@@ -1266,7 +1266,7 @@ export default function SparklinePage() {
               <span className="sparkline-page__tier-size">~3-5 KB</span>
             </div>
             <p className="sparkline-page__tier-desc">
-              Aurora glow effects, spring-scale animations, shimmer gradients, particle effects at motion level 3.
+              Aurora glow on hover point, animated line trace entrance, and shimmer sweep overlay.
             </p>
             <div className="sparkline-page__tier-import">
               import {'{'} Sparkline {'}'} from '@annondeveloper/ui-kit/premium'

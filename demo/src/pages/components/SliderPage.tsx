@@ -1361,7 +1361,7 @@ export default function SliderPage() {
               <span className="slider-page__tier-size">~3-5 KB</span>
             </div>
             <p className="slider-page__tier-desc">
-              Aurora glow effects, spring-scale animations, shimmer gradients, particle effects at motion level 3.
+              Aurora glow on thumb with hover intensify, spring-bounce on active release, and shimmer track fill overlay.
             </p>
             <div className="slider-page__tier-import">
               import {'{'} Slider {'}'} from '@annondeveloper/ui-kit/premium'

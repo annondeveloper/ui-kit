@@ -4,6 +4,7 @@ import { CoreChart as BaseCoreChart, type CoreChartProps } from '../domain/core-
 import { useMotionLevel } from '../core/motion/use-motion-level'
 import { css } from '../core/styles/css-tag'
 import { useStyles } from '../core/styles/use-styles'
+import { sharedPremiumCSS } from './shared-effects'
 
 const premiumCoreChartStyles = css`
   @layer premium {
@@ -12,6 +13,10 @@ const premiumCoreChartStyles = css`
         position: relative;
         display: inline-block;
       }
+
+      /* Shared premium effects */
+      ${sharedPremiumCSS}
+
 
       /* Subtle cell glow on high usage */
       :scope:not([data-motion="0"]) .ui-core-chart__cell {

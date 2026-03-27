@@ -1300,7 +1300,7 @@ export default function StatusBadgePage() {
               <span className="status-badge-page__tier-size">~3-5 KB</span>
             </div>
             <p className="status-badge-page__tier-desc">
-              Aurora glow effects, spring-scale animations, shimmer gradients, particle effects at motion level 3.
+              Spring-scale entrance animation, aurora glow per status color, and pulsing glow on the status dot.
             </p>
             <div className="status-badge-page__tier-import">
               import {'{'} StatusBadge {'}'} from '@annondeveloper/ui-kit/premium'

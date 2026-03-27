@@ -1334,7 +1334,7 @@ export default function AppShellPage() {
               <span className="app-shell-page__tier-size">~3-5 KB</span>
             </div>
             <p className="app-shell-page__tier-desc">
-              Aurora glow effects, spring-scale animations, shimmer gradients, particle effects at motion level 3.
+              Glass morphism sidebar, aurora glow on active nav items, spring sidebar collapse, and content entrance animation.
             </p>
             <div className="app-shell-page__tier-import">
               import {'{'} AppShell {'}'} from '@annondeveloper/ui-kit/premium'

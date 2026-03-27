@@ -4,6 +4,7 @@ import { ConnectionTestPanel as BaseConnectionTestPanel, type ConnectionTestPane
 import { useMotionLevel } from '../core/motion/use-motion-level'
 import { css } from '../core/styles/css-tag'
 import { useStyles } from '../core/styles/use-styles'
+import { sharedPremiumCSS } from './shared-effects'
 
 const premiumConnectionTestPanelStyles = css`
   @layer premium {
@@ -11,6 +12,10 @@ const premiumConnectionTestPanelStyles = css`
       :scope {
         display: contents;
       }
+
+      /* Shared premium effects */
+      ${sharedPremiumCSS}
+
 
       /* Aurora glow on running icon */
       :scope .ui-connection-test-panel__icon[data-status="running"] {

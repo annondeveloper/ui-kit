@@ -1397,7 +1397,7 @@ function MyPage() {
               <span className={`${P}tier-size`}>~3-5 KB</span>
             </div>
             <p className={`${P}tier-desc`}>
-              Aurora glow effects, spring-scale animations, shimmer gradients, particle effects at motion level 3.
+              Aurora glow on current item, spring-slide staggered entrance, and hover glow on links.
             </p>
             <div className={`${P}tier-import`}>
               import {'{'} Breadcrumbs {'}'} from '@annondeveloper/ui-kit/premium'

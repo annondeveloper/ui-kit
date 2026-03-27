@@ -1301,7 +1301,7 @@ export default function KanbanColumnPage() {
               <span className="kanban-column-page__tier-size">~3-5 KB</span>
             </div>
             <p className="kanban-column-page__tier-desc">
-              Aurora glow effects, spring-scale animations, shimmer gradients, particle effects at motion level 3.
+              Glass morphism header, aurora glow on drag-over, spring-snap staggered card entrance, and card hover glow.
             </p>
             <div className="kanban-column-page__tier-import">
               import {'{'} KanbanColumn {'}'} from '@annondeveloper/ui-kit/premium'

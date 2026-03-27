@@ -1133,7 +1133,7 @@ export default function ColorInputPage() {
               <span className="color-input-page__tier-size">~3-5 KB</span>
             </div>
             <p className="color-input-page__tier-desc">
-              Aurora glow effects, spring-scale animations, shimmer gradients, particle effects at motion level 3.
+              Aurora glow on focus, spring-scale on swatch hover, shimmer sweep on selected color, and glass popover.
             </p>
             <div className="color-input-page__tier-import">
               import {'{'} ColorInput {'}'} from '@annondeveloper/ui-kit/premium'

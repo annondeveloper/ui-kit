@@ -5,6 +5,7 @@ import { BorderBeam as BaseBorderBeam, type BorderBeamProps } from '../domain/bo
 import { useMotionLevel } from '../core/motion/use-motion-level'
 import { css } from '../core/styles/css-tag'
 import { useStyles } from '../core/styles/use-styles'
+import { sharedPremiumCSS } from './shared-effects'
 
 const premiumBorderBeamStyles = css`
   @layer premium {
@@ -12,6 +13,10 @@ const premiumBorderBeamStyles = css`
       :scope {
         position: relative;
       }
+
+      /* Shared premium effects */
+      ${sharedPremiumCSS}
+
 
       /* Multi-color aurora gradient beam */
       :scope .ui-border-beam::before {

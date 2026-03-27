@@ -5,6 +5,7 @@ import { Link as BaseLink, type LinkProps } from '../components/link'
 import { useMotionLevel } from '../core/motion/use-motion-level'
 import { css } from '../core/styles/css-tag'
 import { useStyles } from '../core/styles/use-styles'
+import { sharedPremiumCSS } from './shared-effects'
 
 const premiumLinkStyles = css`
   @layer premium {
@@ -13,6 +14,10 @@ const premiumLinkStyles = css`
         display: inline;
         position: relative;
       }
+
+      /* Shared premium effects */
+      ${sharedPremiumCSS}
+
 
       /* Aurora underline glow on hover */
       :scope .ui-link:hover {

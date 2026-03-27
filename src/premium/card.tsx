@@ -6,6 +6,7 @@ import { useMotionLevel } from '../core/motion/use-motion-level'
 import { useEntrance } from '../core/motion/use-entrance'
 import { css } from '../core/styles/css-tag'
 import { useStyles } from '../core/styles/use-styles'
+import { sharedPremiumCSS } from './shared-effects'
 
 const premiumCardStyles = css`
   @layer premium {
@@ -16,6 +17,10 @@ const premiumCardStyles = css`
         width: 100%;
         min-width: 0;
       }
+
+      /* Shared premium effects */
+      ${sharedPremiumCSS}
+
       /* Cursor-tracking aurora glow */
       :scope::before {
         content: '';

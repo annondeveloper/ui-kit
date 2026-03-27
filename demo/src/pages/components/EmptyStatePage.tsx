@@ -1222,7 +1222,7 @@ export default function EmptyStatePage() {
               <span className="empty-state-page__tier-size">~3-5 KB</span>
             </div>
             <p className="empty-state-page__tier-desc">
-              Aurora glow effects, spring-scale animations, shimmer gradients, particle effects at motion level 3.
+              Spring-bounce icon entrance, aurora glow on CTA button, and floating ambient particle dots.
             </p>
             <div className="empty-state-page__tier-import">
               import {'{'} EmptyState {'}'} from '@annondeveloper/ui-kit/premium'

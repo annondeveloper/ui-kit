@@ -1215,7 +1215,7 @@ export default function LogViewerPage() {
               <span className="log-viewer-page__tier-size">~3-5 KB</span>
             </div>
             <p className="log-viewer-page__tier-desc">
-              Aurora glow effects, spring-scale animations, shimmer gradients, particle effects at motion level 3.
+              Aurora glow on error lines, shimmer sweep on new entries, and pulsing error line highlight.
             </p>
             <div className="log-viewer-page__tier-import">
               import {'{'} LogViewer {'}'} from '@annondeveloper/ui-kit/premium'
