@@ -26,6 +26,7 @@ const pages: { path: string; label: string; icon: IconName }[] = [
   { path: '/themes', label: 'Theme Playground', icon: 'settings' as const },
   { path: '/docs', label: 'Documentation', icon: 'file' },
   { path: '/performance', label: 'Performance', icon: 'zap' },
+  { path: '/generator', label: 'Code Generator', icon: 'code' },
 ]
 
 // ─── Component Sidebar Groups ─────────────────────────────────────────────────
