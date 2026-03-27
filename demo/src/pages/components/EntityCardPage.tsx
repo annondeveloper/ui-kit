@@ -7,7 +7,6 @@ import { EntityCard } from '@ui/domain/entity-card'
 import { EntityCard as LiteEntityCard } from '@ui/lite/entity-card'
 import { EntityCard as PremiumEntityCard } from '@ui/premium/entity-card'
 import { Button } from '@ui/components/button'
-import { Card } from '@ui/components/card'
 import { CopyBlock } from '@ui/domain/copy-block'
 import { Tabs, TabPanel } from '@ui/components/tabs'
 import { Icon } from '@ui/core/icons/icon'
@@ -195,15 +194,18 @@ const pageStyles = css`
       }
 
       .entity-card-page__playground-result {
-        overflow-x: auto;
-        min-block-size: 200px;
-        display: grid;
-        place-items: center;
-        padding: 2rem;
-        background: var(--bg-base);
+        overflow: visible;
+        min-block-size: 320px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 2.5rem;
+        background: var(--bg-elevated);
         border-radius: var(--radius-md);
         position: relative;
-        overflow: hidden;
+      }
+      .entity-card-page__playground-result > * {
+        inline-size: min(100%, 400px);
       }
 
       .entity-card-page__playground-result::before {
