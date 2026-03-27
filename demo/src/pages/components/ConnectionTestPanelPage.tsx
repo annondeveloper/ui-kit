@@ -1,13 +1,12 @@
 'use client'
 
-import { useState, useMemo, useCallback } from 'react'
+import { useState, useMemo } from 'react'
 import { css } from '@ui/core/styles/css-tag'
 import { useStyles } from '@ui/core/styles/use-styles'
 import { ConnectionTestPanel, type TestStep } from '@ui/domain/connection-test-panel'
 import { ConnectionTestPanel as LiteConnectionTestPanel } from '@ui/lite/connection-test-panel'
 import { ConnectionTestPanel as PremiumConnectionTestPanel } from '@ui/premium/connection-test-panel'
 import { Button } from '@ui/components/button'
-import { Card } from '@ui/components/card'
 import { CopyBlock } from '@ui/domain/copy-block'
 import { Tabs, TabPanel } from '@ui/components/tabs'
 import { Icon } from '@ui/core/icons/icon'
@@ -84,12 +83,6 @@ const pageStyles = css`
         overflow: visible;
         position: relative;
         box-shadow: inset 0 1px 0 oklch(100% 0 0 / 0.04), 0 2px 8px oklch(0% 0 0 / 0.15);
-        opacity: 0;
-        transform: translateY(32px) scale(0.98);
-        filter: blur(4px);
-        animation: ctp-section-reveal 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-        animation-timeline: view();
-        animation-range: entry 0% entry 40%;
       }
 
       @keyframes ctp-section-reveal {
@@ -97,8 +90,15 @@ const pageStyles = css`
         to { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
       }
 
-      @supports not (animation-timeline: view()) {
-        .connection-test-panel-page__section { opacity: 1; transform: none; filter: none; animation: none; }
+      @supports (animation-timeline: view()) {
+        .connection-test-panel-page__section {
+          opacity: 0;
+          transform: translateY(32px) scale(0.98);
+          filter: blur(4px);
+          animation: ctp-section-reveal 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+          animation-timeline: view();
+          animation-range: entry 0% entry 40%;
+        }
       }
 
       .connection-test-panel-page__section-title {
@@ -187,10 +187,10 @@ const pageStyles = css`
         display: grid;
         place-items: center;
         padding: 2rem;
-        background: var(--bg-base);
+        background: var(--bg-elevated);
         border-radius: var(--radius-md);
         position: relative;
-        overflow: hidden;
+        overflow: visible;
       }
 
       .connection-test-panel-page__playground-result::before {
@@ -662,7 +662,7 @@ function PlaygroundSection() {
 // ─── Main Component ──────────────────────────────────────────────────────────
 
 export default function ConnectionTestPanelPage() {
-  useStyles(pageStyles)
+  useStyles('connection-test-panel-page', pageStyles)
   const { tier, setTier } = useTier()
 
   const Component = tier === 'lite' ? LiteConnectionTestPanel : tier === 'premium' ? PremiumConnectionTestPanel : ConnectionTestPanel

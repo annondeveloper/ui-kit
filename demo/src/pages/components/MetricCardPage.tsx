@@ -189,7 +189,7 @@ const pageStyles = css`
       .mc-page__preview {
         padding: 2.5rem;
         border-radius: var(--radius-md);
-        background: var(--bg-base);
+        background: var(--bg-elevated);
         position: relative;
         overflow: hidden;
         display: flex;
@@ -255,14 +255,15 @@ const pageStyles = css`
       }
 
       .mc-page__playground-result {
-        min-block-size: 200px;
+        min-block-size: 250px;
         display: grid;
         place-items: center;
         padding: 3rem;
-        background: var(--bg-base);
+        background: var(--bg-elevated);
+        border: 1px solid var(--border-default);
         border-radius: var(--radius-md);
         position: relative;
-        overflow: hidden;
+        overflow: visible;
       }
 
       /* Dot grid for playground result */
@@ -405,7 +406,7 @@ const pageStyles = css`
         padding: 1.25rem 0.75rem;
         border: 1px solid var(--border-subtle);
         border-radius: var(--radius-md);
-        background: var(--bg-base);
+        background: var(--bg-elevated);
       }
 
       .mc-page__state-label {

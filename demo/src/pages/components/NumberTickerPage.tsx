@@ -193,7 +193,7 @@ const pageStyles = css`
       .number-ticker-page__preview {
         padding: 2.5rem;
         border-radius: var(--radius-md);
-        background: var(--bg-base);
+        background: var(--bg-elevated);
         position: relative;
         overflow: hidden;
         display: flex;
@@ -240,14 +240,15 @@ const pageStyles = css`
       }
 
       .number-ticker-page__playground-result {
-        min-block-size: 200px;
+        min-block-size: 120px;
         display: grid;
         place-items: center;
         padding: 3rem;
-        background: var(--bg-base);
+        background: var(--bg-elevated);
         border-radius: var(--radius-md);
         position: relative;
-        overflow: hidden;
+        overflow: visible;
+        color: var(--text-primary);
       }
 
       .number-ticker-page__playground-result::before {

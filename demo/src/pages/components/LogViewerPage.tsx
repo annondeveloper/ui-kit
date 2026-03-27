@@ -190,7 +190,7 @@ const pageStyles = css`
       .log-viewer-page__preview {
         padding: 2.5rem;
         border-radius: var(--radius-md);
-        background: var(--bg-base);
+        background: var(--bg-elevated);
         position: relative;
         overflow-x: auto;
         overflow-y: hidden;
@@ -244,11 +244,11 @@ const pageStyles = css`
       .log-viewer-page__playground-result {
         min-block-size: 200px;
         padding: 1rem;
-        background: var(--bg-base);
+        background: var(--bg-surface);
         border-radius: var(--radius-md);
         position: relative;
         overflow-x: auto;
-        overflow-y: hidden;
+        overflow-y: auto;
       }
 
       .log-viewer-page__playground-result::before {

@@ -42,7 +42,8 @@ const metricCardStyles = css`
         container-type: inline-size;
         border-radius: var(--radius-lg, 0.75rem);
         background: var(--bg-surface, oklch(22% 0.02 270));
-        border: 1px solid var(--border-subtle, oklch(100% 0 0 / 0.08));
+        border: 1px solid var(--border-default);
+        box-shadow: var(--shadow-sm);
         overflow: hidden;
         transition: box-shadow 0.2s var(--ease-out, ease-out),
                     transform 0.2s var(--ease-out, ease-out);
