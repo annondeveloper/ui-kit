@@ -192,7 +192,7 @@ const pageStyles = css`
         border-radius: var(--radius-md);
         background: var(--bg-base);
         position: relative;
-        overflow: hidden;
+        overflow: visible;
         display: flex;
         flex-wrap: wrap;
         align-items: center;
@@ -238,20 +238,22 @@ const pageStyles = css`
       }
 
       .popover-page__playground-preview {
+        min-inline-size: 0;
         display: flex;
         flex-direction: column;
         gap: 1.5rem;
       }
 
       .popover-page__playground-result {
-        min-block-size: 200px;
+        overflow: visible;
+        min-block-size: 300px;
         display: grid;
         place-items: center;
         padding: 3rem;
         background: var(--bg-base);
         border-radius: var(--radius-md);
         position: relative;
-        overflow: hidden;
+        overflow: visible;
       }
 
       .popover-page__playground-result::before {
@@ -573,7 +575,7 @@ const pageStyles = css`
 
         .popover-page__playground-result {
           padding: 2rem;
-          min-block-size: 120px;
+          min-block-size: 300px;
         }
 
         .popover-page__tiers {
@@ -671,7 +673,7 @@ const TIERS: { id: Tier; label: string }[] = [
 const IMPORT_STRINGS: Record<Tier, string> = {
   lite: "import { Popover } from '@annondeveloper/ui-kit/lite'",
   standard: "import { Popover } from '@annondeveloper/ui-kit'",
-  premium: "import { Popover } from '@annondeveloper/ui-kit'",
+  premium: "import { Popover } from '@annondeveloper/ui-kit/premium'",
 }
 
 function CopyButton({ text }: { text: string }) {
@@ -1349,7 +1351,7 @@ export default function PopoverPage() {
             </div>
           </div>
 
-          {/* Premium (maps to standard) */}
+          {/* Premium */}
           <div
             className={`popover-page__tier-card${tier === 'premium' ? ' popover-page__tier-card--active' : ''}`}
             onClick={() => setTier('premium')}
@@ -1359,14 +1361,13 @@ export default function PopoverPage() {
           >
             <div className="popover-page__tier-header">
               <span className="popover-page__tier-name">Premium</span>
-              <span className="popover-page__tier-size">~2.5 KB</span>
+              <span className="popover-page__tier-size">~3-5 KB</span>
             </div>
             <p className="popover-page__tier-desc">
-              Same as Standard for Popover. No premium tier exists yet &mdash;
-              falls back to the Standard implementation.
+              Aurora glow shadow on panel, animated shimmer border, and spring-scale entrance with blur.
             </p>
             <div className="popover-page__tier-import">
-              import {'{'} Popover {'}'} from '@annondeveloper/ui-kit'
+              import {'{'} Popover {'}'} from '@annondeveloper/ui-kit/premium'
             </div>
             <div className="popover-page__tier-preview">
               <Popover content={<span style={{ fontSize: '0.75rem' }}>Preview content</span>}>

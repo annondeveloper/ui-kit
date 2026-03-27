@@ -39,6 +39,7 @@ const cardStyles = css`
     @scope (.ui-card) {
       :scope {
         position: relative;
+        min-inline-size: 200px;
         display: block;
         border-radius: var(--radius-lg, 0.75rem);
         container-type: inline-size;

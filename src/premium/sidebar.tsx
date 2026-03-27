@@ -5,6 +5,7 @@ import { Sidebar as BaseSidebar, type SidebarProps } from '../components/sidebar
 import { useMotionLevel } from '../core/motion/use-motion-level'
 import { css } from '../core/styles/css-tag'
 import { useStyles } from '../core/styles/use-styles'
+import { sharedPremiumCSS } from './shared-effects'
 
 
 // ─── Premium styles ──────────────────────────────────────────────────────────
@@ -15,6 +16,10 @@ const premiumSidebarStyles = css`
       :scope {
         display: contents;
       }
+
+      /* Shared premium effects */
+      ${sharedPremiumCSS}
+
 
       /* ── Glass morphism background ── */
       :scope .ui-sidebar {

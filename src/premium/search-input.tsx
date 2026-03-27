@@ -5,6 +5,7 @@ import { SearchInput as BaseSearchInput, type SearchInputProps } from '../compon
 import { useMotionLevel } from '../core/motion/use-motion-level'
 import { css } from '../core/styles/css-tag'
 import { useStyles } from '../core/styles/use-styles'
+import { sharedPremiumCSS } from './shared-effects'
 
 
 // ─── Premium styles ──────────────────────────────────────────────────────────
@@ -15,6 +16,10 @@ const premiumSearchInputStyles = css`
       :scope {
         display: contents;
       }
+
+      /* Shared premium effects */
+      ${sharedPremiumCSS}
+
 
       /* ── Aurora glow focus ring ── */
       :scope .ui-search-input__field:focus {

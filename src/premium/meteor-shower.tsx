@@ -5,6 +5,7 @@ import { MeteorShower as BaseMeteorShower, type MeteorShowerProps } from '../dom
 import { useMotionLevel } from '../core/motion/use-motion-level'
 import { css } from '../core/styles/css-tag'
 import { useStyles } from '../core/styles/use-styles'
+import { sharedPremiumCSS } from './shared-effects'
 
 const premiumMeteorStyles = css`
   @layer premium {
@@ -12,6 +13,10 @@ const premiumMeteorStyles = css`
       :scope {
         display: contents;
       }
+
+      /* Shared premium effects */
+      ${sharedPremiumCSS}
+
 
       /* Enhanced glow trails */
       :scope .ui-meteor-shower--meteor {

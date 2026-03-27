@@ -26,6 +26,10 @@ export interface ConfirmDialogProps {
 const confirmDialogStyles = css`
   @layer components {
     @scope (.ui-confirm-dialog) {
+      :scope {
+        min-inline-size: 280px;
+      }
+
       .ui-confirm-dialog__description {
         margin: 0;
         font-size: var(--text-sm, 0.875rem);

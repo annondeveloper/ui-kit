@@ -5,6 +5,7 @@ import { AnimatedCounter as BaseAnimatedCounter, type AnimatedCounterProps } fro
 import { useMotionLevel } from '../core/motion/use-motion-level'
 import { css } from '../core/styles/css-tag'
 import { useStyles } from '../core/styles/use-styles'
+import { sharedPremiumCSS } from './shared-effects'
 
 const premiumAnimatedCounterStyles = css`
   @layer premium {
@@ -13,6 +14,10 @@ const premiumAnimatedCounterStyles = css`
         display: inline-flex;
         position: relative;
       }
+
+      /* Shared premium effects */
+      ${sharedPremiumCSS}
+
 
       /* Spring-scale entrance */
       :scope:not([data-motion="0"]) .ui-animated-counter {

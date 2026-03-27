@@ -247,12 +247,14 @@ const pageStyles = css`
       }
 
       .navbar-page__playground-preview {
+        min-inline-size: 0;
         display: flex;
         flex-direction: column;
         gap: 1.5rem;
       }
 
       .navbar-page__playground-result {
+        overflow-x: auto;
         min-block-size: 120px;
         display: flex;
         flex-direction: column;
@@ -752,7 +754,7 @@ const TIERS: { id: Tier; label: string }[] = [
 const IMPORT_STRINGS: Record<Tier, string> = {
   lite: "import { Navbar } from '@annondeveloper/ui-kit/lite'",
   standard: "import { Navbar } from '@annondeveloper/ui-kit'",
-  premium: "import { Navbar } from '@annondeveloper/ui-kit'",
+  premium: "import { Navbar } from '@annondeveloper/ui-kit/premium'",
 }
 
 const COLOR_PRESETS = [
@@ -1512,14 +1514,13 @@ export default function NavbarPage() {
           >
             <div className="navbar-page__tier-header">
               <span className="navbar-page__tier-name">Premium</span>
-              <span className="navbar-page__tier-size">~1.2 KB</span>
+              <span className="navbar-page__tier-size">~3-5 KB</span>
             </div>
             <p className="navbar-page__tier-desc">
-              Same as Standard for Navbar. Premium features like animations
-              and effects are applied to the child components within the navbar.
+              Glass morphism surface, aurora glow on active items, spring hover transitions, and slide entrance animation.
             </p>
             <div className="navbar-page__tier-import">
-              import {'{'} Navbar {'}'} from '@annondeveloper/ui-kit'
+              import {'{'} Navbar {'}'} from '@annondeveloper/ui-kit/premium'
             </div>
             <div className="navbar-page__tier-preview">
               <Navbar

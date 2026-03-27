@@ -5,14 +5,20 @@ import { FileUpload as BaseFileUpload, type FileUploadProps } from '../component
 import { useMotionLevel } from '../core/motion/use-motion-level'
 import { css } from '../core/styles/css-tag'
 import { useStyles } from '../core/styles/use-styles'
+import { sharedPremiumCSS } from './shared-effects'
 
 const premiumFileUploadStyles = css`
   @layer premium {
     @scope (.ui-premium-file-upload) {
       :scope {
+        position: relative;
         display: flex;
         flex-direction: column;
       }
+
+      /* Shared premium effects */
+      ${sharedPremiumCSS}
+
 
       /* Aurora glow on drag-over — targets base component's data attr */
       :scope .ui-file-upload[data-dragover] .ui-file-upload__dropzone {

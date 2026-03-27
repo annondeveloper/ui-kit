@@ -242,12 +242,14 @@ const pageStyles = css`
       }
 
       .status-pulse-page__playground-preview {
+        min-inline-size: 0;
         display: flex;
         flex-direction: column;
         gap: 1.5rem;
       }
 
       .status-pulse-page__playground-result {
+        overflow-x: auto;
         min-block-size: 200px;
         display: grid;
         place-items: center;
@@ -601,7 +603,8 @@ const pageStyles = css`
         .status-pulse-page__title { font-size: 1.75rem; }
         .status-pulse-page__preview { padding: 1.75rem; }
         .status-pulse-page__playground { grid-template-columns: 1fr; }
-        .status-pulse-page__playground-result { padding: 2rem; min-block-size: 120px; }
+        .status-pulse-page__playground-result { padding: 2rem; overflow-x: auto;
+        min-block-size: 120px; }
         .status-pulse-page__labeled-row { gap: 1rem; }
         .status-pulse-page__states-grid { grid-template-columns: repeat(2, 1fr); }
         .status-pulse-page__tiers { grid-template-columns: 1fr; }
@@ -662,7 +665,7 @@ const SIZES: Size[] = ['sm', 'md', 'lg']
 const IMPORT_STRINGS: Record<Tier, string> = {
   lite: "import { StatusPulse } from '@annondeveloper/ui-kit/lite'",
   standard: "import { StatusPulse } from '@annondeveloper/ui-kit'",
-  premium: "import { StatusPulse } from '@annondeveloper/ui-kit'",
+  premium: "import { StatusPulse } from '@annondeveloper/ui-kit/premium'",
 }
 
 const COLOR_PRESETS = [
@@ -1252,14 +1255,13 @@ export default function StatusPulsePage() {
           >
             <div className="status-pulse-page__tier-header">
               <span className="status-pulse-page__tier-name">Premium</span>
-              <span className="status-pulse-page__tier-size">~1 KB</span>
+              <span className="status-pulse-page__tier-size">~3-5 KB</span>
             </div>
             <p className="status-pulse-page__tier-desc">
-              Uses the Standard tier component. StatusPulse is fully featured
-              at the Standard level -- no additional premium wrapper needed.
+              Spring-scale entrance, ambient aurora glow behind the dot, multi-ring pulse, and glow breathing effect.
             </p>
             <div className="status-pulse-page__tier-import">
-              import {'{'} StatusPulse {'}'} from '@annondeveloper/ui-kit'
+              import {'{'} StatusPulse {'}'} from '@annondeveloper/ui-kit/premium'
             </div>
             <div className="status-pulse-page__tier-preview">
               <StatusPulse status="ok" label="OK" size="lg" />
@@ -1267,7 +1269,9 @@ export default function StatusPulsePage() {
             </div>
             <div className="status-pulse-page__size-breakdown">
               <div className="status-pulse-page__size-row">
-                <span>Same as Standard: <strong style={{ color: 'var(--brand)' }}>1.9 KB</strong> gzip</span>
+                <span>Component: <strong style={{ color: 'var(--text-primary)' }}>3.5 KB</strong></span>
+                <span>+ Shared: <strong style={{ color: 'var(--text-primary)' }}>0.9 KB</strong></span>
+                <span>= <strong style={{ color: 'var(--brand)' }}>4.4 KB</strong> gzip</span>
               </div>
             </div>
           </div>

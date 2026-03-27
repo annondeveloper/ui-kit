@@ -5,13 +5,19 @@ import { InlineEdit as BaseInlineEdit, type InlineEditProps } from '../component
 import { useMotionLevel } from '../core/motion/use-motion-level'
 import { css } from '../core/styles/css-tag'
 import { useStyles } from '../core/styles/use-styles'
+import { sharedPremiumCSS } from './shared-effects'
 
 const premiumInlineEditStyles = css`
   @layer premium {
     @scope (.ui-premium-inline-edit) {
       :scope {
+        position: relative;
         display: inline-flex;
       }
+
+      /* Shared premium effects */
+      ${sharedPremiumCSS}
+
 
       /* Spring-scale on edit mode enter */
       :scope:not([data-motion="0"]) .ui-inline-edit__field {

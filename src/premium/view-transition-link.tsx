@@ -4,6 +4,7 @@ import { ViewTransitionLink as BaseViewTransitionLink, type ViewTransitionLinkPr
 import { useMotionLevel } from '../core/motion/use-motion-level'
 import { css } from '../core/styles/css-tag'
 import { useStyles } from '../core/styles/use-styles'
+import { sharedPremiumCSS } from './shared-effects'
 
 const premiumViewTransitionLinkStyles = css`
   @layer premium {
@@ -12,6 +13,10 @@ const premiumViewTransitionLinkStyles = css`
         display: inline-flex;
         position: relative;
       }
+
+      /* Shared premium effects */
+      ${sharedPremiumCSS}
+
 
       /* Aurora glow on hover */
       :scope:not([data-motion="0"]) .ui-view-transition-link:hover {

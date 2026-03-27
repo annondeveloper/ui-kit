@@ -5,6 +5,7 @@ import { FlipWords as BaseFlipWords, type FlipWordsProps } from '../domain/flip-
 import { useMotionLevel } from '../core/motion/use-motion-level'
 import { css } from '../core/styles/css-tag'
 import { useStyles } from '../core/styles/use-styles'
+import { sharedPremiumCSS } from './shared-effects'
 
 const premiumFlipWordsStyles = css`
   @layer premium {
@@ -13,6 +14,10 @@ const premiumFlipWordsStyles = css`
         display: inline-flex;
         position: relative;
       }
+
+      /* Shared premium effects */
+      ${sharedPremiumCSS}
+
 
       /* Aurora glow on active word */
       :scope:not([data-motion="0"]) .ui-flip-words__word--active {

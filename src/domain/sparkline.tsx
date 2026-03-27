@@ -30,6 +30,7 @@ const sparklineStyles = css`
     @scope (.ui-sparkline) {
       :scope {
         position: relative;
+        min-inline-size: 80px;
         display: inline-block;
         line-height: 0;
       }

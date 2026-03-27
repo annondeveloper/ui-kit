@@ -220,12 +220,14 @@ const pageStyles = css`
       }
 
       .sortable-list-page__playground-preview {
+        min-inline-size: 0;
         display: flex;
         flex-direction: column;
         gap: 1.5rem;
       }
 
       .sortable-list-page__playground-result {
+        overflow-x: auto;
         min-block-size: 250px;
         padding: 1.5rem;
         background: var(--bg-base);
@@ -523,7 +525,7 @@ const ORIENTATIONS: Orientation[] = ['vertical', 'horizontal']
 const IMPORT_STRINGS: Record<Tier, string> = {
   lite: "import { SortableList } from '@annondeveloper/ui-kit/lite'",
   standard: "import { SortableList } from '@annondeveloper/ui-kit'",
-  premium: "import { SortableList } from '@annondeveloper/ui-kit'",
+  premium: "import { SortableList } from '@annondeveloper/ui-kit/premium'",
 }
 
 function createInitialItems(): SortableItem[] {

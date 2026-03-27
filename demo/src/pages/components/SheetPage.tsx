@@ -238,12 +238,14 @@ const pageStyles = css`
       }
 
       .sheet-page__playground-preview {
+        min-inline-size: 0;
         display: flex;
         flex-direction: column;
         gap: 1.5rem;
       }
 
       .sheet-page__playground-result {
+        overflow-x: auto;
         min-block-size: 200px;
         display: grid;
         place-items: center;
@@ -621,7 +623,7 @@ const SIZES: Size[] = ['sm', 'md', 'lg']
 const IMPORT_STRINGS: Record<Tier, string> = {
   lite: "import { Sheet } from '@annondeveloper/ui-kit/lite'",
   standard: "import { Sheet } from '@annondeveloper/ui-kit'",
-  premium: "import { Sheet } from '@annondeveloper/ui-kit'",
+  premium: "import { Sheet } from '@annondeveloper/ui-kit/premium'",
 }
 
 function CopyButton({ text }: { text: string }) {
@@ -1412,7 +1414,7 @@ export default function SheetPage() {
             </div>
           </div>
 
-          {/* Premium (maps to standard) */}
+          {/* Premium */}
           <div
             className={`sheet-page__tier-card${tier === 'premium' ? ' sheet-page__tier-card--active' : ''}`}
             onClick={() => setTier('premium')}
@@ -1422,14 +1424,13 @@ export default function SheetPage() {
           >
             <div className="sheet-page__tier-header">
               <span className="sheet-page__tier-name">Premium</span>
-              <span className="sheet-page__tier-size">~3 KB</span>
+              <span className="sheet-page__tier-size">~3-5 KB</span>
             </div>
             <p className="sheet-page__tier-desc">
-              Same as Standard for Sheet. No premium tier exists yet &mdash;
-              falls back to the Standard implementation.
+              Spring-slide entrance with overshoot, aurora glow edge on open, and glass morphism backdrop blur.
             </p>
             <div className="sheet-page__tier-import">
-              import {'{'} Sheet {'}'} from '@annondeveloper/ui-kit'
+              import {'{'} Sheet {'}'} from '@annondeveloper/ui-kit/premium'
             </div>
             <div className="sheet-page__tier-preview">
               <Button variant="primary" size="sm">Premium Sheet</Button>

@@ -4,6 +4,7 @@ import { RingChart as BaseRingChart, type RingChartProps } from '../domain/ring-
 import { useMotionLevel } from '../core/motion/use-motion-level'
 import { css } from '../core/styles/css-tag'
 import { useStyles } from '../core/styles/use-styles'
+import { sharedPremiumCSS } from './shared-effects'
 
 const premiumRingChartStyles = css`
   @layer premium {
@@ -12,6 +13,10 @@ const premiumRingChartStyles = css`
         position: relative;
         display: inline-flex;
       }
+
+      /* Shared premium effects */
+      ${sharedPremiumCSS}
+
 
       /* Aurora glow behind the ring */
       :scope:not([data-motion="0"]) .ui-ring-chart {

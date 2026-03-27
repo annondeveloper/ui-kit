@@ -5,6 +5,7 @@ import { DataTable as BaseDataTable, type DataTableProps } from '../domain/data-
 import { useMotionLevel } from '../core/motion/use-motion-level'
 import { css } from '../core/styles/css-tag'
 import { useStyles } from '../core/styles/use-styles'
+import { sharedPremiumCSS } from './shared-effects'
 
 const premiumDataTableStyles = css`
   @layer premium {
@@ -12,6 +13,10 @@ const premiumDataTableStyles = css`
       :scope {
         position: relative;
       }
+
+      /* Shared premium effects */
+      ${sharedPremiumCSS}
+
 
       /* Aurora glow on sorted column header */
       :scope:not([data-motion="0"]) .ui-data-table__header-cell[aria-sort="ascending"],

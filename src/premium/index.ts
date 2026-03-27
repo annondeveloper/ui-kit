@@ -141,9 +141,15 @@ export { DensitySelector } from './density-selector'
 export { ColumnVisibilityToggle } from './column-visibility-toggle'
 export { CSVExportButton } from './csv-export'
 
+
 // Domain (specialized)
 export { JsonViewer } from './json-viewer'
 export { CodeEditor } from './code-editor'
 export { Tour } from './tour'
 export { RichTextEditor } from './rich-text-editor'
 export { Cropper } from './cropper'
+export { DiskMountBar } from './disk-mount-bar'
+export { ConnectionTestPanel } from './connection-test-panel'
+export { PropertyList } from './property-list'
+export { EntityCard } from './entity-card'
+export { ServiceStrip } from './service-strip'

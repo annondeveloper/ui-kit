@@ -5,6 +5,7 @@ import { OrbitingCircles as BaseOrbitingCircles, type OrbitingCirclesProps } fro
 import { useMotionLevel } from '../core/motion/use-motion-level'
 import { css } from '../core/styles/css-tag'
 import { useStyles } from '../core/styles/use-styles'
+import { sharedPremiumCSS } from './shared-effects'
 
 const premiumOrbitingStyles = css`
   @layer premium {
@@ -12,6 +13,10 @@ const premiumOrbitingStyles = css`
       :scope {
         display: contents;
       }
+
+      /* Shared premium effects */
+      ${sharedPremiumCSS}
+
 
       /* Aurora glow on the orbit track */
       :scope .ui-orbiting-circles::before {

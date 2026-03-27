@@ -243,12 +243,14 @@ const pageStyles = css`
       }
 
       .divider-page__playground-preview {
+        min-inline-size: 0;
         display: flex;
         flex-direction: column;
         gap: 1.5rem;
       }
 
       .divider-page__playground-result {
+        overflow-x: auto;
         min-block-size: 200px;
         display: flex;
         align-items: center;
@@ -680,7 +682,7 @@ const SPACINGS: Spacing[] = ['sm', 'md', 'lg']
 const IMPORT_STRINGS: Record<Tier, string> = {
   lite: "import { Divider } from '@annondeveloper/ui-kit/lite'",
   standard: "import { Divider } from '@annondeveloper/ui-kit'",
-  premium: "import { Divider } from '@annondeveloper/ui-kit'",
+  premium: "import { Divider } from '@annondeveloper/ui-kit/premium'",
 }
 
 const P = 'divider-page__'
@@ -1261,7 +1263,7 @@ export default function DividerPage() {
         </h2>
         <p className={`${P}section-desc`}>
           Choose the right balance of features and bundle size. Divider ships as Lite (plain hr) and Standard (full-featured).
-          Premium maps to Standard for this component.
+          Premium adds aurora glow effects and spring animations.
         </p>
 
         <div className={`${P}tiers`}>
@@ -1325,7 +1327,7 @@ export default function DividerPage() {
             </div>
           </div>
 
-          {/* Premium (maps to Standard) */}
+          {/* Premium */}
           <div
             className={`${P}tier-card${tier === 'premium' ? ` ${P}tier-card--active` : ''}`}
             onClick={() => setTier('premium')}
@@ -1335,13 +1337,13 @@ export default function DividerPage() {
           >
             <div className={`${P}tier-header`}>
               <span className={`${P}tier-name`}>Premium</span>
-              <span className={`${P}tier-size`}>~1.0 KB</span>
+              <span className={`${P}tier-size`}>~3-5 KB</span>
             </div>
             <p className={`${P}tier-desc`}>
-              Maps to Standard for Divider. No additional premium features for this component — Standard already includes all functionality.
+              Shimmer gradient sweep along the divider line, and aurora glow on the label text.
             </p>
             <div className={`${P}tier-import`}>
-              import {'{'} Divider {'}'} from '@annondeveloper/ui-kit'
+              import {'{'} Divider {'}'} from '@annondeveloper/ui-kit/premium'
             </div>
             <div className={`${P}tier-preview`} style={{ width: '100%' }}>
               <Divider label="OR" />

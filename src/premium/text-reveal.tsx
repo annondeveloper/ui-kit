@@ -4,6 +4,7 @@ import { type TextRevealProps, TextReveal as BaseTextReveal } from '../domain/te
 import { useMotionLevel } from '../core/motion/use-motion-level'
 import { css } from '../core/styles/css-tag'
 import { useStyles } from '../core/styles/use-styles'
+import { sharedPremiumCSS } from './shared-effects'
 
 const premiumTextRevealStyles = css`
   @layer premium {
@@ -11,6 +12,10 @@ const premiumTextRevealStyles = css`
       :scope {
         position: relative;
       }
+
+      /* Shared premium effects */
+      ${sharedPremiumCSS}
+
 
       /* Enhanced spring-reveal per character */
       :scope:not([data-motion="0"]) .ui-text-reveal__char {

@@ -4,6 +4,7 @@ import { type StepWizardProps, StepWizard as BaseStepWizard } from '../domain/st
 import { useMotionLevel } from '../core/motion/use-motion-level'
 import { css } from '../core/styles/css-tag'
 import { useStyles } from '../core/styles/use-styles'
+import { sharedPremiumCSS } from './shared-effects'
 
 const premiumStepWizardStyles = css`
   @layer premium {
@@ -11,6 +12,10 @@ const premiumStepWizardStyles = css`
       :scope {
         position: relative;
       }
+
+      /* Shared premium effects */
+      ${sharedPremiumCSS}
+
 
       /* Aurora glow active step indicator */
       :scope:not([data-motion="0"]) .ui-step-wizard__step[data-active="true"] .ui-step-wizard__indicator {

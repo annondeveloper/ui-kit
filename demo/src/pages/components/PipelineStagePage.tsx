@@ -259,21 +259,26 @@ const pageStyles = css`
       }
 
       .pipeline-stage-page__playground-preview {
+        min-inline-size: 0;
         display: flex;
         flex-direction: column;
         gap: 1.5rem;
       }
 
       .pipeline-stage-page__playground-result {
+        overflow-x: auto;
         min-block-size: 200px;
-        display: grid;
-        place-items: center;
+        display: flex;
+        flex-wrap: nowrap;
+        align-items: center;
+        justify-content: center;
         padding: 3rem;
         background: var(--bg-base);
         border-radius: var(--radius-md);
         position: relative;
         overflow-x: auto;
         overflow-y: hidden;
+        -webkit-overflow-scrolling: touch;
       }
 
       .pipeline-stage-page__playground-result::before {
@@ -401,7 +406,7 @@ const pageStyles = css`
         cursor: pointer;
         transition: border-color 0.2s, box-shadow 0.2s, transform 0.2s;
         min-width: 0;
-        overflow: hidden;
+        overflow: visible;
       }
 
       .pipeline-stage-page__tier-card:hover {
@@ -456,9 +461,11 @@ const pageStyles = css`
 
       .pipeline-stage-page__tier-preview {
         display: flex;
+        flex-wrap: nowrap;
         justify-content: center;
         padding-block-start: 0.5rem;
         overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
       }
 
       /* ── Code tabs & exports ────────────────────────── */

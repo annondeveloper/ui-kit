@@ -235,12 +235,14 @@ const pageStyles = css`
       }
 
       .streaming-text-page__playground-preview {
+        min-inline-size: 0;
         display: flex;
         flex-direction: column;
         gap: 1.5rem;
       }
 
       .streaming-text-page__playground-result {
+        overflow-x: auto;
         min-block-size: 200px;
         display: flex;
         align-items: center;
@@ -584,7 +586,8 @@ const pageStyles = css`
         .streaming-text-page__title { font-size: 1.75rem; }
         .streaming-text-page__preview { padding: 1.75rem; }
         .streaming-text-page__playground { grid-template-columns: 1fr; }
-        .streaming-text-page__playground-result { padding: 1.5rem; min-block-size: 150px; }
+        .streaming-text-page__playground-result { padding: 1.5rem; overflow-x: auto;
+        min-block-size: 150px; }
         .streaming-text-page__tiers { grid-template-columns: 1fr; }
         .streaming-text-page__section { padding: 1.25rem; }
       }

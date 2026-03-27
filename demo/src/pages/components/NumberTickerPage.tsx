@@ -193,7 +193,7 @@ const pageStyles = css`
       .number-ticker-page__preview {
         padding: 2.5rem;
         border-radius: var(--radius-md);
-        background: var(--bg-base);
+        background: var(--bg-elevated);
         position: relative;
         overflow: hidden;
         display: flex;
@@ -234,20 +234,23 @@ const pageStyles = css`
       }
 
       .number-ticker-page__playground-preview {
+        min-inline-size: 0;
         display: flex;
         flex-direction: column;
         gap: 1.5rem;
       }
 
       .number-ticker-page__playground-result {
-        min-block-size: 200px;
+        overflow-x: auto;
+        min-block-size: 120px;
         display: grid;
         place-items: center;
         padding: 3rem;
-        background: var(--bg-base);
+        background: var(--bg-elevated);
         border-radius: var(--radius-md);
         position: relative;
-        overflow: hidden;
+        overflow: visible;
+        color: var(--text-primary);
       }
 
       .number-ticker-page__playground-result::before {
@@ -570,7 +573,8 @@ const pageStyles = css`
         .number-ticker-page__title { font-size: 1.75rem; }
         .number-ticker-page__preview { padding: 1.75rem; }
         .number-ticker-page__playground { grid-template-columns: 1fr; }
-        .number-ticker-page__playground-result { padding: 2rem; min-block-size: 120px; }
+        .number-ticker-page__playground-result { padding: 2rem; overflow-x: auto;
+        min-block-size: 120px; }
         .number-ticker-page__tiers { grid-template-columns: 1fr; }
         .number-ticker-page__section { padding: 1.25rem; }
       }

@@ -154,9 +154,15 @@ export { DensitySelector, type LiteDensitySelectorProps } from './density-select
 export { ColumnVisibilityToggle, type LiteColumnVisibilityToggleProps } from './column-visibility-toggle'
 export { CSVExportButton, type LiteCSVExportButtonProps } from './csv-export'
 
+
 // ─── Domain (specialized) ──────────────────────────────────────────────────
 export { JsonViewer, type LiteJsonViewerProps } from './json-viewer'
 export { CodeEditor, type LiteCodeEditorProps } from './code-editor'
 export { Tour, type LiteTourProps, type LiteTourStep } from './tour'
 export { RichTextEditor, type LiteRichTextEditorProps } from './rich-text-editor'
 export { Cropper, type LiteCropperProps } from './cropper'
+export { DiskMountBar, type LiteDiskMountBarProps, type LiteMountInfo } from './disk-mount-bar'
+export { ConnectionTestPanel, type LiteConnectionTestPanelProps, type LiteTestStep } from './connection-test-panel'
+export { PropertyList, type LitePropertyListProps, type LitePropertyItem } from './property-list'
+export { EntityCard, type LiteEntityCardProps } from './entity-card'
+export { ServiceStrip, type LiteServiceStripProps, type LiteServiceItem } from './service-strip'

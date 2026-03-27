@@ -30,6 +30,7 @@ const realtimeValueStyles = css`
     @scope (.ui-realtime-value) {
       :scope {
         display: inline-flex;
+        min-inline-size: 60px;
         align-items: baseline;
         gap: var(--space-2xs, 0.25rem);
         font-variant-numeric: tabular-nums;

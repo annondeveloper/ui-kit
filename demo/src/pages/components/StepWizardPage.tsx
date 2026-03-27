@@ -230,12 +230,14 @@ const pageStyles = css`
       }
 
       .step-wizard-page__playground-preview {
+        min-inline-size: 0;
         display: flex;
         flex-direction: column;
         gap: 1.5rem;
       }
 
       .step-wizard-page__playground-result {
+        overflow-x: auto;
         min-block-size: 200px;
         display: flex;
         flex-direction: column;
@@ -604,7 +606,7 @@ const TIERS: { id: Tier; label: string }[] = [
 const IMPORT_STRINGS: Record<Tier, string> = {
   lite: "import { StepWizard } from '@annondeveloper/ui-kit/lite'",
   standard: "import { StepWizard } from '@annondeveloper/ui-kit'",
-  premium: "import { StepWizard } from '@annondeveloper/ui-kit'",
+  premium: "import { StepWizard } from '@annondeveloper/ui-kit/premium'",
 }
 
 const DEMO_STEPS = [

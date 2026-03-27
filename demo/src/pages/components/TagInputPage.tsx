@@ -213,9 +213,11 @@ const pageStyles = css`
         .tag-input-page__playground-controls { position: static !important; }
       }
 
-      .tag-input-page__playground-preview { display: flex; flex-direction: column; gap: 1.5rem; }
+      .tag-input-page__playground-preview { min-inline-size: 0;
+        display: flex; flex-direction: column; gap: 1.5rem; }
 
       .tag-input-page__playground-result {
+        overflow-x: auto;
         min-block-size: 200px;
         display: grid;
         place-items: center;
@@ -386,7 +388,8 @@ const pageStyles = css`
         .tag-input-page__title { font-size: 1.75rem; }
         .tag-input-page__preview { padding: 1.75rem; }
         .tag-input-page__playground { grid-template-columns: 1fr; }
-        .tag-input-page__playground-result { padding: 2rem; min-block-size: 120px; }
+        .tag-input-page__playground-result { padding: 2rem; overflow-x: auto;
+        min-block-size: 120px; }
         .tag-input-page__states-grid { grid-template-columns: 1fr; }
         .tag-input-page__tiers { grid-template-columns: 1fr; }
         .tag-input-page__section { padding: 1.25rem; }
@@ -442,7 +445,7 @@ const SIZES: Size[] = ['xs', 'sm', 'md', 'lg', 'xl']
 const IMPORT_STRINGS: Record<Tier, string> = {
   lite: "import { TagInput } from '@annondeveloper/ui-kit/lite'",
   standard: "import { TagInput } from '@annondeveloper/ui-kit'",
-  premium: "import { TagInput } from '@annondeveloper/ui-kit'",
+  premium: "import { TagInput } from '@annondeveloper/ui-kit/premium'",
 }
 
 const COLOR_PRESETS = [
@@ -1009,16 +1012,16 @@ export default function TagInputPage() {
             </div>
           </div>
 
-          {/* Premium (maps to Standard) */}
+          {/* Premium */}
           <div className={`tag-input-page__tier-card${tier === 'premium' ? ' tag-input-page__tier-card--active' : ''}`}
             onClick={() => setTier('premium')} role="button" tabIndex={0}
             onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setTier('premium') } }}>
             <div className="tag-input-page__tier-header">
               <span className="tag-input-page__tier-name">Premium</span>
-              <span className="tag-input-page__tier-size">~2 KB</span>
+              <span className="tag-input-page__tier-size">~3-5 KB</span>
             </div>
-            <p className="tag-input-page__tier-desc">Uses Standard tier (no premium variant exists yet). Same full feature set with sizes, validation, and animations.</p>
-            <div className="tag-input-page__tier-import">import {'{'} TagInput {'}'} from '@annondeveloper/ui-kit'</div>
+            <p className="tag-input-page__tier-desc">Aurora glow on tag pills, spring-scale on tag add, and shimmer sweep on newest tag.</p>
+            <div className="tag-input-page__tier-import">import {'{'} TagInput {'}'} from '@annondeveloper/ui-kit/premium'</div>
             <div className="tag-input-page__tier-preview">
               <div style={{ inlineSize: '100%' }}>
                 <StatefulTagInput tier="standard" size="md" placeholder="Add..." maxTags={0} error="" disabled={false} allowDuplicates={false} hasValidation={false} initialTags={['Premium']} />

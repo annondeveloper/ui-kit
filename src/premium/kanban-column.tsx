@@ -4,6 +4,7 @@ import { KanbanColumn as BaseKanbanColumn, type KanbanColumnProps } from '../dom
 import { useMotionLevel } from '../core/motion/use-motion-level'
 import { css } from '../core/styles/css-tag'
 import { useStyles } from '../core/styles/use-styles'
+import { sharedPremiumCSS } from './shared-effects'
 
 const premiumKanbanStyles = css`
   @layer premium {
@@ -11,6 +12,10 @@ const premiumKanbanStyles = css`
       :scope {
         position: relative;
       }
+
+      /* Shared premium effects */
+      ${sharedPremiumCSS}
+
 
       /* Glass morphism header */
       :scope .ui-kanban-column__header {

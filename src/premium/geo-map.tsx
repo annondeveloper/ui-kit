@@ -4,6 +4,7 @@ import { GeoMap as BaseGeoMap, type GeoMapProps } from '../domain/geo-map'
 import { useMotionLevel } from '../core/motion/use-motion-level'
 import { css } from '../core/styles/css-tag'
 import { useStyles } from '../core/styles/use-styles'
+import { sharedPremiumCSS } from './shared-effects'
 
 const premiumGeoMapStyles = css`
   @layer premium {
@@ -11,6 +12,10 @@ const premiumGeoMapStyles = css`
       :scope {
         position: relative;
       }
+
+      /* Shared premium effects */
+      ${sharedPremiumCSS}
+
 
       /* Aurora glow on data points */
       :scope .ui-geo-map__point {

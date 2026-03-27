@@ -239,12 +239,14 @@ const pageStyles = css`
       }
 
       .core-chart-page__playground-preview {
+        min-inline-size: 0;
         display: flex;
         flex-direction: column;
         gap: 1.5rem;
       }
 
       .core-chart-page__playground-result {
+        overflow-x: auto;
         min-block-size: 200px;
         display: grid;
         place-items: center;
@@ -545,7 +547,8 @@ const pageStyles = css`
         .core-chart-page__title { font-size: 1.75rem; }
         .core-chart-page__preview { padding: 1.75rem; }
         .core-chart-page__playground { grid-template-columns: 1fr; }
-        .core-chart-page__playground-result { padding: 2rem; min-block-size: 120px; }
+        .core-chart-page__playground-result { padding: 2rem; overflow-x: auto;
+        min-block-size: 120px; }
         .core-chart-page__labeled-row { gap: 1rem; }
         .core-chart-page__tiers { grid-template-columns: 1fr; }
         .core-chart-page__section { padding: 1.25rem; }

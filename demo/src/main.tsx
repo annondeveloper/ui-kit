@@ -154,6 +154,13 @@ const TimelinePage = lazy(() => import('./pages/components/TimelinePage'))
 const TourPage = lazy(() => import('./pages/components/TourPage'))
 const TransferListPage = lazy(() => import('./pages/components/TransferListPage'))
 
+// ─── New Domain Components ─────────────────────────────────────────────────
+const PropertyListPage = lazy(() => import('./pages/components/PropertyListPage'))
+const EntityCardPage = lazy(() => import('./pages/components/EntityCardPage'))
+const ServiceStripPage = lazy(() => import('./pages/components/ServiceStripPage'))
+const DiskMountBarPage = lazy(() => import('./pages/components/DiskMountBarPage'))
+const ConnectionTestPanelPage = lazy(() => import('./pages/components/ConnectionTestPanelPage'))
+
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <BrowserRouter basename="/ui-kit">
@@ -308,6 +315,13 @@ createRoot(document.getElementById('root')!).render(
             <Route path="components/timeline" element={<Suspense><TimelinePage /></Suspense>} />
             <Route path="components/tour" element={<Suspense><TourPage /></Suspense>} />
             <Route path="components/transfer-list" element={<Suspense><TransferListPage /></Suspense>} />
+
+            {/* New domain components */}
+            <Route path="components/property-list" element={<Suspense><PropertyListPage /></Suspense>} />
+            <Route path="components/entity-card" element={<Suspense><EntityCardPage /></Suspense>} />
+            <Route path="components/service-strip" element={<Suspense><ServiceStripPage /></Suspense>} />
+            <Route path="components/disk-mount-bar" element={<Suspense><DiskMountBarPage /></Suspense>} />
+            <Route path="components/connection-test-panel" element={<Suspense><ConnectionTestPanelPage /></Suspense>} />
           </Route>
         </Routes>
       </ToastProvider>

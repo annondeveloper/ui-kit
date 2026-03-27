@@ -192,7 +192,7 @@ const pageStyles = css`
         border-radius: var(--radius-md);
         background: var(--bg-base);
         position: relative;
-        overflow: hidden;
+        overflow: visible;
         display: flex;
         flex-wrap: wrap;
         align-items: center;
@@ -238,20 +238,22 @@ const pageStyles = css`
       }
 
       .command-bar-page__playground-preview {
+        min-inline-size: 0;
         display: flex;
         flex-direction: column;
         gap: 1.5rem;
       }
 
       .command-bar-page__playground-result {
-        min-block-size: 200px;
+        overflow: visible;
+        min-block-size: 300px;
         display: grid;
         place-items: center;
         padding: 3rem;
         background: var(--bg-base);
         border-radius: var(--radius-md);
         position: relative;
-        overflow: hidden;
+        overflow: visible;
       }
 
       .command-bar-page__playground-result::before {
@@ -656,7 +658,7 @@ const TIERS: { id: Tier; label: string }[] = [
 const IMPORT_STRINGS: Record<Tier, string> = {
   lite: "import { CommandBar } from '@annondeveloper/ui-kit/lite'",
   standard: "import { CommandBar } from '@annondeveloper/ui-kit'",
-  premium: "import { CommandBar } from '@annondeveloper/ui-kit'",
+  premium: "import { CommandBar } from '@annondeveloper/ui-kit/premium'",
 }
 
 const DEMO_ITEMS: CommandItem[] = [
@@ -1171,7 +1173,7 @@ export default function CommandBarPage() {
         </h2>
         <p className="command-bar-page__section-desc">
           Choose the right tier for your needs. CommandBar ships in two tiers
-          (no premium variant &mdash; premium maps to standard).
+          Premium adds aurora glow effects and spring animations.
         </p>
 
         <div className="command-bar-page__tiers">
@@ -1228,28 +1230,29 @@ export default function CommandBarPage() {
             </div>
           </div>
 
-          {/* Premium (maps to standard) */}
+          {/* Premium */}
           <div
             className={`command-bar-page__tier-card${tier === 'premium' ? ' command-bar-page__tier-card--active' : ''}`}
-            onClick={() => setTier('standard')}
+            onClick={() => setTier('premium')}
             role="button"
             tabIndex={0}
-            onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setTier('standard') } }}
+            onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setTier('premium') } }}
           >
             <div className="command-bar-page__tier-header">
               <span className="command-bar-page__tier-name">Premium</span>
-              <span className="command-bar-page__tier-size">= Standard</span>
+              <span className="command-bar-page__tier-size">~3-5 KB</span>
             </div>
             <p className="command-bar-page__tier-desc">
-              No separate premium tier for CommandBar. The standard version includes all features
-              including animations. Premium maps directly to Standard.
+              Glass morphism container, aurora glow on active item, spring entrance animation, and hover glow.
             </p>
             <div className="command-bar-page__tier-import">
-              import {'{'} CommandBar {'}'} from '@annondeveloper/ui-kit'
+              import {'{'} CommandBar {'}'} from '@annondeveloper/ui-kit/premium'
             </div>
             <div className="command-bar-page__size-breakdown">
               <div className="command-bar-page__size-row">
-                <span style={{ fontStyle: 'italic', color: 'var(--text-tertiary)' }}>Same as Standard tier</span>
+                <span>Component: <strong style={{ color: 'var(--text-primary)' }}>3.5 KB</strong></span>
+                <span>+ Shared: <strong style={{ color: 'var(--text-primary)' }}>0.9 KB</strong></span>
+                <span>= <strong style={{ color: 'var(--brand)' }}>4.4 KB</strong> gzip</span>
               </div>
             </div>
           </div>

@@ -231,12 +231,14 @@ const pageStyles = css`
       }
 
       .sparkline-page__playground-preview {
+        min-inline-size: 0;
         display: flex;
         flex-direction: column;
         gap: 1.5rem;
       }
 
       .sparkline-page__playground-result {
+        overflow-x: auto;
         min-block-size: 200px;
         display: grid;
         place-items: center;
@@ -564,7 +566,8 @@ const pageStyles = css`
         .sparkline-page__title { font-size: 1.75rem; }
         .sparkline-page__preview { padding: 1.75rem; }
         .sparkline-page__playground { grid-template-columns: 1fr; }
-        .sparkline-page__playground-result { padding: 2rem; min-block-size: 120px; }
+        .sparkline-page__playground-result { padding: 2rem; overflow-x: auto;
+        min-block-size: 120px; }
         .sparkline-page__tiers { grid-template-columns: 1fr; }
         .sparkline-page__section { padding: 1.25rem; }
       }
@@ -619,7 +622,7 @@ const TIERS: { id: Tier; label: string }[] = [
 const IMPORT_STRINGS: Record<Tier, string> = {
   lite: "import { Sparkline } from '@annondeveloper/ui-kit/lite'",
   standard: "import { Sparkline } from '@annondeveloper/ui-kit'",
-  premium: "import { Sparkline } from '@annondeveloper/ui-kit'",
+  premium: "import { Sparkline } from '@annondeveloper/ui-kit/premium'",
 }
 
 const SAMPLE_DATA = [4, 8, 15, 16, 23, 42, 38, 35, 30, 25, 28, 33, 40, 45, 50, 48, 42, 38, 35, 40]
@@ -1260,14 +1263,13 @@ export default function SparklinePage() {
           >
             <div className="sparkline-page__tier-header">
               <span className="sparkline-page__tier-name">Premium</span>
-              <span className="sparkline-page__tier-size">~1.2 KB</span>
+              <span className="sparkline-page__tier-size">~3-5 KB</span>
             </div>
             <p className="sparkline-page__tier-desc">
-              Same as Standard — Sparkline is a data visualization component where additional
-              premium effects (glow, particles) are not applicable. Use Standard tier.
+              Aurora glow on hover point, animated line trace entrance, and shimmer sweep overlay.
             </p>
             <div className="sparkline-page__tier-import">
-              import {'{'} Sparkline {'}'} from '@annondeveloper/ui-kit'
+              import {'{'} Sparkline {'}'} from '@annondeveloper/ui-kit/premium'
             </div>
             <div className="sparkline-page__tier-preview">
               <Sparkline data={SAMPLE_DATA} height={32} width={160} showTooltip gradient />

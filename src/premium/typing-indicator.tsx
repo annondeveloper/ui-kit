@@ -5,13 +5,19 @@ import { TypingIndicator as BaseTypingIndicator, type TypingIndicatorProps } fro
 import { useMotionLevel } from '../core/motion/use-motion-level'
 import { css } from '../core/styles/css-tag'
 import { useStyles } from '../core/styles/use-styles'
+import { sharedPremiumCSS } from './shared-effects'
 
 const premiumTypingStyles = css`
   @layer premium {
     @scope (.ui-premium-typing-indicator) {
       :scope {
+        position: relative;
         display: inline-flex;
       }
+
+      /* Shared premium effects */
+      ${sharedPremiumCSS}
+
 
       /* Enhanced aurora pulse dots with glow */
       :scope:not([data-motion="0"]) .ui-typing-indicator__dot {

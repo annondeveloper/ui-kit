@@ -5,6 +5,7 @@ import { StatusPulse as BaseStatusPulse, type StatusPulseProps } from '../compon
 import { useMotionLevel } from '../core/motion/use-motion-level'
 import { css } from '../core/styles/css-tag'
 import { useStyles } from '../core/styles/use-styles'
+import { sharedPremiumCSS } from './shared-effects'
 
 
 // ─── Premium styles ──────────────────────────────────────────────────────────
@@ -15,6 +16,10 @@ const premiumStatusPulseStyles = css`
       :scope {
         display: contents;
       }
+
+      /* Shared premium effects */
+      ${sharedPremiumCSS}
+
 
       /* ── Spring-scale entrance ── */
       :scope .ui-status-pulse {

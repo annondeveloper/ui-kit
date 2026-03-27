@@ -33,6 +33,7 @@ const coreChartStyles = css`
     @scope (.ui-core-chart) {
       :scope {
         position: relative;
+        min-inline-size: 160px;
         display: inline-block;
       }
 

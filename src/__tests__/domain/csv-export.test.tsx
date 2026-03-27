@@ -16,6 +16,11 @@ const sampleData = [
   { name: 'Server C', status: 'up', cpu: 78 },
 ]
 
+const sampleData2 = [
+  { host: 'srv-01', cpu: 72, memory: 8192 },
+  { host: 'srv-02', cpu: 45, memory: 16384 },
+]
+
 // Mock URL.createObjectURL and revokeObjectURL
 beforeEach(() => {
   vi.stubGlobal('URL', {
@@ -26,7 +31,7 @@ beforeEach(() => {
 })
 
 describe('CSVExportButton', () => {
-  // ─── Rendering ──────────────────────────────────────────────────────
+  // ─── Rendering (ours) ──────────────────────────────────────────────
 
   describe('rendering', () => {
     it('renders with scope class', () => {
@@ -137,7 +142,7 @@ describe('CSVExportButton', () => {
     })
   })
 
-  // ─── Accessibility ────────────────────────────────────────────────
+  // ─── Accessibility (ours) ──────────────────────────────────────────
 
   describe('accessibility', () => {
     it('renders as type="button"', () => {
@@ -160,6 +165,77 @@ describe('CSVExportButton', () => {
       const { container } = render(<CSVExportButton data={sampleData} disabled />)
       const results = await axe(container)
       expect(results).toHaveNoViolations()
+    })
+  })
+
+  // ─── Rendering (origin/main) ───────────────────────────────────────
+
+  describe('rendering (origin/main)', () => {
+    it('renders a button element', () => {
+      render(<CSVExportButton data={sampleData2} />)
+      expect(screen.getByRole('button')).toBeInTheDocument()
+    })
+
+    it('renders default text "Export CSV"', () => {
+      render(<CSVExportButton data={sampleData2} />)
+      expect(screen.getByText('Export CSV')).toBeInTheDocument()
+    })
+
+    it('renders custom children', () => {
+      render(<CSVExportButton data={sampleData2}>Download</CSVExportButton>)
+      expect(screen.getByText('Download')).toBeInTheDocument()
+    })
+
+    it('applies size data attribute', () => {
+      render(<CSVExportButton data={sampleData2} size="lg" />)
+      expect(screen.getByRole('button')).toHaveAttribute('data-size', 'lg')
+    })
+
+    it('renders all 5 sizes', () => {
+      const sizes = ['xs', 'sm', 'md', 'lg', 'xl'] as const
+      for (const s of sizes) {
+        const { unmount } = render(<CSVExportButton data={sampleData2} size={s} />)
+        expect(screen.getByRole('button')).toHaveAttribute('data-size', s)
+        unmount()
+      }
+    })
+
+    it('renders disabled state', () => {
+      render(<CSVExportButton data={sampleData2} disabled />)
+      expect(screen.getByRole('button')).toBeDisabled()
+    })
+  })
+
+  // ─── Interactions (origin/main) ────────────────────────────────────
+
+  describe('interactions (origin/main)', () => {
+    it('calls onExport on click', () => {
+      const onExport = vi.fn()
+      // Mock URL.createObjectURL and link click
+      vi.stubGlobal('URL', { createObjectURL: vi.fn(() => 'blob:test'), revokeObjectURL: vi.fn() })
+      HTMLAnchorElement.prototype.click = vi.fn()
+      render(<CSVExportButton data={sampleData2} onExport={onExport} />)
+      fireEvent.click(screen.getByRole('button'))
+      expect(onExport).toHaveBeenCalledOnce()
+      vi.unstubAllGlobals()
+    })
+  })
+
+  // ─── Accessibility (origin/main) ───────────────────────────────────
+
+  describe('accessibility (origin/main)', () => {
+    it('has no axe violations', async () => {
+      const { container } = render(<CSVExportButton data={sampleData2} />)
+      const results = await axe(container)
+      expect(results).toHaveNoViolations()
+    })
+  })
+
+  // ─── Display name (origin/main) ────────────────────────────────────
+
+  describe('display name', () => {
+    it('has displayName set to "CSVExportButton"', () => {
+      expect(CSVExportButton.displayName).toBe('CSVExportButton')
     })
   })
 })

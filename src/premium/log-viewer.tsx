@@ -4,6 +4,7 @@ import { LogViewer as BaseLogViewer, type LogViewerProps } from '../domain/log-v
 import { useMotionLevel } from '../core/motion/use-motion-level'
 import { css } from '../core/styles/css-tag'
 import { useStyles } from '../core/styles/use-styles'
+import { sharedPremiumCSS } from './shared-effects'
 
 const premiumLogViewerStyles = css`
   @layer premium {
@@ -11,6 +12,10 @@ const premiumLogViewerStyles = css`
       :scope {
         display: contents;
       }
+
+      /* Shared premium effects */
+      ${sharedPremiumCSS}
+
 
       /* Aurora glow on error lines */
       :scope .ui-log-viewer__line[data-line-level="error"] {

@@ -63,6 +63,7 @@ const chartStyles = css`
     @scope (.ui-time-series-chart) {
       :scope {
         position: relative;
+        min-inline-size: 200px;
         font-family: var(--font-mono, ui-monospace, monospace);
       }
 

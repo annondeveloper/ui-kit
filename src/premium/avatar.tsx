@@ -5,6 +5,7 @@ import { Avatar as BaseAvatar, type AvatarProps } from '../components/avatar'
 import { useMotionLevel } from '../core/motion/use-motion-level'
 import { css } from '../core/styles/css-tag'
 import { useStyles } from '../core/styles/use-styles'
+import { sharedPremiumCSS } from './shared-effects'
 
 interface PremiumAvatarProps extends AvatarProps {
   motion?: 0 | 1 | 2 | 3
@@ -17,6 +18,10 @@ const premiumAvatarStyles = css`
         display: inline-flex;
         position: relative;
       }
+
+      /* Shared premium effects */
+      ${sharedPremiumCSS}
+
 
       /* Ambient glow ring */
       :scope .ui-avatar {

@@ -6,6 +6,7 @@ import { useMotionLevel } from '../core/motion/use-motion-level'
 import { useEntrance } from '../core/motion/use-entrance'
 import { css } from '../core/styles/css-tag'
 import { useStyles } from '../core/styles/use-styles'
+import { sharedPremiumCSS } from './shared-effects'
 
 const premiumCSVExportStyles = css`
   @layer premium {
@@ -15,6 +16,10 @@ const premiumCSVExportStyles = css`
         display: inline-flex;
         overflow: hidden;
       }
+
+      /* Shared premium effects */
+      ${sharedPremiumCSS}
+
       /* Success particle burst */
       .ui-premium-csv-export__particle {
         position: absolute;

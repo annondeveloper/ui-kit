@@ -5,6 +5,7 @@ import { Alert as BaseAlert, type AlertProps } from '../components/alert'
 import { useMotionLevel } from '../core/motion/use-motion-level'
 import { css } from '../core/styles/css-tag'
 import { useStyles } from '../core/styles/use-styles'
+import { sharedPremiumCSS } from './shared-effects'
 
 
 // ─── Premium styles ──────────────────────────────────────────────────────────
@@ -15,6 +16,10 @@ const premiumAlertStyles = css`
       :scope {
         display: contents;
       }
+
+      /* Shared premium effects */
+      ${sharedPremiumCSS}
+
 
       /* ── Spring-scale entrance with blur-in ── */
       :scope .ui-alert {

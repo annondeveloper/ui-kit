@@ -5,13 +5,19 @@ import { Badge as BaseBadge, type BadgeProps } from '../components/badge'
 import { useMotionLevel } from '../core/motion/use-motion-level'
 import { css } from '../core/styles/css-tag'
 import { useStyles } from '../core/styles/use-styles'
+import { sharedPremiumCSS } from './shared-effects'
 
 const premiumBadgeStyles = css`
   @layer premium {
     @scope (.ui-premium-badge) {
       :scope {
+        position: relative;
         display: inline-flex;
       }
+
+      /* Shared premium effects */
+      ${sharedPremiumCSS}
+
 
       /* Ambient glow matching variant color */
       :scope .ui-badge[data-variant="primary"] {

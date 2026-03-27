@@ -265,12 +265,14 @@ const pageStyles = css`
       }
 
       .uptime-tracker-page__playground-preview {
+        min-inline-size: 0;
         display: flex;
         flex-direction: column;
         gap: 1.5rem;
       }
 
       .uptime-tracker-page__playground-result {
+        overflow-x: auto;
         min-block-size: 120px;
         display: flex;
         flex-direction: column;

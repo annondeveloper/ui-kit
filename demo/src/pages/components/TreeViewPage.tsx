@@ -220,12 +220,14 @@ const pageStyles = css`
       }
 
       .tree-view-page__playground-preview {
+        min-inline-size: 0;
         display: flex;
         flex-direction: column;
         gap: 1.5rem;
       }
 
       .tree-view-page__playground-result {
+        overflow-x: auto;
         min-block-size: 250px;
         padding: 1.5rem;
         background: var(--bg-base);
@@ -524,7 +526,7 @@ const treeNodeProps: PropDef[] = [
 const IMPORT_STRINGS: Record<Tier, string> = {
   lite: "import { TreeView } from '@annondeveloper/ui-kit/lite'",
   standard: "import { TreeView } from '@annondeveloper/ui-kit'",
-  premium: "import { TreeView } from '@annondeveloper/ui-kit'",
+  premium: "import { TreeView } from '@annondeveloper/ui-kit/premium'",
 }
 
 const FILE_TREE: TreeNode[] = [

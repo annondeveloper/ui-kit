@@ -230,12 +230,14 @@ const pageStyles = css`
       }
 
       .toast-page__playground-preview {
+        min-inline-size: 0;
         display: flex;
         flex-direction: column;
         gap: 1.5rem;
       }
 
       .toast-page__playground-result {
+        overflow-x: auto;
         min-block-size: 200px;
         display: grid;
         place-items: center;
@@ -589,7 +591,7 @@ const TIERS: { id: Tier; label: string }[] = [
 const IMPORT_STRINGS: Record<Tier, string> = {
   lite: "import { Toast } from '@annondeveloper/ui-kit/lite'",
   standard: "import { ToastProvider, useToast } from '@annondeveloper/ui-kit'",
-  premium: "import { ToastProvider, useToast } from '@annondeveloper/ui-kit'",
+  premium: "import { ToastProvider, useToast } from '@annondeveloper/ui-kit/premium'",
 }
 
 function CopyButton({ text }: { text: string }) {

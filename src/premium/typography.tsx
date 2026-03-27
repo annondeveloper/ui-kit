@@ -5,6 +5,7 @@ import { Typography as BaseTypography, type TypographyProps } from '../component
 import { useMotionLevel } from '../core/motion/use-motion-level'
 import { css } from '../core/styles/css-tag'
 import { useStyles } from '../core/styles/use-styles'
+import { sharedPremiumCSS } from './shared-effects'
 
 const premiumTypographyStyles = css`
   @layer premium {
@@ -12,6 +13,10 @@ const premiumTypographyStyles = css`
       :scope {
         display: contents;
       }
+
+      /* Shared premium effects */
+      ${sharedPremiumCSS}
+
 
       /* Shimmer gradient text for headings — motion 2+ */
       :scope:not([data-motion="0"]):not([data-motion="1"]) .ui-typography[data-variant^="h"] {

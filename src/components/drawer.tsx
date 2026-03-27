@@ -32,6 +32,7 @@ const drawerStyles = css`
     @scope (.ui-drawer) {
       :scope {
         position: fixed;
+        min-inline-size: 240px;
         inset: 0;
         z-index: 50;
         pointer-events: none;

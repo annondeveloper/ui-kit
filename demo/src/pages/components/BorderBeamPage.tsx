@@ -237,12 +237,14 @@ const pageStyles = css`
       }
 
       .borderbeam-page__playground-preview {
+        min-inline-size: 0;
         display: flex;
         flex-direction: column;
         gap: 1.5rem;
       }
 
       .borderbeam-page__playground-result {
+        overflow-x: auto;
         min-block-size: 250px;
         display: grid;
         place-items: center;
@@ -532,7 +534,8 @@ const pageStyles = css`
         .borderbeam-page__title { font-size: 1.75rem; }
         .borderbeam-page__preview { padding: 1.75rem; }
         .borderbeam-page__playground { grid-template-columns: 1fr; }
-        .borderbeam-page__playground-result { padding: 2rem; min-block-size: 180px; }
+        .borderbeam-page__playground-result { padding: 2rem; overflow-x: auto;
+        min-block-size: 180px; }
         .borderbeam-page__tiers { grid-template-columns: 1fr; }
         .borderbeam-page__section { padding: 1.25rem; }
       }
@@ -604,7 +607,7 @@ const COLOR_PRESETS = [
 const IMPORT_STRINGS: Record<Tier, string> = {
   lite: "/* CSS-only: @import '@annondeveloper/ui-kit/css/components/border-beam.css' */",
   standard: "import { BorderBeam } from '@annondeveloper/ui-kit'",
-  premium: "import { BorderBeam } from '@annondeveloper/ui-kit'",
+  premium: "import { BorderBeam } from '@annondeveloper/ui-kit/premium'",
 }
 
 function CopyButton({ text }: { text: string }) {

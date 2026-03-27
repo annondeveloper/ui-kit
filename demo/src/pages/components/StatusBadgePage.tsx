@@ -247,12 +247,14 @@ const pageStyles = css`
       }
 
       .status-badge-page__playground-preview {
+        min-inline-size: 0;
         display: flex;
         flex-direction: column;
         gap: 1.5rem;
       }
 
       .status-badge-page__playground-result {
+        overflow-x: auto;
         min-block-size: 200px;
         display: grid;
         place-items: center;
@@ -605,7 +607,8 @@ const pageStyles = css`
         .status-badge-page__title { font-size: 1.75rem; }
         .status-badge-page__preview { padding: 1.75rem; }
         .status-badge-page__playground { grid-template-columns: 1fr; }
-        .status-badge-page__playground-result { padding: 2rem; min-block-size: 120px; }
+        .status-badge-page__playground-result { padding: 2rem; overflow-x: auto;
+        min-block-size: 120px; }
         .status-badge-page__labeled-row { gap: 1rem; }
         .status-badge-page__states-grid { grid-template-columns: repeat(2, 1fr); }
         .status-badge-page__tiers { grid-template-columns: 1fr; }
@@ -673,7 +676,7 @@ const TIERS: { id: Tier; label: string }[] = [
 const IMPORT_STRINGS: Record<Tier, string> = {
   lite: "import { StatusBadge } from '@annondeveloper/ui-kit/lite'",
   standard: "import { StatusBadge } from '@annondeveloper/ui-kit'",
-  premium: "import { StatusBadge } from '@annondeveloper/ui-kit'",
+  premium: "import { StatusBadge } from '@annondeveloper/ui-kit/premium'",
 }
 
 const COLOR_PRESETS = [
@@ -829,7 +832,7 @@ function generateAngularCode(tier: Tier, status: Status, size: Size, label: stri
 /* In styles.css */
 @import '@annondeveloper/ui-kit/lite/styles.css';`
   }
-  return `<!-- Angular -- ${tier === 'premium' ? 'Standard' : 'Standard'} tier -->
+  return `<!-- Angular -- ${tier === 'premium' ? 'Premium' : 'Standard'} tier -->
 <span
   class="ui-status-badge"
   data-status="${status}"
@@ -1294,21 +1297,22 @@ export default function StatusBadgePage() {
           >
             <div className="status-badge-page__tier-header">
               <span className="status-badge-page__tier-name">Premium</span>
-              <span className="status-badge-page__tier-size">~1.2 KB</span>
+              <span className="status-badge-page__tier-size">~3-5 KB</span>
             </div>
             <p className="status-badge-page__tier-desc">
-              Uses the Standard tier component. StatusBadge is fully featured
-              at the Standard level -- no additional premium wrapper needed.
+              Spring-scale entrance animation, aurora glow per status color, and pulsing glow on the status dot.
             </p>
             <div className="status-badge-page__tier-import">
-              import {'{'} StatusBadge {'}'} from '@annondeveloper/ui-kit'
+              import {'{'} StatusBadge {'}'} from '@annondeveloper/ui-kit/premium'
             </div>
             <div className="status-badge-page__tier-preview">
               <StatusBadge status="critical" label="Premium" pulse icon={<Icon name="alert-circle" size="sm" />} />
             </div>
             <div className="status-badge-page__size-breakdown">
               <div className="status-badge-page__size-row">
-                <span>Same as Standard: <strong style={{ color: 'var(--brand)' }}>2.1 KB</strong> gzip</span>
+                <span>Component: <strong style={{ color: 'var(--text-primary)' }}>3.5 KB</strong></span>
+                <span>+ Shared: <strong style={{ color: 'var(--text-primary)' }}>0.9 KB</strong></span>
+                <span>= <strong style={{ color: 'var(--brand)' }}>4.4 KB</strong> gzip</span>
               </div>
             </div>
           </div>

@@ -224,12 +224,14 @@ const pageStyles = css`
       }
 
       .diff-viewer-page__playground-preview {
+        min-inline-size: 0;
         display: flex;
         flex-direction: column;
         gap: 1.5rem;
       }
 
       .diff-viewer-page__playground-result {
+        overflow-x: auto;
         min-block-size: 200px;
         display: flex;
         flex-direction: column;
@@ -604,7 +606,7 @@ const DIFF_SAMPLES: Record<DiffSample, { old: string; new: string; oldTitle: str
 const IMPORT_STRINGS: Record<Tier, string> = {
   lite: "import { DiffViewer } from '@annondeveloper/ui-kit/lite'",
   standard: "import { DiffViewer } from '@annondeveloper/ui-kit'",
-  premium: "import { DiffViewer } from '@annondeveloper/ui-kit'",
+  premium: "import { DiffViewer } from '@annondeveloper/ui-kit/premium'",
 }
 
 function CopyButton({ text }: { text: string }) {
@@ -1219,14 +1221,13 @@ export default function DiffViewerPage() {
           >
             <div className="diff-viewer-page__tier-header">
               <span className="diff-viewer-page__tier-name">Premium</span>
-              <span className="diff-viewer-page__tier-size">~3.2 KB</span>
+              <span className="diff-viewer-page__tier-size">~3-5 KB</span>
             </div>
             <p className="diff-viewer-page__tier-desc">
-              Same as Standard — DiffViewer is a code analysis component where additional
-              premium effects are not applicable. Use Standard tier.
+              Aurora glow on changed lines, shimmer on additions, spring-slide staggered line entrance, and fold toggle hover glow.
             </p>
             <div className="diff-viewer-page__tier-import">
-              import {'{'} DiffViewer {'}'} from '@annondeveloper/ui-kit'
+              import {'{'} DiffViewer {'}'} from '@annondeveloper/ui-kit/premium'
             </div>
             <div className="diff-viewer-page__tier-preview" style={{ maxHeight: '120px', overflow: 'hidden' }}>
               <DiffViewer oldValue="const x = 1;" newValue="const x: number = 1;" oldTitle="Old" newTitle="New" />

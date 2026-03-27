@@ -37,6 +37,7 @@ const dashboardGridStyles = css`
     @scope (.ui-dashboard-grid) {
       :scope {
         position: relative;
+        min-inline-size: 320px;
         display: flex;
         flex-direction: column;
         container-type: inline-size;

@@ -248,12 +248,14 @@ const pageStyles = css`
       }
 
       .evervault-card-page__playground-preview {
+        min-inline-size: 0;
         display: flex;
         flex-direction: column;
         gap: 1.5rem;
       }
 
       .evervault-card-page__playground-result {
+        overflow-x: auto;
         min-block-size: 200px;
         display: grid;
         place-items: center;
@@ -1254,7 +1256,7 @@ export default function EvervaultCardPage() {
         <p className="evervault-card-page__section-desc">
           Choose the right balance of features and bundle size. The Standard tier includes the
           full matrix scramble effect with motion support. Lite provides CSS-only structure.
-          Premium adds enhanced glow trails and particle effects.
+          Premium adds enhanced glow trails, animated aurora gradient border, and spring-hover scale.
         </p>
 
         <div className="evervault-card-page__tiers">

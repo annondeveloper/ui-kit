@@ -15,8 +15,14 @@ const sampleDevices = [
   { startU: 5, heightU: 4, label: 'Server', status: 'critical' as const },
 ]
 
+const devices = [
+  { startU: 1, heightU: 1, label: 'PDU', status: 'ok' as const },
+  { startU: 3, heightU: 2, label: 'Core Switch', status: 'warning' as const },
+  { startU: 10, heightU: 4, label: 'Server A', status: 'critical' as const },
+]
+
 describe('RackDiagram', () => {
-  // ─── Rendering ──────────────────────────────────────────────────────
+  // ─── Rendering (ours) ──────────────────────────────────────────────
 
   describe('rendering', () => {
     it('renders with scope class', () => {
@@ -81,16 +87,16 @@ describe('RackDiagram', () => {
   describe('tooltip', () => {
     it('shows tooltip on device hover', () => {
       const { container } = render(<RackDiagram units={12} devices={sampleDevices} />)
-      const devices = container.querySelectorAll('.ui-rack-diagram__device')
-      fireEvent.mouseEnter(devices[0])
+      const devEls = container.querySelectorAll('.ui-rack-diagram__device')
+      fireEvent.mouseEnter(devEls[0])
       expect(container.querySelector('.ui-rack-diagram__tooltip')).toBeInTheDocument()
     })
 
     it('hides tooltip on device mouse leave', () => {
       const { container } = render(<RackDiagram units={12} devices={sampleDevices} />)
-      const devices = container.querySelectorAll('.ui-rack-diagram__device')
-      fireEvent.mouseEnter(devices[0])
-      fireEvent.mouseLeave(devices[0])
+      const devEls = container.querySelectorAll('.ui-rack-diagram__device')
+      fireEvent.mouseEnter(devEls[0])
+      fireEvent.mouseLeave(devEls[0])
       expect(container.querySelector('.ui-rack-diagram__tooltip')).not.toBeInTheDocument()
     })
   })
@@ -127,7 +133,7 @@ describe('RackDiagram', () => {
     })
   })
 
-  // ─── Accessibility ────────────────────────────────────────────────
+  // ─── Accessibility (ours) ──────────────────────────────────────────
 
   describe('accessibility', () => {
     it('has img role', () => {
@@ -146,6 +152,81 @@ describe('RackDiagram', () => {
       const { container } = render(<RackDiagram units={12} devices={sampleDevices} />)
       const results = await axe(container)
       expect(results).toHaveNoViolations()
+    })
+  })
+
+  // ─── Rendering (origin/main) ───────────────────────────────────────
+
+  describe('rendering (origin/main)', () => {
+    it('renders with role="img"', () => {
+      render(<RackDiagram units={42} devices={devices} />)
+      expect(screen.getByRole('img')).toBeInTheDocument()
+    })
+
+    it('has aria-label with unit and device count', () => {
+      render(<RackDiagram units={42} devices={devices} />)
+      expect(screen.getByRole('img')).toHaveAttribute('aria-label', 'Rack diagram: 42U, 3 devices')
+    })
+
+    it('renders device labels', () => {
+      render(<RackDiagram units={42} devices={devices} />)
+      expect(screen.getByText('PDU')).toBeInTheDocument()
+      expect(screen.getByText('Core Switch')).toBeInTheDocument()
+      expect(screen.getByText('Server A')).toBeInTheDocument()
+    })
+
+    it('renders unit numbers by default', () => {
+      const { container } = render(<RackDiagram units={12} devices={[]} />)
+      const numbers = container.querySelectorAll('.ui-rack-diagram__number')
+      expect(numbers).toHaveLength(12)
+    })
+
+    it('hides unit numbers when showUnitNumbers is false', () => {
+      const { container } = render(<RackDiagram units={12} devices={[]} showUnitNumbers={false} />)
+      const numbers = container.querySelectorAll('.ui-rack-diagram__number')
+      expect(numbers).toHaveLength(0)
+    })
+
+    it('renders device status attributes', () => {
+      const { container } = render(<RackDiagram units={42} devices={devices} />)
+      const devEls = container.querySelectorAll('.ui-rack-diagram__device')
+      expect(devEls[0]).toHaveAttribute('data-status', 'ok')
+      expect(devEls[1]).toHaveAttribute('data-status', 'warning')
+      expect(devEls[2]).toHaveAttribute('data-status', 'critical')
+    })
+
+    it('renders correct number of slot rows', () => {
+      const { container } = render(<RackDiagram units={12} devices={[]} />)
+      const slots = container.querySelectorAll('.ui-rack-diagram__slot')
+      expect(slots).toHaveLength(12)
+    })
+
+    it('supports rear orientation', () => {
+      const { container } = render(<RackDiagram units={12} devices={devices} orientation="rear" />)
+      expect(container.querySelector('.ui-rack-diagram')).toBeInTheDocument()
+    })
+
+    it('applies data-size attribute', () => {
+      const { container } = render(<RackDiagram units={12} devices={[]} size="sm" />)
+      expect(container.querySelector('.ui-rack-diagram')).toHaveAttribute('data-size', 'sm')
+    })
+  })
+
+  // ─── Accessibility (origin/main) ───────────────────────────────────
+
+  describe('accessibility (origin/main)', () => {
+    it('has no axe violations', async () => {
+      const { container } = render(<RackDiagram units={12} devices={devices} />)
+      const results = await axe(container)
+      expect(results).toHaveNoViolations()
+    })
+  })
+
+  // ─── Display name (origin/main) ────────────────────────────────────
+
+  describe('display name', () => {
+    it('has displayName set to "RackDiagram"', () => {
+      expect(RackDiagram.displayName).toBe('RackDiagram')
     })
   })
 })

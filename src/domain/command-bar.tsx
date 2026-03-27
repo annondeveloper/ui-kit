@@ -83,7 +83,7 @@ const commandBarStyles = css`
       }
 
       dialog::backdrop {
-        background: oklch(0% 0 0 / 0.5);
+        background: var(--bg-overlay);
         backdrop-filter: blur(4px);
       }
 

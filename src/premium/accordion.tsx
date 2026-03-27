@@ -8,6 +8,7 @@ import {
 import { useMotionLevel } from '../core/motion/use-motion-level'
 import { css } from '../core/styles/css-tag'
 import { useStyles } from '../core/styles/use-styles'
+import { sharedPremiumCSS } from './shared-effects'
 
 // ─── Styles ─────────────────────────────────────────────────────────────────
 
@@ -17,6 +18,10 @@ const premiumAccordionStyles = css`
       :scope {
         display: contents;
       }
+
+      /* Shared premium effects */
+      ${sharedPremiumCSS}
+
 
       /* Spring-animated expand with overshoot curve */
       :scope:not([data-motion="0"]) .ui-accordion details[open] > .ui-accordion__content-wrapper {

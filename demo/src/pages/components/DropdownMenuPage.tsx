@@ -238,20 +238,22 @@ const pageStyles = css`
       }
 
       .dropdown-menu-page__playground-preview {
+        min-inline-size: 0;
         display: flex;
         flex-direction: column;
         gap: 1.5rem;
       }
 
       .dropdown-menu-page__playground-result {
-        min-block-size: 200px;
+        overflow: visible;
+        min-block-size: 300px;
         display: grid;
         place-items: center;
         padding: 3rem;
         background: var(--bg-base);
         border-radius: var(--radius-md);
         position: relative;
-        overflow: hidden;
+        overflow: visible;
       }
 
       .dropdown-menu-page__playground-result::before {
@@ -528,7 +530,7 @@ const pageStyles = css`
 
         .dropdown-menu-page__playground-result {
           padding: 2rem;
-          min-block-size: 120px;
+          min-block-size: 300px;
         }
 
         .dropdown-menu-page__tiers {
@@ -625,7 +627,7 @@ const PLACEMENTS: Placement[] = ['bottom-start', 'bottom-end', 'top-start', 'top
 const IMPORT_STRINGS: Record<Tier, string> = {
   lite: "import { DropdownMenu } from '@annondeveloper/ui-kit/lite'",
   standard: "import { DropdownMenu } from '@annondeveloper/ui-kit'",
-  premium: "import { DropdownMenu } from '@annondeveloper/ui-kit'",
+  premium: "import { DropdownMenu } from '@annondeveloper/ui-kit/premium'",
 }
 
 function CopyButton({ text }: { text: string }) {
@@ -1359,7 +1361,7 @@ export default function DropdownMenuPage() {
             </div>
           </div>
 
-          {/* Premium (maps to standard) */}
+          {/* Premium */}
           <div
             className={`dropdown-menu-page__tier-card${tier === 'premium' ? ' dropdown-menu-page__tier-card--active' : ''}`}
             onClick={() => setTier('premium')}
@@ -1369,14 +1371,13 @@ export default function DropdownMenuPage() {
           >
             <div className="dropdown-menu-page__tier-header">
               <span className="dropdown-menu-page__tier-name">Premium</span>
-              <span className="dropdown-menu-page__tier-size">~3 KB</span>
+              <span className="dropdown-menu-page__tier-size">~3-5 KB</span>
             </div>
             <p className="dropdown-menu-page__tier-desc">
-              Same as Standard for DropdownMenu. No premium tier exists yet &mdash;
-              falls back to the Standard implementation.
+              Spring-scale panel entrance, aurora glow on active item, and shimmer gradient on hover.
             </p>
             <div className="dropdown-menu-page__tier-import">
-              import {'{'} DropdownMenu {'}'} from '@annondeveloper/ui-kit'
+              import {'{'} DropdownMenu {'}'} from '@annondeveloper/ui-kit/premium'
             </div>
             <div className="dropdown-menu-page__tier-preview">
               <Button variant="primary" size="sm">Premium Menu</Button>

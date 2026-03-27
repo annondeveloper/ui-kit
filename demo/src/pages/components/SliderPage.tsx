@@ -247,12 +247,14 @@ const pageStyles = css`
       }
 
       .slider-page__playground-preview {
+        min-inline-size: 0;
         display: flex;
         flex-direction: column;
         gap: 1.5rem;
       }
 
       .slider-page__playground-result {
+        overflow-x: auto;
         min-block-size: 200px;
         display: grid;
         place-items: center;
@@ -712,7 +714,7 @@ const TIERS: { id: Tier; label: string }[] = [
 const IMPORT_STRINGS: Record<Tier, string> = {
   lite: "import { Slider } from '@annondeveloper/ui-kit/lite'",
   standard: "import { Slider } from '@annondeveloper/ui-kit'",
-  premium: "import { Slider } from '@annondeveloper/ui-kit'",
+  premium: "import { Slider } from '@annondeveloper/ui-kit/premium'",
 }
 
 const COLOR_PRESETS = [
@@ -1346,7 +1348,7 @@ export default function SliderPage() {
             </div>
           </div>
 
-          {/* Premium (maps to Standard) */}
+          {/* Premium */}
           <div
             className={`slider-page__tier-card${tier === 'premium' ? ' slider-page__tier-card--active' : ''}`}
             onClick={() => setTier('premium')}
@@ -1356,14 +1358,13 @@ export default function SliderPage() {
           >
             <div className="slider-page__tier-header">
               <span className="slider-page__tier-name">Premium</span>
-              <span className="slider-page__tier-size">~1.8 KB</span>
+              <span className="slider-page__tier-size">~3-5 KB</span>
             </div>
             <p className="slider-page__tier-desc">
-              Same as Standard. Premium tier shares the full slider implementation
-              with all features included.
+              Aurora glow on thumb with hover intensify, spring-bounce on active release, and shimmer track fill overlay.
             </p>
             <div className="slider-page__tier-import">
-              import {'{'} Slider {'}'} from '@annondeveloper/ui-kit'
+              import {'{'} Slider {'}'} from '@annondeveloper/ui-kit/premium'
             </div>
             <div className="slider-page__tier-preview">
               <div style={{ inlineSize: '100%' }}>

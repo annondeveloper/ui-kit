@@ -5,6 +5,7 @@ import { Navbar as BaseNavbar, type NavbarProps } from '../components/navbar'
 import { useMotionLevel } from '../core/motion/use-motion-level'
 import { css } from '../core/styles/css-tag'
 import { useStyles } from '../core/styles/use-styles'
+import { sharedPremiumCSS } from './shared-effects'
 
 interface PremiumNavbarProps extends NavbarProps {
   motion?: 0 | 1 | 2 | 3
@@ -16,6 +17,10 @@ const premiumNavbarStyles = css`
       :scope {
         display: contents;
       }
+
+      /* Shared premium effects */
+      ${sharedPremiumCSS}
+
 
       /* Glass morphism surface */
       :scope .ui-navbar {

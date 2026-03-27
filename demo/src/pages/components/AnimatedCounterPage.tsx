@@ -242,12 +242,14 @@ const pageStyles = css`
       }
 
       .animated-counter-page__playground-preview {
+        min-inline-size: 0;
         display: flex;
         flex-direction: column;
         gap: 1.5rem;
       }
 
       .animated-counter-page__playground-result {
+        overflow-x: auto;
         min-block-size: 200px;
         display: grid;
         place-items: center;
@@ -623,7 +625,8 @@ const pageStyles = css`
         .animated-counter-page__title { font-size: 1.75rem; }
         .animated-counter-page__preview { padding: 1.75rem; }
         .animated-counter-page__playground { grid-template-columns: 1fr; }
-        .animated-counter-page__playground-result { padding: 2rem; min-block-size: 120px; }
+        .animated-counter-page__playground-result { padding: 2rem; overflow-x: auto;
+        min-block-size: 120px; }
         .animated-counter-page__labeled-row { gap: 1rem; }
         .animated-counter-page__states-grid { grid-template-columns: repeat(2, 1fr); }
         .animated-counter-page__tiers { grid-template-columns: 1fr; }
@@ -682,7 +685,7 @@ const FORMAT_STYLES: FormatStyle[] = ['default', 'currency', 'percent', 'compact
 const IMPORT_STRINGS: Record<Tier, string> = {
   lite: "import { AnimatedCounter } from '@annondeveloper/ui-kit/lite'",
   standard: "import { AnimatedCounter } from '@annondeveloper/ui-kit'",
-  premium: "import { AnimatedCounter } from '@annondeveloper/ui-kit'",
+  premium: "import { AnimatedCounter } from '@annondeveloper/ui-kit/premium'",
 }
 
 const COLOR_PRESETS = [
@@ -1326,21 +1329,22 @@ export default function AnimatedCounterPage() {
           >
             <div className="animated-counter-page__tier-header">
               <span className="animated-counter-page__tier-name">Premium</span>
-              <span className="animated-counter-page__tier-size">~1.5 KB</span>
+              <span className="animated-counter-page__tier-size">~3-5 KB</span>
             </div>
             <p className="animated-counter-page__tier-desc">
-              Uses the Standard tier component. AnimatedCounter is fully featured
-              at the Standard level -- no additional premium wrapper needed.
+              Spring-scale entrance, aurora glow on value change, and shimmer sweep across digits.
             </p>
             <div className="animated-counter-page__tier-import">
-              import {'{'} AnimatedCounter {'}'} from '@annondeveloper/ui-kit'
+              import {'{'} AnimatedCounter {'}'} from '@annondeveloper/ui-kit/premium'
             </div>
             <div className="animated-counter-page__tier-preview">
               <AnimatedCounter value={99942} format={currencyFormat} />
             </div>
             <div className="animated-counter-page__size-breakdown">
               <div className="animated-counter-page__size-row">
-                <span>Same as Standard: <strong style={{ color: 'var(--brand)' }}>2.4 KB</strong> gzip</span>
+                <span>Component: <strong style={{ color: 'var(--text-primary)' }}>3.5 KB</strong></span>
+                <span>+ Shared: <strong style={{ color: 'var(--text-primary)' }}>0.9 KB</strong></span>
+                <span>= <strong style={{ color: 'var(--brand)' }}>4.4 KB</strong> gzip</span>
               </div>
             </div>
           </div>

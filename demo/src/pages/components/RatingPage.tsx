@@ -219,9 +219,11 @@ const pageStyles = css`
         .rating-page__playground-controls { position: static !important; }
       }
 
-      .rating-page__playground-preview { display: flex; flex-direction: column; gap: 1.5rem; }
+      .rating-page__playground-preview { min-inline-size: 0;
+        display: flex; flex-direction: column; gap: 1.5rem; }
 
       .rating-page__playground-result {
+        overflow-x: auto;
         min-block-size: 200px;
         display: grid;
         place-items: center;
@@ -374,7 +376,8 @@ const pageStyles = css`
         .rating-page__title { font-size: 1.75rem; }
         .rating-page__preview { padding: 1.75rem; }
         .rating-page__playground { grid-template-columns: 1fr; }
-        .rating-page__playground-result { padding: 2rem; min-block-size: 120px; }
+        .rating-page__playground-result { padding: 2rem; overflow-x: auto;
+        min-block-size: 120px; }
         .rating-page__tiers { grid-template-columns: 1fr; }
         .rating-page__section { padding: 1.25rem; }
       }
@@ -428,7 +431,7 @@ const LITE_SIZES: ('sm' | 'md' | 'lg')[] = ['sm', 'md', 'lg']
 const IMPORT_STRINGS: Record<Tier, string> = {
   lite: "import { Rating } from '@annondeveloper/ui-kit/lite'",
   standard: "import { Rating } from '@annondeveloper/ui-kit'",
-  premium: "import { Rating } from '@annondeveloper/ui-kit'",
+  premium: "import { Rating } from '@annondeveloper/ui-kit/premium'",
 }
 
 const COLOR_PRESETS = [
@@ -903,12 +906,12 @@ export default function RatingPage() {
           >
             <div className="rating-page__tier-header">
               <span className="rating-page__tier-name">Premium</span>
-              <span className="rating-page__tier-size">~2.2 KB</span>
+              <span className="rating-page__tier-size">~3-5 KB</span>
             </div>
             <p className="rating-page__tier-desc">
-              Same as Standard. Premium tier shares the full Rating implementation with all features included.
+              Spring-scale on star hover, aurora glow trail on filled stars, and radial burst on max rating.
             </p>
-            <div className="rating-page__tier-import">import {'{'} Rating {'}'} from '@annondeveloper/ui-kit'</div>
+            <div className="rating-page__tier-import">import {'{'} Rating {'}'} from '@annondeveloper/ui-kit/premium'</div>
             <div className="rating-page__tier-preview">
               <Rating defaultValue={4} size="xl" />
             </div>

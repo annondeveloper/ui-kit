@@ -41,12 +41,13 @@ const popoverStyles = css`
     @scope (.ui-popover) {
       :scope {
         position: fixed;
+        min-inline-size: 180px;
         z-index: 50;
       }
 
       .ui-popover__panel {
         position: relative;
-        background: var(--surface-elevated, oklch(22% 0.01 270));
+        background: var(--surface-elevated);
         border: 1px solid var(--border-subtle, oklch(100% 0 0 / 0.08));
         border-radius: var(--radius-lg, 0.5rem);
         box-shadow: var(--shadow-lg, 0 8px 24px oklch(0% 0 0 / 0.3));
@@ -61,7 +62,7 @@ const popoverStyles = css`
         position: absolute;
         inline-size: 10px;
         block-size: 10px;
-        background: var(--surface-elevated, oklch(22% 0.01 270));
+        background: var(--surface-elevated);
         border: 1px solid var(--border-subtle, oklch(100% 0 0 / 0.08));
         transform: rotate(45deg);
       }

@@ -317,12 +317,14 @@ const pageStyles = css`
       }
 
       .view-transition-link-page__playground-preview {
+        min-inline-size: 0;
         display: flex;
         flex-direction: column;
         gap: 1.5rem;
       }
 
       .view-transition-link-page__playground-result {
+        overflow-x: auto;
         min-block-size: 160px;
         display: grid;
         place-items: center;

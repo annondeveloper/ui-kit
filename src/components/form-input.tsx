@@ -39,6 +39,7 @@ const formInputStyles = css`
     @scope (.ui-form-input) {
       :scope {
         display: flex;
+        min-inline-size: 200px;
         flex-direction: column;
         gap: var(--space-xs, 0.25rem);
         position: relative;

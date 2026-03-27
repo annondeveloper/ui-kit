@@ -241,12 +241,14 @@ const pageStyles = css`
       }
 
       .meteor-page__playground-preview {
+        min-inline-size: 0;
         display: flex;
         flex-direction: column;
         gap: 1.5rem;
       }
 
       .meteor-page__playground-result {
+        overflow-x: auto;
         min-block-size: 280px;
         display: grid;
         place-items: center;
@@ -519,7 +521,8 @@ const pageStyles = css`
         .meteor-page__title { font-size: 1.75rem; }
         .meteor-page__preview { padding: 1.75rem; }
         .meteor-page__playground { grid-template-columns: 1fr; }
-        .meteor-page__playground-result { padding: 2rem; min-block-size: 200px; }
+        .meteor-page__playground-result { padding: 2rem; overflow-x: auto;
+        min-block-size: 200px; }
         .meteor-page__tiers { grid-template-columns: 1fr; }
         .meteor-page__section { padding: 1.25rem; }
       }
@@ -581,7 +584,7 @@ const TIERS: { id: Tier; label: string }[] = [
 const IMPORT_STRINGS: Record<Tier, string> = {
   lite: "/* CSS-only: @import '@annondeveloper/ui-kit/css/components/meteor-shower.css' */",
   standard: "import { MeteorShower } from '@annondeveloper/ui-kit'",
-  premium: "import { MeteorShower } from '@annondeveloper/ui-kit'",
+  premium: "import { MeteorShower } from '@annondeveloper/ui-kit/premium'",
 }
 
 function CopyButton({ text }: { text: string }) {

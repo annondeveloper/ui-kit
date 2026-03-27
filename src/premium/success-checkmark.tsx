@@ -5,6 +5,7 @@ import { SuccessCheckmark as BaseSuccessCheckmark, type SuccessCheckmarkProps } 
 import { useMotionLevel } from '../core/motion/use-motion-level'
 import { css } from '../core/styles/css-tag'
 import { useStyles } from '../core/styles/use-styles'
+import { sharedPremiumCSS } from './shared-effects'
 
 
 // ─── Premium styles ──────────────────────────────────────────────────────────
@@ -15,6 +16,10 @@ const premiumSuccessCheckmarkStyles = css`
       :scope {
         display: contents;
       }
+
+      /* Shared premium effects */
+      ${sharedPremiumCSS}
+
 
       /* ── Spring-draw SVG — bouncier circle and check draw ── */
       :scope .ui-success-checkmark__circle {

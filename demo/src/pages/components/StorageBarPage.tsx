@@ -246,12 +246,14 @@ const pageStyles = css`
       }
 
       .storage-bar-page__playground-preview {
+        min-inline-size: 0;
         display: flex;
         flex-direction: column;
         gap: 1.5rem;
       }
 
       .storage-bar-page__playground-result {
+        overflow-x: auto;
         min-block-size: 120px;
         display: flex;
         flex-direction: column;
@@ -606,7 +608,8 @@ const pageStyles = css`
         .storage-bar-page__title { font-size: 1.75rem; }
         .storage-bar-page__preview { padding: 1.75rem; }
         .storage-bar-page__playground { grid-template-columns: 1fr; }
-        .storage-bar-page__playground-result { padding: 1.5rem 2rem; min-block-size: 80px; }
+        .storage-bar-page__playground-result { padding: 1.5rem 2rem; overflow-x: auto;
+        min-block-size: 80px; }
         .storage-bar-page__labeled-row { gap: 1rem; }
         .storage-bar-page__tiers { grid-template-columns: 1fr; }
         .storage-bar-page__section { padding: 1.25rem; }

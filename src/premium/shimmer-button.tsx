@@ -4,13 +4,19 @@ import { ShimmerButton as BaseShimmerButton, type ShimmerButtonProps } from '../
 import { useMotionLevel } from '../core/motion/use-motion-level'
 import { css } from '../core/styles/css-tag'
 import { useStyles } from '../core/styles/use-styles'
+import { sharedPremiumCSS } from './shared-effects'
 
 const premiumShimmerButtonStyles = css`
   @layer premium {
     @scope (.ui-premium-shimmer-button) {
       :scope {
+        position: relative;
         display: inline-flex;
       }
+
+      /* Shared premium effects */
+      ${sharedPremiumCSS}
+
 
       /* Enhanced shimmer — faster, multi-layer */
       :scope:not([data-motion="0"]) .ui-shimmer-button::before {

@@ -5,6 +5,7 @@ import { TracingBeam as BaseTracingBeam, type TracingBeamProps } from '../domain
 import { useMotionLevel } from '../core/motion/use-motion-level'
 import { css } from '../core/styles/css-tag'
 import { useStyles } from '../core/styles/use-styles'
+import { sharedPremiumCSS } from './shared-effects'
 
 const premiumBeamStyles = css`
   @layer premium {
@@ -12,6 +13,10 @@ const premiumBeamStyles = css`
       :scope {
         position: relative;
       }
+
+      /* Shared premium effects */
+      ${sharedPremiumCSS}
+
 
       /* Enhanced aurora beam gradient with wider glow */
       :scope:not([data-motion="0"]) .ui-tracing-beam--progress {

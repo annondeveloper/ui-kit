@@ -4,6 +4,7 @@ import { SeverityTimeline as BaseSeverityTimeline, type SeverityTimelineProps } 
 import { useMotionLevel } from '../core/motion/use-motion-level'
 import { css } from '../core/styles/css-tag'
 import { useStyles } from '../core/styles/use-styles'
+import { sharedPremiumCSS } from './shared-effects'
 
 const premiumSeverityTimelineStyles = css`
   @layer premium {
@@ -11,6 +12,10 @@ const premiumSeverityTimelineStyles = css`
       :scope {
         display: contents;
       }
+
+      /* Shared premium effects */
+      ${sharedPremiumCSS}
+
 
       /* Aurora glow per severity dot */
       :scope .ui-severity-timeline__dot[data-severity="info"] {

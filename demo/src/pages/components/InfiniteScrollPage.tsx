@@ -253,6 +253,7 @@ const pageStyles = css`
       }
 
       .infinite-scroll-page__playground-preview {
+        min-inline-size: 0;
         display: flex;
         flex-direction: column;
         gap: 1.5rem;
@@ -476,7 +477,7 @@ function DemoListItem({ item }: { item: DemoItem }) {
 const IMPORT_STRINGS: Record<Tier, string> = {
   lite: "import { InfiniteScroll } from '@annondeveloper/ui-kit/lite'",
   standard: "import { InfiniteScroll } from '@annondeveloper/ui-kit'",
-  premium: "import { InfiniteScroll } from '@annondeveloper/ui-kit'",
+  premium: "import { InfiniteScroll } from '@annondeveloper/ui-kit/premium'",
 }
 
 function CopyButton({ text }: { text: string }) {
@@ -1042,17 +1043,16 @@ export default function InfiniteScrollPage() {
           >
             <div className="infinite-scroll-page__tier-header">
               <span className="infinite-scroll-page__tier-name">Premium</span>
-              <span className="infinite-scroll-page__tier-size">~1.8 KB</span>
+              <span className="infinite-scroll-page__tier-size">~3-5 KB</span>
             </div>
             <p className="infinite-scroll-page__tier-desc">
-              Same as Standard — InfiniteScroll is a behavioral component where additional
-              premium effects are not applicable. Use Standard tier.
+              Spring entrance per item with stagger, aurora loading glow, and fade edge for seamless scrolling.
             </p>
             <div className="infinite-scroll-page__tier-import">
-              import {'{'} InfiniteScroll {'}'} from '@annondeveloper/ui-kit'
+              import {'{'} InfiniteScroll {'}'} from '@annondeveloper/ui-kit/premium'
             </div>
             <div className="infinite-scroll-page__tier-preview">
-              <span style={{ fontSize: 'var(--text-xs)', color: 'var(--text-tertiary)' }}>Same as Standard</span>
+              <span style={{ fontSize: 'var(--text-xs)', color: 'var(--text-tertiary)' }}>Premium preview</span>
             </div>
             <div className="infinite-scroll-page__size-breakdown">
               <div className="infinite-scroll-page__size-row">

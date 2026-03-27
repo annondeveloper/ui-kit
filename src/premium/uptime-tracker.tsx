@@ -5,6 +5,7 @@ import { UptimeTracker as BaseUptimeTracker, type UptimeTrackerProps } from '../
 import { useMotionLevel } from '../core/motion/use-motion-level'
 import { css } from '../core/styles/css-tag'
 import { useStyles } from '../core/styles/use-styles'
+import { sharedPremiumCSS } from './shared-effects'
 
 const premiumUptimeTrackerStyles = css`
   @layer premium {
@@ -12,6 +13,10 @@ const premiumUptimeTrackerStyles = css`
       :scope {
         position: relative;
       }
+
+      /* Shared premium effects */
+      ${sharedPremiumCSS}
+
 
       /* Aurora glow bars based on status */
       :scope .ui-uptime-tracker__day[data-status="up"] {

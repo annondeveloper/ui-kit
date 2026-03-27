@@ -231,12 +231,14 @@ const pageStyles = css`
       }
 
       .empty-state-page__playground-preview {
+        min-inline-size: 0;
         display: flex;
         flex-direction: column;
         gap: 1.5rem;
       }
 
       .empty-state-page__playground-result {
+        overflow-x: auto;
         min-block-size: 280px;
         display: grid;
         place-items: center;
@@ -608,7 +610,7 @@ type Size = 'sm' | 'md' | 'lg'
 const IMPORT_STRINGS: Record<Tier, string> = {
   lite: "import { EmptyState } from '@annondeveloper/ui-kit/lite'",
   standard: "import { EmptyState } from '@annondeveloper/ui-kit'",
-  premium: "import { EmptyState } from '@annondeveloper/ui-kit'",
+  premium: "import { EmptyState } from '@annondeveloper/ui-kit/premium'",
 }
 
 function CopyButton({ text }: { text: string }) {
@@ -1217,14 +1219,13 @@ export default function EmptyStatePage() {
           >
             <div className="empty-state-page__tier-header">
               <span className="empty-state-page__tier-name">Premium</span>
-              <span className="empty-state-page__tier-size">~1.5 KB</span>
+              <span className="empty-state-page__tier-size">~3-5 KB</span>
             </div>
             <p className="empty-state-page__tier-desc">
-              Same as Standard — EmptyState is a layout component where additional
-              premium effects are not applicable. Use Standard tier.
+              Spring-bounce icon entrance, aurora glow on CTA button, and floating ambient particle dots.
             </p>
             <div className="empty-state-page__tier-import">
-              import {'{'} EmptyState {'}'} from '@annondeveloper/ui-kit'
+              import {'{'} EmptyState {'}'} from '@annondeveloper/ui-kit/premium'
             </div>
             <div className="empty-state-page__tier-preview">
               <EmptyState icon={<Icon name="inbox" size="sm" />} title="Empty" description="Nothing here" size="sm" />

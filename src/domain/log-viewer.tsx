@@ -47,10 +47,10 @@ const logViewerStyles = css`
         font-family: var(--font-mono, ui-monospace, 'Cascadia Code', 'Source Code Pro', Menlo, Consolas, monospace);
         font-size: var(--text-sm, 0.875rem);
         line-height: 1.5;
-        background: var(--bg-deep, oklch(14% 0.01 270));
+        background: var(--bg-surface, oklch(18% 0.01 270));
         border: 1px solid var(--border-subtle, oklch(100% 0 0 / 0.08));
         border-radius: var(--radius-md, 0.5rem);
-        overflow: hidden;
+        overflow: auto;
       }
 
       .ui-log-viewer__scroll {

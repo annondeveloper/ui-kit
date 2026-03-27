@@ -5,6 +5,7 @@ import { Combobox as BaseCombobox, type ComboboxProps } from '../components/comb
 import { useMotionLevel } from '../core/motion/use-motion-level'
 import { css } from '../core/styles/css-tag'
 import { useStyles } from '../core/styles/use-styles'
+import { sharedPremiumCSS } from './shared-effects'
 
 const premiumComboboxStyles = css`
   @layer premium {
@@ -12,6 +13,10 @@ const premiumComboboxStyles = css`
       :scope {
         display: contents;
       }
+
+      /* Shared premium effects */
+      ${sharedPremiumCSS}
+
 
       /* Aurora glow on trigger when focused */
       :scope .ui-combobox__input:focus-visible {

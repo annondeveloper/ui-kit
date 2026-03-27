@@ -28,6 +28,7 @@ const gaugeStyles = css`
     @scope (.ui-threshold-gauge) {
       :scope {
         position: relative;
+        min-inline-size: 120px;
         display: inline-flex;
         flex-direction: column;
         align-items: center;

@@ -186,9 +186,11 @@ const pageStyles = css`
         .color-input-page__playground-controls { position: static !important; }
       }
 
-      .color-input-page__playground-preview { display: flex; flex-direction: column; gap: 1.5rem; }
+      .color-input-page__playground-preview { min-inline-size: 0;
+        display: flex; flex-direction: column; gap: 1.5rem; }
 
       .color-input-page__playground-result {
+        overflow: visible;
         min-block-size: 200px; display: grid; place-items: center; padding: 3rem;
         background: var(--bg-base); border-radius: var(--radius-md);
         position: relative; overflow: hidden;
@@ -423,7 +425,8 @@ const pageStyles = css`
         .color-input-page__title { font-size: 1.75rem; }
         .color-input-page__preview { padding: 1.75rem; }
         .color-input-page__playground { grid-template-columns: 1fr; }
-        .color-input-page__playground-result { padding: 2rem; min-block-size: 120px; }
+        .color-input-page__playground-result { padding: 2rem; overflow-x: auto;
+        min-block-size: 120px; }
         .color-input-page__states-grid { grid-template-columns: 1fr; }
         .color-input-page__tiers { grid-template-columns: 1fr; }
         .color-input-page__section { padding: 1.25rem; }
@@ -480,7 +483,7 @@ const DEFAULT_SWATCHES = ['#ff0000', '#ff8800', '#ffcc00', '#00cc44', '#0088ff',
 const IMPORT_STRINGS: Record<Tier, string> = {
   lite: "import { ColorInput } from '@annondeveloper/ui-kit/lite'",
   standard: "import { ColorInput } from '@annondeveloper/ui-kit'",
-  premium: "import { ColorInput } from '@annondeveloper/ui-kit'",
+  premium: "import { ColorInput } from '@annondeveloper/ui-kit/premium'",
 }
 
 function CopyButton({ text }: { text: string }) {
@@ -1125,26 +1128,27 @@ export default function ColorInputPage() {
 
           <div
             className={`color-input-page__tier-card${tier === 'premium' ? ' color-input-page__tier-card--active' : ''}`}
-            onClick={() => setTier('standard')} role="button" tabIndex={0}
-            onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setTier('standard') } }}
+            onClick={() => setTier('premium')} role="button" tabIndex={0}
+            onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setTier('premium') } }}
           >
             <div className="color-input-page__tier-header">
               <span className="color-input-page__tier-name">Premium</span>
-              <span className="color-input-page__tier-size">--</span>
+              <span className="color-input-page__tier-size">~3-5 KB</span>
             </div>
             <p className="color-input-page__tier-desc">
-              No premium tier yet. Uses the Standard tier. Future premium may add
-              OKLCH mode, alpha channel, gradient builder, and eyedropper.
+              Aurora glow on focus, spring-scale on swatch hover, shimmer sweep on selected color, and glass popover.
             </p>
             <div className="color-input-page__tier-import">
-              import {'{'} ColorInput {'}'} from '@annondeveloper/ui-kit'
+              import {'{'} ColorInput {'}'} from '@annondeveloper/ui-kit/premium'
             </div>
             <div className="color-input-page__tier-preview">
               <ColorInput name="tier-prem" size="sm" defaultValue="#6366f1" />
             </div>
             <div className="color-input-page__size-breakdown">
               <div className="color-input-page__size-row">
-                <span>Same as Standard tier</span>
+                <span>Component: <strong style={{ color: 'var(--text-primary)' }}>3.5 KB</strong></span>
+                <span>+ Shared: <strong style={{ color: 'var(--text-primary)' }}>0.9 KB</strong></span>
+                <span>= <strong style={{ color: 'var(--brand)' }}>4.4 KB</strong> gzip</span>
               </div>
             </div>
           </div>

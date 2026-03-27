@@ -132,6 +132,7 @@ const dataTableStyles = css`
     @scope (.ui-data-table) {
       :scope {
         position: relative;
+        min-inline-size: 320px;
         display: flex;
         flex-direction: column;
         gap: var(--space-sm, 0.5rem);

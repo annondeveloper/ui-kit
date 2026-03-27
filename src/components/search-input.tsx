@@ -52,6 +52,7 @@ const searchInputStyles = css`
     @scope (.ui-search-input) {
       :scope {
         position: relative;
+        min-inline-size: 200px;
         display: flex;
         align-items: center;
         font-family: inherit;

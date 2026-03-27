@@ -28,6 +28,7 @@ const confidenceBarStyles = css`
     @scope (.ui-confidence-bar) {
       :scope {
         display: flex;
+        min-inline-size: 200px;
         flex-direction: column;
         gap: var(--space-2xs, 0.25rem);
       }

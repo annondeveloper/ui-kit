@@ -5,6 +5,7 @@ import { CopyBlock as BaseCopyBlock, type CopyBlockProps } from '../domain/copy-
 import { useMotionLevel } from '../core/motion/use-motion-level'
 import { css } from '../core/styles/css-tag'
 import { useStyles } from '../core/styles/use-styles'
+import { sharedPremiumCSS } from './shared-effects'
 
 const premiumCopyBlockStyles = css`
   @layer premium {
@@ -12,6 +13,10 @@ const premiumCopyBlockStyles = css`
       :scope {
         position: relative;
       }
+
+      /* Shared premium effects */
+      ${sharedPremiumCSS}
+
 
       /* Aurora glow on copy button */
       :scope:not([data-motion="0"]) .ui-copy-block__copy-btn {

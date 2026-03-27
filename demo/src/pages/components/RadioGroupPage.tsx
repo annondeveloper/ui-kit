@@ -245,12 +245,14 @@ const pageStyles = css`
       }
 
       .radio-group-page__playground-preview {
+        min-inline-size: 0;
         display: flex;
         flex-direction: column;
         gap: 1.5rem;
       }
 
       .radio-group-page__playground-result {
+        overflow-x: auto;
         min-block-size: 200px;
         display: grid;
         place-items: center;
@@ -603,7 +605,8 @@ const pageStyles = css`
         .radio-group-page__title { font-size: 1.75rem; }
         .radio-group-page__preview { padding: 1.75rem; }
         .radio-group-page__playground { grid-template-columns: 1fr; }
-        .radio-group-page__playground-result { padding: 2rem; min-block-size: 120px; }
+        .radio-group-page__playground-result { padding: 2rem; overflow-x: auto;
+        min-block-size: 120px; }
         .radio-group-page__tiers { grid-template-columns: 1fr; }
         .radio-group-page__section { padding: 1.25rem; }
         .radio-group-page__states-grid { grid-template-columns: 1fr; }
@@ -666,7 +669,7 @@ const ORIENTATIONS: Orientation[] = ['horizontal', 'vertical']
 const IMPORT_STRINGS: Record<Tier, string> = {
   lite: "import { RadioGroup } from '@annondeveloper/ui-kit/lite'",
   standard: "import { RadioGroup } from '@annondeveloper/ui-kit'",
-  premium: "import { RadioGroup } from '@annondeveloper/ui-kit'",
+  premium: "import { RadioGroup } from '@annondeveloper/ui-kit/premium'",
 }
 
 const SAMPLE_OPTIONS = [
@@ -1386,14 +1389,13 @@ export default function RadioGroupPage() {
           >
             <div className="radio-group-page__tier-header">
               <span className="radio-group-page__tier-name">Premium</span>
-              <span className="radio-group-page__tier-size">~2 KB</span>
+              <span className="radio-group-page__tier-size">~3-5 KB</span>
             </div>
             <p className="radio-group-page__tier-desc">
-              Same as Standard. Premium tier shares the full RadioGroup implementation
-              with all features included.
+              Spring-scale pop on selection, aurora glow on checked radio, and shimmer on the checked dot indicator.
             </p>
             <div className="radio-group-page__tier-import">
-              import {'{'} RadioGroup {'}'} from '@annondeveloper/ui-kit'
+              import {'{'} RadioGroup {'}'} from '@annondeveloper/ui-kit/premium'
             </div>
             <div className="radio-group-page__tier-preview">
               <RadioGroup

@@ -192,13 +192,13 @@ const pageStyles = css`
         border-radius: var(--radius-md);
         background: var(--bg-base);
         position: relative;
-        overflow: hidden;
+        overflow: visible;
         display: flex;
         flex-wrap: wrap;
-        align-items: center;
+        align-items: flex-start;
         justify-content: center;
         gap: 1.25rem;
-        min-block-size: 80px;
+        min-block-size: 360px;
       }
 
       .date-picker-page__preview::before {
@@ -243,20 +243,22 @@ const pageStyles = css`
       }
 
       .date-picker-page__playground-preview {
+        min-inline-size: 0;
         display: flex;
         flex-direction: column;
         gap: 1.5rem;
       }
 
       .date-picker-page__playground-result {
-        min-block-size: 200px;
+        overflow: visible;
+        min-block-size: 380px;
         display: grid;
-        place-items: center;
-        padding: 3rem;
+        place-items: start center;
+        padding: 2rem 3rem 3rem;
         background: var(--bg-base);
         border-radius: var(--radius-md);
         position: relative;
-        overflow: hidden;
+        overflow: visible;
       }
 
       .date-picker-page__playground-result::before {
@@ -712,7 +714,7 @@ const TIERS: { id: Tier; label: string }[] = [
 const IMPORT_STRINGS: Record<Tier, string> = {
   lite: "import { DatePicker } from '@annondeveloper/ui-kit/lite'",
   standard: "import { DatePicker } from '@annondeveloper/ui-kit'",
-  premium: "import { DatePicker } from '@annondeveloper/ui-kit'",
+  premium: "import { DatePicker } from '@annondeveloper/ui-kit/premium'",
 }
 
 function CopyButton({ text }: { text: string }) {
@@ -901,7 +903,7 @@ function generateAngularCode(tier: Tier, size: Size, label: string, disabled: bo
 /* In styles.css */
 @import '@annondeveloper/ui-kit/lite/styles.css';`
   }
-  return `<!-- Angular — ${tier === 'premium' ? 'Standard' : 'Standard'} tier (CSS-only approach) -->
+  return `<!-- Angular — ${tier === 'premium' ? 'Premium' : 'Standard'} tier (CSS-only approach) -->
 <div class="ui-date-picker" data-size="${size}">
   ${label ? `<label class="ui-date-picker__label">${label}</label>` : ''}
   <div class="ui-date-picker__input-wrapper">
@@ -1396,31 +1398,33 @@ export default function DatePickerPage() {
             </div>
           </div>
 
-          {/* Premium (maps to Standard) */}
+          {/* Premium */}
           <div
             className={`date-picker-page__tier-card${tier === 'premium' ? ' date-picker-page__tier-card--active' : ''}`}
-            onClick={() => setTier('standard')}
+            onClick={() => setTier('premium')}
             role="button"
             tabIndex={0}
-            onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setTier('standard') } }}
+            onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setTier('premium') } }}
           >
             <div className="date-picker-page__tier-header">
               <span className="date-picker-page__tier-name">Premium</span>
-              <span className="date-picker-page__tier-size">—</span>
+              <span className="date-picker-page__tier-size">~5 KB</span>
             </div>
             <p className="date-picker-page__tier-desc">
-              No premium tier yet. Uses the Standard tier. A future premium tier
-              may add range selection, animations, and more.
+              Spring calendar entrance with overshoot, aurora glow on selected date,
+              shimmer highlight on today, glass morphism dropdown.
             </p>
             <div className="date-picker-page__tier-import">
-              import {'{'} DatePicker {'}'} from '@annondeveloper/ui-kit'
+              import {'{'} DatePicker {'}'} from '@annondeveloper/ui-kit/premium'
             </div>
             <div className="date-picker-page__tier-preview">
-              <DatePicker placeholder="Standard" size="sm" />
+              <DatePicker placeholder="Premium" size="sm" />
             </div>
             <div className="date-picker-page__size-breakdown">
               <div className="date-picker-page__size-row">
-                <span>Same as Standard tier</span>
+                <span>Component: <strong style={{ color: 'var(--text-primary)' }}>5.0 KB</strong></span>
+                <span>+ Shared: <strong style={{ color: 'var(--text-primary)' }}>0.9 KB</strong></span>
+                <span>= <strong style={{ color: 'var(--brand)' }}>5.9 KB</strong> gzip</span>
               </div>
             </div>
           </div>

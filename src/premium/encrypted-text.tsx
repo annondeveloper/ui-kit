@@ -5,6 +5,7 @@ import { EncryptedText as BaseEncryptedText, type EncryptedTextProps } from '../
 import { useMotionLevel } from '../core/motion/use-motion-level'
 import { css } from '../core/styles/css-tag'
 import { useStyles } from '../core/styles/use-styles'
+import { sharedPremiumCSS } from './shared-effects'
 
 const premiumEncryptedTextStyles = css`
   @layer premium {
@@ -13,6 +14,10 @@ const premiumEncryptedTextStyles = css`
         display: inline-flex;
         position: relative;
       }
+
+      /* Shared premium effects */
+      ${sharedPremiumCSS}
+
 
       /* Enhanced scramble glow during animation */
       :scope:not([data-motion="0"]) .ui-encrypted-text[data-scrambling="true"] {

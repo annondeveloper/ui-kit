@@ -247,12 +247,14 @@ const pageStyles = css`
       }
 
       .filter-pill-page__playground-preview {
+        min-inline-size: 0;
         display: flex;
         flex-direction: column;
         gap: 1.5rem;
       }
 
       .filter-pill-page__playground-result {
+        overflow-x: auto;
         min-block-size: 200px;
         display: grid;
         place-items: center;
@@ -612,7 +614,8 @@ const pageStyles = css`
         .filter-pill-page__title { font-size: 1.75rem; }
         .filter-pill-page__preview { padding: 1.75rem; }
         .filter-pill-page__playground { grid-template-columns: 1fr; }
-        .filter-pill-page__playground-result { padding: 2rem; min-block-size: 120px; }
+        .filter-pill-page__playground-result { padding: 2rem; overflow-x: auto;
+        min-block-size: 120px; }
         .filter-pill-page__labeled-row { gap: 1rem; }
         .filter-pill-page__states-grid { grid-template-columns: repeat(2, 1fr); }
         .filter-pill-page__tiers { grid-template-columns: 1fr; }
@@ -683,7 +686,7 @@ const SIZES: Size[] = ['sm', 'md']
 const IMPORT_STRINGS: Record<Tier, string> = {
   lite: "import { FilterPill } from '@annondeveloper/ui-kit/lite'",
   standard: "import { FilterPill, FilterPillGroup } from '@annondeveloper/ui-kit'",
-  premium: "import { FilterPill, FilterPillGroup } from '@annondeveloper/ui-kit'",
+  premium: "import { FilterPill, FilterPillGroup } from '@annondeveloper/ui-kit/premium'",
 }
 
 const COLOR_PRESETS = [
@@ -1404,21 +1407,22 @@ export default function FilterPillPage() {
           >
             <div className="filter-pill-page__tier-header">
               <span className="filter-pill-page__tier-name">Premium</span>
-              <span className="filter-pill-page__tier-size">~1.8 KB</span>
+              <span className="filter-pill-page__tier-size">~3-5 KB</span>
             </div>
             <p className="filter-pill-page__tier-desc">
-              Uses the Standard tier component. FilterPill is fully featured
-              at the Standard level -- no additional premium wrapper needed.
+              Spring-scale on select/deselect, aurora glow on active pill, and shimmer sweep on active state.
             </p>
             <div className="filter-pill-page__tier-import">
-              import {'{'} FilterPill, FilterPillGroup {'}'} from '@annondeveloper/ui-kit'
+              import {'{'} FilterPill, FilterPillGroup {'}'} from '@annondeveloper/ui-kit/premium'
             </div>
             <div className="filter-pill-page__tier-preview">
               <FilterPill label="Premium" active icon={<Icon name="zap" size="sm" />} count={99} />
             </div>
             <div className="filter-pill-page__size-breakdown">
               <div className="filter-pill-page__size-row">
-                <span>Same as Standard: <strong style={{ color: 'var(--brand)' }}>2.7 KB</strong> gzip</span>
+                <span>Component: <strong style={{ color: 'var(--text-primary)' }}>3.5 KB</strong></span>
+                <span>+ Shared: <strong style={{ color: 'var(--text-primary)' }}>0.9 KB</strong></span>
+                <span>= <strong style={{ color: 'var(--brand)' }}>4.4 KB</strong> gzip</span>
               </div>
             </div>
           </div>

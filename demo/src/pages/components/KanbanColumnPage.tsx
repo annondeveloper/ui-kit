@@ -231,12 +231,14 @@ const pageStyles = css`
       }
 
       .kanban-column-page__playground-preview {
+        min-inline-size: 0;
         display: flex;
         flex-direction: column;
         gap: 1.5rem;
       }
 
       .kanban-column-page__playground-result {
+        overflow-x: auto;
         min-block-size: 300px;
         display: flex;
         justify-content: center;
@@ -597,7 +599,7 @@ const TIERS: { id: Tier; label: string }[] = [
 const IMPORT_STRINGS: Record<Tier, string> = {
   lite: "import { KanbanColumn } from '@annondeveloper/ui-kit/lite'",
   standard: "import { KanbanColumn } from '@annondeveloper/ui-kit'",
-  premium: "import { KanbanColumn } from '@annondeveloper/ui-kit'",
+  premium: "import { KanbanColumn } from '@annondeveloper/ui-kit/premium'",
 }
 
 type Priority = 'low' | 'medium' | 'high' | 'critical'
@@ -1296,14 +1298,13 @@ export default function KanbanColumnPage() {
           >
             <div className="kanban-column-page__tier-header">
               <span className="kanban-column-page__tier-name">Premium</span>
-              <span className="kanban-column-page__tier-size">~2.8 KB</span>
+              <span className="kanban-column-page__tier-size">~3-5 KB</span>
             </div>
             <p className="kanban-column-page__tier-desc">
-              Same as Standard — KanbanColumn is a layout component where additional
-              premium effects (glow, particles) are not applicable. Use Standard tier.
+              Glass morphism header, aurora glow on drag-over, spring-snap staggered card entrance, and card hover glow.
             </p>
             <div className="kanban-column-page__tier-import">
-              import {'{'} KanbanColumn {'}'} from '@annondeveloper/ui-kit'
+              import {'{'} KanbanColumn {'}'} from '@annondeveloper/ui-kit/premium'
             </div>
             <div className="kanban-column-page__tier-preview">
               <KanbanColumn

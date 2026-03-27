@@ -4,6 +4,7 @@ import { RackDiagram as BaseRackDiagram, type RackDiagramProps } from '../domain
 import { useMotionLevel } from '../core/motion/use-motion-level'
 import { css } from '../core/styles/css-tag'
 import { useStyles } from '../core/styles/use-styles'
+import { sharedPremiumCSS } from './shared-effects'
 
 const premiumRackDiagramStyles = css`
   @layer premium {
@@ -12,6 +13,10 @@ const premiumRackDiagramStyles = css`
         position: relative;
         display: inline-flex;
       }
+
+      /* Shared premium effects */
+      ${sharedPremiumCSS}
+
 
       /* Status glow on devices */
       :scope:not([data-motion="0"]) .ui-rack-diagram__device[data-status="ok"] {

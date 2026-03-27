@@ -247,12 +247,14 @@ const pageStyles = css`
       }
 
       .form-input-page__playground-preview {
+        min-inline-size: 0;
         display: flex;
         flex-direction: column;
         gap: 1.5rem;
       }
 
       .form-input-page__playground-result {
+        overflow-x: auto;
         min-block-size: 200px;
         display: grid;
         place-items: center;
@@ -613,7 +615,8 @@ const pageStyles = css`
         .form-input-page__title { font-size: 1.75rem; }
         .form-input-page__preview { padding: 1.75rem; }
         .form-input-page__playground { grid-template-columns: 1fr; }
-        .form-input-page__playground-result { padding: 2rem; min-block-size: 120px; }
+        .form-input-page__playground-result { padding: 2rem; overflow-x: auto;
+        min-block-size: 120px; }
         .form-input-page__labeled-row { gap: 1rem; }
         .form-input-page__states-grid { grid-template-columns: repeat(2, 1fr); }
         .form-input-page__tiers { grid-template-columns: 1fr; }
@@ -686,7 +689,7 @@ const VARIANTS: Variant[] = ['default', 'filled']
 const IMPORT_STRINGS: Record<Tier, string> = {
   lite: "import { FormInput } from '@annondeveloper/ui-kit/lite'",
   standard: "import { FormInput } from '@annondeveloper/ui-kit'",
-  premium: "import { FormInput } from '@annondeveloper/ui-kit'",
+  premium: "import { FormInput } from '@annondeveloper/ui-kit/premium'",
 }
 
 const COLOR_PRESETS = [
@@ -1391,7 +1394,7 @@ export default function FormInputPage() {
             </div>
           </div>
 
-          {/* Premium (maps to Standard) */}
+          {/* Premium */}
           <div
             className={`form-input-page__tier-card${tier === 'premium' ? ' form-input-page__tier-card--active' : ''}`}
             onClick={() => setTier('premium')}
@@ -1401,18 +1404,17 @@ export default function FormInputPage() {
           >
             <div className="form-input-page__tier-header">
               <span className="form-input-page__tier-name">Premium</span>
-              <span className="form-input-page__tier-size">~2 KB</span>
+              <span className="form-input-page__tier-size">~3-5 KB</span>
             </div>
             <p className="form-input-page__tier-desc">
-              Uses Standard tier (no premium variant exists yet). Same full feature set
-              with icons, variants, descriptions, and form context integration.
+              Aurora glow focus ring, spring-shake on validation error, and shimmer sweep on valid focus.
             </p>
             <div className="form-input-page__tier-import">
-              import {'{'} FormInput {'}'} from '@annondeveloper/ui-kit'
+              import {'{'} FormInput {'}'} from '@annondeveloper/ui-kit/premium'
             </div>
             <div className="form-input-page__tier-preview">
               <div style={{ inlineSize: '100%' }}>
-                <FormInput name="prem-preview" label="Premium Input" placeholder="Same as Standard..." iconEnd={<Icon name="check" size="sm" />} />
+                <FormInput name="prem-preview" label="Premium Input" placeholder="Premium tier..." iconEnd={<Icon name="check" size="sm" />} />
               </div>
             </div>
             <div className="form-input-page__size-breakdown">

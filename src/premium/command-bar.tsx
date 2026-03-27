@@ -5,6 +5,7 @@ import { CommandBar as BaseCommandBar, type CommandBarProps } from '../domain/co
 import { useMotionLevel } from '../core/motion/use-motion-level'
 import { css } from '../core/styles/css-tag'
 import { useStyles } from '../core/styles/use-styles'
+import { sharedPremiumCSS } from './shared-effects'
 
 const premiumCommandBarStyles = css`
   @layer premium {
@@ -12,6 +13,10 @@ const premiumCommandBarStyles = css`
       :scope {
         position: relative;
       }
+
+      /* Shared premium effects */
+      ${sharedPremiumCSS}
+
 
       /* Glass morphism on container */
       :scope .ui-command-bar {

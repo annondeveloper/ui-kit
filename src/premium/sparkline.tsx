@@ -4,6 +4,7 @@ import { type SparklineProps, Sparkline as BaseSparkline } from '../domain/spark
 import { useMotionLevel } from '../core/motion/use-motion-level'
 import { css } from '../core/styles/css-tag'
 import { useStyles } from '../core/styles/use-styles'
+import { sharedPremiumCSS } from './shared-effects'
 
 const premiumSparklineStyles = css`
   @layer premium {
@@ -11,6 +12,10 @@ const premiumSparklineStyles = css`
       :scope {
         position: relative;
       }
+
+      /* Shared premium effects */
+      ${sharedPremiumCSS}
+
 
       /* Aurora glow on hover point */
       :scope:not([data-motion="0"]) .ui-sparkline__tooltip-dot {

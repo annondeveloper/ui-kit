@@ -2,9 +2,9 @@
 
 ## Overview
 
-`@annondeveloper/ui-kit` is a zero-dependency React component library with 111 components, physics-based animations, an OKLCH color system, and the Aurora Fluid design identity.
+`@annondeveloper/ui-kit` is a zero-dependency React component library with 116 components, physics-based animations, an OKLCH color system, and the Aurora Fluid design identity.
 
-- **111 components** across 3 weight tiers (Lite, Standard, Premium)
+- **116 components** across 3 weight tiers (Lite, Standard, Premium)
 - **Zero dependencies** — only `react` ^19 and `react-dom` ^19 as peer deps
 - **OKLCH color system** — perceptually uniform, with relative color syntax for theme generation
 - **Physics-based motion** — real spring solver (RK4 integration), 4 motion levels
@@ -42,7 +42,7 @@ function App() {
 
 Every component is available in up to 3 weight tiers, allowing you to optimize bundle size.
 
-### Lite — 109 components
+### Lite — 114 components
 
 ```tsx
 import { Button, Badge, Card } from '@annondeveloper/ui-kit/lite'
@@ -53,20 +53,20 @@ import { Button, Badge, Card } from '@annondeveloper/ui-kit/lite'
 - Pure `className` + `data-*` attribute wrappers with `forwardRef`
 - Ideal for: landing pages, static sites, email templates, SSR
 
-### Standard (default) — 111 components
+### Standard (default) — 116 components
 
 ```tsx
 import { Button, Badge, Card } from '@annondeveloper/ui-kit'
 ```
 
 - ~1.5–5 KB per component (gzipped)
-- 47 general-purpose + 64 domain-specific components
+- 47 general-purpose + 69 domain-specific components
 - Motion levels 0–3 with real spring solver
 - OKLCH theming with `adoptedStyleSheets` auto-injection
 - `@scope` CSS isolation, `@layer components` cascade
 - Full keyboard navigation and ARIA patterns
 
-### Premium — 109 components
+### Premium — 114 components
 
 ```tsx
 import { Button, Badge, Card } from '@annondeveloper/ui-kit/premium'
@@ -92,21 +92,21 @@ import { DataTable } from '@annondeveloper/ui-kit'            // full-featured t
 
 | Tier | Components | Notes |
 |------|-----------|-------|
-| Lite | 109 | All except `ui-provider` and `native-tooltip` |
-| Standard | 111 | 47 general-purpose + 64 domain-specific |
-| Premium | 109 | All except `ui-provider` and `native-tooltip` |
+| Lite | 114 | All except `ui-provider` and `native-tooltip` |
+| Standard | 116 | 47 general-purpose + 69 domain-specific |
+| Premium | 114 | All except `ui-provider` and `native-tooltip` |
 
 ## Entry Points
 
 | Path | Description | Components |
 |------|-------------|-----------|
-| `@annondeveloper/ui-kit` | Standard tier (default) | 111 |
-| `@annondeveloper/ui-kit/lite` | Lite tier | 109 |
-| `@annondeveloper/ui-kit/premium` | Premium tier | 109 |
+| `@annondeveloper/ui-kit` | Standard tier (default) | 116 |
+| `@annondeveloper/ui-kit/lite` | Lite tier | 114 |
+| `@annondeveloper/ui-kit/premium` | Premium tier | 114 |
 | `@annondeveloper/ui-kit/form` | Form engine | `createForm`, `useForm`, validators |
 | `@annondeveloper/ui-kit/theme` | Theme utilities | `generateTheme`, `applyTheme`, `themeToCSS`, `validateContrast` |
 | `@annondeveloper/ui-kit/css/theme.css` | Standalone theme CSS | Dark + light mode tokens |
-| `@annondeveloper/ui-kit/css/all.css` | All component CSS | 109 component stylesheets |
+| `@annondeveloper/ui-kit/css/all.css` | All component CSS | 114 component stylesheets |
 | `@annondeveloper/ui-kit/css/components/*` | Per-component CSS | Individual stylesheets |
 
 ## UIProvider
@@ -247,6 +247,13 @@ Motion cascade: OS `prefers-reduced-motion` > component `motion` prop > CSS `--m
 - **RackDiagram** — data center rack visualization with U-slot device positioning
 - **SwitchFaceplate** — network switch port grid with status colors and port type shapes
 
+#### Entity & Detail Display
+- **PropertyList** — key-value detail panel with label/value rows, copy buttons, monospace, links
+- **EntityCard** — infrastructure resource card with name, status, type, metrics, tags, actions
+- **DiskMountBar** — collapsible disk mount utilization bars with threshold colors
+- **ServiceStrip** — horizontal service badge strip with status colors and overflow count
+- **ConnectionTestPanel** — step-by-step connectivity test UI with pass/fail/running status
+
 #### Table Utilities
 - **DensitySelector** — compact/comfortable/spacious segmented control
 - **ColumnVisibilityToggle** — dropdown checkbox list for column show/hide
@@ -360,7 +367,7 @@ const result = validateContrast(theme)
 | Standard tier | ~149 KB gzip |
 | Premium tier | ~40 KB gzip |
 | Lite tier | ~12 KB gzip |
-| CSS extractions | 109 component files |
+| CSS extractions | 114 component files |
 | Tree-shaking | Full ESM — import only what you use |
 
 Typical app importing ~20 components: **~15–25 KB gzipped** after tree-shaking.
@@ -377,6 +384,6 @@ Typical app importing ~20 components: **~15–25 KB gzipped** after tree-shaking
 ```bash
 npx @annondeveloper/ui-kit init          # Copy theme + utils
 npx @annondeveloper/ui-kit add <name>    # Copy component source
-npx @annondeveloper/ui-kit list          # List all 111 components
+npx @annondeveloper/ui-kit list          # List all 116 components
 npx @annondeveloper/ui-kit theme         # Generate theme from brand color
 ```

@@ -230,12 +230,14 @@ const pageStyles = css`
       }
 
       .time-range-selector-page__playground-preview {
+        min-inline-size: 0;
         display: flex;
         flex-direction: column;
         gap: 1.5rem;
       }
 
       .time-range-selector-page__playground-result {
+        overflow-x: auto;
         min-block-size: 120px;
         display: grid;
         place-items: center;

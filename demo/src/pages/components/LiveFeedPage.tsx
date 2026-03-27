@@ -233,12 +233,14 @@ const pageStyles = css`
       }
 
       .live-feed-page__playground-preview {
+        min-inline-size: 0;
         display: flex;
         flex-direction: column;
         gap: 1.5rem;
       }
 
       .live-feed-page__playground-result {
+        overflow-x: auto;
         min-block-size: 200px;
         padding: 1rem;
         background: var(--bg-base);
@@ -608,7 +610,7 @@ const CONNECTION_STATUSES: ConnectionStatus[] = ['connected', 'reconnecting', 'o
 const IMPORT_STRINGS: Record<Tier, string> = {
   lite: "import { LiveFeed } from '@annondeveloper/ui-kit/lite'",
   standard: "import { LiveFeed } from '@annondeveloper/ui-kit'",
-  premium: "import { LiveFeed } from '@annondeveloper/ui-kit'",
+  premium: "import { LiveFeed } from '@annondeveloper/ui-kit/premium'",
 }
 
 const EVENT_MESSAGES = [
@@ -1124,7 +1126,7 @@ export default function LiveFeedPage() {
           <a href="#tiers">Weight Tiers</a>
         </h2>
         <p className="live-feed-page__section-desc">
-          LiveFeed ships in two tiers. No premium variant &mdash; premium maps to standard.
+          LiveFeed ships in three tiers. Premium adds aurora glow effects and spring animations.
         </p>
 
         <div className="live-feed-page__tiers">
@@ -1181,28 +1183,29 @@ export default function LiveFeedPage() {
             </div>
           </div>
 
-          {/* Premium (maps to standard) */}
+          {/* Premium */}
           <div
             className={`live-feed-page__tier-card${tier === 'premium' ? ' live-feed-page__tier-card--active' : ''}`}
-            onClick={() => setTier('standard')}
+            onClick={() => setTier('premium')}
             role="button"
             tabIndex={0}
-            onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setTier('standard') } }}
+            onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setTier('premium') } }}
           >
             <div className="live-feed-page__tier-header">
               <span className="live-feed-page__tier-name">Premium</span>
-              <span className="live-feed-page__tier-size">= Standard</span>
+              <span className="live-feed-page__tier-size">~3-5 KB</span>
             </div>
             <p className="live-feed-page__tier-desc">
-              No separate premium tier. Standard includes all features
-              including animations. Premium maps directly to Standard.
+              Spring-slide entrance for new items, aurora glow on the newest entry, and shimmer loading state.
             </p>
             <div className="live-feed-page__tier-import">
-              import {'{'} LiveFeed {'}'} from '@annondeveloper/ui-kit'
+              import {'{'} LiveFeed {'}'} from '@annondeveloper/ui-kit/premium'
             </div>
             <div className="live-feed-page__size-breakdown">
               <div className="live-feed-page__size-row">
-                <span style={{ fontStyle: 'italic', color: 'var(--text-tertiary)' }}>Same as Standard tier</span>
+                <span>Component: <strong style={{ color: 'var(--text-primary)' }}>3.5 KB</strong></span>
+                <span>+ Shared: <strong style={{ color: 'var(--text-primary)' }}>0.9 KB</strong></span>
+                <span>= <strong style={{ color: 'var(--brand)' }}>4.4 KB</strong> gzip</span>
               </div>
             </div>
           </div>

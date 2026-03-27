@@ -5,14 +5,20 @@ import { TagInput as BaseTagInput, type TagInputProps } from '../components/tag-
 import { useMotionLevel } from '../core/motion/use-motion-level'
 import { css } from '../core/styles/css-tag'
 import { useStyles } from '../core/styles/use-styles'
+import { sharedPremiumCSS } from './shared-effects'
 
 const premiumTagInputStyles = css`
   @layer premium {
     @scope (.ui-premium-tag-input) {
       :scope {
+        position: relative;
         display: flex;
         flex-direction: column;
       }
+
+      /* Shared premium effects */
+      ${sharedPremiumCSS}
+
 
       /* Aurora glow on tag pills */
       :scope .ui-tag-input__tag {

@@ -276,12 +276,14 @@ const pageStyles = css`
       }
 
       .tracing-beam-page__playground-preview {
+        min-inline-size: 0;
         display: flex;
         flex-direction: column;
         gap: 1.5rem;
       }
 
       .tracing-beam-page__playground-result {
+        overflow-x: auto;
         min-block-size: 300px;
         padding: 2rem;
         background: var(--bg-base);

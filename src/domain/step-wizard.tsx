@@ -123,6 +123,17 @@ const stepWizardStyles = css`
         border-color: var(--brand, oklch(65% 0.2 270));
         color: var(--text-on-brand, oklch(100% 0 0));
         box-shadow: 0 0 0 3px oklch(from var(--brand, oklch(65% 0.2 270)) l c h / 0.2);
+        animation: ui-step-active-pulse 2s ease-in-out infinite;
+      }
+
+      @keyframes ui-step-active-pulse {
+        0%, 100% { box-shadow: 0 0 0 3px oklch(from var(--brand, oklch(65% 0.2 270)) l c h / 0.2); }
+        50% { box-shadow: 0 0 0 6px oklch(from var(--brand, oklch(65% 0.2 270)) l c h / 0.1), 0 0 12px oklch(from var(--brand, oklch(65% 0.2 270)) l c h / 0.08); }
+      }
+
+      :scope[data-motion="0"] .ui-step-wizard__indicator { animation: none; }
+      @media (prefers-reduced-motion: reduce) {
+        .ui-step-wizard__indicator { animation: none; }
       }
 
       .ui-step-wizard__indicator[data-state="completed"] {

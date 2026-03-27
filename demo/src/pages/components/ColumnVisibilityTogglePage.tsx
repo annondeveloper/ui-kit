@@ -239,13 +239,15 @@ const pageStyles = css`
       }
 
       .column-visibility-toggle-page__playground-preview {
+        min-inline-size: 0;
         display: flex;
         flex-direction: column;
         gap: 1.5rem;
       }
 
       .column-visibility-toggle-page__playground-result {
-        min-block-size: 200px;
+        overflow: visible;
+        min-block-size: 300px;
         display: flex;
         flex-direction: column;
         gap: 1.5rem;
@@ -574,7 +576,7 @@ const pageStyles = css`
 
         .column-visibility-toggle-page__playground-result {
           padding: 1.5rem;
-          min-block-size: 120px;
+          min-block-size: 300px;
         }
 
         .column-visibility-toggle-page__tiers {

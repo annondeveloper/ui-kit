@@ -4,6 +4,7 @@ import { DropdownMenu as BaseDropdownMenu, type DropdownMenuProps } from '../com
 import { useMotionLevel } from '../core/motion/use-motion-level'
 import { css } from '../core/styles/css-tag'
 import { useStyles } from '../core/styles/use-styles'
+import { sharedPremiumCSS } from './shared-effects'
 
 const premiumDropdownMenuStyles = css`
   @layer premium {
@@ -11,6 +12,10 @@ const premiumDropdownMenuStyles = css`
       :scope {
         display: contents;
       }
+
+      /* Shared premium effects */
+      ${sharedPremiumCSS}
+
 
       /* Spring-scale entrance on panel */
       :scope:not([data-motion="0"]) .ui-dropdown-menu__panel {

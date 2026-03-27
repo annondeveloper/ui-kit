@@ -210,9 +210,11 @@ const pageStyles = css`
         .search-input-page__playground-controls { position: static !important; }
       }
 
-      .search-input-page__playground-preview { display: flex; flex-direction: column; gap: 1.5rem; }
+      .search-input-page__playground-preview { min-inline-size: 0;
+        display: flex; flex-direction: column; gap: 1.5rem; }
 
       .search-input-page__playground-result {
+        overflow-x: auto;
         min-block-size: 200px;
         display: grid;
         place-items: center;
@@ -387,7 +389,8 @@ const pageStyles = css`
         .search-input-page__title { font-size: 1.75rem; }
         .search-input-page__preview { padding: 1.75rem; }
         .search-input-page__playground { grid-template-columns: 1fr; }
-        .search-input-page__playground-result { padding: 2rem; min-block-size: 120px; }
+        .search-input-page__playground-result { padding: 2rem; overflow-x: auto;
+        min-block-size: 120px; }
         .search-input-page__states-grid { grid-template-columns: 1fr; }
         .search-input-page__tiers { grid-template-columns: 1fr; }
         .search-input-page__section { padding: 1.25rem; }
@@ -444,7 +447,7 @@ const SIZES: Size[] = ['xs', 'sm', 'md', 'lg', 'xl']
 const IMPORT_STRINGS: Record<Tier, string> = {
   lite: "import { SearchInput } from '@annondeveloper/ui-kit/lite'",
   standard: "import { SearchInput } from '@annondeveloper/ui-kit'",
-  premium: "import { SearchInput } from '@annondeveloper/ui-kit'",
+  premium: "import { SearchInput } from '@annondeveloper/ui-kit/premium'",
 }
 
 const COLOR_PRESETS = [
@@ -998,16 +1001,16 @@ export default function SearchInputPage() {
             </div>
           </div>
 
-          {/* Premium (maps to Standard) */}
+          {/* Premium */}
           <div className={`search-input-page__tier-card${tier === 'premium' ? ' search-input-page__tier-card--active' : ''}`}
             onClick={() => setTier('premium')} role="button" tabIndex={0}
             onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setTier('premium') } }}>
             <div className="search-input-page__tier-header">
               <span className="search-input-page__tier-name">Premium</span>
-              <span className="search-input-page__tier-size">~1.5 KB</span>
+              <span className="search-input-page__tier-size">~3-5 KB</span>
             </div>
-            <p className="search-input-page__tier-desc">Uses Standard tier (no premium variant exists yet). Same full feature set with debounce, loading, and clear.</p>
-            <div className="search-input-page__tier-import">import {'{'} SearchInput {'}'} from '@annondeveloper/ui-kit'</div>
+            <p className="search-input-page__tier-desc">Aurora glow focus ring, spring-bounce clear button, and shimmer loading state.</p>
+            <div className="search-input-page__tier-import">import {'{'} SearchInput {'}'} from '@annondeveloper/ui-kit/premium'</div>
             <div className="search-input-page__tier-preview">
               <div style={{ inlineSize: '100%' }}>
                 <SearchInput placeholder="Premium search..." />

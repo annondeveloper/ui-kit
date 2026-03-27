@@ -5,13 +5,19 @@ import { Kbd as BaseKbd, type KbdProps } from '../components/kbd'
 import { useMotionLevel } from '../core/motion/use-motion-level'
 import { css } from '../core/styles/css-tag'
 import { useStyles } from '../core/styles/use-styles'
+import { sharedPremiumCSS } from './shared-effects'
 
 const premiumKbdStyles = css`
   @layer premium {
     @scope (.ui-premium-kbd) {
       :scope {
+        position: relative;
         display: inline-flex;
       }
+
+      /* Shared premium effects */
+      ${sharedPremiumCSS}
+
 
       /* Spring-scale hover lift */
       @media (hover: hover) {

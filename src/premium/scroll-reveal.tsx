@@ -4,6 +4,7 @@ import { ScrollReveal as BaseScrollReveal, type ScrollRevealProps } from '../dom
 import { useMotionLevel } from '../core/motion/use-motion-level'
 import { css } from '../core/styles/css-tag'
 import { useStyles } from '../core/styles/use-styles'
+import { sharedPremiumCSS } from './shared-effects'
 
 const premiumScrollRevealStyles = css`
   @layer premium {
@@ -11,6 +12,10 @@ const premiumScrollRevealStyles = css`
       :scope {
         display: contents;
       }
+
+      /* Shared premium effects */
+      ${sharedPremiumCSS}
+
 
       /* Enhanced spring-entrance with overshoot */
       :scope .ui-scroll-reveal[data-revealed="true"]:not([data-motion="0"]) {

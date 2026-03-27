@@ -275,12 +275,14 @@ const pageStyles = css`
       }
 
       .time-series-chart-page__playground-preview {
+        min-inline-size: 0;
         display: flex;
         flex-direction: column;
         gap: 1.5rem;
       }
 
       .time-series-chart-page__playground-result {
+        overflow-x: auto;
         min-block-size: 200px;
         display: flex;
         flex-direction: column;
@@ -542,7 +544,8 @@ const pageStyles = css`
         .time-series-chart-page__title { font-size: 1.75rem; }
         .time-series-chart-page__preview { padding: 1.75rem; }
         .time-series-chart-page__playground { grid-template-columns: 1fr; }
-        .time-series-chart-page__playground-result { padding: 1rem; min-block-size: 120px; }
+        .time-series-chart-page__playground-result { padding: 1rem; overflow-x: auto;
+        min-block-size: 120px; }
         .time-series-chart-page__tiers { grid-template-columns: 1fr; }
         .time-series-chart-page__section { padding: 1.25rem; }
       }

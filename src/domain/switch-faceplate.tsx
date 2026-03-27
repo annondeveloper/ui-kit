@@ -39,6 +39,7 @@ const faceplateStyles = css`
     @scope (.ui-switch-faceplate) {
       :scope {
         position: relative;
+        min-inline-size: 200px;
         display: inline-block;
         background: var(--bg-surface, oklch(20% 0.01 270));
         border: 1px solid var(--border-default);

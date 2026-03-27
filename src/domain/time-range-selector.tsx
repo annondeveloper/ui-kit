@@ -45,6 +45,7 @@ const selectorStyles = css`
     @scope (.ui-time-range-selector) {
       :scope {
         display: flex;
+        min-inline-size: 200px;
         flex-wrap: wrap;
         align-items: center;
         gap: var(--space-sm, 0.5rem);

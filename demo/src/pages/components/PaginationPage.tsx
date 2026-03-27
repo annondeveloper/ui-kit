@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useMemo, useRef, useEffect } from 'react'
+import { useState, useMemo, useRef, useEffect, useCallback } from 'react'
 import { css } from '@ui/core/styles/css-tag'
 import { useStyles } from '@ui/core/styles/use-styles'
 import { Pagination } from '@ui/components/pagination'
@@ -243,12 +243,14 @@ const pageStyles = css`
       }
 
       .pagination-page__playground-preview {
+        min-inline-size: 0;
         display: flex;
         flex-direction: column;
         gap: 1.5rem;
       }
 
       .pagination-page__playground-result {
+        overflow-x: auto;
         min-block-size: 200px;
         display: grid;
         place-items: center;
@@ -680,7 +682,7 @@ const TIERS: { id: Tier; label: string }[] = [
 const IMPORT_STRINGS: Record<Tier, string> = {
   lite: "import { Pagination } from '@annondeveloper/ui-kit/lite'",
   standard: "import { Pagination } from '@annondeveloper/ui-kit'",
-  premium: "import { Pagination } from '@annondeveloper/ui-kit'",
+  premium: "import { Pagination } from '@annondeveloper/ui-kit/premium'",
 }
 
 function CopyButton({ text, prefix }: { text: string; prefix: string }) {
@@ -1156,7 +1158,7 @@ export default function PaginationPage() {
     return () => observer.disconnect()
   }, [])
 
-  // No premium exists for Pagination — premium maps to standard
+  // Premium tier now available at @annondeveloper/ui-kit/premium
   const PaginationComponent = tier === 'lite' ? LitePagination : Pagination
 
   return (
@@ -1279,7 +1281,7 @@ export default function PaginationPage() {
         </h2>
         <p className={`${P}section-desc`}>
           Choose the right balance of features and bundle size. Pagination ships as Lite (CSS-only) and Standard (full-featured).
-          Premium maps to Standard for this component.
+          Premium adds aurora glow effects and spring animations.
         </p>
 
         <div className={`${P}tiers`}>
@@ -1343,7 +1345,7 @@ export default function PaginationPage() {
             </div>
           </div>
 
-          {/* Premium (maps to Standard) */}
+          {/* Premium */}
           <div
             className={`${P}tier-card${tier === 'premium' ? ` ${P}tier-card--active` : ''}`}
             onClick={() => setTier('premium')}
@@ -1353,13 +1355,13 @@ export default function PaginationPage() {
           >
             <div className={`${P}tier-header`}>
               <span className={`${P}tier-name`}>Premium</span>
-              <span className={`${P}tier-size`}>~1.8 KB</span>
+              <span className={`${P}tier-size`}>~3-5 KB</span>
             </div>
             <p className={`${P}tier-desc`}>
-              Maps to Standard for Pagination. No additional premium features for this component — Standard already includes all functionality.
+              Aurora glow on current page, spring-scale page pop animation, shimmer on page change, and hover glow.
             </p>
             <div className={`${P}tier-import`}>
-              import {'{'} Pagination {'}'} from '@annondeveloper/ui-kit'
+              import {'{'} Pagination {'}'} from '@annondeveloper/ui-kit/premium'
             </div>
             <div className={`${P}tier-preview`}>
               <Pagination page={3} totalPages={10} onChange={() => {}} showFirst />

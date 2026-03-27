@@ -223,6 +223,7 @@ const pageStyles = css`
       }
 
       .copy-block-page__playground-preview {
+        min-inline-size: 0;
         display: flex;
         flex-direction: column;
         gap: 1.5rem;
@@ -664,7 +665,7 @@ const LANG_SAMPLES: Record<Language, { code: string; label: string }> = {
 const IMPORT_STRINGS: Record<Tier, string> = {
   lite: "import { CopyBlock } from '@annondeveloper/ui-kit/lite'",
   standard: "import { CopyBlock } from '@annondeveloper/ui-kit'",
-  premium: "import { CopyBlock } from '@annondeveloper/ui-kit'",
+  premium: "import { CopyBlock } from '@annondeveloper/ui-kit/premium'",
 }
 
 function CopyButton({ text }: { text: string }) {
@@ -1247,14 +1248,13 @@ export default function CopyBlockPage() {
           >
             <div className="copy-block-page__tier-header">
               <span className="copy-block-page__tier-name">Premium</span>
-              <span className="copy-block-page__tier-size">~3.5 KB</span>
+              <span className="copy-block-page__tier-size">~3-5 KB</span>
             </div>
             <p className="copy-block-page__tier-desc">
-              Same as Standard — CopyBlock is a content display component where
-              premium effects are not applicable. Use Standard tier.
+              Aurora glow on copy button and container hover, spring-scale click feedback, and shimmer on highlighted lines.
             </p>
             <div className="copy-block-page__tier-import">
-              import {'{'} CopyBlock {'}'} from '@annondeveloper/ui-kit'
+              import {'{'} CopyBlock {'}'} from '@annondeveloper/ui-kit/premium'
             </div>
             <div className="copy-block-page__tier-preview">
               <CopyBlock code="const x = 42" language="typescript" title="example.ts" />

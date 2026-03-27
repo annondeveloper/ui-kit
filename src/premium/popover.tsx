@@ -4,6 +4,7 @@ import { Popover as BasePopover, type PopoverProps } from '../components/popover
 import { useMotionLevel } from '../core/motion/use-motion-level'
 import { css } from '../core/styles/css-tag'
 import { useStyles } from '../core/styles/use-styles'
+import { sharedPremiumCSS } from './shared-effects'
 
 const premiumPopoverStyles = css`
   @layer premium {
@@ -11,6 +12,10 @@ const premiumPopoverStyles = css`
       :scope {
         display: contents;
       }
+
+      /* Shared premium effects */
+      ${sharedPremiumCSS}
+
 
       /* Aurora glow shadow on panel */
       :scope .ui-popover .ui-popover__panel {

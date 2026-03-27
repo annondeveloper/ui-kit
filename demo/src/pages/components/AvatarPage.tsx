@@ -219,9 +219,11 @@ const pageStyles = css`
         .avatar-page__playground-controls { position: static !important; }
       }
 
-      .avatar-page__playground-preview { display: flex; flex-direction: column; gap: 1.5rem; }
+      .avatar-page__playground-preview { min-inline-size: 0;
+        display: flex; flex-direction: column; gap: 1.5rem; }
 
       .avatar-page__playground-result {
+        overflow-x: auto;
         min-block-size: 200px;
         display: grid;
         place-items: center;
@@ -472,7 +474,8 @@ const pageStyles = css`
         .avatar-page__title { font-size: 1.75rem; }
         .avatar-page__preview { padding: 1.75rem; }
         .avatar-page__playground { grid-template-columns: 1fr; }
-        .avatar-page__playground-result { padding: 2rem; min-block-size: 120px; }
+        .avatar-page__playground-result { padding: 2rem; overflow-x: auto;
+        min-block-size: 120px; }
         .avatar-page__tiers { grid-template-columns: 1fr; }
         .avatar-page__section { padding: 1.25rem; }
       }
@@ -522,7 +525,7 @@ const STATUSES: Status[] = ['online', 'offline', 'away', 'busy']
 const IMPORT_STRINGS: Record<Tier, string> = {
   lite: "import { Avatar } from '@annondeveloper/ui-kit/lite'",
   standard: "import { Avatar } from '@annondeveloper/ui-kit'",
-  premium: "import { Avatar } from '@annondeveloper/ui-kit'",
+  premium: "import { Avatar } from '@annondeveloper/ui-kit/premium'",
 }
 
 const COLOR_PRESETS = [
@@ -990,12 +993,12 @@ export default function AvatarPage() {
           >
             <div className="avatar-page__tier-header">
               <span className="avatar-page__tier-name">Premium</span>
-              <span className="avatar-page__tier-size">~1.5 KB</span>
+              <span className="avatar-page__tier-size">~3-5 KB</span>
             </div>
             <p className="avatar-page__tier-desc">
-              Same as Standard. Premium tier shares the full Avatar implementation with all features included.
+              Ambient aurora glow ring, spring-scale on hover, shimmer on loading state, and status dot glow.
             </p>
-            <div className="avatar-page__tier-import">import {'{'} Avatar {'}'} from '@annondeveloper/ui-kit'</div>
+            <div className="avatar-page__tier-import">import {'{'} Avatar {'}'} from '@annondeveloper/ui-kit/premium'</div>
             <div className="avatar-page__tier-preview">
               <Avatar size="xl" name="Premium User" status="away" />
             </div>

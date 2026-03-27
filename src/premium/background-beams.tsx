@@ -5,6 +5,7 @@ import { BackgroundBeams as BaseBackgroundBeams, type BackgroundBeamsProps } fro
 import { useMotionLevel } from '../core/motion/use-motion-level'
 import { css } from '../core/styles/css-tag'
 import { useStyles } from '../core/styles/use-styles'
+import { sharedPremiumCSS } from './shared-effects'
 
 const premiumBackgroundBeamsStyles = css`
   @layer premium {
@@ -12,6 +13,10 @@ const premiumBackgroundBeamsStyles = css`
       :scope {
         position: relative;
       }
+
+      /* Shared premium effects */
+      ${sharedPremiumCSS}
+
 
       /* Enhanced beam glow intensity */
       :scope .ui-background-beams--beam {

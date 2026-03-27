@@ -5,6 +5,7 @@ import { SmartTable as BaseSmartTable, type SmartTableProps } from '../domain/sm
 import { useMotionLevel } from '../core/motion/use-motion-level'
 import { css } from '../core/styles/css-tag'
 import { useStyles } from '../core/styles/use-styles'
+import { sharedPremiumCSS } from './shared-effects'
 
 const premiumSmartTableStyles = css`
   @layer premium {
@@ -12,6 +13,10 @@ const premiumSmartTableStyles = css`
       :scope {
         position: relative;
       }
+
+      /* Shared premium effects */
+      ${sharedPremiumCSS}
+
 
       /* Aurora glow headers */
       :scope .ui-data-table__header-cell {

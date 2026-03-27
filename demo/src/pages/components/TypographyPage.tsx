@@ -243,12 +243,14 @@ const pageStyles = css`
       }
 
       .typography-page__playground-preview {
+        min-inline-size: 0;
         display: flex;
         flex-direction: column;
         gap: 1.5rem;
       }
 
       .typography-page__playground-result {
+        overflow-x: auto;
         min-block-size: 200px;
         display: grid;
         place-items: center;
@@ -721,7 +723,7 @@ const TIERS: { id: Tier; label: string }[] = [
 const IMPORT_STRINGS: Record<Tier, string> = {
   lite: "import { Typography } from '@annondeveloper/ui-kit/lite'",
   standard: "import { Typography } from '@annondeveloper/ui-kit'",
-  premium: "import { Typography } from '@annondeveloper/ui-kit'",
+  premium: "import { Typography } from '@annondeveloper/ui-kit/premium'",
 }
 
 const VARIANT_DISPLAY_TEXT: Record<Variant, string> = {
@@ -1281,7 +1283,7 @@ export default function TypographyPage() {
         </h2>
         <p className="typography-page__section-desc">
           Choose the right balance of features and bundle size. Lite provides CSS-only rendering.
-          Standard adds weight overrides, alignment, truncation, and motion. No premium tier exists -- premium maps to standard.
+          Standard adds weight overrides, alignment, truncation, and motion. Premium adds aurora glow effects and spring animations.
         </p>
 
         <div className="typography-page__tiers">
@@ -1347,30 +1349,32 @@ export default function TypographyPage() {
             </div>
           </div>
 
-          {/* Premium (maps to Standard) */}
+          {/* Premium */}
           <div
             className={`typography-page__tier-card${tier === 'premium' ? ' typography-page__tier-card--active' : ''}`}
-            onClick={() => setTier('standard')}
+            onClick={() => setTier('premium')}
             role="button"
             tabIndex={0}
-            onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setTier('standard') } }}
+            onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setTier('premium') } }}
           >
             <div className="typography-page__tier-header">
               <span className="typography-page__tier-name">Premium</span>
-              <span className="typography-page__tier-size">= Standard</span>
+              <span className="typography-page__tier-size">~3-5 KB</span>
             </div>
             <p className="typography-page__tier-desc">
-              No separate premium tier for Typography. Premium import maps directly to the Standard component.
+              Shimmer gradient text on headings, aurora glow on code variant, and spring-fade entrance animation.
             </p>
             <div className="typography-page__tier-import">
-              import {'{'} Typography {'}'} from '@annondeveloper/ui-kit'
+              import {'{'} Typography {'}'} from '@annondeveloper/ui-kit/premium'
             </div>
             <div className="typography-page__tier-preview">
               <Typography variant="h4" color="brand">Standard</Typography>
             </div>
             <div className="typography-page__size-breakdown">
               <div className="typography-page__size-row">
-                <span>Same as Standard tier</span>
+                <span>Component: <strong style={{ color: 'var(--text-primary)' }}>3.0 KB</strong></span>
+                <span>+ Shared: <strong style={{ color: 'var(--text-primary)' }}>0.9 KB</strong></span>
+                <span>= <strong style={{ color: 'var(--brand)' }}>3.9 KB</strong> gzip</span>
               </div>
             </div>
           </div>

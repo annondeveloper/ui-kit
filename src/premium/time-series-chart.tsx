@@ -4,6 +4,7 @@ import { type TimeSeriesChartProps, TimeSeriesChart as BaseTimeSeriesChart } fro
 import { useMotionLevel } from '../core/motion/use-motion-level'
 import { css } from '../core/styles/css-tag'
 import { useStyles } from '../core/styles/use-styles'
+import { sharedPremiumCSS } from './shared-effects'
 
 const premiumTimeSeriesStyles = css`
   @layer premium {
@@ -11,6 +12,10 @@ const premiumTimeSeriesStyles = css`
       :scope {
         position: relative;
       }
+
+      /* Shared premium effects */
+      ${sharedPremiumCSS}
+
 
       /* Aurora glow on series lines */
       :scope:not([data-motion="0"]) .ui-time-series-chart__series-line {

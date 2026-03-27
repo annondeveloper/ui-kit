@@ -209,12 +209,14 @@ const pageStyles = css`
       }
 
       .heatmap-calendar-page__playground-preview {
+        min-inline-size: 0;
         display: flex;
         flex-direction: column;
         gap: 1.5rem;
       }
 
       .heatmap-calendar-page__playground-result {
+        overflow-x: auto;
         min-block-size: 180px;
         display: flex;
         justify-content: center;
@@ -484,7 +486,7 @@ const COLOR_THEMES: Record<ColorTheme, [string, string]> = {
 const IMPORT_STRINGS: Record<Tier, string> = {
   lite: "import { HeatmapCalendar } from '@annondeveloper/ui-kit/lite'",
   standard: "import { HeatmapCalendar } from '@annondeveloper/ui-kit'",
-  premium: "import { HeatmapCalendar } from '@annondeveloper/ui-kit'",
+  premium: "import { HeatmapCalendar } from '@annondeveloper/ui-kit/premium'",
 }
 
 function CopyButton({ text }: { text: string }) {
@@ -987,14 +989,13 @@ export default function HeatmapCalendarPage() {
           >
             <div className="heatmap-calendar-page__tier-header">
               <span className="heatmap-calendar-page__tier-name">Premium</span>
-              <span className="heatmap-calendar-page__tier-size">~2.4 KB</span>
+              <span className="heatmap-calendar-page__tier-size">~3-5 KB</span>
             </div>
             <p className="heatmap-calendar-page__tier-desc">
-              Same as Standard — HeatmapCalendar is a data visualization component where additional
-              premium effects are not applicable. Use Standard tier.
+              Aurora glow on hover, shimmer fill on data cells, spring-scale tooltip entrance, and staggered cell entrance.
             </p>
             <div className="heatmap-calendar-page__tier-import">
-              import {'{'} HeatmapCalendar {'}'} from '@annondeveloper/ui-kit'
+              import {'{'} HeatmapCalendar {'}'} from '@annondeveloper/ui-kit/premium'
             </div>
             <div className="heatmap-calendar-page__tier-preview">
               <HeatmapCalendar data={quarterData.slice(0, 60)} showTooltip />
