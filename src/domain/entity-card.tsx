@@ -204,6 +204,20 @@ const entityCardStyles = css`
         inline-size: 6px;
         block-size: 6px;
         border-radius: 9999px;
+        animation: ui-entity-card-pulse 2s ease-in-out infinite;
+      }
+
+      @keyframes ui-entity-card-pulse {
+        0%, 100% { opacity: 1; transform: scale(1); }
+        50% { opacity: 0.6; transform: scale(0.85); }
+      }
+
+      :scope[data-motion="0"] .ui-entity-card__status-dot {
+        animation: none;
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        .ui-entity-card__status-dot { animation: none; }
       }
 
       .ui-entity-card__status[data-status="ok"] {

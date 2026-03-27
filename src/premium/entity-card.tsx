@@ -38,6 +38,16 @@ const premiumEntityCardStyles = css`
           opacity: 1;
         }
       }
+      /* Enhanced status dot with aurora glow ring */
+      :scope:not([data-motion="0"]) .ui-entity-card__status-dot {
+        animation: ui-premium-entity-dot-pulse 2s ease-in-out infinite;
+        box-shadow: 0 0 4px currentColor;
+      }
+      @keyframes ui-premium-entity-dot-pulse {
+        0%, 100% { opacity: 1; transform: scale(1); box-shadow: 0 0 4px currentColor; }
+        50% { opacity: 0.7; transform: scale(0.8); box-shadow: 0 0 10px currentColor, 0 0 20px currentColor; }
+      }
+
       /* Status shimmer for critical */
       :scope:not([data-motion="0"]) .ui-entity-card[data-status="critical"] {
         animation: ui-premium-entity-critical-pulse 3s ease-in-out infinite;
