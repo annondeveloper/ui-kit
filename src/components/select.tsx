@@ -197,12 +197,12 @@ const selectStyles = css`
         min-inline-size: 100%;
         max-block-size: 15rem;
         overflow: auto;
-        border: 1px solid oklch(100% 0 0 / 0.12);
-        border-block-start-color: oklch(100% 0 0 / 0.18);
+        border: 1px solid var(--border-default);
+        border-block-start-color: var(--border-strong);
         border-radius: var(--radius-lg, 0.5rem);
-        background: oklch(from var(--surface-elevated, oklch(22% 0.01 270)) l c h / 0.85);
+        background: var(--surface-elevated);
         backdrop-filter: blur(16px) saturate(1.5);
-        box-shadow: 0 12px 40px oklch(0% 0 0 / 0.35), 0 4px 16px oklch(0% 0 0 / 0.2), inset 0 1px 0 oklch(100% 0 0 / 0.06);
+        box-shadow: var(--shadow-lg), inset 0 1px 0 var(--border-subtle);
         padding-block: 0.25rem;
         outline: none;
       }
