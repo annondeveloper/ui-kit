@@ -589,7 +589,7 @@ const TIERS: { id: Tier; label: string }[] = [
 const IMPORT_STRINGS: Record<Tier, string> = {
   lite: "import { Toast } from '@annondeveloper/ui-kit/lite'",
   standard: "import { ToastProvider, useToast } from '@annondeveloper/ui-kit'",
-  premium: "import { ToastProvider, useToast } from '@annondeveloper/ui-kit'",
+  premium: "import { ToastProvider, useToast } from '@annondeveloper/ui-kit/premium'",
 }
 
 function CopyButton({ text }: { text: string }) {

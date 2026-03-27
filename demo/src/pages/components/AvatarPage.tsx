@@ -522,7 +522,7 @@ const STATUSES: Status[] = ['online', 'offline', 'away', 'busy']
 const IMPORT_STRINGS: Record<Tier, string> = {
   lite: "import { Avatar } from '@annondeveloper/ui-kit/lite'",
   standard: "import { Avatar } from '@annondeveloper/ui-kit'",
-  premium: "import { Avatar } from '@annondeveloper/ui-kit'",
+  premium: "import { Avatar } from '@annondeveloper/ui-kit/premium'",
 }
 
 const COLOR_PRESETS = [

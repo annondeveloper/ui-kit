@@ -477,7 +477,7 @@ const DEFAULT_SWATCHES = ['#ff0000', '#ff8800', '#ffcc00', '#00cc44', '#0088ff',
 const IMPORT_STRINGS: Record<Tier, string> = {
   lite: "import { ColorInput } from '@annondeveloper/ui-kit/lite'",
   standard: "import { ColorInput } from '@annondeveloper/ui-kit'",
-  premium: "import { ColorInput } from '@annondeveloper/ui-kit'",
+  premium: "import { ColorInput } from '@annondeveloper/ui-kit/premium'",
 }
 
 function CopyButton({ text }: { text: string }) {

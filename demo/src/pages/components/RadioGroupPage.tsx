@@ -666,7 +666,7 @@ const ORIENTATIONS: Orientation[] = ['horizontal', 'vertical']
 const IMPORT_STRINGS: Record<Tier, string> = {
   lite: "import { RadioGroup } from '@annondeveloper/ui-kit/lite'",
   standard: "import { RadioGroup } from '@annondeveloper/ui-kit'",
-  premium: "import { RadioGroup } from '@annondeveloper/ui-kit'",
+  premium: "import { RadioGroup } from '@annondeveloper/ui-kit/premium'",
 }
 
 const SAMPLE_OPTIONS = [

@@ -441,7 +441,7 @@ const SIZES: Size[] = ['xs', 'sm', 'md', 'lg', 'xl']
 const IMPORT_STRINGS: Record<Tier, string> = {
   lite: "import { SearchInput } from '@annondeveloper/ui-kit/lite'",
   standard: "import { SearchInput } from '@annondeveloper/ui-kit'",
-  premium: "import { SearchInput } from '@annondeveloper/ui-kit'",
+  premium: "import { SearchInput } from '@annondeveloper/ui-kit/premium'",
 }
 
 const COLOR_PRESETS = [

@@ -604,7 +604,7 @@ const COLOR_PRESETS = [
 const IMPORT_STRINGS: Record<Tier, string> = {
   lite: "/* CSS-only: @import '@annondeveloper/ui-kit/css/components/border-beam.css' */",
   standard: "import { BorderBeam } from '@annondeveloper/ui-kit'",
-  premium: "import { BorderBeam } from '@annondeveloper/ui-kit'",
+  premium: "import { BorderBeam } from '@annondeveloper/ui-kit/premium'",
 }
 
 function CopyButton({ text }: { text: string }) {

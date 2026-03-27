@@ -656,7 +656,7 @@ const TIERS: { id: Tier; label: string }[] = [
 const IMPORT_STRINGS: Record<Tier, string> = {
   lite: "import { CommandBar } from '@annondeveloper/ui-kit/lite'",
   standard: "import { CommandBar } from '@annondeveloper/ui-kit'",
-  premium: "import { CommandBar } from '@annondeveloper/ui-kit'",
+  premium: "import { CommandBar } from '@annondeveloper/ui-kit/premium'",
 }
 
 const DEMO_ITEMS: CommandItem[] = [
@@ -1171,7 +1171,7 @@ export default function CommandBarPage() {
         </h2>
         <p className="command-bar-page__section-desc">
           Choose the right tier for your needs. CommandBar ships in two tiers
-          (no premium variant &mdash; premium maps to standard).
+          Premium adds aurora glow effects and spring animations.
         </p>
 
         <div className="command-bar-page__tiers">

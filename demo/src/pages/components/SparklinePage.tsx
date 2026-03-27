@@ -619,7 +619,7 @@ const TIERS: { id: Tier; label: string }[] = [
 const IMPORT_STRINGS: Record<Tier, string> = {
   lite: "import { Sparkline } from '@annondeveloper/ui-kit/lite'",
   standard: "import { Sparkline } from '@annondeveloper/ui-kit'",
-  premium: "import { Sparkline } from '@annondeveloper/ui-kit'",
+  premium: "import { Sparkline } from '@annondeveloper/ui-kit/premium'",
 }
 
 const SAMPLE_DATA = [4, 8, 15, 16, 23, 42, 38, 35, 30, 25, 28, 33, 40, 45, 50, 48, 42, 38, 35, 40]

@@ -721,7 +721,7 @@ const TIERS: { id: Tier; label: string }[] = [
 const IMPORT_STRINGS: Record<Tier, string> = {
   lite: "import { Typography } from '@annondeveloper/ui-kit/lite'",
   standard: "import { Typography } from '@annondeveloper/ui-kit'",
-  premium: "import { Typography } from '@annondeveloper/ui-kit'",
+  premium: "import { Typography } from '@annondeveloper/ui-kit/premium'",
 }
 
 const VARIANT_DISPLAY_TEXT: Record<Variant, string> = {

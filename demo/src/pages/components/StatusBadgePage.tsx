@@ -829,7 +829,7 @@ function generateAngularCode(tier: Tier, status: Status, size: Size, label: stri
 /* In styles.css */
 @import '@annondeveloper/ui-kit/lite/styles.css';`
   }
-  return `<!-- Angular -- ${tier === 'premium' ? 'Standard' : 'Standard'} tier -->
+  return `<!-- Angular -- ${tier === 'premium' ? 'Premium' : 'Standard'} tier -->
 <span
   class="ui-status-badge"
   data-status="${status}"

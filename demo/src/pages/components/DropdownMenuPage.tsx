@@ -625,7 +625,7 @@ const PLACEMENTS: Placement[] = ['bottom-start', 'bottom-end', 'top-start', 'top
 const IMPORT_STRINGS: Record<Tier, string> = {
   lite: "import { DropdownMenu } from '@annondeveloper/ui-kit/lite'",
   standard: "import { DropdownMenu } from '@annondeveloper/ui-kit'",
-  premium: "import { DropdownMenu } from '@annondeveloper/ui-kit'",
+  premium: "import { DropdownMenu } from '@annondeveloper/ui-kit/premium'",
 }
 
 function CopyButton({ text }: { text: string }) {
@@ -1359,7 +1359,7 @@ export default function DropdownMenuPage() {
             </div>
           </div>
 
-          {/* Premium (maps to standard) */}
+          {/* Premium */}
           <div
             className={`dropdown-menu-page__tier-card${tier === 'premium' ? ' dropdown-menu-page__tier-card--active' : ''}`}
             onClick={() => setTier('premium')}

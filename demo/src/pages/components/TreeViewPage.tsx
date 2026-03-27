@@ -524,7 +524,7 @@ const treeNodeProps: PropDef[] = [
 const IMPORT_STRINGS: Record<Tier, string> = {
   lite: "import { TreeView } from '@annondeveloper/ui-kit/lite'",
   standard: "import { TreeView } from '@annondeveloper/ui-kit'",
-  premium: "import { TreeView } from '@annondeveloper/ui-kit'",
+  premium: "import { TreeView } from '@annondeveloper/ui-kit/premium'",
 }
 
 const FILE_TREE: TreeNode[] = [

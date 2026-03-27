@@ -612,7 +612,7 @@ const COLOR_PRESETS = [
 const IMPORT_STRINGS: Record<Tier, string> = {
   lite: "/* CSS-only: @import '@annondeveloper/ui-kit/css/components/wavy-background.css' */",
   standard: "import { WavyBackground } from '@annondeveloper/ui-kit'",
-  premium: "import { WavyBackground } from '@annondeveloper/ui-kit'",
+  premium: "import { WavyBackground } from '@annondeveloper/ui-kit/premium'",
 }
 
 function CopyButton({ text }: { text: string }) {

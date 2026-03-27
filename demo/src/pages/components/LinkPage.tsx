@@ -690,7 +690,7 @@ const SIZES: Size[] = ['xs', 'sm', 'md', 'lg', 'xl']
 const IMPORT_STRINGS: Record<Tier, string> = {
   lite: "import { Link } from '@annondeveloper/ui-kit/lite'",
   standard: "import { Link } from '@annondeveloper/ui-kit'",
-  premium: "import { Link } from '@annondeveloper/ui-kit'",
+  premium: "import { Link } from '@annondeveloper/ui-kit/premium'",
 }
 
 function CopyButton({ text }: { text: string }) {

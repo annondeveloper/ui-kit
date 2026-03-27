@@ -663,7 +663,7 @@ const COLOR_PRESETS = [
 const IMPORT_STRINGS: Record<Tier, string> = {
   lite: "/* CSS-only: @import '@annondeveloper/ui-kit/css/components/background-beams.css' */",
   standard: "import { BackgroundBeams } from '@annondeveloper/ui-kit'",
-  premium: "import { BackgroundBeams } from '@annondeveloper/ui-kit'",
+  premium: "import { BackgroundBeams } from '@annondeveloper/ui-kit/premium'",
 }
 
 function CopyButton({ text }: { text: string }) {

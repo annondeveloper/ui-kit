@@ -604,7 +604,7 @@ const DIFF_SAMPLES: Record<DiffSample, { old: string; new: string; oldTitle: str
 const IMPORT_STRINGS: Record<Tier, string> = {
   lite: "import { DiffViewer } from '@annondeveloper/ui-kit/lite'",
   standard: "import { DiffViewer } from '@annondeveloper/ui-kit'",
-  premium: "import { DiffViewer } from '@annondeveloper/ui-kit'",
+  premium: "import { DiffViewer } from '@annondeveloper/ui-kit/premium'",
 }
 
 function CopyButton({ text }: { text: string }) {

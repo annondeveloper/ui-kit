@@ -875,6 +875,11 @@ const galleryGroups: GalleryGroup[] = [
       { name: 'DensitySelector', desc: 'Table density toggle control', path: '/components/density-selector', tiers: ['L', 'S', 'P'] },
       { name: 'ColumnVisibilityToggle', desc: 'Column show/hide dropdown', path: '/components/column-visibility-toggle', tiers: ['L', 'S', 'P'] },
       { name: 'CSVExportButton', desc: 'One-click CSV download', path: '/components/csv-export', tiers: ['L', 'S', 'P'] },
+      { name: 'PropertyList', desc: 'Key-value detail panel', path: '/components/property-list', tiers: ['L', 'S', 'P'] },
+      { name: 'EntityCard', desc: 'Infrastructure resource card', path: '/components/entity-card', tiers: ['L', 'S', 'P'] },
+      { name: 'ServiceStrip', desc: 'Horizontal service badge strip', path: '/components/service-strip', tiers: ['L', 'S', 'P'] },
+      { name: 'DiskMountBar', desc: 'Disk mount utilization bars', path: '/components/disk-mount-bar', tiers: ['L', 'S', 'P'] },
+      { name: 'ConnectionTestPanel', desc: 'Step-by-step connectivity test', path: '/components/connection-test-panel', tiers: ['L', 'S', 'P'] },
     ],
   },
   {
@@ -1077,7 +1082,7 @@ export default function Home() {
 
         <div className="home-hero-entrance">
           <p className="home-hero-sub">
-            111 components. Physics-based animations. OKLCH color system.
+            116 components. Physics-based animations. OKLCH color system.
             Aurora Fluid design language. 3 weight tiers. Zero dependencies.
           </p>
         </div>
@@ -1121,13 +1126,13 @@ export default function Home() {
           <div className="home-stats">
             <div className="home-stat-cell">
               <div className="home-stat-inner">
-                <span className="home-stat-value">111</span>
+                <span className="home-stat-value">116</span>
                 <span className="home-stat-label">Components</span>
               </div>
             </div>
             <div className="home-stat-cell">
               <div className="home-stat-inner">
-                <span className="home-stat-value">109</span>
+                <span className="home-stat-value">114</span>
                 <span className="home-stat-label">Premium</span>
               </div>
             </div>

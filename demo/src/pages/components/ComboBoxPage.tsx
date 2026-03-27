@@ -576,7 +576,7 @@ const SIZES: Size[] = ['sm', 'md', 'lg']
 const IMPORT_STRINGS: Record<Tier, string> = {
   lite: "import { Combobox } from '@annondeveloper/ui-kit/lite'",
   standard: "import { Combobox } from '@annondeveloper/ui-kit'",
-  premium: "import { Combobox } from '@annondeveloper/ui-kit'",
+  premium: "import { Combobox } from '@annondeveloper/ui-kit/premium'",
 }
 
 const COLOR_PRESETS = [

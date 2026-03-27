@@ -664,7 +664,7 @@ const LANG_SAMPLES: Record<Language, { code: string; label: string }> = {
 const IMPORT_STRINGS: Record<Tier, string> = {
   lite: "import { CopyBlock } from '@annondeveloper/ui-kit/lite'",
   standard: "import { CopyBlock } from '@annondeveloper/ui-kit'",
-  premium: "import { CopyBlock } from '@annondeveloper/ui-kit'",
+  premium: "import { CopyBlock } from '@annondeveloper/ui-kit/premium'",
 }
 
 function CopyButton({ text }: { text: string }) {

@@ -573,7 +573,7 @@ const SHORT_LINES: LogLine[] = SAMPLE_LINES.slice(0, 5)
 const IMPORT_STRINGS: Record<Tier, string> = {
   lite: "import { LogViewer } from '@annondeveloper/ui-kit/lite'",
   standard: "import { LogViewer } from '@annondeveloper/ui-kit'",
-  premium: "import { LogViewer } from '@annondeveloper/ui-kit'",
+  premium: "import { LogViewer } from '@annondeveloper/ui-kit/premium'",
 }
 
 function CopyButton({ text }: { text: string }) {

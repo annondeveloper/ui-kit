@@ -608,7 +608,7 @@ type Size = 'sm' | 'md' | 'lg'
 const IMPORT_STRINGS: Record<Tier, string> = {
   lite: "import { EmptyState } from '@annondeveloper/ui-kit/lite'",
   standard: "import { EmptyState } from '@annondeveloper/ui-kit'",
-  premium: "import { EmptyState } from '@annondeveloper/ui-kit'",
+  premium: "import { EmptyState } from '@annondeveloper/ui-kit/premium'",
 }
 
 function CopyButton({ text }: { text: string }) {

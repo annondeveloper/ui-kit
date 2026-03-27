@@ -683,7 +683,7 @@ const SIZES: Size[] = ['sm', 'md']
 const IMPORT_STRINGS: Record<Tier, string> = {
   lite: "import { FilterPill } from '@annondeveloper/ui-kit/lite'",
   standard: "import { FilterPill, FilterPillGroup } from '@annondeveloper/ui-kit'",
-  premium: "import { FilterPill, FilterPillGroup } from '@annondeveloper/ui-kit'",
+  premium: "import { FilterPill, FilterPillGroup } from '@annondeveloper/ui-kit/premium'",
 }
 
 const COLOR_PRESETS = [

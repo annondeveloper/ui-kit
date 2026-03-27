@@ -664,7 +664,7 @@ const TIERS: { id: Tier; label: string }[] = [
 const IMPORT_STRINGS: Record<Tier, string> = {
   lite: "import { AppShell } from '@annondeveloper/ui-kit/lite'",
   standard: "import { AppShell } from '@annondeveloper/ui-kit'",
-  premium: "import { AppShell } from '@annondeveloper/ui-kit'",
+  premium: "import { AppShell } from '@annondeveloper/ui-kit/premium'",
 }
 
 function CopyButton({ text }: { text: string }) {
@@ -1261,7 +1261,7 @@ export default function AppShellPage() {
         </h2>
         <p className="app-shell-page__section-desc">
           Choose the right balance of features and bundle size. AppShell ships in two tiers
-          (no premium variant &mdash; premium maps to standard).
+          Premium adds aurora glow effects and spring animations.
         </p>
 
         <div className="app-shell-page__tiers">

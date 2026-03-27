@@ -621,7 +621,7 @@ const SIZES: Size[] = ['sm', 'md', 'lg']
 const IMPORT_STRINGS: Record<Tier, string> = {
   lite: "import { Sheet } from '@annondeveloper/ui-kit/lite'",
   standard: "import { Sheet } from '@annondeveloper/ui-kit'",
-  premium: "import { Sheet } from '@annondeveloper/ui-kit'",
+  premium: "import { Sheet } from '@annondeveloper/ui-kit/premium'",
 }
 
 function CopyButton({ text }: { text: string }) {
@@ -1412,7 +1412,7 @@ export default function SheetPage() {
             </div>
           </div>
 
-          {/* Premium (maps to standard) */}
+          {/* Premium */}
           <div
             className={`sheet-page__tier-card${tier === 'premium' ? ' sheet-page__tier-card--active' : ''}`}
             onClick={() => setTier('premium')}

@@ -712,7 +712,7 @@ const TIERS: { id: Tier; label: string }[] = [
 const IMPORT_STRINGS: Record<Tier, string> = {
   lite: "import { DatePicker } from '@annondeveloper/ui-kit/lite'",
   standard: "import { DatePicker } from '@annondeveloper/ui-kit'",
-  premium: "import { DatePicker } from '@annondeveloper/ui-kit'",
+  premium: "import { DatePicker } from '@annondeveloper/ui-kit/premium'",
 }
 
 function CopyButton({ text }: { text: string }) {
@@ -901,7 +901,7 @@ function generateAngularCode(tier: Tier, size: Size, label: string, disabled: bo
 /* In styles.css */
 @import '@annondeveloper/ui-kit/lite/styles.css';`
   }
-  return `<!-- Angular — ${tier === 'premium' ? 'Standard' : 'Standard'} tier (CSS-only approach) -->
+  return `<!-- Angular — ${tier === 'premium' ? 'Premium' : 'Standard'} tier (CSS-only approach) -->
 <div class="ui-date-picker" data-size="${size}">
   ${label ? `<label class="ui-date-picker__label">${label}</label>` : ''}
   <div class="ui-date-picker__input-wrapper">

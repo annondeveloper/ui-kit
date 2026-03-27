@@ -680,7 +680,7 @@ const MAX_SIZE_MAP: Record<MaxSizeOption, number | undefined> = {
 const IMPORT_STRINGS: Record<Tier, string> = {
   lite: "import { FileUpload } from '@annondeveloper/ui-kit/lite'",
   standard: "import { FileUpload } from '@annondeveloper/ui-kit'",
-  premium: "import { FileUpload } from '@annondeveloper/ui-kit'",
+  premium: "import { FileUpload } from '@annondeveloper/ui-kit/premium'",
 }
 
 function CopyButton({ text }: { text: string }) {

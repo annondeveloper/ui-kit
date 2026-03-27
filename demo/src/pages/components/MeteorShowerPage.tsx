@@ -581,7 +581,7 @@ const TIERS: { id: Tier; label: string }[] = [
 const IMPORT_STRINGS: Record<Tier, string> = {
   lite: "/* CSS-only: @import '@annondeveloper/ui-kit/css/components/meteor-shower.css' */",
   standard: "import { MeteorShower } from '@annondeveloper/ui-kit'",
-  premium: "import { MeteorShower } from '@annondeveloper/ui-kit'",
+  premium: "import { MeteorShower } from '@annondeveloper/ui-kit/premium'",
 }
 
 function CopyButton({ text }: { text: string }) {

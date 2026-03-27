@@ -672,7 +672,7 @@ const SEPARATOR_MAP: Record<SeparatorType, string> = {
 const IMPORT_STRINGS: Record<Tier, string> = {
   lite: "import { Breadcrumbs } from '@annondeveloper/ui-kit/lite'",
   standard: "import { Breadcrumbs } from '@annondeveloper/ui-kit'",
-  premium: "import { Breadcrumbs } from '@annondeveloper/ui-kit'",
+  premium: "import { Breadcrumbs } from '@annondeveloper/ui-kit/premium'",
 }
 
 const SAMPLE_ITEMS_SHORT = [

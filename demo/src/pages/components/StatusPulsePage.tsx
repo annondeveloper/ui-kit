@@ -662,7 +662,7 @@ const SIZES: Size[] = ['sm', 'md', 'lg']
 const IMPORT_STRINGS: Record<Tier, string> = {
   lite: "import { StatusPulse } from '@annondeveloper/ui-kit/lite'",
   standard: "import { StatusPulse } from '@annondeveloper/ui-kit'",
-  premium: "import { StatusPulse } from '@annondeveloper/ui-kit'",
+  premium: "import { StatusPulse } from '@annondeveloper/ui-kit/premium'",
 }
 
 const COLOR_PRESETS = [

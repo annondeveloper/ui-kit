@@ -686,7 +686,7 @@ const VARIANTS: Variant[] = ['default', 'filled']
 const IMPORT_STRINGS: Record<Tier, string> = {
   lite: "import { FormInput } from '@annondeveloper/ui-kit/lite'",
   standard: "import { FormInput } from '@annondeveloper/ui-kit'",
-  premium: "import { FormInput } from '@annondeveloper/ui-kit'",
+  premium: "import { FormInput } from '@annondeveloper/ui-kit/premium'",
 }
 
 const COLOR_PRESETS = [

@@ -671,7 +671,7 @@ const TIERS: { id: Tier; label: string }[] = [
 const IMPORT_STRINGS: Record<Tier, string> = {
   lite: "import { Popover } from '@annondeveloper/ui-kit/lite'",
   standard: "import { Popover } from '@annondeveloper/ui-kit'",
-  premium: "import { Popover } from '@annondeveloper/ui-kit'",
+  premium: "import { Popover } from '@annondeveloper/ui-kit/premium'",
 }
 
 function CopyButton({ text }: { text: string }) {

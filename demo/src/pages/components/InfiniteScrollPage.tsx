@@ -473,7 +473,7 @@ function DemoListItem({ item }: { item: DemoItem }) {
 const IMPORT_STRINGS: Record<Tier, string> = {
   lite: "import { InfiniteScroll } from '@annondeveloper/ui-kit/lite'",
   standard: "import { InfiniteScroll } from '@annondeveloper/ui-kit'",
-  premium: "import { InfiniteScroll } from '@annondeveloper/ui-kit'",
+  premium: "import { InfiniteScroll } from '@annondeveloper/ui-kit/premium'",
 }
 
 function CopyButton({ text }: { text: string }) {

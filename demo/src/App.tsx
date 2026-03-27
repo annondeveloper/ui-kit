@@ -155,6 +155,11 @@ const componentGroups: ComponentGroup[] = [
       { name: 'DensitySelector', path: '/components/density-selector' },
       { name: 'ColumnVisibilityToggle', path: '/components/column-visibility-toggle' },
       { name: 'CSVExport', path: '/components/csv-export' },
+      { name: 'PropertyList', path: '/components/property-list' },
+      { name: 'EntityCard', path: '/components/entity-card' },
+      { name: 'ServiceStrip', path: '/components/service-strip' },
+      { name: 'DiskMountBar', path: '/components/disk-mount-bar' },
+      { name: 'ConnectionTestPanel', path: '/components/connection-test-panel' },
     ],
   },
   {

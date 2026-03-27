@@ -481,7 +481,7 @@ const COLOR_THEMES: Record<ColorTheme, [string, string]> = {
 const IMPORT_STRINGS: Record<Tier, string> = {
   lite: "import { HeatmapCalendar } from '@annondeveloper/ui-kit/lite'",
   standard: "import { HeatmapCalendar } from '@annondeveloper/ui-kit'",
-  premium: "import { HeatmapCalendar } from '@annondeveloper/ui-kit'",
+  premium: "import { HeatmapCalendar } from '@annondeveloper/ui-kit/premium'",
 }
 
 function CopyButton({ text }: { text: string }) {

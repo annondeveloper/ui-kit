@@ -428,7 +428,7 @@ const LITE_SIZES: ('sm' | 'md' | 'lg')[] = ['sm', 'md', 'lg']
 const IMPORT_STRINGS: Record<Tier, string> = {
   lite: "import { Rating } from '@annondeveloper/ui-kit/lite'",
   standard: "import { Rating } from '@annondeveloper/ui-kit'",
-  premium: "import { Rating } from '@annondeveloper/ui-kit'",
+  premium: "import { Rating } from '@annondeveloper/ui-kit/premium'",
 }
 
 const COLOR_PRESETS = [

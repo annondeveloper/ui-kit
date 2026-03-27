@@ -433,7 +433,7 @@ const SIZES: Size[] = ['sm', 'md', 'lg']
 const IMPORT_STRINGS: Record<Tier, string> = {
   lite: "import { InlineEdit } from '@annondeveloper/ui-kit/lite'",
   standard: "import { InlineEdit } from '@annondeveloper/ui-kit'",
-  premium: "import { InlineEdit } from '@annondeveloper/ui-kit'",
+  premium: "import { InlineEdit } from '@annondeveloper/ui-kit/premium'",
 }
 
 function CopyButton({ text }: { text: string }) {

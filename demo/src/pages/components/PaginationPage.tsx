@@ -680,7 +680,7 @@ const TIERS: { id: Tier; label: string }[] = [
 const IMPORT_STRINGS: Record<Tier, string> = {
   lite: "import { Pagination } from '@annondeveloper/ui-kit/lite'",
   standard: "import { Pagination } from '@annondeveloper/ui-kit'",
-  premium: "import { Pagination } from '@annondeveloper/ui-kit'",
+  premium: "import { Pagination } from '@annondeveloper/ui-kit/premium'",
 }
 
 function CopyButton({ text, prefix }: { text: string; prefix: string }) {

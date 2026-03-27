@@ -680,7 +680,7 @@ const VARIANTS: Variant[] = ['default', 'ghost']
 const IMPORT_STRINGS: Record<Tier, string> = {
   lite: "import { Kbd } from '@annondeveloper/ui-kit/lite'",
   standard: "import { Kbd } from '@annondeveloper/ui-kit'",
-  premium: "import { Kbd } from '@annondeveloper/ui-kit'",
+  premium: "import { Kbd } from '@annondeveloper/ui-kit/premium'",
 }
 
 interface ShortcutCombo {
