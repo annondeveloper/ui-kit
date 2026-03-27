@@ -13,6 +13,7 @@ import { Icon, type IconName } from '@ui/core/icons/icon'
 import { Skeleton } from '@ui/components/skeleton'
 import { css } from '@ui/core/styles/css-tag'
 import { useStyles } from '@ui/core/styles/use-styles'
+import { TransitionRouter } from './components/TransitionRouter'
 
 // ─── Global Tier Context ──────────────────────────────────────────────────────
 export type Tier = 'lite' | 'standard' | 'premium'
@@ -24,6 +25,7 @@ const pages: { path: string; label: string; icon: IconName }[] = [
   { path: '/icons', label: 'Icons', icon: 'image' },
   { path: '/themes', label: 'Theme Playground', icon: 'settings' as const },
   { path: '/docs', label: 'Documentation', icon: 'file' },
+  { path: '/performance', label: 'Performance', icon: 'zap' },
 ]
 
 // ─── Component Sidebar Groups ─────────────────────────────────────────────────
@@ -1465,6 +1467,7 @@ export default function App() {
   return (
     <UIProvider motion={motion as 0|1|2|3} mode={light ? 'light' : 'dark'}>
       <TierContext.Provider value={{ tier, setTier }}>
+      <TransitionRouter>
       <div className="site" data-tier={tier}>
         {/* Desktop sidebar */}
         <aside className="site-sidebar" data-tier={tier}>
@@ -1499,12 +1502,13 @@ export default function App() {
         </Drawer>
 
         {/* Main */}
-        <main className="site-main" key={location.pathname}>
+        <main className="site-main">
           <Suspense fallback={<Skeleton variant="rectangular" width="100%" height={300} />}>
             <Outlet />
           </Suspense>
         </main>
       </div>
+      </TransitionRouter>
       </TierContext.Provider>
     </UIProvider>
   )

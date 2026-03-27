@@ -1011,8 +1011,10 @@ const tierStyle: Record<TierBadge, React.CSSProperties> = {
 // ─── Gallery Card ────────────────────────────────────────────────────────────
 
 function GalleryCard({ item }: { item: GalleryItem }) {
+  // Derive a CSS-safe view-transition-name from the component path
+  const transitionName = `component-${item.path.split('/').pop()}`
   return (
-    <Link to={item.path} className="home-glow-card-link">
+    <Link to={item.path} className="home-glow-card-link" style={{ viewTransitionName: transitionName }}>
       <GlowCard glowColor="oklch(60% 0.15 270 / 0.2)">
         <div className="home-gallery-card-inner">
           <div className="home-gallery-card-top">
