@@ -49,6 +49,7 @@ const trafficCardStyles = css`
     @scope (.ui-network-traffic-card) {
       :scope {
         position: relative;
+        min-inline-size: 280px;
         display: flex;
         flex-direction: column;
         gap: var(--space-sm, 0.5rem);

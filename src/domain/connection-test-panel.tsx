@@ -37,6 +37,7 @@ const connectionTestPanelStyles = css`
       :scope {
         display: flex;
         flex-direction: column;
+        min-inline-size: 320px;
         border: 1px solid var(--border-subtle, oklch(100% 0 0 / 0.1));
         border-radius: var(--radius-lg, 0.75rem);
         background: var(--bg-surface, oklch(20% 0.02 270));

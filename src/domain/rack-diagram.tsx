@@ -35,7 +35,7 @@ export interface RackDiagramProps extends HTMLAttributes<HTMLDivElement> {
 const rackDiagramStyles = css`
   @layer components {
     @scope (.ui-rack-diagram) {
-      :scope { position: relative; display: inline-flex; }
+      :scope { position: relative; display: inline-flex; min-inline-size: 200px; }
       .ui-rack-diagram__numbers { display: flex; flex-direction: column; padding-block-start: 2px; }
       .ui-rack-diagram__number { display: flex; align-items: center; justify-content: flex-end; padding-inline-end: 0.375rem; font-size: var(--text-xs, 0.75rem); font-variant-numeric: tabular-nums; color: var(--text-tertiary, oklch(55% 0 0)); }
       :scope[data-size="sm"] .ui-rack-diagram__number { font-size: 0.5rem; padding-inline-end: 0.25rem; }

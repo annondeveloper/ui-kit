@@ -98,6 +98,7 @@ const upstreamDashboardStyles = css`
     @scope (.ui-upstream-dashboard) {
       :scope {
         position: relative;
+        min-inline-size: 320px;
         display: flex;
         flex-direction: column;
         gap: var(--space-md, 1rem);

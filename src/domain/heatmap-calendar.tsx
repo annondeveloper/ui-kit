@@ -35,6 +35,7 @@ const heatmapStyles = css`
     @scope (.ui-heatmap-calendar) {
       :scope {
         position: relative;
+        min-inline-size: 200px;
         container-type: inline-size;
         overflow-x: auto;
       }

@@ -40,6 +40,7 @@ const propertyListStyles = css`
       :scope {
         display: grid;
         gap: 0;
+        min-inline-size: 320px;
         container-type: inline-size;
         border-radius: var(--radius-lg, 0.75rem);
         background: var(--bg-surface, oklch(22% 0.02 270));

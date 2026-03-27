@@ -35,6 +35,7 @@ const metricCardStyles = css`
     @scope (.ui-metric-card) {
       :scope {
         position: relative;
+        min-inline-size: 280px;
         display: flex;
         flex-direction: column;
         gap: var(--space-xs, 0.25rem);
