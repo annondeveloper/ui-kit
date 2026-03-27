@@ -246,7 +246,7 @@ const pageStyles = css`
       }
 
       .column-visibility-toggle-page__playground-result {
-        overflow-x: auto;
+        overflow: visible;
         min-block-size: 300px;
         display: flex;
         flex-direction: column;

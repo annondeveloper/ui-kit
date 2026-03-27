@@ -218,7 +218,7 @@ const datePickerStyles = css`
         padding: var(--space-sm, 0.75rem);
         border: 1px solid var(--border-default, oklch(100% 0 0 / 0.12));
         border-radius: var(--radius-md, 0.375rem);
-        background: var(--surface-raised, oklch(18% 0.01 270));
+        background: var(--surface-raised);
         box-shadow: var(--shadow-lg, 0 8px 24px oklch(0% 0 0 / 0.3));
         min-inline-size: 280px;
       }

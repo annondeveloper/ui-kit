@@ -76,7 +76,7 @@ const selectStyles = css`
         inline-size: 100%;
         border: 1px solid var(--border-default, oklch(100% 0 0 / 0.12));
         border-radius: var(--radius-md, 0.375rem);
-        background: var(--surface-default, oklch(18% 0.01 270));
+        background: var(--surface-default);
         color: var(--text-primary, oklch(90% 0 0));
         font-family: inherit;
         font-size: var(--text-sm, 0.875rem);
@@ -199,7 +199,7 @@ const selectStyles = css`
         overflow: auto;
         border: 1px solid var(--border-subtle, oklch(100% 0 0 / 0.08));
         border-radius: var(--radius-lg, 0.5rem);
-        background: var(--surface-elevated, oklch(22% 0.01 270));
+        background: var(--surface-elevated);
         box-shadow: var(--shadow-lg, 0 8px 24px oklch(0% 0 0 / 0.3));
         padding-block: 0.25rem;
         outline: none;

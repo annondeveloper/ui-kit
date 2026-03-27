@@ -261,7 +261,7 @@ const pageStyles = css`
       }
 
       .tooltip-page__playground-result {
-        overflow-x: auto;
+        overflow: visible;
         min-block-size: 300px;
         display: grid;
         place-items: center;

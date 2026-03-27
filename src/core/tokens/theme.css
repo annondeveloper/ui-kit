@@ -28,6 +28,8 @@
   --bg-hover: oklch(100% 0 0 / 0.06);
   --bg-active: oklch(100% 0 0 / 0.08);
   --surface-default: oklch(16% 0.015 270);
+  --surface-elevated: oklch(20% 0.02 270);
+  --surface-raised: oklch(22% 0.015 270);
 
   /* Text */
   --text-primary: oklch(97% 0 0);
@@ -101,6 +103,8 @@ html.light {
   --bg-hover: oklch(0% 0 0 / 0.04);
   --bg-active: oklch(0% 0 0 / 0.07);
   --surface-default: oklch(97% 0.005 270);
+  --surface-elevated: oklch(100% 0 0);
+  --surface-raised: oklch(100% 0 0);
 
   /* Text */
   --text-primary: oklch(15% 0.01 270);

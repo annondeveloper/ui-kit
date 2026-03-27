@@ -70,7 +70,7 @@ const columnVisibilityStyles = css`
         min-inline-size: 200px;
         max-block-size: 320px;
         overflow-y: auto;
-        background: var(--bg-surface, oklch(20% 0 0 / 0.95));
+        background: var(--surface-elevated);
         border: 1px solid var(--border-default, oklch(100% 0 0 / 0.1));
         border-radius: var(--radius-lg, 0.75rem);
         box-shadow: var(--shadow-lg, 0 8px 24px oklch(0% 0 0 / 0.3));

@@ -250,7 +250,7 @@ const pageStyles = css`
       }
 
       .date-picker-page__playground-result {
-        overflow-x: auto;
+        overflow: visible;
         min-block-size: 380px;
         display: grid;
         place-items: start center;

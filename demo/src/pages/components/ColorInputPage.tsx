@@ -187,7 +187,7 @@ const pageStyles = css`
         display: flex; flex-direction: column; gap: 1.5rem; }
 
       .color-input-page__playground-result {
-        overflow-x: auto;
+        overflow: visible;
         min-block-size: 200px; display: grid; place-items: center; padding: 3rem;
         background: var(--bg-base); border-radius: var(--radius-md);
         position: relative; overflow: hidden;

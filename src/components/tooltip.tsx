@@ -41,7 +41,7 @@ const tooltipStyles = css`
 
       .ui-tooltip__panel {
         position: relative;
-        background: var(--surface-elevated, oklch(22% 0.01 270));
+        background: var(--surface-elevated);
         color: var(--text-primary, oklch(90% 0 0));
         font-size: var(--text-sm, 0.875rem);
         line-height: 1.4;
@@ -59,7 +59,7 @@ const tooltipStyles = css`
         position: absolute;
         inline-size: 8px;
         block-size: 8px;
-        background: var(--surface-elevated, oklch(22% 0.01 270));
+        background: var(--surface-elevated);
         transform: rotate(45deg);
       }
 
