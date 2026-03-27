@@ -29,6 +29,7 @@ const glowCardStyles = css`
         --glow-x: 50%;
         --glow-y: 50%;
         position: relative;
+        min-inline-size: 200px;
         overflow: hidden;
         border-radius: var(--radius-lg, 0.75rem);
         background: var(--bg-surface, oklch(22% 0.02 270));

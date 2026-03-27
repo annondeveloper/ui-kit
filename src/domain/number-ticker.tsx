@@ -28,6 +28,7 @@ const numberTickerStyles = css`
     @scope (.ui-number-ticker) {
       :scope {
         display: inline-flex;
+        min-inline-size: 60px;
         align-items: baseline;
         font-variant-numeric: tabular-nums;
         overflow: hidden;

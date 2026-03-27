@@ -35,6 +35,7 @@ const utilizationBarStyles = css`
     @scope (.ui-utilization-bar) {
       :scope {
         position: relative;
+        min-inline-size: 120px;
         display: flex;
         flex-direction: column;
         gap: var(--space-xs, 0.25rem);

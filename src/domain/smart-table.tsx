@@ -38,6 +38,7 @@ const smartTableStyles = css`
     @scope (.ui-smart-table) {
       :scope {
         display: contents;
+        min-inline-size: 320px;
       }
     }
   }

@@ -33,6 +33,7 @@ const gridStyles = css`
     @scope (.ui-port-status-grid) {
       :scope {
         position: relative;
+        min-inline-size: 200px;
       }
 
       .ui-port-status-grid__grid {

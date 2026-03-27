@@ -30,6 +30,7 @@ const emptyStateStyles = css`
     @scope (.ui-empty-state) {
       :scope {
         display: flex;
+        min-inline-size: 240px;
         flex-direction: column;
         align-items: center;
         justify-content: center;

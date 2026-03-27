@@ -33,6 +33,7 @@ const uptimeStyles = css`
     @scope (.ui-uptime-tracker) {
       :scope {
         position: relative;
+        min-inline-size: 200px;
         display: flex;
         flex-direction: column;
         gap: var(--space-sm, 0.5rem);

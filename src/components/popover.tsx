@@ -41,6 +41,7 @@ const popoverStyles = css`
     @scope (.ui-popover) {
       :scope {
         position: fixed;
+        min-inline-size: 180px;
         z-index: 50;
       }
 

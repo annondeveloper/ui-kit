@@ -37,6 +37,7 @@ const serviceStripStyles = css`
     @scope (.ui-service-strip) {
       :scope {
         display: flex;
+        min-inline-size: 200px;
         flex-wrap: wrap;
         gap: var(--space-xs, 0.25rem);
         container-type: inline-size;

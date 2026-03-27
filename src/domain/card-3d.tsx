@@ -28,6 +28,7 @@ const card3DStyles = css`
     @scope (.ui-card-3d) {
       :scope {
         perspective: var(--card-3d-perspective, 1000px);
+        min-inline-size: 200px;
         display: inline-block;
       }
 
