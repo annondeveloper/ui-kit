@@ -1,26 +1,22 @@
-import { lazy, Suspense, useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
-// Above-the-fold: load eagerly (hero section)
 import { Button } from '@ui/components/button'
 import { Badge } from '@ui/components/badge'
+import { Card } from '@ui/components/card'
 import { Progress } from '@ui/components/progress'
 import { StatusBadge } from '@ui/components/status-badge'
 import { StatusPulse } from '@ui/components/status-pulse'
 import { Icon, type IconName } from '@ui/core/icons/icon'
+import { MetricCard } from '@ui/domain/metric-card'
+import { Sparkline } from '@ui/domain/sparkline'
+import { CopyBlock } from '@ui/domain/copy-block'
+import { GlowCard } from '@ui/domain/glow-card'
+import { ShimmerButton } from '@ui/domain/shimmer-button'
+import { BorderBeam } from '@ui/domain/border-beam'
+import { Divider } from '@ui/components/divider'
+import { FilterPill } from '@ui/components/filter-pill'
 import { css } from '@ui/core/styles/css-tag'
 import { useStyles } from '@ui/core/styles/use-styles'
-
-// Below-the-fold: lazy-loaded (gallery, dashboard, getting started)
-const Card = lazy(() => import('@ui/components/card').then(m => ({ default: m.Card })))
-// AnimatedCounter removed — stats use plain numbers for instant render
-const MetricCard = lazy(() => import('@ui/domain/metric-card').then(m => ({ default: m.MetricCard })))
-const Sparkline = lazy(() => import('@ui/domain/sparkline').then(m => ({ default: m.Sparkline })))
-const CopyBlock = lazy(() => import('@ui/domain/copy-block').then(m => ({ default: m.CopyBlock })))
-const GlowCard = lazy(() => import('@ui/domain/glow-card').then(m => ({ default: m.GlowCard })))
-const ShimmerButton = lazy(() => import('@ui/domain/shimmer-button').then(m => ({ default: m.ShimmerButton })))
-const BorderBeam = lazy(() => import('@ui/domain/border-beam').then(m => ({ default: m.BorderBeam })))
-const Divider = lazy(() => import('@ui/components/divider').then(m => ({ default: m.Divider })))
-const FilterPill = lazy(() => import('@ui/components/filter-pill').then(m => ({ default: m.FilterPill })))
 
 // LazySection removed — all sections now render eagerly with lazy() imports
 
@@ -1155,7 +1151,7 @@ export default function Home() {
       </section>
 
       {/* ── Component Gallery ── */}
-      <Suspense fallback={null}><RevealSection className="home-section">
+      <RevealSection className="home-section">
         <div className="home-section-header">
           <h2>All {totalComponents} Components</h2>
           <p>
@@ -1203,10 +1199,10 @@ export default function Home() {
             </Link>
           </div>
         ))}
-      </RevealSection></Suspense>
+      </RevealSection>
 
       {/* ── Feature Highlights ── */}
-      <Suspense fallback={null}><RevealSection className="home-section">
+      <RevealSection className="home-section">
         <div className="home-section-header">
           <h2>What makes this different</h2>
           <p>
@@ -1229,10 +1225,10 @@ export default function Home() {
             </StaggerItem>
           ))}
         </div>
-      </RevealSection></Suspense>
+      </RevealSection>
 
       {/* ── Getting Started ── */}
-      <Suspense fallback={null}><RevealSection className="home-section">
+      <RevealSection className="home-section">
         <div className="home-section-header">
           <h2>Getting Started</h2>
           <p>
@@ -1323,10 +1319,10 @@ export default function Home() {
             </BorderBeam>
           </StaggerItem>
         </div>
-      </RevealSection></Suspense>
+      </RevealSection>
 
       {/* ── Live Dashboard Preview ── */}
-      <Suspense fallback={null}><RevealSection className="home-section">
+      <RevealSection className="home-section">
         <div className="home-section-header">
           <h2>Built for real interfaces</h2>
           <p>
@@ -1386,10 +1382,10 @@ export default function Home() {
             </div>
           </Card>
         </BorderBeam>
-      </RevealSection></Suspense>
+      </RevealSection>
 
       {/* ── Code Example ── */}
-      <Suspense fallback={null}><RevealSection className="home-section">
+      <RevealSection className="home-section">
         <div className="home-section-header">
           <h2>Simple to use</h2>
           <p>Import what you need. Wrap in UIProvider. Ship.</p>
@@ -1405,10 +1401,10 @@ export default function Home() {
             />
           </Card>
         </div>
-      </RevealSection></Suspense>
+      </RevealSection>
 
       {/* ── Footer ── */}
-      <Suspense fallback={null}><Divider spacing="lg" />
+      <Divider spacing="lg" />
       <footer className="home-footer">
         <a href="https://github.com/annondeveloper/ui-kit" target="_blank" rel="noopener noreferrer">
           GitHub
@@ -1428,7 +1424,7 @@ export default function Home() {
         <div className="home-footer-built">
           Built with zero dependencies. Powered by Aurora Fluid design.
         </div>
-      </footer></Suspense>
+      </footer>
     </div>
   )
 }
