@@ -130,6 +130,10 @@ const componentGroups: ComponentGroup[] = [
       { name: 'CopyBlock', path: '/components/copy-block' },
       { name: 'DiffViewer', path: '/components/diff-viewer' },
       { name: 'TreeView', path: '/components/tree-view' },
+      { name: 'TimeSeriesChart', path: '/components/time-series-chart' },
+      { name: 'RingChart', path: '/components/ring-chart' },
+      { name: 'CoreChart', path: '/components/core-chart' },
+      { name: 'StorageBar', path: '/components/storage-bar' },
     ],
   },
   {
@@ -146,6 +150,11 @@ const componentGroups: ComponentGroup[] = [
       { name: 'RealtimeValue', path: '/components/realtime-value' },
       { name: 'GeoMap', path: '/components/geo-map' },
       { name: 'DashboardGrid', path: '/components/dashboard-grid' },
+      { name: 'RackDiagram', path: '/components/rack-diagram' },
+      { name: 'SwitchFaceplate', path: '/components/switch-faceplate' },
+      { name: 'DensitySelector', path: '/components/density-selector' },
+      { name: 'ColumnVisibilityToggle', path: '/components/column-visibility-toggle' },
+      { name: 'CSVExport', path: '/components/csv-export' },
     ],
   },
   {

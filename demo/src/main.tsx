@@ -27,13 +27,17 @@ const Card3dPage = lazy(() => import('./pages/components/Card3dPage'))
 const CardPage = lazy(() => import('./pages/components/CardPage'))
 const CheckboxPage = lazy(() => import('./pages/components/CheckboxPage'))
 const ColorInputPage = lazy(() => import('./pages/components/ColorInputPage'))
+const ColumnVisibilityTogglePage = lazy(() => import('./pages/components/ColumnVisibilityTogglePage'))
 const ComboBoxPage = lazy(() => import('./pages/components/ComboBoxPage'))
 const CommandBarPage = lazy(() => import('./pages/components/CommandBarPage'))
 const ConfidenceBarPage = lazy(() => import('./pages/components/ConfidenceBarPage'))
+const CoreChartPage = lazy(() => import('./pages/components/CoreChartPage'))
 const CopyBlockPage = lazy(() => import('./pages/components/CopyBlockPage'))
+const CsvExportPage = lazy(() => import('./pages/components/CsvExportPage'))
 const DashboardGridPage = lazy(() => import('./pages/components/DashboardGridPage'))
 const DataTablePage = lazy(() => import('./pages/components/DataTablePage'))
 const DatePickerPage = lazy(() => import('./pages/components/DatePickerPage'))
+const DensitySelectorPage = lazy(() => import('./pages/components/DensitySelectorPage'))
 const DialogPage = lazy(() => import('./pages/components/DialogPage'))
 const DiffViewerPage = lazy(() => import('./pages/components/DiffViewerPage'))
 const DividerPage = lazy(() => import('./pages/components/DividerPage'))
@@ -70,10 +74,12 @@ const PipelineStagePage = lazy(() => import('./pages/components/PipelineStagePag
 const PopoverPage = lazy(() => import('./pages/components/PopoverPage'))
 const PortStatusGridPage = lazy(() => import('./pages/components/PortStatusGridPage'))
 const ProgressPage = lazy(() => import('./pages/components/ProgressPage'))
+const RackDiagramPage = lazy(() => import('./pages/components/RackDiagramPage'))
 const RadioGroupPage = lazy(() => import('./pages/components/RadioGroupPage'))
 const RatingPage = lazy(() => import('./pages/components/RatingPage'))
 const RealtimeValuePage = lazy(() => import('./pages/components/RealtimeValuePage'))
 const ResponsiveCardPage = lazy(() => import('./pages/components/ResponsiveCardPage'))
+const RingChartPage = lazy(() => import('./pages/components/RingChartPage'))
 const RipplePage = lazy(() => import('./pages/components/RipplePage'))
 const SearchInputPage = lazy(() => import('./pages/components/SearchInputPage'))
 const SelectPage = lazy(() => import('./pages/components/SelectPage'))
@@ -89,6 +95,8 @@ const SparklinePage = lazy(() => import('./pages/components/SparklinePage'))
 const SpotlightCardPage = lazy(() => import('./pages/components/SpotlightCardPage'))
 const StatusBadgePage = lazy(() => import('./pages/components/StatusBadgePage'))
 const StatusPulsePage = lazy(() => import('./pages/components/StatusPulsePage'))
+const StorageBarPage = lazy(() => import('./pages/components/StorageBarPage'))
+const SwitchFaceplatePage = lazy(() => import('./pages/components/SwitchFaceplatePage'))
 const StepWizardPage = lazy(() => import('./pages/components/StepWizardPage'))
 const StreamingTextPage = lazy(() => import('./pages/components/StreamingTextPage'))
 const TabsPage = lazy(() => import('./pages/components/TabsPage'))
@@ -96,6 +104,7 @@ const TagInputPage = lazy(() => import('./pages/components/TagInputPage'))
 const TextRevealPage = lazy(() => import('./pages/components/TextRevealPage'))
 const ThresholdGaugePage = lazy(() => import('./pages/components/ThresholdGaugePage'))
 const TimeRangeSelectorPage = lazy(() => import('./pages/components/TimeRangeSelectorPage'))
+const TimeSeriesChartPage = lazy(() => import('./pages/components/TimeSeriesChartPage'))
 const ToastPage = lazy(() => import('./pages/components/ToastPage'))
 const ToggleSwitchPage = lazy(() => import('./pages/components/ToggleSwitchPage'))
 const TooltipPage = lazy(() => import('./pages/components/TooltipPage'))
@@ -140,11 +149,15 @@ createRoot(document.getElementById('root')!).render(
             <Route path="components/color-input" element={<Suspense><ColorInputPage /></Suspense>} />
             <Route path="components/combobox" element={<Suspense><ComboBoxPage /></Suspense>} />
             <Route path="components/command-bar" element={<Suspense><CommandBarPage /></Suspense>} />
+            <Route path="components/column-visibility-toggle" element={<Suspense><ColumnVisibilityTogglePage /></Suspense>} />
             <Route path="components/confidence-bar" element={<Suspense><ConfidenceBarPage /></Suspense>} />
             <Route path="components/copy-block" element={<Suspense><CopyBlockPage /></Suspense>} />
+            <Route path="components/core-chart" element={<Suspense><CoreChartPage /></Suspense>} />
+            <Route path="components/csv-export" element={<Suspense><CsvExportPage /></Suspense>} />
             <Route path="components/dashboard-grid" element={<Suspense><DashboardGridPage /></Suspense>} />
             <Route path="components/data-table" element={<Suspense><DataTablePage /></Suspense>} />
             <Route path="components/date-picker" element={<Suspense><DatePickerPage /></Suspense>} />
+            <Route path="components/density-selector" element={<Suspense><DensitySelectorPage /></Suspense>} />
             <Route path="components/dialog" element={<Suspense><DialogPage /></Suspense>} />
             <Route path="components/diff-viewer" element={<Suspense><DiffViewerPage /></Suspense>} />
             <Route path="components/divider" element={<Suspense><DividerPage /></Suspense>} />
@@ -181,10 +194,12 @@ createRoot(document.getElementById('root')!).render(
             <Route path="components/popover" element={<Suspense><PopoverPage /></Suspense>} />
             <Route path="components/port-status-grid" element={<Suspense><PortStatusGridPage /></Suspense>} />
             <Route path="components/progress" element={<Suspense><ProgressPage /></Suspense>} />
+            <Route path="components/rack-diagram" element={<Suspense><RackDiagramPage /></Suspense>} />
             <Route path="components/radio-group" element={<Suspense><RadioGroupPage /></Suspense>} />
             <Route path="components/rating" element={<Suspense><RatingPage /></Suspense>} />
             <Route path="components/realtime-value" element={<Suspense><RealtimeValuePage /></Suspense>} />
             <Route path="components/responsive-card" element={<Suspense><ResponsiveCardPage /></Suspense>} />
+            <Route path="components/ring-chart" element={<Suspense><RingChartPage /></Suspense>} />
             <Route path="components/ripple" element={<Suspense><RipplePage /></Suspense>} />
             <Route path="components/search-input" element={<Suspense><SearchInputPage /></Suspense>} />
             <Route path="components/select" element={<Suspense><SelectPage /></Suspense>} />
@@ -201,12 +216,15 @@ createRoot(document.getElementById('root')!).render(
             <Route path="components/status-badge" element={<Suspense><StatusBadgePage /></Suspense>} />
             <Route path="components/status-pulse" element={<Suspense><StatusPulsePage /></Suspense>} />
             <Route path="components/step-wizard" element={<Suspense><StepWizardPage /></Suspense>} />
+            <Route path="components/storage-bar" element={<Suspense><StorageBarPage /></Suspense>} />
             <Route path="components/streaming-text" element={<Suspense><StreamingTextPage /></Suspense>} />
+            <Route path="components/switch-faceplate" element={<Suspense><SwitchFaceplatePage /></Suspense>} />
             <Route path="components/tabs" element={<Suspense><TabsPage /></Suspense>} />
             <Route path="components/tag-input" element={<Suspense><TagInputPage /></Suspense>} />
             <Route path="components/text-reveal" element={<Suspense><TextRevealPage /></Suspense>} />
             <Route path="components/threshold-gauge" element={<Suspense><ThresholdGaugePage /></Suspense>} />
             <Route path="components/time-range-selector" element={<Suspense><TimeRangeSelectorPage /></Suspense>} />
+            <Route path="components/time-series-chart" element={<Suspense><TimeSeriesChartPage /></Suspense>} />
             <Route path="components/toast" element={<Suspense><ToastPage /></Suspense>} />
             <Route path="components/toggle-switch" element={<Suspense><ToggleSwitchPage /></Suspense>} />
             <Route path="components/tooltip" element={<Suspense><TooltipPage /></Suspense>} />
