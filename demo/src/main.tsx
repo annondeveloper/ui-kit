@@ -12,6 +12,7 @@ const IconsPage = lazy(() => import('./pages/IconsPage'))
 const ThemePage = lazy(() => import('./pages/ThemePage'))
 const PerformancePage = lazy(() => import('./pages/PerformancePage'))
 const GeneratorPage = lazy(() => import('./pages/GeneratorPage'))
+const ChoreographyPage = lazy(() => import('./pages/ChoreographyPage'))
 
 // ─── Component Pages (A-Z) ──────────────────────────────────────────────────
 const AccordionPage = lazy(() => import('./pages/components/AccordionPage'))
@@ -176,6 +177,7 @@ createRoot(document.getElementById('root')!).render(
             <Route path="docs" element={<Suspense><DocsPage /></Suspense>} />
             <Route path="performance" element={<Suspense><PerformancePage /></Suspense>} />
             <Route path="generator" element={<Suspense><GeneratorPage /></Suspense>} />
+            <Route path="choreography" element={<Suspense><ChoreographyPage /></Suspense>} />
 
             {/* Component pages (A-Z) */}
             <Route path="components/accordion" element={<Suspense><AccordionPage /></Suspense>} />

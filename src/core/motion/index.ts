@@ -48,3 +48,6 @@ export type { ChoreographyStep, ChoreographyConfig } from './choreography'
 
 export { getChoreographyPreset } from './choreography-presets'
 export type { ChoreographyPreset } from './choreography-presets'
+
+export { useScrollChoreography } from './scroll-choreography'
+export type { ScrollChoreographyConfig } from './scroll-choreography'
