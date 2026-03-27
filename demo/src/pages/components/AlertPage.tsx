@@ -156,9 +156,9 @@ const pageStyles = css`
 
       @supports not (animation-timeline: view()) {
         .alert-page__section {
-          opacity: 0;
-          transform: translateY(32px) scale(0.98);
-          filter: blur(4px);
+          opacity: 1;
+          transform: none;
+          filter: none;
           animation: none;
         }
       }
@@ -722,6 +722,9 @@ const alertProps: PropDef[] = [
   { name: 'children', type: 'ReactNode', description: 'Alert body content.' },
   { name: 'className', type: 'string', description: 'Additional CSS class name merged with the component class.' },
   { name: 'ref', type: 'Ref<HTMLDivElement>', description: 'Forwarded ref to the underlying <div> element.' },
+  { name: 'banner', type: 'boolean', default: 'false', description: 'Full-width banner mode with top border.' },
+  { name: 'compact', type: 'boolean', default: 'false', description: 'Compact single-line layout.' },
+  { name: 'classNames', type: "Partial<Record<'root' | 'icon' | 'content' | 'title' | 'body' | 'dismiss', string>>", description: 'Custom classes for inner parts.' },
 ]
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────

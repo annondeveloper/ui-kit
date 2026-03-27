@@ -156,9 +156,9 @@ const pageStyles = css`
 
       @supports not (animation-timeline: view()) {
         .button-page__section {
-          opacity: 0;
-          transform: translateY(32px) scale(0.98);
-          filter: blur(4px);
+          opacity: 1;
+          transform: none;
+          filter: none;
           animation: none;
         }
       }
@@ -839,7 +839,7 @@ const pageStyles = css`
 // ─── Props Data ───────────────────────────────────────────────────────────────
 
 const buttonProps: PropDef[] = [
-  { name: 'variant', type: "'primary' | 'secondary' | 'ghost' | 'danger'", default: "'primary'", description: 'Visual style variant controlling colors and emphasis.' },
+  { name: 'variant', type: "'primary' | 'secondary' | 'ghost' | 'danger' | 'link'", default: "'primary'", description: 'Visual style variant controlling colors and emphasis.' },
   { name: 'size', type: "'xs' | 'sm' | 'md' | 'lg' | 'xl'", default: "'md'", description: 'Controls padding, font-size, and min-height.' },
   { name: 'loading', type: 'boolean', default: 'false', description: 'Shows a spinner overlay and prevents interaction. Announces via aria-busy.' },
   { name: 'icon', type: 'ReactNode', description: 'Leading icon element rendered before children.' },
@@ -853,15 +853,19 @@ const buttonProps: PropDef[] = [
   { name: 'ref', type: 'Ref<HTMLButtonElement>', description: 'Forwarded ref to the underlying <button> element.' },
   { name: 'haptics', type: "boolean | 'light' | 'medium' | 'heavy' | 'selection' | 'success' | 'error'", description: 'Enable haptic vibration feedback on click. true uses light pattern.' },
   { name: 'shortcuts', type: '{ activate?: string }', description: "Custom keyboard shortcut to activate this button. Example: 'ctrl+s'" },
+  { name: 'loadingText', type: 'string', description: 'Custom text shown during loading instead of hiding content.' },
+  { name: 'fullWidth', type: 'boolean', default: 'false', description: 'Makes button stretch to fill container width.' },
+  { name: 'iconOnly', type: 'boolean', default: 'false', description: 'Compact square button for icon-only usage.' },
+  { name: 'classNames', type: "Partial<Record<'root' | 'icon' | 'iconEnd', string>>", description: 'Custom classes for inner parts.' },
 ]
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
-type Variant = 'primary' | 'secondary' | 'ghost' | 'danger'
+type Variant = 'primary' | 'secondary' | 'ghost' | 'danger' | 'link'
 type Size = 'xs' | 'sm' | 'md' | 'lg' | 'xl'
 type AnimationStyle = 'smooth' | 'spring' | 'bounce' | 'none'
 
-const VARIANTS: Variant[] = ['primary', 'secondary', 'ghost', 'danger']
+const VARIANTS: Variant[] = ['primary', 'secondary', 'ghost', 'danger', 'link']
 const SIZES: Size[] = ['xs', 'sm', 'md', 'lg', 'xl']
 const TIERS: { id: Tier; label: string }[] = [
   { id: 'lite', label: 'Lite' },
@@ -1027,6 +1031,17 @@ function generateLiteCss(variant: Variant, size: Size, brandColor: string): stri
 .ui-lite-button[data-variant="danger"]:hover:not(:disabled) {
   filter: brightness(1.1);
   transform: translateY(-1px);
+}`,
+    link: `.ui-lite-button[data-variant="link"] {
+  background: transparent;
+  color: var(--brand, oklch(65% 0.2 270));
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  padding: 0;
+  min-height: auto;
+}
+.ui-lite-button[data-variant="link"]:hover:not(:disabled) {
+  text-decoration-thickness: 2px;
 }`,
   }
 
@@ -1468,7 +1483,7 @@ export default function ButtonPage() {
           <a href="#variants">Variants</a>
         </h2>
         <p className="button-page__section-desc">
-          Four built-in variants for different levels of emphasis and semantic meaning.
+          Five built-in variants for different levels of emphasis and semantic meaning.
         </p>
         <div className="button-page__preview">
           <div className="button-page__labeled-row">

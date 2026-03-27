@@ -14,7 +14,13 @@ export interface AlertProps extends Omit<HTMLAttributes<HTMLDivElement>, 'title'
   onDismiss?: () => void
   action?: { label: string; onClick: () => void }
   size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl'
+  /** Full-width banner mode (no border-radius, full-width border-top instead of border-left) */
+  banner?: boolean
+  /** Reduced padding, single-line layout */
+  compact?: boolean
   motion?: 0 | 1 | 2 | 3
+  /** Custom class names for internal parts */
+  classNames?: Partial<Record<'root' | 'icon' | 'content' | 'title' | 'body' | 'dismiss', string>>
   children: ReactNode
 }
 
@@ -87,6 +93,9 @@ const alertStyles = css`
         border-inline-start: 4px solid transparent;
         font-family: inherit;
         line-height: 1.5;
+        backdrop-filter: blur(12px) saturate(1.3);
+        box-shadow: inset 0 1px 0 oklch(100% 0 0 / 0.06);
+        overflow: hidden;
       }
 
       /* Sizes */
@@ -140,6 +149,40 @@ const alertStyles = css`
       :scope[data-variant="error"] {
         border-inline-start-color: var(--status-critical, oklch(65% 0.25 25));
         background: oklch(from var(--status-critical, oklch(65% 0.25 25)) l c h / 0.08);
+      }
+
+      /* Subtle right-side accent gradient fade */
+      :scope[data-variant="info"]::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+        background: linear-gradient(to right, transparent 60%, oklch(from var(--status-info, oklch(65% 0.2 250)) l c h / 0.04) 100%);
+        border-radius: inherit;
+      }
+      :scope[data-variant="success"]::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+        background: linear-gradient(to right, transparent 60%, oklch(from var(--status-positive, oklch(65% 0.2 145)) l c h / 0.04) 100%);
+        border-radius: inherit;
+      }
+      :scope[data-variant="warning"]::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+        background: linear-gradient(to right, transparent 60%, oklch(from var(--status-warning, oklch(75% 0.15 80)) l c h / 0.04) 100%);
+        border-radius: inherit;
+      }
+      :scope[data-variant="error"]::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+        background: linear-gradient(to right, transparent 60%, oklch(from var(--status-critical, oklch(65% 0.25 25)) l c h / 0.04) 100%);
+        border-radius: inherit;
       }
 
       /* Icon */
@@ -253,6 +296,41 @@ const alertStyles = css`
         block-size: 1rem;
       }
 
+      /* Banner mode */
+      :scope[data-banner="true"] {
+        border-radius: 0;
+        border-inline-start: none;
+        border-block-start: 4px solid transparent;
+        inline-size: 100%;
+      }
+      :scope[data-banner="true"][data-variant="info"] {
+        border-block-start-color: var(--status-info, oklch(65% 0.2 250));
+      }
+      :scope[data-banner="true"][data-variant="success"] {
+        border-block-start-color: var(--status-positive, oklch(65% 0.2 145));
+      }
+      :scope[data-banner="true"][data-variant="warning"] {
+        border-block-start-color: var(--status-warning, oklch(75% 0.15 80));
+      }
+      :scope[data-banner="true"][data-variant="error"] {
+        border-block-start-color: var(--status-critical, oklch(65% 0.25 25));
+      }
+
+      /* Compact mode */
+      :scope[data-compact="true"] {
+        padding-block: 0.25rem;
+        padding-inline: 0.5rem;
+        align-items: center;
+      }
+      :scope[data-compact="true"] .ui-alert__content {
+        flex-direction: row;
+        align-items: center;
+        gap: var(--space-sm, 0.5rem);
+      }
+      :scope[data-compact="true"] .ui-alert__icon {
+        padding-block-start: 0;
+      }
+
       /* Entry animation — motion level 1+ */
       :scope:not([data-motion="0"]) {
         animation: ui-alert-slide-in 0.25s var(--ease-out, ease-out);
@@ -305,7 +383,10 @@ export const Alert = forwardRef<HTMLDivElement, AlertProps>(
       onDismiss,
       action,
       size = 'md',
+      banner = false,
+      compact = false,
       motion: motionProp,
+      classNames,
       children,
       className,
       ...rest
@@ -321,20 +402,22 @@ export const Alert = forwardRef<HTMLDivElement, AlertProps>(
     return (
       <div
         ref={ref}
-        className={cn(cls('root'), className)}
+        className={cn(cls('root'), classNames?.root, className)}
         data-variant={variant}
         data-size={size}
+        data-banner={banner || undefined}
+        data-compact={compact || undefined}
         data-motion={motionLevel}
         role={role}
         {...rest}
       >
-        <span className="ui-alert__icon" aria-hidden="true">
+        <span className={cn('ui-alert__icon', classNames?.icon)} aria-hidden="true">
           {icon || <IconComponent />}
         </span>
 
-        <div className="ui-alert__content">
-          {title && <div className="ui-alert__title">{title}</div>}
-          <div className="ui-alert__body">{children}</div>
+        <div className={cn('ui-alert__content', classNames?.content)}>
+          {title && <div className={cn('ui-alert__title', classNames?.title)}>{title}</div>}
+          <div className={cn('ui-alert__body', classNames?.body)}>{children}</div>
           {action && (
             <div className="ui-alert__actions">
               <button
@@ -351,7 +434,7 @@ export const Alert = forwardRef<HTMLDivElement, AlertProps>(
         {dismissible && (
           <button
             type="button"
-            className="ui-alert__dismiss"
+            className={cn('ui-alert__dismiss', classNames?.dismiss)}
             onClick={onDismiss}
             aria-label="Dismiss"
           >

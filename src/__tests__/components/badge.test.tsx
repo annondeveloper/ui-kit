@@ -1,5 +1,6 @@
-import { describe, it, expect, afterEach } from 'vitest'
-import { render, screen, cleanup } from '@testing-library/react'
+import { describe, it, expect, vi, afterEach } from 'vitest'
+import { render, screen, cleanup, fireEvent } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import { createRef } from 'react'
 import { axe, toHaveNoViolations } from 'jest-axe'
 import { Badge } from '../../components/badge'
@@ -135,6 +136,51 @@ describe('Badge', () => {
       render(<Badge data-testid="my-badge" id="badge-1">Attrs</Badge>)
       const badge = screen.getByTestId('my-badge')
       expect(badge).toHaveAttribute('id', 'badge-1')
+    })
+  })
+
+  // ─── Removable ───────────────────────────────────────────────────
+
+  describe('removable', () => {
+    it('renders remove button when removable is true', () => {
+      const { container } = render(<Badge removable>Tag</Badge>)
+      const removeBtn = container.querySelector('.ui-badge__remove')
+      expect(removeBtn).toBeInTheDocument()
+      expect(removeBtn).toHaveAttribute('aria-label', 'Remove')
+    })
+
+    it('does not render remove button when removable is false', () => {
+      const { container } = render(<Badge>Tag</Badge>)
+      expect(container.querySelector('.ui-badge__remove')).not.toBeInTheDocument()
+    })
+
+    it('calls onRemove when remove button is clicked', async () => {
+      const onRemove = vi.fn()
+      const { container } = render(<Badge removable onRemove={onRemove}>Tag</Badge>)
+      const removeBtn = container.querySelector('.ui-badge__remove')!
+      await userEvent.click(removeBtn)
+      expect(onRemove).toHaveBeenCalledTimes(1)
+    })
+  })
+
+  // ─── Outline ────────────────────────────────────────────────────
+
+  describe('outline', () => {
+    it('sets data-outline="true" when outline is true', () => {
+      render(<Badge outline>Outline</Badge>)
+      expect(screen.getByText('Outline')).toHaveAttribute('data-outline', 'true')
+    })
+
+    it('does not set data-outline when outline is false', () => {
+      render(<Badge>Normal</Badge>)
+      expect(screen.getByText('Normal')).not.toHaveAttribute('data-outline')
+    })
+
+    it('works with variant prop', () => {
+      render(<Badge outline variant="primary">Primary Outline</Badge>)
+      const badge = screen.getByText('Primary Outline')
+      expect(badge).toHaveAttribute('data-outline', 'true')
+      expect(badge).toHaveAttribute('data-variant', 'primary')
     })
   })
 

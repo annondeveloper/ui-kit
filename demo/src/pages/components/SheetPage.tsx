@@ -150,9 +150,9 @@ const pageStyles = css`
 
       @supports not (animation-timeline: view()) {
         .sheet-page__section {
-          opacity: 0;
-          transform: translateY(32px) scale(0.98);
-          filter: blur(4px);
+          opacity: 1;
+          transform: none;
+          filter: none;
           animation: none;
         }
       }
@@ -188,14 +188,14 @@ const pageStyles = css`
       /* ── Preview box ────────────────────────────────── */
 
       .sheet-page__preview {
-        padding: 2.5rem;
+        padding: 2rem;
         border-radius: var(--radius-md);
         background: var(--bg-base);
         position: relative;
-        overflow: hidden;
+        overflow: visible;
         display: flex;
         flex-wrap: wrap;
-        align-items: center;
+        align-items: flex-start;
         justify-content: center;
         gap: 1.25rem;
         min-block-size: 80px;

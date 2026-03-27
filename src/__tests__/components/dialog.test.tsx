@@ -438,6 +438,180 @@ describe('Dialog', () => {
     })
   })
 
+  // ─── Footer ────────────────────────────────────────────────────────
+
+  describe('footer', () => {
+    it('renders footer content when footer prop is provided', () => {
+      render(
+        <Dialog open onClose={() => {}} footer={<button>Save</button>}>
+          Content
+        </Dialog>
+      )
+      expect(screen.getByRole('button', { name: 'Save' })).toBeInTheDocument()
+    })
+
+    it('renders footer in a ui-dialog__footer element', () => {
+      const { container } = render(
+        <Dialog open onClose={() => {}} footer={<span>Footer</span>}>
+          Content
+        </Dialog>
+      )
+      const footer = container.querySelector('.ui-dialog__footer')
+      expect(footer).toBeInTheDocument()
+      expect(footer).toHaveTextContent('Footer')
+    })
+
+    it('does not render footer element when footer prop is not provided', () => {
+      const { container } = render(
+        <Dialog open onClose={() => {}}>
+          Content
+        </Dialog>
+      )
+      expect(container.querySelector('.ui-dialog__footer')).not.toBeInTheDocument()
+    })
+  })
+
+  // ─── preventClose ─────────────────────────────────────────────────
+
+  describe('preventClose', () => {
+    it('prevents closing via Escape when preventClose is true', () => {
+      const onClose = vi.fn()
+      render(
+        <Dialog open onClose={onClose} preventClose>
+          Content
+        </Dialog>
+      )
+      const dialog = screen.getByRole('dialog')
+      fireEvent.keyDown(dialog, { key: 'Escape' })
+      expect(onClose).not.toHaveBeenCalled()
+    })
+
+    it('prevents closing via overlay click when preventClose is true', () => {
+      const onClose = vi.fn()
+      render(
+        <Dialog open onClose={onClose} preventClose>
+          Content
+        </Dialog>
+      )
+      const dialog = screen.getByRole('dialog')
+      fireEvent.click(dialog, { target: dialog })
+      expect(onClose).not.toHaveBeenCalled()
+    })
+
+    it('allows closing via Escape when preventClose is false', () => {
+      const onClose = vi.fn()
+      render(
+        <Dialog open onClose={onClose}>
+          Content
+        </Dialog>
+      )
+      const dialog = screen.getByRole('dialog')
+      fireEvent.keyDown(dialog, { key: 'Escape' })
+      expect(onClose).toHaveBeenCalledTimes(1)
+    })
+  })
+
+  // ─── classNames prop ──────────────────────────────────────────────
+
+  describe('classNames', () => {
+    it('applies classNames.root to the wrapper element', () => {
+      const { container } = render(
+        <Dialog open onClose={() => {}} classNames={{ root: 'custom-root' }}>
+          Content
+        </Dialog>
+      )
+      const wrapper = container.querySelector('.ui-dialog')!
+      expect(wrapper.className).toContain('custom-root')
+      expect(wrapper.className).toContain('ui-dialog')
+    })
+
+    it('applies classNames.header to the header element', () => {
+      const { container } = render(
+        <Dialog open onClose={() => {}} title="Title" classNames={{ header: 'custom-header' }}>
+          Content
+        </Dialog>
+      )
+      const header = container.querySelector('.ui-dialog__header')!
+      expect(header.className).toContain('custom-header')
+      expect(header.className).toContain('ui-dialog__header')
+    })
+
+    it('applies classNames.title to the title element', () => {
+      const { container } = render(
+        <Dialog open onClose={() => {}} title="Title" classNames={{ title: 'custom-title' }}>
+          Content
+        </Dialog>
+      )
+      const title = container.querySelector('.ui-dialog__title')!
+      expect(title.className).toContain('custom-title')
+      expect(title.className).toContain('ui-dialog__title')
+    })
+
+    it('applies classNames.description to the description element', () => {
+      const { container } = render(
+        <Dialog open onClose={() => {}} title="Title" description="Desc" classNames={{ description: 'custom-desc' }}>
+          Content
+        </Dialog>
+      )
+      const desc = container.querySelector('.ui-dialog__description')!
+      expect(desc.className).toContain('custom-desc')
+      expect(desc.className).toContain('ui-dialog__description')
+    })
+
+    it('applies classNames.body to the body element', () => {
+      const { container } = render(
+        <Dialog open onClose={() => {}} classNames={{ body: 'custom-body' }}>
+          Content
+        </Dialog>
+      )
+      const body = container.querySelector('.ui-dialog__body')!
+      expect(body.className).toContain('custom-body')
+      expect(body.className).toContain('ui-dialog__body')
+    })
+
+    it('applies classNames.close to the close button', () => {
+      const { container } = render(
+        <Dialog open onClose={() => {}} title="Title" classNames={{ close: 'custom-close' }}>
+          Content
+        </Dialog>
+      )
+      const close = container.querySelector('.ui-dialog__close')!
+      expect(close.className).toContain('custom-close')
+      expect(close.className).toContain('ui-dialog__close')
+    })
+
+    it('applies classNames.footer to the footer element', () => {
+      const { container } = render(
+        <Dialog open onClose={() => {}} footer={<button>Save</button>} classNames={{ footer: 'custom-footer' }}>
+          Content
+        </Dialog>
+      )
+      const footer = container.querySelector('.ui-dialog__footer')!
+      expect(footer.className).toContain('custom-footer')
+      expect(footer.className).toContain('ui-dialog__footer')
+    })
+
+    it('merges classNames.root with className prop', () => {
+      const { container } = render(
+        <Dialog open onClose={() => {}} classNames={{ root: 'cn-root' }} className="class-prop">
+          Content
+        </Dialog>
+      )
+      const wrapper = container.querySelector('.ui-dialog')!
+      expect(wrapper.className).toContain('cn-root')
+      expect(wrapper.className).toContain('class-prop')
+    })
+
+    it('handles undefined classNames gracefully', () => {
+      const { container } = render(
+        <Dialog open onClose={() => {}} classNames={undefined}>
+          Content
+        </Dialog>
+      )
+      expect(container.querySelector('.ui-dialog')).toBeInTheDocument()
+    })
+  })
+
   // ─── Accessibility ──────────────────────────────────────────────────
 
   describe('accessibility', () => {

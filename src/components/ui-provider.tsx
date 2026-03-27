@@ -4,6 +4,8 @@ import { applyTheme } from '../core/tokens/generator'
 import { ThemeProvider } from '../core/tokens/theme-context'
 import { MotionProvider } from '../core/motion/motion-context'
 import { DensityProvider, type Density } from '../core/tokens/density-context'
+import { oklchFallbackStyles } from '../core/styles/fallbacks'
+import { injectCSS } from '../core/styles/dom-injector'
 
 export interface UIProviderProps {
   children: ReactNode
@@ -22,6 +24,11 @@ export function UIProvider({
   density = 'default',
   onModeChange,
 }: UIProviderProps) {
+  // Inject OKLCH fallbacks for older browsers (no-op if already injected)
+  useEffect(() => {
+    injectCSS(oklchFallbackStyles.id, oklchFallbackStyles.css)
+  }, [])
+
   // Apply theme tokens if provided
   useEffect(() => {
     if (theme) applyTheme(theme)

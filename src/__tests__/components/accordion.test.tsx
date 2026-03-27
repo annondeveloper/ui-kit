@@ -290,6 +290,71 @@ describe('Accordion', () => {
     })
   })
 
+  // ─── Variant ─────────────────────────────────────────────────────
+
+  describe('variant', () => {
+    it('defaults to data-variant="default"', () => {
+      const { container } = render(<Accordion items={defaultItems} />)
+      expect(container.querySelector('.ui-accordion')).toHaveAttribute('data-variant', 'default')
+    })
+
+    it('applies bordered variant', () => {
+      const { container } = render(<Accordion items={defaultItems} variant="bordered" />)
+      expect(container.querySelector('.ui-accordion')).toHaveAttribute('data-variant', 'bordered')
+    })
+
+    it('applies separated variant', () => {
+      const { container } = render(<Accordion items={defaultItems} variant="separated" />)
+      expect(container.querySelector('.ui-accordion')).toHaveAttribute('data-variant', 'separated')
+    })
+  })
+
+  // ─── Size ───────────────────────────────────────────────────────────
+
+  describe('size', () => {
+    it('defaults to data-size="md"', () => {
+      const { container } = render(<Accordion items={defaultItems} />)
+      expect(container.querySelector('.ui-accordion')).toHaveAttribute('data-size', 'md')
+    })
+
+    it('applies size sm', () => {
+      const { container } = render(<Accordion items={defaultItems} size="sm" />)
+      expect(container.querySelector('.ui-accordion')).toHaveAttribute('data-size', 'sm')
+    })
+
+    it('applies size lg', () => {
+      const { container } = render(<Accordion items={defaultItems} size="lg" />)
+      expect(container.querySelector('.ui-accordion')).toHaveAttribute('data-size', 'lg')
+    })
+  })
+
+  // ─── Item icon ──────────────────────────────────────────────────────
+
+  describe('item icon', () => {
+    it('renders item icon when provided', () => {
+      const items = [
+        { id: 'a', trigger: 'Section A', content: 'Content A', icon: <svg data-testid="item-icon" /> },
+      ]
+      render(<Accordion items={items} />)
+      expect(screen.getByTestId('item-icon')).toBeInTheDocument()
+    })
+
+    it('wraps icon in ui-accordion__item-icon class', () => {
+      const items = [
+        { id: 'a', trigger: 'Section A', content: 'Content A', icon: <svg data-testid="item-icon" /> },
+      ]
+      const { container } = render(<Accordion items={items} />)
+      const iconWrapper = container.querySelector('.ui-accordion__item-icon')!
+      expect(iconWrapper).toBeInTheDocument()
+      expect(iconWrapper).toHaveAttribute('aria-hidden', 'true')
+    })
+
+    it('does not render icon wrapper when no icon provided', () => {
+      const { container } = render(<Accordion items={defaultItems} />)
+      expect(container.querySelector('.ui-accordion__item-icon')).toBeNull()
+    })
+  })
+
   // ─── Accessibility ────────────────────────────────────────────────
 
   describe('accessibility', () => {

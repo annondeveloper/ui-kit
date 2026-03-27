@@ -13,16 +13,24 @@ export interface ButtonShortcuts {
 }
 
 export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: 'primary' | 'secondary' | 'ghost' | 'danger'
+  variant?: 'primary' | 'secondary' | 'ghost' | 'danger' | 'link'
   size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl'
   loading?: boolean
+  /** Custom text to display during loading state instead of hiding content */
+  loadingText?: string
   icon?: ReactNode
   iconEnd?: ReactNode
+  /** Makes the button fill the full width of its container */
+  fullWidth?: boolean
+  /** Compact square button for icon-only usage (no text, adjusts sizing) */
+  iconOnly?: boolean
   motion?: 0 | 1 | 2 | 3
   /** Enable haptic feedback on click. `true` uses 'light', or pass a specific pattern. */
   haptics?: boolean | HapticType
   /** Custom keyboard shortcuts for this button */
   shortcuts?: ButtonShortcuts
+  /** Custom class names for internal parts */
+  classNames?: Partial<Record<'root' | 'icon' | 'iconEnd', string>>
 }
 
 const buttonStyles = css`
@@ -97,17 +105,18 @@ const buttonStyles = css`
         background: var(--brand);
         color: var(--text-on-brand);
         border-color: transparent;
-        box-shadow: var(--shadow-sm);
+        box-shadow: inset 0 1px 0 oklch(100% 0 0 / 0.15), var(--shadow-sm);
       }
       :scope[data-variant="primary"]:hover:not(:disabled) {
         background: var(--brand-light);
-        box-shadow: var(--shadow-md);
+        box-shadow: 0 0 20px oklch(from var(--brand) l c h / 0.2), var(--shadow-md);
       }
 
       :scope[data-variant="secondary"] {
         background: var(--bg-elevated, oklch(100% 0 0 / 0.06));
         color: var(--text-primary);
         border-color: var(--border-default);
+        box-shadow: inset 0 1px 0 oklch(100% 0 0 / 0.06);
       }
       :scope[data-variant="secondary"]:hover:not(:disabled) {
         background: var(--bg-hover, oklch(100% 0 0 / 0.1));
@@ -120,7 +129,7 @@ const buttonStyles = css`
         border-color: transparent;
       }
       :scope[data-variant="ghost"]:hover:not(:disabled) {
-        background: var(--bg-hover, oklch(100% 0 0 / 0.06));
+        background: oklch(from var(--brand, oklch(65% 0.2 270)) l c h / 0.06);
         color: var(--text-primary);
       }
 
@@ -235,6 +244,72 @@ const buttonStyles = css`
         block-size: 1em;
         flex-shrink: 0;
       }
+
+      /* Link variant */
+      :scope[data-variant="link"] {
+        background: transparent;
+        color: var(--brand, oklch(62% 0.2 270));
+        border-color: transparent;
+        padding-inline: 0;
+        padding-block: 0;
+        min-block-size: auto;
+        border-radius: 0;
+        font-weight: 500;
+        text-decoration: underline;
+        text-underline-offset: 0.15em;
+        box-shadow: none;
+      }
+      :scope[data-variant="link"]:hover:not(:disabled) {
+        color: var(--brand-light, oklch(72% 0.2 270));
+        text-decoration-thickness: 2px;
+      }
+      :scope[data-variant="link"]:active:not(:disabled) {
+        color: var(--brand-dark, oklch(52% 0.2 270));
+      }
+
+      /* Full width */
+      :scope[data-full-width="true"] {
+        inline-size: 100%;
+      }
+
+      /* Icon-only — compact square button */
+      :scope[data-icon-only="true"] {
+        padding-inline: 0;
+        aspect-ratio: 1;
+      }
+      :scope[data-icon-only="true"][data-size="xs"] {
+        inline-size: 24px;
+        padding: 0;
+      }
+      :scope[data-icon-only="true"][data-size="sm"] {
+        inline-size: 32px;
+        padding: 0;
+      }
+      :scope[data-icon-only="true"][data-size="md"] {
+        inline-size: 36px;
+        padding: 0;
+      }
+      :scope[data-icon-only="true"][data-size="lg"] {
+        inline-size: 44px;
+        padding: 0;
+      }
+      :scope[data-icon-only="true"][data-size="xl"] {
+        inline-size: 52px;
+        padding: 0;
+      }
+
+      /* Loading with loadingText — keep text visible */
+      :scope[data-loading="true"][data-has-loading-text="true"] {
+        color: inherit;
+        pointer-events: none;
+      }
+      :scope[data-loading="true"][data-has-loading-text="true"]::after {
+        position: relative;
+        inset-block-start: auto;
+        inset-inline-start: auto;
+        translate: none;
+        margin-inline-start: var(--space-xs);
+      }
     }
 
     @keyframes ui-button-spin {
@@ -249,11 +324,15 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       variant = 'primary',
       size = 'md',
       loading = false,
+      loadingText,
       icon,
       iconEnd,
+      fullWidth,
+      iconOnly,
       motion: motionProp,
       haptics: hapticsProp,
       shortcuts,
+      classNames,
       disabled,
       children,
       className,
@@ -326,10 +405,13 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         ref={setRef}
         type={type}
         disabled={disabled}
-        className={cn(cls('root'), className)}
+        className={cn(cls('root'), classNames?.root, className)}
         data-variant={variant}
         data-size={size}
         data-loading={loading}
+        data-has-loading-text={loading && loadingText ? true : undefined}
+        data-full-width={fullWidth || undefined}
+        data-icon-only={iconOnly || undefined}
         data-motion={motionLevel}
         onClick={handleClick}
         aria-busy={loading || undefined}
@@ -337,9 +419,9 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         aria-keyshortcuts={shortcuts?.activate || undefined}
         {...rest}
       >
-        {icon && <span className="ui-button__icon">{icon}</span>}
-        {children}
-        {iconEnd && <span className="ui-button__icon-end">{iconEnd}</span>}
+        {icon && <span className={cn('ui-button__icon', classNames?.icon)}>{icon}</span>}
+        {loading && loadingText ? loadingText : children}
+        {iconEnd && <span className={cn('ui-button__icon-end', classNames?.iconEnd)}>{iconEnd}</span>}
       </button>
     )
   }

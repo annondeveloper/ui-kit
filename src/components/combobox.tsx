@@ -174,10 +174,12 @@ const comboboxStyles = css`
         min-inline-size: 100%;
         max-block-size: 15rem;
         overflow: auto;
-        border: 1px solid var(--border-subtle, oklch(100% 0 0 / 0.08));
+        border: 1px solid oklch(100% 0 0 / 0.12);
+        border-block-start-color: oklch(100% 0 0 / 0.18);
         border-radius: var(--radius-lg, 0.5rem);
-        background: var(--surface-elevated);
-        box-shadow: var(--shadow-lg, 0 8px 24px oklch(0% 0 0 / 0.3));
+        background: oklch(from var(--surface-elevated, oklch(22% 0.01 270)) l c h / 0.85);
+        backdrop-filter: blur(16px) saturate(1.5);
+        box-shadow: 0 12px 40px oklch(0% 0 0 / 0.35), 0 4px 16px oklch(0% 0 0 / 0.2), inset 0 1px 0 oklch(100% 0 0 / 0.06);
         padding-block: 0.25rem;
         outline: none;
       }

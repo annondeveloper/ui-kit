@@ -2,7 +2,7 @@ import { generateTheme, type ThemeMode } from './generator'
 import type { ThemeTokens } from './tokens'
 
 /**
- * 10 named theme presets — pre-built themes users can switch between.
+ * 15 named theme presets — pre-built themes users can switch between.
  * Each provides a complete ThemeTokens object for dark mode (default).
  */
 export const themes = {
@@ -25,6 +25,13 @@ export const themes = {
 
   // Neutral themes
   slate: generateTheme('#64748b'),            // Gray/Slate
+
+  // Professional themes
+  corporate: generateTheme('#1e40af'),        // Deep corporate blue
+  midnight: generateTheme('#312e81'),         // Rich midnight indigo
+  forest: generateTheme('#065f46'),           // Deep forest green
+  wine: generateTheme('#881337'),             // Rich burgundy/wine
+  carbon: generateTheme('#27272a'),           // Carbon/near-black neutral
 } as const
 
 /**
@@ -41,6 +48,11 @@ export const lightThemes = {
   violet: generateTheme('#8b5cf6', 'light'),
   fuchsia: generateTheme('#d946ef', 'light'),
   slate: generateTheme('#64748b', 'light'),
+  corporate: generateTheme('#1e40af', 'light'),
+  midnight: generateTheme('#312e81', 'light'),
+  forest: generateTheme('#065f46', 'light'),
+  wine: generateTheme('#881337', 'light'),
+  carbon: generateTheme('#27272a', 'light'),
 } as const
 
 /** Union type of available theme names */

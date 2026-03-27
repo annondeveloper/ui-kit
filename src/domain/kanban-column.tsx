@@ -1,7 +1,10 @@
 'use client'
 
-import {
+import React, {
   useCallback,
+  useRef,
+  useState,
+  useEffect,
   type HTMLAttributes,
   type ReactNode,
 } from 'react'
@@ -227,6 +230,27 @@ const kanbanColumnStyles = css`
         flex-shrink: 0;
       }
 
+      /* ── Drag and drop states ─────────────────────────── */
+
+      .ui-kanban-column__card--dragging {
+        opacity: 0.5;
+        box-shadow: 0 0 0 2px var(--brand, oklch(65% 0.2 270));
+      }
+
+      .ui-kanban__drop-indicator {
+        block-size: 2px;
+        background: var(--brand, oklch(65% 0.2 270));
+        border-radius: 1px;
+        box-shadow: 0 0 6px oklch(from var(--brand, oklch(65% 0.2 270)) l c h / 0.4);
+        margin-block: -1px;
+        pointer-events: none;
+      }
+
+      .ui-kanban-column__cards[data-drag-over] {
+        box-shadow: inset 0 0 0 1px oklch(from var(--brand, oklch(65% 0.2 270)) l c h / 0.15);
+        border-radius: var(--radius-md, 0.5rem);
+      }
+
       /* ── Reduced motion ──────────────────────────────── */
 
       @media (prefers-reduced-motion: reduce) {
@@ -319,6 +343,157 @@ export function KanbanColumn({
   const headerId = useStableId('kanban-header')
 
   const wipExceeded = wipLimit !== undefined && cards.length >= wipLimit
+  const cardsRef = useRef<HTMLDivElement>(null)
+  const [dropIndicatorIndex, setDropIndicatorIndex] = useState<number | null>(null)
+  const dropIndicatorIndexRef = useRef<number | null>(null)
+  const [isDragOver, setIsDragOver] = useState(false)
+  const dragEnterCounterRef = useRef(0)
+
+  // Keep ref in sync with state
+  const updateDropIndicatorIndex = useCallback((index: number | null) => {
+    dropIndicatorIndexRef.current = index
+    setDropIndicatorIndex(index)
+  }, [])
+
+  // ── Drag handlers ──
+
+  const handleDragStart = useCallback(
+    (e: React.DragEvent, cardId: string) => {
+      e.dataTransfer.effectAllowed = 'move'
+      e.dataTransfer.setData('text/plain', JSON.stringify({ cardId, sourceColumnId: columnId }))
+      const target = e.currentTarget as HTMLElement
+      requestAnimationFrame(() => {
+        target?.classList?.add('ui-kanban-column__card--dragging')
+      })
+    },
+    [columnId]
+  )
+
+  const handleDragEnd = useCallback((e: React.DragEvent) => {
+    const target = e.currentTarget as HTMLElement
+    target.classList.remove('ui-kanban-column__card--dragging')
+    updateDropIndicatorIndex(null)
+    setIsDragOver(false)
+  }, [updateDropIndicatorIndex])
+
+  const getDropIndex = useCallback((e: React.DragEvent) => {
+    const container = cardsRef.current
+    if (!container) return cards.length
+    const cardElements = Array.from(container.querySelectorAll<HTMLElement>('[data-card]'))
+    for (let i = 0; i < cardElements.length; i++) {
+      const rect = cardElements[i].getBoundingClientRect()
+      const midY = rect.top + rect.height / 2
+      if (e.clientY < midY) return i
+    }
+    return cards.length
+  }, [cards.length])
+
+  const handleDragEnter = useCallback(
+    (e: React.DragEvent) => {
+      e.preventDefault()
+      dragEnterCounterRef.current++
+      setIsDragOver(true)
+    },
+    []
+  )
+
+  const handleDragOver = useCallback(
+    (e: React.DragEvent) => {
+      e.preventDefault()
+      e.dataTransfer.dropEffect = 'move'
+      const index = getDropIndex(e)
+      updateDropIndicatorIndex(index)
+    },
+    [getDropIndex, updateDropIndicatorIndex]
+  )
+
+  const handleDragLeave = useCallback((e: React.DragEvent) => {
+    dragEnterCounterRef.current--
+    if (dragEnterCounterRef.current <= 0) {
+      dragEnterCounterRef.current = 0
+      updateDropIndicatorIndex(null)
+      setIsDragOver(false)
+    }
+  }, [updateDropIndicatorIndex])
+
+  const handleDrop = useCallback(
+    (e: React.DragEvent) => {
+      e.preventDefault()
+      dragEnterCounterRef.current = 0
+      updateDropIndicatorIndex(null)
+      setIsDragOver(false)
+      try {
+        const data = JSON.parse(e.dataTransfer.getData('text/plain'))
+        const newIndex = getDropIndex(e)
+        onCardMove?.(data.cardId, columnId, newIndex)
+      } catch {
+        // ignore invalid drag data
+      }
+    },
+    [getDropIndex, onCardMove, columnId, updateDropIndicatorIndex]
+  )
+
+  // ── Touch DnD (basic) ──
+
+  const touchState = useRef<{
+    cardId: string
+    startY: number
+    el: HTMLElement
+    clone: HTMLElement | null
+  } | null>(null)
+
+  useEffect(() => {
+    const container = cardsRef.current
+    if (!container || !onCardMove) return
+
+    const handleTouchStart = (e: TouchEvent) => {
+      const card = (e.target as HTMLElement).closest<HTMLElement>('[data-card]')
+      if (!card) return
+      const cardId = card.getAttribute('data-card-id')
+      if (!cardId) return
+      const touch = e.touches[0]
+      card.classList.add('ui-kanban-column__card--dragging')
+      touchState.current = { cardId, startY: touch.clientY, el: card, clone: null }
+    }
+
+    const handleTouchMove = (e: TouchEvent) => {
+      if (!touchState.current) return
+      e.preventDefault()
+      const touch = e.touches[0]
+      const cardEls = Array.from(container.querySelectorAll<HTMLElement>('[data-card]'))
+      let newIndex = cardEls.length
+      for (let i = 0; i < cardEls.length; i++) {
+        const rect = cardEls[i].getBoundingClientRect()
+        if (touch.clientY < rect.top + rect.height / 2) {
+          newIndex = i
+          break
+        }
+      }
+      updateDropIndicatorIndex(newIndex)
+    }
+
+    const handleTouchEnd = () => {
+      if (!touchState.current) return
+      const { cardId, el } = touchState.current
+      el.classList.remove('ui-kanban-column__card--dragging')
+      const currentDropIndex = dropIndicatorIndexRef.current
+      if (currentDropIndex !== null) {
+        onCardMove(cardId, columnId, currentDropIndex)
+      }
+      updateDropIndicatorIndex(null)
+      touchState.current = null
+    }
+
+    container.addEventListener('touchstart', handleTouchStart, { passive: true })
+    container.addEventListener('touchmove', handleTouchMove, { passive: false })
+    container.addEventListener('touchend', handleTouchEnd)
+
+    return () => {
+      container.removeEventListener('touchstart', handleTouchStart)
+      container.removeEventListener('touchmove', handleTouchMove)
+      container.removeEventListener('touchend', handleTouchEnd)
+    }
+  }, [onCardMove, columnId, updateDropIndicatorIndex])
 
   const handleCardClick = useCallback(
     (cardId: string) => {
@@ -372,18 +547,32 @@ export function KanbanColumn({
 
       {/* Cards */}
       {!collapsed && (
-        <div className="ui-kanban-column__cards">
+        <div
+          ref={cardsRef}
+          className="ui-kanban-column__cards"
+          {...(isDragOver ? { 'data-drag-over': '' } : {})}
+          onDragEnter={onCardMove ? handleDragEnter : undefined}
+          onDragOver={onCardMove ? handleDragOver : undefined}
+          onDragLeave={onCardMove ? handleDragLeave : undefined}
+          onDrop={onCardMove ? handleDrop : undefined}
+        >
           {cards.map((card, i) => (
-            <div
-              key={card.id}
-              className="ui-kanban-column__card"
-              data-card=""
-              data-card-id={card.id}
-              data-priority={card.priority || undefined}
-              tabIndex={onCardClick ? 0 : undefined}
-              onClick={() => handleCardClick(card.id)}
-              onKeyDown={(e) => handleCardKeyDown(e, card.id)}
-            >
+            <React.Fragment key={card.id}>
+              {dropIndicatorIndex === i && (
+                <div className="ui-kanban__drop-indicator" aria-hidden="true" />
+              )}
+              <div
+                className="ui-kanban-column__card"
+                data-card=""
+                data-card-id={card.id}
+                data-priority={card.priority || undefined}
+                tabIndex={onCardClick ? 0 : undefined}
+                draggable={onCardMove ? true : undefined}
+                onDragStart={onCardMove ? (e) => handleDragStart(e, card.id) : undefined}
+                onDragEnd={onCardMove ? handleDragEnd : undefined}
+                onClick={() => handleCardClick(card.id)}
+                onKeyDown={(e) => handleCardKeyDown(e, card.id)}
+              >
               <span className="ui-kanban-column__card-title">{card.title}</span>
               {card.description && (
                 <span className="ui-kanban-column__card-desc">{card.description}</span>
@@ -399,7 +588,11 @@ export function KanbanColumn({
                 </div>
               )}
             </div>
+            </React.Fragment>
           ))}
+          {dropIndicatorIndex === cards.length && (
+            <div className="ui-kanban__drop-indicator" aria-hidden="true" />
+          )}
         </div>
       )}
     </div>

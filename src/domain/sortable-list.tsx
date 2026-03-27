@@ -1,6 +1,6 @@
 'use client'
 
-import {
+import React, {
   useCallback,
   useEffect,
   useRef,
@@ -81,6 +81,33 @@ const sortableListStyles = css`
           var(--shadow-md, 0 4px 12px oklch(0% 0 0 / 0.25));
         cursor: grabbing;
         z-index: 10;
+      }
+
+      /* Drag-in-progress visual feedback */
+      .ui-sortable-list__item--dragging {
+        opacity: 0.5;
+        box-shadow:
+          0 0 0 2px var(--brand, oklch(65% 0.2 270)),
+          0 8px 24px oklch(0% 0 0 / 0.3);
+        transform: scale(1.02);
+      }
+
+      /* Drop indicator line */
+      .ui-sortable-list__drop-indicator {
+        block-size: 2px;
+        background: var(--brand, oklch(65% 0.2 270));
+        border-radius: 1px;
+        box-shadow: 0 0 6px oklch(from var(--brand, oklch(65% 0.2 270)) l c h / 0.4);
+        margin-block: -1px;
+        pointer-events: none;
+      }
+
+      :scope[data-orientation="horizontal"] .ui-sortable-list__drop-indicator {
+        inline-size: 2px;
+        block-size: auto;
+        align-self: stretch;
+        margin-inline: -1px;
+        margin-block: 0;
       }
 
       .ui-sortable-list__item[aria-disabled="true"] {
@@ -205,6 +232,8 @@ export function SortableList({
   const motionLevel = useMotionLevel(motionProp)
   const listRef = useRef<HTMLDivElement>(null)
   const [grabbedId, setGrabbedId] = useState<string | null>(null)
+  const [draggedId, setDraggedId] = useState<string | null>(null)
+  const [dropIndex, setDropIndex] = useState<number | null>(null)
 
   // Initialize tabindex
   useEffect(() => {
@@ -229,6 +258,7 @@ export function SortableList({
   const moveItem = useCallback(
     (fromIndex: number, toIndex: number) => {
       if (toIndex < 0 || toIndex >= items.length) return
+      if (fromIndex === toIndex) return
       const next = [...items]
       const [moved] = next.splice(fromIndex, 1)
       next.splice(toIndex, 0, moved)
@@ -313,6 +343,86 @@ export function SortableList({
     [disabled, orientation, items, moveItem, focusItem, grabbedId]
   )
 
+  // ── Mouse drag handlers (native HTML DnD) ──
+
+  const getDropIndexFromEvent = useCallback(
+    (e: React.DragEvent) => {
+      const list = listRef.current
+      if (!list) return items.length
+      const options = Array.from(list.querySelectorAll<HTMLElement>('[role="option"]'))
+      const isVertical = orientation === 'vertical'
+      for (let i = 0; i < options.length; i++) {
+        const rect = options[i].getBoundingClientRect()
+        const mid = isVertical
+          ? rect.top + rect.height / 2
+          : rect.left + rect.width / 2
+        const pos = isVertical ? e.clientY : e.clientX
+        if (pos < mid) return i
+      }
+      return items.length
+    },
+    [items.length, orientation]
+  )
+
+  const handleDragStart = useCallback(
+    (e: React.DragEvent, itemId: string) => {
+      if (disabled) return
+      e.dataTransfer.effectAllowed = 'move'
+      e.dataTransfer.setData('text/plain', itemId)
+      setDraggedId(itemId)
+      const target = e.currentTarget as HTMLElement
+      requestAnimationFrame(() => {
+        target?.classList?.add('ui-sortable-list__item--dragging')
+      })
+    },
+    [disabled]
+  )
+
+  const handleDragEnd = useCallback((e: React.DragEvent) => {
+    const el = e.currentTarget as HTMLElement
+    el.classList.remove('ui-sortable-list__item--dragging')
+    setDraggedId(null)
+    setDropIndex(null)
+  }, [])
+
+  const handleDragOver = useCallback(
+    (e: React.DragEvent) => {
+      e.preventDefault()
+      e.dataTransfer.dropEffect = 'move'
+      const idx = getDropIndexFromEvent(e)
+      setDropIndex(idx)
+    },
+    [getDropIndexFromEvent]
+  )
+
+  const handleDragLeave = useCallback((e: React.DragEvent) => {
+    const list = listRef.current
+    if (list && !list.contains(e.relatedTarget as Node)) {
+      setDropIndex(null)
+    }
+  }, [])
+
+  const handleDrop = useCallback(
+    (e: React.DragEvent) => {
+      e.preventDefault()
+      const dragItemId = e.dataTransfer.getData('text/plain')
+      const fromIndex = items.findIndex((item) => item.id === dragItemId)
+      let toIndex = getDropIndexFromEvent(e)
+      setDraggedId(null)
+      setDropIndex(null)
+      if (fromIndex < 0) return
+      // Adjust target index when dragging downward
+      if (fromIndex < toIndex) toIndex -= 1
+      if (fromIndex !== toIndex) {
+        const next = [...items]
+        const [moved] = next.splice(fromIndex, 1)
+        next.splice(toIndex, 0, moved)
+        onChange(next)
+      }
+    },
+    [items, getDropIndexFromEvent, onChange]
+  )
+
   return (
     <div
       className={cn(cls('root'), className)}
@@ -326,27 +436,40 @@ export function SortableList({
         aria-label={ariaLabel || 'Sortable list'}
         aria-orientation={orientation}
         onKeyDown={handleKeyDown}
+        onDragOver={!disabled ? handleDragOver : undefined}
+        onDragLeave={!disabled ? handleDragLeave : undefined}
+        onDrop={!disabled ? handleDrop : undefined}
       >
         {items.map((item, i) => (
-          <div
-            key={item.id}
-            role="option"
-            aria-selected={grabbedId === item.id}
-            aria-disabled={disabled || undefined}
-            aria-roledescription="sortable item"
-            data-item-id={item.id}
-            data-grabbed={grabbedId === item.id ? 'true' : undefined}
-            className="ui-sortable-list__item"
-            tabIndex={-1}
-          >
-            {handle && (
-              <span className="ui-sortable-list__handle" aria-hidden="true">
-                <GripIcon />
-              </span>
+          <React.Fragment key={item.id}>
+            {dropIndex === i && draggedId !== null && (
+              <div className="ui-sortable-list__drop-indicator" aria-hidden="true" />
             )}
-            <span className="ui-sortable-list__content">{item.content}</span>
-          </div>
+            <div
+              role="option"
+              aria-selected={grabbedId === item.id}
+              aria-disabled={disabled || undefined}
+              aria-roledescription="sortable item"
+              data-item-id={item.id}
+              data-grabbed={grabbedId === item.id ? 'true' : undefined}
+              className="ui-sortable-list__item"
+              tabIndex={-1}
+              draggable={!disabled}
+              onDragStart={!disabled ? (e) => handleDragStart(e, item.id) : undefined}
+              onDragEnd={!disabled ? handleDragEnd : undefined}
+            >
+              {handle && (
+                <span className="ui-sortable-list__handle" aria-hidden="true">
+                  <GripIcon />
+                </span>
+              )}
+              <span className="ui-sortable-list__content">{item.content}</span>
+            </div>
+          </React.Fragment>
         ))}
+        {dropIndex === items.length && draggedId !== null && (
+          <div className="ui-sortable-list__drop-indicator" aria-hidden="true" />
+        )}
       </div>
     </div>
   )

@@ -191,6 +191,18 @@ const checkboxStyles = css`
         }
       }
 
+      /* Bounce animation on check — motion level 2+ */
+      @keyframes ui-checkbox-bounce {
+        0% { transform: scale(1); }
+        40% { transform: scale(1.15); }
+        60% { transform: scale(0.95); }
+        100% { transform: scale(1); }
+      }
+
+      :scope:not([data-motion="0"]):not([data-motion="1"]) .ui-checkbox__input:checked ~ .ui-checkbox__box {
+        animation: ui-checkbox-bounce 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+      }
+
       /* Print */
       @media print {
         .ui-checkbox__box {

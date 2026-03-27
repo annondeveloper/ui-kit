@@ -197,10 +197,12 @@ const selectStyles = css`
         min-inline-size: 100%;
         max-block-size: 15rem;
         overflow: auto;
-        border: 1px solid var(--border-subtle, oklch(100% 0 0 / 0.08));
+        border: 1px solid oklch(100% 0 0 / 0.12);
+        border-block-start-color: oklch(100% 0 0 / 0.18);
         border-radius: var(--radius-lg, 0.5rem);
-        background: var(--surface-elevated);
-        box-shadow: var(--shadow-lg, 0 8px 24px oklch(0% 0 0 / 0.3));
+        background: oklch(from var(--surface-elevated, oklch(22% 0.01 270)) l c h / 0.85);
+        backdrop-filter: blur(16px) saturate(1.5);
+        box-shadow: 0 12px 40px oklch(0% 0 0 / 0.35), 0 4px 16px oklch(0% 0 0 / 0.2), inset 0 1px 0 oklch(100% 0 0 / 0.06);
         padding-block: 0.25rem;
         outline: none;
       }
@@ -349,6 +351,31 @@ const selectStyles = css`
         animation: ui-select-error-in 0.2s var(--ease-out, ease-out);
       }
 
+      /* Staggered option appearance — motion level 2+ */
+      :scope:not([data-motion="0"]):not([data-motion="1"]) .ui-select__option {
+        animation: ui-option-appear 0.15s ease-out both;
+      }
+      :scope:not([data-motion="0"]):not([data-motion="1"]) .ui-select__option:nth-child(1) { animation-delay: 0ms; }
+      :scope:not([data-motion="0"]):not([data-motion="1"]) .ui-select__option:nth-child(2) { animation-delay: 20ms; }
+      :scope:not([data-motion="0"]):not([data-motion="1"]) .ui-select__option:nth-child(3) { animation-delay: 40ms; }
+      :scope:not([data-motion="0"]):not([data-motion="1"]) .ui-select__option:nth-child(4) { animation-delay: 60ms; }
+      :scope:not([data-motion="0"]):not([data-motion="1"]) .ui-select__option:nth-child(5) { animation-delay: 80ms; }
+      :scope:not([data-motion="0"]):not([data-motion="1"]) .ui-select__option:nth-child(6) { animation-delay: 100ms; }
+      :scope:not([data-motion="0"]):not([data-motion="1"]) .ui-select__option:nth-child(7) { animation-delay: 120ms; }
+      :scope:not([data-motion="0"]):not([data-motion="1"]) .ui-select__option:nth-child(8) { animation-delay: 140ms; }
+      :scope:not([data-motion="0"]):not([data-motion="1"]) .ui-select__option:nth-child(9) { animation-delay: 160ms; }
+      :scope:not([data-motion="0"]):not([data-motion="1"]) .ui-select__option:nth-child(10) { animation-delay: 180ms; }
+      :scope:not([data-motion="0"]):not([data-motion="1"]) .ui-select__option:nth-child(11) { animation-delay: 200ms; }
+      :scope:not([data-motion="0"]):not([data-motion="1"]) .ui-select__option:nth-child(12) { animation-delay: 220ms; }
+      :scope:not([data-motion="0"]):not([data-motion="1"]) .ui-select__option:nth-child(13) { animation-delay: 240ms; }
+      :scope:not([data-motion="0"]):not([data-motion="1"]) .ui-select__option:nth-child(14) { animation-delay: 260ms; }
+      :scope:not([data-motion="0"]):not([data-motion="1"]) .ui-select__option:nth-child(15) { animation-delay: 280ms; }
+      :scope:not([data-motion="0"]):not([data-motion="1"]) .ui-select__option:nth-child(16) { animation-delay: 300ms; }
+      :scope:not([data-motion="0"]):not([data-motion="1"]) .ui-select__option:nth-child(17) { animation-delay: 300ms; }
+      :scope:not([data-motion="0"]):not([data-motion="1"]) .ui-select__option:nth-child(18) { animation-delay: 300ms; }
+      :scope:not([data-motion="0"]):not([data-motion="1"]) .ui-select__option:nth-child(19) { animation-delay: 300ms; }
+      :scope:not([data-motion="0"]):not([data-motion="1"]) .ui-select__option:nth-child(20) { animation-delay: 300ms; }
+
       /* Touch targets */
       @media (pointer: coarse) {
         .ui-select__trigger {
@@ -398,6 +425,17 @@ const selectStyles = css`
           animation: none;
           transition: none;
         }
+      }
+    }
+
+    @keyframes ui-option-appear {
+      from {
+        opacity: 0;
+        transform: translateY(-4px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
       }
     }
 

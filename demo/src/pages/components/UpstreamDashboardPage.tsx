@@ -208,9 +208,9 @@ const pageStyles = css`
 
       @supports not (animation-timeline: view()) {
         .ud-page__section {
-          opacity: 0;
-          transform: translateY(32px) scale(0.98);
-          filter: blur(4px);
+          opacity: 1;
+          transform: none;
+          filter: none;
           animation: none;
         }
       }
