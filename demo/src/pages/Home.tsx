@@ -102,7 +102,7 @@ const homeStyles = css`
 
     /* ─── Scroll Reveal ─── */
     .home-reveal {
-      opacity: 0;
+      opacity: 1;
       transform: translateY(24px);
       transition: opacity 0.6s var(--ease), transform 0.6s var(--ease);
     }
@@ -113,7 +113,7 @@ const homeStyles = css`
 
     /* ─── Stagger Items ─── */
     .home-stagger-item {
-      opacity: 0;
+      opacity: 1;
       transform: translateY(16px) scale(0.97);
       transition: opacity 0.4s var(--ease), transform 0.5s var(--spring);
     }
@@ -240,7 +240,7 @@ const homeStyles = css`
 
     /* Hero text stagger entrance */
     .home-hero-entrance {
-      opacity: 0;
+      opacity: 1;
       transform: translateY(20px);
       animation: hero-enter 0.7s var(--ease) forwards;
     }
