@@ -427,6 +427,107 @@ describe('Tabs', () => {
     })
   })
 
+  // ─── Badge ──────────────────────────────────────────────────────
+
+  describe('badge', () => {
+    it('renders badge next to tab label', () => {
+      const tabsWithBadge: Tab[] = [
+        { id: 'a', label: 'Messages', badge: '5' },
+        { id: 'b', label: 'Settings' },
+      ]
+      const { container } = render(
+        <Tabs tabs={tabsWithBadge} defaultTab="a">
+          <TabPanel tabId="a">Panel A</TabPanel>
+          <TabPanel tabId="b">Panel B</TabPanel>
+        </Tabs>
+      )
+      const badge = container.querySelector('.ui-tabs__tab-badge')
+      expect(badge).toBeInTheDocument()
+      expect(badge).toHaveTextContent('5')
+    })
+
+    it('renders badge as ReactNode', () => {
+      const tabsWithBadge: Tab[] = [
+        { id: 'a', label: 'Items', badge: <span data-testid="custom-badge">New</span> },
+        { id: 'b', label: 'Other' },
+      ]
+      render(
+        <Tabs tabs={tabsWithBadge} defaultTab="a">
+          <TabPanel tabId="a">Panel A</TabPanel>
+          <TabPanel tabId="b">Panel B</TabPanel>
+        </Tabs>
+      )
+      expect(screen.getByTestId('custom-badge')).toBeInTheDocument()
+    })
+
+    it('does not render badge when not provided', () => {
+      const { container } = renderTabs()
+      expect(container.querySelector('.ui-tabs__tab-badge')).not.toBeInTheDocument()
+    })
+  })
+
+  // ─── Closeable ─────────────────────────────────────────────────────
+
+  describe('closeable', () => {
+    it('renders close button when closeable is true', () => {
+      const tabsWithClose: Tab[] = [
+        { id: 'a', label: 'Tab A', closeable: true },
+        { id: 'b', label: 'Tab B' },
+      ]
+      const { container } = render(
+        <Tabs tabs={tabsWithClose} defaultTab="a">
+          <TabPanel tabId="a">Panel A</TabPanel>
+          <TabPanel tabId="b">Panel B</TabPanel>
+        </Tabs>
+      )
+      const closeBtn = container.querySelector('.ui-tabs__tab-close')
+      expect(closeBtn).toBeInTheDocument()
+      expect(closeBtn).toHaveAttribute('aria-label', 'Close Tab A')
+    })
+
+    it('does not render close button when closeable is false or absent', () => {
+      const { container } = renderTabs()
+      expect(container.querySelector('.ui-tabs__tab-close')).not.toBeInTheDocument()
+    })
+
+    it('calls onClose with tab id when close button is clicked', async () => {
+      const onClose = vi.fn()
+      const tabsWithClose: Tab[] = [
+        { id: 'a', label: 'Tab A', closeable: true },
+        { id: 'b', label: 'Tab B', closeable: true },
+      ]
+      const { container } = render(
+        <Tabs tabs={tabsWithClose} defaultTab="a" onClose={onClose}>
+          <TabPanel tabId="a">Panel A</TabPanel>
+          <TabPanel tabId="b">Panel B</TabPanel>
+        </Tabs>
+      )
+      const closeButtons = container.querySelectorAll('.ui-tabs__tab-close')
+      await userEvent.click(closeButtons[1])
+      expect(onClose).toHaveBeenCalledWith('b')
+    })
+
+    it('does not switch tab when close button is clicked', async () => {
+      const onClose = vi.fn()
+      const onChange = vi.fn()
+      const tabsWithClose: Tab[] = [
+        { id: 'a', label: 'Tab A', closeable: true },
+        { id: 'b', label: 'Tab B', closeable: true },
+      ]
+      const { container } = render(
+        <Tabs tabs={tabsWithClose} defaultTab="a" onClose={onClose} onChange={onChange}>
+          <TabPanel tabId="a">Panel A</TabPanel>
+          <TabPanel tabId="b">Panel B</TabPanel>
+        </Tabs>
+      )
+      const closeButtons = container.querySelectorAll('.ui-tabs__tab-close')
+      await userEvent.click(closeButtons[0])
+      // onChange should NOT be called because stopPropagation prevents tab switch
+      expect(onChange).not.toHaveBeenCalled()
+      expect(onClose).toHaveBeenCalledWith('a')
+    })
+  })
+
   // ─── Accessibility ────────────────────────────────────────────────
 
   describe('accessibility', () => {

@@ -390,6 +390,170 @@ describe('Button', () => {
     })
   })
 
+  // ─── Loading text ──────────────────────────────────────────────────
+
+  describe('loadingText', () => {
+    it('renders loadingText instead of children when loading', () => {
+      render(<Button loading loadingText="Saving...">Save</Button>)
+      const btn = screen.getByRole('button')
+      expect(btn).toHaveTextContent('Saving...')
+      expect(btn).not.toHaveTextContent('Save')
+    })
+
+    it('sets data-has-loading-text when loading with loadingText', () => {
+      render(<Button loading loadingText="Please wait...">Submit</Button>)
+      const btn = screen.getByRole('button')
+      expect(btn).toHaveAttribute('data-has-loading-text', 'true')
+    })
+
+    it('does not set data-has-loading-text when not loading', () => {
+      render(<Button loadingText="Please wait...">Submit</Button>)
+      const btn = screen.getByRole('button')
+      expect(btn).not.toHaveAttribute('data-has-loading-text')
+    })
+
+    it('renders children when not loading even if loadingText is set', () => {
+      render(<Button loadingText="Saving...">Save</Button>)
+      const btn = screen.getByRole('button')
+      expect(btn).toHaveTextContent('Save')
+      expect(btn).not.toHaveTextContent('Saving...')
+    })
+  })
+
+  // ─── Link variant ────────────────────────────────────────────────
+
+  describe('variant="link"', () => {
+    it('renders with data-variant="link"', () => {
+      render(<Button variant="link">Learn more</Button>)
+      const btn = screen.getByRole('button')
+      expect(btn).toHaveAttribute('data-variant', 'link')
+    })
+
+    it('still renders a <button> element', () => {
+      render(<Button variant="link">Link Button</Button>)
+      const btn = screen.getByRole('button')
+      expect(btn.tagName).toBe('BUTTON')
+    })
+
+    it('renders children text content', () => {
+      render(<Button variant="link">Click here</Button>)
+      expect(screen.getByRole('button')).toHaveTextContent('Click here')
+    })
+
+    it('calls onClick when clicked', () => {
+      const handleClick = vi.fn()
+      render(<Button variant="link" onClick={handleClick}>Link</Button>)
+      fireEvent.click(screen.getByRole('button'))
+      expect(handleClick).toHaveBeenCalledTimes(1)
+    })
+  })
+
+  // ─── Full width ──────────────────────────────────────────────────
+
+  describe('fullWidth', () => {
+    it('applies data-full-width attribute when fullWidth is true', () => {
+      render(<Button fullWidth>Full Width</Button>)
+      const btn = screen.getByRole('button')
+      expect(btn).toHaveAttribute('data-full-width', 'true')
+    })
+
+    it('does not apply data-full-width when fullWidth is not set', () => {
+      render(<Button>Normal Width</Button>)
+      const btn = screen.getByRole('button')
+      expect(btn).not.toHaveAttribute('data-full-width')
+    })
+
+    it('does not apply data-full-width when fullWidth is false', () => {
+      render(<Button fullWidth={false}>Normal Width</Button>)
+      const btn = screen.getByRole('button')
+      expect(btn).not.toHaveAttribute('data-full-width')
+    })
+  })
+
+  // ─── Icon only ───────────────────────────────────────────────────
+
+  describe('iconOnly', () => {
+    it('applies data-icon-only attribute when iconOnly is true', () => {
+      const icon = <svg data-testid="icon" />
+      render(<Button iconOnly icon={icon} aria-label="Close" />)
+      const btn = screen.getByRole('button')
+      expect(btn).toHaveAttribute('data-icon-only', 'true')
+    })
+
+    it('does not apply data-icon-only when iconOnly is not set', () => {
+      render(<Button>Normal</Button>)
+      const btn = screen.getByRole('button')
+      expect(btn).not.toHaveAttribute('data-icon-only')
+    })
+
+    it('renders the icon inside the button', () => {
+      const icon = <svg data-testid="close-icon" />
+      render(<Button iconOnly icon={icon} aria-label="Close" />)
+      expect(screen.getByTestId('close-icon')).toBeInTheDocument()
+    })
+
+    it('works with different sizes', () => {
+      const icon = <svg data-testid="icon" />
+      render(<Button iconOnly icon={icon} size="sm" aria-label="Menu" />)
+      const btn = screen.getByRole('button')
+      expect(btn).toHaveAttribute('data-icon-only', 'true')
+      expect(btn).toHaveAttribute('data-size', 'sm')
+    })
+  })
+
+  // ─── classNames prop ──────────────────────────────────────────────
+
+  describe('classNames', () => {
+    it('applies classNames.root to the button element', () => {
+      render(<Button classNames={{ root: 'custom-root' }}>Click</Button>)
+      const btn = screen.getByRole('button')
+      expect(btn.className).toContain('custom-root')
+      expect(btn.className).toContain('ui-button')
+    })
+
+    it('applies classNames.icon to the leading icon wrapper', () => {
+      const icon = <svg data-testid="lead" />
+      const { container } = render(
+        <Button icon={icon} classNames={{ icon: 'custom-icon' }}>Click</Button>
+      )
+      const iconWrapper = screen.getByTestId('lead').parentElement!
+      expect(iconWrapper.className).toContain('ui-button__icon')
+      expect(iconWrapper.className).toContain('custom-icon')
+    })
+
+    it('applies classNames.iconEnd to the trailing icon wrapper', () => {
+      const iconEnd = <svg data-testid="trail" />
+      const { container } = render(
+        <Button iconEnd={iconEnd} classNames={{ iconEnd: 'custom-icon-end' }}>Click</Button>
+      )
+      const iconWrapper = screen.getByTestId('trail').parentElement!
+      expect(iconWrapper.className).toContain('ui-button__icon-end')
+      expect(iconWrapper.className).toContain('custom-icon-end')
+    })
+
+    it('merges classNames.root with className prop', () => {
+      render(
+        <Button classNames={{ root: 'cn-root' }} className="class-prop">Click</Button>
+      )
+      const btn = screen.getByRole('button')
+      expect(btn.className).toContain('cn-root')
+      expect(btn.className).toContain('class-prop')
+      expect(btn.className).toContain('ui-button')
+    })
+
+    it('works with partial classNames (only some keys)', () => {
+      render(<Button classNames={{ root: 'only-root' }}>Click</Button>)
+      const btn = screen.getByRole('button')
+      expect(btn.className).toContain('only-root')
+    })
+
+    it('handles undefined classNames gracefully', () => {
+      render(<Button classNames={undefined}>Click</Button>)
+      const btn = screen.getByRole('button')
+      expect(btn.className).toContain('ui-button')
+    })
+  })
+
   // ─── Display name ─────────────────────────────────────────────────
 
   describe('display name', () => {

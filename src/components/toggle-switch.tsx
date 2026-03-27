@@ -134,15 +134,21 @@ const toggleSwitchStyles = css`
         transition: inset-inline-start 0.15s var(--ease-out, ease-out);
       }
 
-      /* Motion level 2: spring easing */
+      /* Motion level 2: spring easing with glow transition */
       :scope[data-motion="2"] .ui-toggle-switch__thumb {
-        transition: inset-inline-start 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        transition: inset-inline-start 0.3s cubic-bezier(0.34, 1.56, 0.64, 1),
+                    box-shadow 0.2s ease-out;
       }
 
       /* Motion level 3: full physics with stretch */
       :scope[data-motion="3"] .ui-toggle-switch__thumb {
         transition: inset-inline-start 0.35s cubic-bezier(0.34, 1.56, 0.64, 1),
                     inline-size 0.2s var(--ease-out, ease-out);
+      }
+
+      /* Glow on checked thumb — motion level 2+ */
+      :scope:not([data-motion="0"]):not([data-motion="1"]) .ui-toggle-switch__input:checked ~ .ui-toggle-switch__track .ui-toggle-switch__thumb {
+        box-shadow: 0 0 8px oklch(from var(--brand, oklch(65% 0.2 270)) l c h / 0.3);
       }
 
       /* Checked state — track color */

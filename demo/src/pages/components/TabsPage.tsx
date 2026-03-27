@@ -155,9 +155,9 @@ const pageStyles = css`
 
       @supports not (animation-timeline: view()) {
         .tabs-page__section {
-          opacity: 0;
-          transform: translateY(32px) scale(0.98);
-          filter: blur(4px);
+          opacity: 1;
+          transform: none;
+          filter: none;
           animation: none;
         }
       }
@@ -708,6 +708,9 @@ const tabsProps: PropDef[] = [
   { name: 'motion', type: '0 | 1 | 2 | 3', description: 'Animation intensity override. Cascades from OS > prop > CSS --motion > UIProvider.' },
   { name: 'children', type: 'ReactNode', description: 'TabPanel children mapping to tab IDs.' },
   { name: 'className', type: 'string', description: 'Additional CSS class name merged with the component class.' },
+  { name: 'badge (Tab)', type: 'ReactNode', description: 'Badge/count shown next to tab label.' },
+  { name: 'closeable (Tab)', type: 'boolean', description: 'Shows a close button on the tab.' },
+  { name: 'onClose', type: '(tabId: string) => void', description: 'Called when a tab close button is clicked.' },
 ]
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────

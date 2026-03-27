@@ -119,6 +119,41 @@ const UtilizationBarPage = lazy(() => import('./pages/components/UtilizationBarP
 const ViewTransitionLinkPage = lazy(() => import('./pages/components/ViewTransitionLinkPage'))
 const WavyBackgroundPage = lazy(() => import('./pages/components/WavyBackgroundPage'))
 
+// ─── New Component Pages ─────────────────────────────────────────────────────
+const ActionIconPage = lazy(() => import('./pages/components/ActionIconPage'))
+const AffixPage = lazy(() => import('./pages/components/AffixPage'))
+const AvatarUploadPage = lazy(() => import('./pages/components/AvatarUploadPage'))
+const BackToTopPage = lazy(() => import('./pages/components/BackToTopPage'))
+const ButtonGroupPage = lazy(() => import('./pages/components/ButtonGroupPage'))
+const CalendarPage = lazy(() => import('./pages/components/CalendarPage'))
+const CarouselPage = lazy(() => import('./pages/components/CarouselPage'))
+const ChipPage = lazy(() => import('./pages/components/ChipPage'))
+const CodeEditorPage = lazy(() => import('./pages/components/CodeEditorPage'))
+const ConfirmDialogPage = lazy(() => import('./pages/components/ConfirmDialogPage'))
+const CopyButtonPage = lazy(() => import('./pages/components/CopyButtonPage'))
+const CropperPage = lazy(() => import('./pages/components/CropperPage'))
+const DateRangePickerPage = lazy(() => import('./pages/components/DateRangePickerPage'))
+const HighlightPage = lazy(() => import('./pages/components/HighlightPage'))
+const IndicatorPage = lazy(() => import('./pages/components/IndicatorPage'))
+const JsonViewerPage = lazy(() => import('./pages/components/JsonViewerPage'))
+const MultiSelectPage = lazy(() => import('./pages/components/MultiSelectPage'))
+const NativeTooltipPage = lazy(() => import('./pages/components/NativeTooltipPage'))
+const NumberInputPage = lazy(() => import('./pages/components/NumberInputPage'))
+const PasswordInputPage = lazy(() => import('./pages/components/PasswordInputPage'))
+const PinInputPage = lazy(() => import('./pages/components/PinInputPage'))
+const RichTextEditorPage = lazy(() => import('./pages/components/RichTextEditorPage'))
+const ScrollRevealPage = lazy(() => import('./pages/components/ScrollRevealPage'))
+const SegmentedControlPage = lazy(() => import('./pages/components/SegmentedControlPage'))
+const SpotlightPage = lazy(() => import('./pages/components/SpotlightPage'))
+const SpoilerPage = lazy(() => import('./pages/components/SpoilerPage'))
+const StepperPage = lazy(() => import('./pages/components/StepperPage'))
+const TableOfContentsPage = lazy(() => import('./pages/components/TableOfContentsPage'))
+const TextareaPage = lazy(() => import('./pages/components/TextareaPage'))
+const TimePickerPage = lazy(() => import('./pages/components/TimePickerPage'))
+const TimelinePage = lazy(() => import('./pages/components/TimelinePage'))
+const TourPage = lazy(() => import('./pages/components/TourPage'))
+const TransferListPage = lazy(() => import('./pages/components/TransferListPage'))
+
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <BrowserRouter basename="/ui-kit">
@@ -238,6 +273,41 @@ createRoot(document.getElementById('root')!).render(
             <Route path="components/utilization-bar" element={<Suspense><UtilizationBarPage /></Suspense>} />
             <Route path="components/view-transition-link" element={<Suspense><ViewTransitionLinkPage /></Suspense>} />
             <Route path="components/wavy-background" element={<Suspense><WavyBackgroundPage /></Suspense>} />
+
+            {/* New component pages */}
+            <Route path="components/action-icon" element={<Suspense><ActionIconPage /></Suspense>} />
+            <Route path="components/affix" element={<Suspense><AffixPage /></Suspense>} />
+            <Route path="components/avatar-upload" element={<Suspense><AvatarUploadPage /></Suspense>} />
+            <Route path="components/back-to-top" element={<Suspense><BackToTopPage /></Suspense>} />
+            <Route path="components/button-group" element={<Suspense><ButtonGroupPage /></Suspense>} />
+            <Route path="components/calendar" element={<Suspense><CalendarPage /></Suspense>} />
+            <Route path="components/carousel" element={<Suspense><CarouselPage /></Suspense>} />
+            <Route path="components/chip" element={<Suspense><ChipPage /></Suspense>} />
+            <Route path="components/code-editor" element={<Suspense><CodeEditorPage /></Suspense>} />
+            <Route path="components/confirm-dialog" element={<Suspense><ConfirmDialogPage /></Suspense>} />
+            <Route path="components/copy-button" element={<Suspense><CopyButtonPage /></Suspense>} />
+            <Route path="components/cropper" element={<Suspense><CropperPage /></Suspense>} />
+            <Route path="components/date-range-picker" element={<Suspense><DateRangePickerPage /></Suspense>} />
+            <Route path="components/highlight" element={<Suspense><HighlightPage /></Suspense>} />
+            <Route path="components/indicator" element={<Suspense><IndicatorPage /></Suspense>} />
+            <Route path="components/json-viewer" element={<Suspense><JsonViewerPage /></Suspense>} />
+            <Route path="components/multi-select" element={<Suspense><MultiSelectPage /></Suspense>} />
+            <Route path="components/native-tooltip" element={<Suspense><NativeTooltipPage /></Suspense>} />
+            <Route path="components/number-input" element={<Suspense><NumberInputPage /></Suspense>} />
+            <Route path="components/password-input" element={<Suspense><PasswordInputPage /></Suspense>} />
+            <Route path="components/pin-input" element={<Suspense><PinInputPage /></Suspense>} />
+            <Route path="components/rich-text-editor" element={<Suspense><RichTextEditorPage /></Suspense>} />
+            <Route path="components/scroll-reveal" element={<Suspense><ScrollRevealPage /></Suspense>} />
+            <Route path="components/segmented-control" element={<Suspense><SegmentedControlPage /></Suspense>} />
+            <Route path="components/spoiler" element={<Suspense><SpoilerPage /></Suspense>} />
+            <Route path="components/spotlight" element={<Suspense><SpotlightPage /></Suspense>} />
+            <Route path="components/stepper" element={<Suspense><StepperPage /></Suspense>} />
+            <Route path="components/table-of-contents" element={<Suspense><TableOfContentsPage /></Suspense>} />
+            <Route path="components/textarea" element={<Suspense><TextareaPage /></Suspense>} />
+            <Route path="components/time-picker" element={<Suspense><TimePickerPage /></Suspense>} />
+            <Route path="components/timeline" element={<Suspense><TimelinePage /></Suspense>} />
+            <Route path="components/tour" element={<Suspense><TourPage /></Suspense>} />
+            <Route path="components/transfer-list" element={<Suspense><TransferListPage /></Suspense>} />
           </Route>
         </Routes>
       </ToastProvider>

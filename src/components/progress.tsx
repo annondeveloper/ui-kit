@@ -57,12 +57,28 @@ const progressStyles = css`
       .ui-progress__fill {
         block-size: 100%;
         border-radius: inherit;
-        transition: inline-size 0.3s var(--ease-out, ease-out);
+        position: relative;
+        overflow: hidden;
+        transition: inline-size 0.6s cubic-bezier(0.16, 1, 0.3, 1);
       }
 
       /* Spring easing for motion level 2+ */
       :scope:not([data-motion="0"]):not([data-motion="1"]) .ui-progress__fill {
-        transition: inline-size 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+        transition: inline-size 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+      }
+
+      /* Shimmer on indeterminate — motion level 1+ */
+      :scope[data-indeterminate]:not([data-motion="0"]) .ui-progress__fill::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(
+          90deg,
+          transparent 0%,
+          oklch(100% 0 0 / 0.15) 50%,
+          transparent 100%
+        );
+        animation: ui-progress-shimmer 1.5s ease-in-out infinite;
       }
 
       /* Variant colors */
@@ -152,6 +168,11 @@ const progressStyles = css`
     @keyframes ui-progress-indeterminate {
       0% { margin-inline-start: -40%; }
       100% { margin-inline-start: 100%; }
+    }
+
+    @keyframes ui-progress-shimmer {
+      0% { transform: translateX(-100%); }
+      100% { transform: translateX(100%); }
     }
   }
 `

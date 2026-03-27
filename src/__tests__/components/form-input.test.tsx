@@ -379,6 +379,195 @@ describe('FormInput', () => {
     })
   })
 
+  // ─── Max length counter ───────────────────────────────────────────
+
+  describe('maxLength counter', () => {
+    it('renders counter with maxLength', () => {
+      const { container } = render(
+        <FormInput name="test" label="Test" maxLength={100} value="hello" onChange={() => {}} />
+      )
+      expect(container.querySelector('.ui-form-input__counter')).toHaveTextContent('5/100')
+    })
+
+    it('shows at-limit styling when value reaches maxLength', () => {
+      const { container } = render(
+        <FormInput name="test" label="Test" maxLength={5} value="hello" onChange={() => {}} />
+      )
+      const counter = container.querySelector('.ui-form-input__counter')!
+      expect(counter).toHaveAttribute('data-at-limit', '')
+    })
+
+    it('does not show at-limit when under maxLength', () => {
+      const { container } = render(
+        <FormInput name="test" label="Test" maxLength={10} value="hi" onChange={() => {}} />
+      )
+      const counter = container.querySelector('.ui-form-input__counter')!
+      expect(counter).not.toHaveAttribute('data-at-limit')
+    })
+
+    it('renders counter with showCount without maxLength', () => {
+      const { container } = render(
+        <FormInput name="test" label="Test" showCount value="hello" onChange={() => {}} />
+      )
+      const counter = container.querySelector('.ui-form-input__counter')!
+      expect(counter).toHaveTextContent('5')
+      expect(counter.textContent).not.toContain('/')
+    })
+
+    it('does not render counter without maxLength or showCount', () => {
+      const { container } = render(
+        <FormInput name="test" label="Test" value="hello" onChange={() => {}} />
+      )
+      expect(container.querySelector('.ui-form-input__counter')).toBeNull()
+    })
+
+    it('passes maxLength to the native input', () => {
+      render(<FormInput name="test" maxLength={50} />)
+      expect(screen.getByRole('textbox')).toHaveAttribute('maxlength', '50')
+    })
+  })
+
+  // ─── Clearable ──────────────────────────────────────────────────────
+
+  describe('clearable', () => {
+    it('shows clear button when clearable and has value', () => {
+      render(
+        <FormInput name="test" clearable value="hello" onChange={() => {}} />
+      )
+      expect(screen.getByRole('button', { name: 'Clear input' })).toBeInTheDocument()
+    })
+
+    it('does not show clear button when clearable but no value', () => {
+      render(
+        <FormInput name="test" clearable value="" onChange={() => {}} />
+      )
+      expect(screen.queryByRole('button', { name: 'Clear input' })).toBeNull()
+    })
+
+    it('calls onClear when clear button is clicked', async () => {
+      const onClear = vi.fn()
+      render(
+        <FormInput name="test" clearable onClear={onClear} value="hello" onChange={() => {}} />
+      )
+      await userEvent.click(screen.getByRole('button', { name: 'Clear input' }))
+      expect(onClear).toHaveBeenCalledOnce()
+    })
+
+    it('sets data-has-icon-end when clearable', () => {
+      const { container } = render(
+        <FormInput name="test" clearable value="" onChange={() => {}} />
+      )
+      const wrapper = container.querySelector('.ui-form-input')!
+      expect(wrapper).toHaveAttribute('data-has-icon-end', '')
+    })
+  })
+
+  // ─── Required indicator ─────────────────────────────────────────────
+
+  describe('required', () => {
+    it('shows required indicator after label', () => {
+      const { container } = render(
+        <FormInput name="test" label="Email" required />
+      )
+      const indicator = container.querySelector('.ui-form-input__required')!
+      expect(indicator).toBeInTheDocument()
+      expect(indicator).toHaveTextContent('*')
+      expect(indicator).toHaveAttribute('aria-hidden', 'true')
+    })
+
+    it('does not show required indicator when not required', () => {
+      const { container } = render(
+        <FormInput name="test" label="Email" />
+      )
+      expect(container.querySelector('.ui-form-input__required')).toBeNull()
+    })
+
+    it('sets native required attribute on input', () => {
+      render(<FormInput name="test" label="Email" required />)
+      expect(screen.getByRole('textbox')).toBeRequired()
+    })
+  })
+
+  // ─── classNames prop ──────────────────────────────────────────────
+
+  describe('classNames', () => {
+    it('applies classNames.root to the wrapper element', () => {
+      const { container } = render(<FormInput name="test" classNames={{ root: 'custom-root' }} />)
+      const wrapper = container.querySelector('.ui-form-input')!
+      expect(wrapper.className).toContain('custom-root')
+      expect(wrapper.className).toContain('ui-form-input')
+    })
+
+    it('applies classNames.label to the label element', () => {
+      const { container } = render(
+        <FormInput name="test" label="Email" classNames={{ label: 'custom-label' }} />
+      )
+      const label = container.querySelector('.ui-form-input__label')!
+      expect(label.className).toContain('custom-label')
+      expect(label.className).toContain('ui-form-input__label')
+    })
+
+    it('applies classNames.field to the input element', () => {
+      const { container } = render(
+        <FormInput name="test" classNames={{ field: 'custom-field' }} />
+      )
+      const input = container.querySelector('.ui-form-input__field')!
+      expect(input.className).toContain('custom-field')
+      expect(input.className).toContain('ui-form-input__field')
+    })
+
+    it('applies classNames.icon to the leading icon element', () => {
+      const { container } = render(
+        <FormInput name="test" icon={<svg />} classNames={{ icon: 'custom-icon' }} />
+      )
+      const icon = container.querySelector('.ui-form-input__icon')!
+      expect(icon.className).toContain('custom-icon')
+      expect(icon.className).toContain('ui-form-input__icon')
+    })
+
+    it('applies classNames.iconEnd to the trailing icon element', () => {
+      const { container } = render(
+        <FormInput name="test" iconEnd={<svg />} classNames={{ iconEnd: 'custom-icon-end' }} />
+      )
+      const iconEnd = container.querySelector('.ui-form-input__icon-end')!
+      expect(iconEnd.className).toContain('custom-icon-end')
+      expect(iconEnd.className).toContain('ui-form-input__icon-end')
+    })
+
+    it('applies classNames.description to the description element', () => {
+      const { container } = render(
+        <FormInput name="test" description="Help text" classNames={{ description: 'custom-desc' }} />
+      )
+      const desc = container.querySelector('.ui-form-input__description')!
+      expect(desc.className).toContain('custom-desc')
+      expect(desc.className).toContain('ui-form-input__description')
+    })
+
+    it('applies classNames.error to the error element', () => {
+      const { container } = render(
+        <FormInput name="test" error="Invalid" classNames={{ error: 'custom-error' }} />
+      )
+      const error = container.querySelector('.ui-form-input__error')!
+      expect(error.className).toContain('custom-error')
+      expect(error.className).toContain('ui-form-input__error')
+    })
+
+    it('merges classNames.root with className prop', () => {
+      const { container } = render(
+        <FormInput name="test" classNames={{ root: 'cn-root' }} className="class-prop" />
+      )
+      const wrapper = container.querySelector('.ui-form-input')!
+      expect(wrapper.className).toContain('cn-root')
+      expect(wrapper.className).toContain('class-prop')
+    })
+
+    it('handles undefined classNames gracefully', () => {
+      const { container } = render(<FormInput name="test" classNames={undefined} />)
+      const wrapper = container.querySelector('.ui-form-input')!
+      expect(wrapper.className).toContain('ui-form-input')
+    })
+  })
+
   // ─── Display name ─────────────────────────────────────────────────
 
   describe('display name', () => {

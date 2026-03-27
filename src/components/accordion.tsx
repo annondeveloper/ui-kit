@@ -19,6 +19,7 @@ export interface AccordionItem {
   trigger: ReactNode
   content: ReactNode
   disabled?: boolean
+  icon?: ReactNode
 }
 
 export interface AccordionProps extends HTMLAttributes<HTMLDivElement> {
@@ -27,6 +28,8 @@ export interface AccordionProps extends HTMLAttributes<HTMLDivElement> {
   defaultOpen?: string[]
   onOpenChange?: (openIds: string[]) => void
   motion?: 0 | 1 | 2 | 3
+  variant?: 'default' | 'bordered' | 'separated'
+  size?: 'sm' | 'md' | 'lg'
 }
 
 // ─── Styles ─────────────────────────────────────────────────────────────────
@@ -75,7 +78,7 @@ const accordionStyles = css`
         content: '';
       }
       summary:hover {
-        background: var(--bg-hover);
+        background: oklch(from var(--brand, oklch(65% 0.2 270)) l c h / 0.04);
       }
       summary:focus-visible {
         outline: 2px solid var(--brand, oklch(65% 0.2 270));
@@ -131,6 +134,46 @@ const accordionStyles = css`
         line-height: 1.6;
         color: var(--text-secondary, oklch(70% 0 0));
         text-wrap: pretty;
+        box-shadow: inset 0 2px 4px oklch(0% 0 0 / 0.04);
+      }
+
+      /* Bordered variant */
+      :scope[data-variant="bordered"] {
+        border: 1px solid var(--border-default);
+        border-radius: var(--radius-md);
+      }
+      :scope[data-variant="bordered"] details:last-child {
+        border-block-end: none;
+      }
+
+      /* Separated variant */
+      :scope[data-variant="separated"] {
+        gap: var(--space-xs, 0.5rem);
+      }
+      :scope[data-variant="separated"] details {
+        border: 1px solid var(--border-subtle);
+        border-radius: var(--radius-md);
+        overflow: hidden;
+      }
+
+      /* Sizes */
+      :scope[data-size="sm"] summary {
+        padding-block: var(--space-xs);
+        padding-inline: var(--space-sm);
+        font-size: var(--text-xs);
+      }
+      :scope[data-size="lg"] summary {
+        padding-block: var(--space-lg);
+        padding-inline: var(--space-lg);
+        font-size: var(--text-base);
+      }
+
+      /* Item icon */
+      .ui-accordion__item-icon {
+        display: inline-flex;
+        align-items: center;
+        margin-inline-end: var(--space-xs);
+        color: var(--text-secondary);
       }
 
       /* Motion 0: instant */
@@ -218,6 +261,8 @@ export const Accordion = forwardRef<HTMLDivElement, AccordionProps>(
       defaultOpen = [],
       onOpenChange,
       motion: motionProp,
+      variant = 'default',
+      size = 'md',
       className,
       ...rest
     },
@@ -266,6 +311,8 @@ export const Accordion = forwardRef<HTMLDivElement, AccordionProps>(
         ref={ref}
         className={cn('ui-accordion', className)}
         data-motion={motionLevel}
+        data-variant={variant}
+        data-size={size}
         {...rest}
       >
         {items.map((item) => (
@@ -277,7 +324,14 @@ export const Accordion = forwardRef<HTMLDivElement, AccordionProps>(
               onClick={(e) => handleSummaryClick(e, item)}
               aria-disabled={item.disabled ? 'true' : undefined}
             >
-              <span>{item.trigger}</span>
+              <span>
+                {item.icon && (
+                  <span className="ui-accordion__item-icon" aria-hidden="true">
+                    {item.icon}
+                  </span>
+                )}
+                {item.trigger}
+              </span>
               <ChevronIcon />
             </summary>
             <div className="ui-accordion__content-wrapper">

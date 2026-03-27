@@ -14,6 +14,9 @@ export interface BadgeProps extends HTMLAttributes<HTMLSpanElement> {
   count?: number
   maxCount?: number
   icon?: ReactNode
+  removable?: boolean
+  onRemove?: () => void
+  outline?: boolean
   motion?: 0 | 1 | 2 | 3
 }
 
@@ -33,6 +36,8 @@ const badgeStyles = css`
         user-select: none;
         vertical-align: middle;
         font-family: inherit;
+        backdrop-filter: blur(8px);
+        box-shadow: inset 0 1px 0 oklch(100% 0 0 / 0.1);
       }
 
       /* Sizes */
@@ -72,6 +77,7 @@ const badgeStyles = css`
         background: oklch(from var(--brand, oklch(65% 0.2 270)) l c h / 0.12);
         color: var(--brand, oklch(65% 0.2 270));
         border-color: oklch(from var(--brand, oklch(65% 0.2 270)) l c h / 0.2);
+        box-shadow: inset 0 1px 0 oklch(100% 0 0 / 0.1), 0 0 12px oklch(from var(--brand, oklch(65% 0.2 270)) l c h / 0.1);
       }
       :scope[data-variant="success"] {
         background: oklch(from var(--status-ok, oklch(72% 0.19 155)) l c h / 0.12);
@@ -127,6 +133,33 @@ const badgeStyles = css`
       .ui-badge__icon svg {
         inline-size: 1em;
         block-size: 1em;
+      }
+
+      /* Remove button */
+      .ui-badge__remove {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        inline-size: 1em;
+        block-size: 1em;
+        border: none;
+        background: none;
+        color: currentColor;
+        cursor: pointer;
+        border-radius: var(--radius-full, 9999px);
+        padding: 0;
+        margin-inline-start: 0.125em;
+        font-size: 0.75em;
+        opacity: 0.6;
+        transition: opacity 0.15s;
+      }
+      .ui-badge__remove:hover {
+        opacity: 1;
+      }
+
+      /* Outline variant */
+      :scope[data-outline="true"] {
+        background: transparent !important;
       }
 
       /* Touch targets */
@@ -186,6 +219,9 @@ export const Badge = forwardRef<HTMLSpanElement, BadgeProps>(
       count,
       maxCount = 99,
       icon,
+      removable = false,
+      onRemove,
+      outline = false,
       motion: motionProp,
       children,
       className,
@@ -209,11 +245,24 @@ export const Badge = forwardRef<HTMLSpanElement, BadgeProps>(
         data-variant={variant}
         data-size={size}
         data-motion={motionLevel}
+        data-outline={outline || undefined}
         {...rest}
       >
         {icon && <span className="ui-badge__icon">{icon}</span>}
         {dot && <span className="ui-badge__dot" data-pulse={pulse || undefined} />}
         {displayCount ?? children}
+        {removable && (
+          <button
+            type="button"
+            className="ui-badge__remove"
+            onClick={onRemove}
+            aria-label="Remove"
+          >
+            <svg width="8" height="8" viewBox="0 0 8 8" fill="none">
+              <path d="M1.5 1.5l5 5m0-5l-5 5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+            </svg>
+          </button>
+        )}
       </span>
     )
   }

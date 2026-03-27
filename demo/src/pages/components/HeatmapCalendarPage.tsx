@@ -142,7 +142,10 @@ const pageStyles = css`
 
       @supports not (animation-timeline: view()) {
         .heatmap-calendar-page__section {
-          opacity: 0; transform: translateY(32px) scale(0.98); filter: blur(4px); animation: none;
+          opacity: 1;
+          transform: none;
+          filter: none;
+          animation: none;
         }
       }
 

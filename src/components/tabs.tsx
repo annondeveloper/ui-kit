@@ -23,6 +23,8 @@ export interface Tab {
   label: ReactNode
   icon?: ReactNode
   disabled?: boolean
+  badge?: ReactNode
+  closeable?: boolean
 }
 
 export interface TabsProps extends Omit<HTMLAttributes<HTMLDivElement>, 'onChange'> {
@@ -30,6 +32,7 @@ export interface TabsProps extends Omit<HTMLAttributes<HTMLDivElement>, 'onChang
   activeTab?: string
   defaultTab?: string
   onChange?: (tabId: string) => void
+  onClose?: (tabId: string) => void
   variant?: 'underline' | 'pills' | 'enclosed'
   size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl'
   orientation?: 'horizontal' | 'vertical'
@@ -195,11 +198,14 @@ const tabsStyles = css`
         position: absolute;
         inset-block-end: -1px;
         inset-inline: 0;
-        block-size: 2px;
+        block-size: 3px;
         background: var(--brand, oklch(65% 0.2 270));
-        border-radius: 1px 1px 0 0;
+        border-radius: 1.5px 1.5px 0 0;
         transform: scaleX(0);
         transition: transform 0.2s var(--ease-out, ease-out);
+      }
+      :scope[data-variant="underline"] .ui-tabs__tab[aria-selected="true"]::after {
+        box-shadow: 0 2px 8px oklch(from var(--brand, oklch(65% 0.2 270)) l c h / 0.3);
       }
       :scope[data-variant="underline"] .ui-tabs__tab[aria-selected="true"]::after {
         transform: scaleX(1);
@@ -230,6 +236,7 @@ const tabsStyles = css`
       :scope[data-variant="pills"] .ui-tabs__tab[aria-selected="true"] {
         background: var(--brand, oklch(65% 0.2 270));
         color: var(--text-on-brand);
+        box-shadow: 0 2px 8px oklch(from var(--brand, oklch(65% 0.2 270)) l c h / 0.25);
       }
       :scope[data-variant="pills"] .ui-tabs__tab:hover:not([aria-selected="true"]):not([aria-disabled="true"]) {
         background: var(--bg-hover);
@@ -242,6 +249,7 @@ const tabsStyles = css`
         border-radius: var(--radius-md, 0.5rem);
         padding: var(--space-xs, 0.25rem);
         border: 1px solid var(--border-subtle, oklch(100% 0 0 / 0.08));
+        box-shadow: inset 0 2px 4px oklch(0% 0 0 / 0.08);
       }
       :scope[data-variant="enclosed"] .ui-tabs__tab {
         border-radius: var(--radius-sm, 0.375rem);
@@ -252,6 +260,45 @@ const tabsStyles = css`
       }
       :scope[data-variant="enclosed"] .ui-tabs__tab:hover:not([aria-selected="true"]):not([aria-disabled="true"]) {
         background: var(--bg-hover);
+      }
+
+      /* ── Badge ─────────────────────────────────────────── */
+
+      .ui-tabs__tab-badge {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-inline-size: 1.25em;
+        padding-inline: 0.25em;
+        font-size: 0.75em;
+        font-weight: 600;
+        line-height: 1;
+        border-radius: var(--radius-full, 9999px);
+        background: oklch(from var(--brand, oklch(65% 0.2 270)) l c h / 0.15);
+        color: var(--brand, oklch(65% 0.2 270));
+      }
+
+      /* ── Close Button ───────────────────────────────────── */
+
+      .ui-tabs__tab-close {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        inline-size: 1.25em;
+        block-size: 1.25em;
+        border: none;
+        background: none;
+        color: var(--text-tertiary);
+        cursor: pointer;
+        border-radius: var(--radius-sm);
+        padding: 0;
+        margin-inline-start: 0.25em;
+        font-size: 0.75em;
+        transition: color 0.15s, background 0.15s;
+      }
+      .ui-tabs__tab-close:hover {
+        background: oklch(100% 0 0 / 0.08);
+        color: var(--text-primary);
       }
 
       /* ── Panel ─────────────────────────────────────────── */
@@ -341,6 +388,7 @@ export function Tabs({
   activeTab: controlledActive,
   defaultTab,
   onChange,
+  onClose,
   variant = 'underline',
   size = 'md',
   orientation = 'horizontal',
@@ -496,6 +544,22 @@ export function Tabs({
               >
                 {tab.icon && <span className="ui-tabs__tab-icon">{tab.icon}</span>}
                 {tab.label}
+                {tab.badge && <span className="ui-tabs__tab-badge">{tab.badge}</span>}
+                {tab.closeable && (
+                  <button
+                    type="button"
+                    className="ui-tabs__tab-close"
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      onClose?.(tab.id)
+                    }}
+                    aria-label={`Close ${tab.label}`}
+                  >
+                    <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
+                      <path d="M2 2l6 6m0-6l-6 6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+                    </svg>
+                  </button>
+                )}
               </button>
             )
           })}

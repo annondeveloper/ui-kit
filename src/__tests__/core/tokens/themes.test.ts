@@ -7,15 +7,16 @@ const THEME_NAMES: ThemeName[] = [
   'ocean', 'emerald', 'cyan',
   'violet', 'fuchsia',
   'slate',
+  'corporate', 'midnight', 'forest', 'wine', 'carbon',
 ]
 
 describe('Named Themes', () => {
-  it('exports exactly 10 dark themes', () => {
-    expect(Object.keys(themes)).toHaveLength(10)
+  it('exports exactly 15 dark themes', () => {
+    expect(Object.keys(themes)).toHaveLength(15)
   })
 
-  it('exports exactly 10 light themes', () => {
-    expect(Object.keys(lightThemes)).toHaveLength(10)
+  it('exports exactly 15 light themes', () => {
+    expect(Object.keys(lightThemes)).toHaveLength(15)
   })
 
   it('has all expected theme names in dark themes', () => {

@@ -438,6 +438,123 @@ describe('Tooltip', () => {
     })
   })
 
+  // ─── Interactive ──────────────────────────────────────────────────
+
+  describe('interactive', () => {
+    it('keeps tooltip visible when hovering over the tooltip', () => {
+      render(
+        <Tooltip content="Interactive content" interactive>
+          <button>Hover me</button>
+        </Tooltip>
+      )
+      const trigger = screen.getByRole('button')
+      fireEvent.mouseEnter(trigger)
+      act(() => { vi.advanceTimersByTime(300) })
+      expect(screen.getByRole('tooltip')).toBeInTheDocument()
+
+      // Mouse leaves trigger (starts hide timer)
+      fireEvent.mouseLeave(trigger)
+
+      // Mouse enters tooltip before hide timer fires
+      const tooltipContainer = screen.getByRole('tooltip').closest('.ui-tooltip')!
+      fireEvent.mouseEnter(tooltipContainer)
+
+      // Advance past the hide delay
+      act(() => { vi.advanceTimersByTime(200) })
+      // Tooltip should still be visible
+      expect(screen.getByRole('tooltip')).toBeInTheDocument()
+    })
+
+    it('hides tooltip when mouse leaves the tooltip', () => {
+      render(
+        <Tooltip content="Interactive content" interactive>
+          <button>Hover me</button>
+        </Tooltip>
+      )
+      const trigger = screen.getByRole('button')
+      fireEvent.mouseEnter(trigger)
+      act(() => { vi.advanceTimersByTime(300) })
+      expect(screen.getByRole('tooltip')).toBeInTheDocument()
+
+      // Mouse leaves trigger, enters tooltip, then leaves tooltip
+      fireEvent.mouseLeave(trigger)
+      const tooltipContainer = screen.getByRole('tooltip').closest('.ui-tooltip')!
+      fireEvent.mouseEnter(tooltipContainer)
+      fireEvent.mouseLeave(tooltipContainer)
+
+      expect(screen.queryByRole('tooltip')).not.toBeInTheDocument()
+    })
+
+    it('applies pointer-events to tooltip when interactive', () => {
+      render(
+        <Tooltip content="Interactive content" interactive>
+          <button>Hover me</button>
+        </Tooltip>
+      )
+      const trigger = screen.getByRole('button')
+      fireEvent.mouseEnter(trigger)
+      act(() => { vi.advanceTimersByTime(300) })
+      const tooltipContainer = screen.getByRole('tooltip').closest('.ui-tooltip') as HTMLElement
+      expect(tooltipContainer.style.pointerEvents).toBe('auto')
+    })
+
+    it('does not apply pointer-events when not interactive', () => {
+      render(
+        <Tooltip content="Normal tooltip">
+          <button>Hover me</button>
+        </Tooltip>
+      )
+      const trigger = screen.getByRole('button')
+      fireEvent.mouseEnter(trigger)
+      act(() => { vi.advanceTimersByTime(300) })
+      const tooltipContainer = screen.getByRole('tooltip').closest('.ui-tooltip') as HTMLElement
+      expect(tooltipContainer.style.pointerEvents).toBe('')
+    })
+  })
+
+  // ─── Max Width ────────────────────────────────────────────────────
+
+  describe('maxWidth', () => {
+    it('applies numeric maxWidth as pixels', () => {
+      render(
+        <Tooltip content="Help text" maxWidth={400}>
+          <button>Hover me</button>
+        </Tooltip>
+      )
+      const trigger = screen.getByRole('button')
+      fireEvent.mouseEnter(trigger)
+      act(() => { vi.advanceTimersByTime(300) })
+      const tooltipContainer = screen.getByRole('tooltip').closest('.ui-tooltip') as HTMLElement
+      expect(tooltipContainer.style.maxInlineSize).toBe('400px')
+    })
+
+    it('applies string maxWidth directly', () => {
+      render(
+        <Tooltip content="Help text" maxWidth="20rem">
+          <button>Hover me</button>
+        </Tooltip>
+      )
+      const trigger = screen.getByRole('button')
+      fireEvent.mouseEnter(trigger)
+      act(() => { vi.advanceTimersByTime(300) })
+      const tooltipContainer = screen.getByRole('tooltip').closest('.ui-tooltip') as HTMLElement
+      expect(tooltipContainer.style.maxInlineSize).toBe('20rem')
+    })
+
+    it('does not set maxInlineSize when maxWidth is not provided', () => {
+      render(
+        <Tooltip content="Help text">
+          <button>Hover me</button>
+        </Tooltip>
+      )
+      const trigger = screen.getByRole('button')
+      fireEvent.mouseEnter(trigger)
+      act(() => { vi.advanceTimersByTime(300) })
+      const tooltipContainer = screen.getByRole('tooltip').closest('.ui-tooltip') as HTMLElement
+      expect(tooltipContainer.style.maxInlineSize).toBe('')
+    })
+  })
+
   // ─── Edge cases ────────────────────────────────────────────────────
 
   describe('edge cases', () => {

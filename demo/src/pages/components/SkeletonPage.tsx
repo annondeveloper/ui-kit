@@ -150,9 +150,9 @@ const pageStyles = css`
 
       @supports not (animation-timeline: view()) {
         .skeleton-page__section {
-          opacity: 0;
-          transform: translateY(32px) scale(0.98);
-          filter: blur(4px);
+          opacity: 1;
+          transform: none;
+          filter: none;
           animation: none;
         }
       }
@@ -667,21 +667,28 @@ const pageStyles = css`
 // ─── Props Data ───────────────────────────────────────────────────────────────
 
 const skeletonProps: PropDef[] = [
-  { name: 'variant', type: "'text' | 'circular' | 'rectangular'", default: "'text'", description: 'Shape variant. Text uses a thin line, circular is round, rectangular has rounded corners.' },
+  { name: 'variant', type: "'text' | 'circular' | 'rectangular' | 'rounded'", default: "'text'", description: 'Shape variant. Text uses a thin line, circular is round, rectangular and rounded have rounded corners.' },
   { name: 'width', type: 'string | number', description: 'Custom inline-size. Numbers are converted to px.' },
   { name: 'height', type: 'string | number', description: 'Custom block-size. Numbers are converted to px.' },
-  { name: 'lines', type: 'number', description: 'Number of text lines to render (only for text variant). Last line is 60% width.' },
-  { name: 'animate', type: 'boolean', default: 'true', description: 'Enable shimmer animation. Respects prefers-reduced-motion.' },
-  { name: 'motion', type: '0 | 1 | 2 | 3', description: 'Animation intensity override. At 0, shimmer is disabled.' },
+  { name: 'lines', type: 'number', description: 'Number of text lines to render (only for text variant). Last lines use natural variable widths.' },
+  { name: 'lineHeight', type: 'string | number', default: "'0.875rem'", description: 'Height of each individual line in multi-line mode.' },
+  { name: 'lineGap', type: 'string | number', default: "'0.625rem'", description: 'Gap between lines in multi-line mode.' },
+  { name: 'animate', type: 'boolean', default: 'true', description: 'Enable animation. Respects prefers-reduced-motion.' },
+  { name: 'animation', type: "'shimmer' | 'pulse' | 'wave'", default: "'shimmer'", description: 'Animation type. Shimmer sweeps a gradient, pulse fades opacity, wave translates a highlight.' },
+  { name: 'radius', type: 'string | number', description: 'Custom border-radius override. Numbers are converted to px.' },
+  { name: 'count', type: 'number', description: 'Repeat the skeleton N times in a flex container.' },
+  { name: 'direction', type: "'row' | 'column'", default: "'row'", description: 'Layout direction when count > 1.' },
+  { name: 'speed', type: "'slow' | 'normal' | 'fast'", default: "'normal'", description: 'Animation speed. Slow=2.4s, normal=1.6s, fast=1s.' },
+  { name: 'motion', type: '0 | 1 | 2 | 3', description: 'Animation intensity override. At 0, all animation is disabled.' },
   { name: 'className', type: 'string', description: 'Additional CSS class name merged with the component class.' },
   { name: 'ref', type: 'Ref<HTMLDivElement>', description: 'Forwarded ref to the underlying <div> element.' },
 ]
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
-type Variant = 'text' | 'circular' | 'rectangular'
+type Variant = 'text' | 'circular' | 'rectangular' | 'rounded'
 
-const VARIANTS: Variant[] = ['text', 'circular', 'rectangular']
+const VARIANTS: Variant[] = ['text', 'circular', 'rectangular', 'rounded']
 
 const IMPORT_STRINGS: Record<Tier, string> = {
   lite: "import { Skeleton } from '@annondeveloper/ui-kit/lite'",
@@ -1123,8 +1130,8 @@ export default function SkeletonPage() {
       <div className={`${P}hero`}>
         <h1 className={`${P}title`}>Skeleton</h1>
         <p className={`${P}desc`}>
-          Loading placeholder with shimmer animation in three variants: text, circular, and rectangular.
-          Ships in two weight tiers with aurora-colored shimmer and multi-line text support.
+          Loading placeholder with shimmer, pulse, and wave animations in four variants: text, circular, rectangular, and rounded.
+          Ships in two weight tiers with multiple animation styles, variable-speed control, count repeating, and multi-line text support.
         </p>
         <div className={`${P}import-row`}>
           <code className={`${P}import-code`}>{IMPORT_STRINGS[tier]}</code>
@@ -1141,7 +1148,7 @@ export default function SkeletonPage() {
           <a href="#variants">Variants</a>
         </h2>
         <p className={`${P}section-desc`}>
-          Three built-in shape variants to match the content being loaded.
+          Four built-in shape variants to match the content being loaded.
         </p>
         <div className={`${P}preview`}>
           <div className={`${P}labeled-row`} style={{ gap: '2rem' }}>
@@ -1157,6 +1164,10 @@ export default function SkeletonPage() {
               <SkeletonComponent variant="rectangular" width={160} height={80} />
               <span className={`${P}item-label`}>rectangular</span>
             </div>
+            <div className={`${P}labeled-item`}>
+              <SkeletonComponent variant="rounded" width={160} height={80} />
+              <span className={`${P}item-label`}>rounded</span>
+            </div>
           </div>
         </div>
       </section>
@@ -1168,7 +1179,7 @@ export default function SkeletonPage() {
             <a href="#multiline">Multi-line Text</a>
           </h2>
           <p className={`${P}section-desc`}>
-            Use the lines prop to render multiple text skeleton lines. The last line automatically renders at 60% width for a natural paragraph appearance.
+            Use the lines prop to render multiple text skeleton lines. The last lines use variable widths for a natural paragraph appearance. Customize lineHeight and lineGap for fine control.
           </p>
           <div className={`${P}preview ${P}preview--col`} style={{ gap: '2rem' }}>
             <div className={`${P}labeled-item`} style={{ width: '100%' }}>
@@ -1194,21 +1205,103 @@ export default function SkeletonPage() {
             <a href="#animation">Animation Control</a>
           </h2>
           <p className={`${P}section-desc`}>
-            The shimmer animation uses aurora-colored gradients and respects prefers-reduced-motion.
-            Disable animation with the animate prop or motion level.
+            Three animation types: shimmer sweeps a gradient highlight, pulse fades opacity, and wave translates a highlight across.
+            Control speed with slow/normal/fast. Disable with animate={'{false}'} or motion level 0.
           </p>
           <div className={`${P}preview`} style={{ gap: '2rem' }}>
             <div className={`${P}labeled-item`}>
-              <Skeleton variant="rectangular" width={160} height={60} animate />
-              <span className={`${P}item-label`}>animated</span>
+              <Skeleton variant="rectangular" width={160} height={60} animation="shimmer" />
+              <span className={`${P}item-label`}>shimmer</span>
+            </div>
+            <div className={`${P}labeled-item`}>
+              <Skeleton variant="rectangular" width={160} height={60} animation="pulse" />
+              <span className={`${P}item-label`}>pulse</span>
+            </div>
+            <div className={`${P}labeled-item`}>
+              <Skeleton variant="rectangular" width={160} height={60} animation="wave" />
+              <span className={`${P}item-label`}>wave</span>
             </div>
             <div className={`${P}labeled-item`}>
               <Skeleton variant="rectangular" width={160} height={60} animate={false} />
               <span className={`${P}item-label`}>static</span>
             </div>
+          </div>
+        </section>
+      )}
+
+      {/* ── 5b. Animation Speed ──────────────────────── */}
+      {tier !== 'lite' && (
+        <section className={`${P}section`} id="speed">
+          <h2 className={`${P}section-title`}>
+            <a href="#speed">Animation Speed</a>
+          </h2>
+          <p className={`${P}section-desc`}>
+            Control animation speed with the speed prop. Slow (2.4s), normal (1.6s), and fast (1s) presets.
+          </p>
+          <div className={`${P}preview`} style={{ gap: '2rem' }}>
             <div className={`${P}labeled-item`}>
-              <Skeleton variant="rectangular" width={160} height={60} motion={0} />
-              <span className={`${P}item-label`}>motion=0</span>
+              <Skeleton variant="rectangular" width={140} height={50} speed="slow" />
+              <span className={`${P}item-label`}>slow</span>
+            </div>
+            <div className={`${P}labeled-item`}>
+              <Skeleton variant="rectangular" width={140} height={50} speed="normal" />
+              <span className={`${P}item-label`}>normal</span>
+            </div>
+            <div className={`${P}labeled-item`}>
+              <Skeleton variant="rectangular" width={140} height={50} speed="fast" />
+              <span className={`${P}item-label`}>fast</span>
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* ── 5c. Count & Direction ──────────────────────── */}
+      {tier !== 'lite' && (
+        <section className={`${P}section`} id="count">
+          <h2 className={`${P}section-title`}>
+            <a href="#count">Count & Direction</a>
+          </h2>
+          <p className={`${P}section-desc`}>
+            Use the count prop to repeat skeletons and direction to control layout. Great for grid placeholders and avatar groups.
+          </p>
+          <div className={`${P}preview ${P}preview--col`} style={{ gap: '2rem' }}>
+            <div className={`${P}labeled-item`} style={{ width: '100%' }}>
+              <Skeleton variant="rectangular" width={80} height={80} count={4} direction="row" />
+              <span className={`${P}item-label`}>count=4 direction="row"</span>
+            </div>
+            <div className={`${P}labeled-item`} style={{ width: '100%' }}>
+              <Skeleton variant="circular" width={40} height={40} count={5} direction="row" />
+              <span className={`${P}item-label`}>circular count=5</span>
+            </div>
+            <div className={`${P}labeled-item`} style={{ width: '100%' }}>
+              <Skeleton variant="text" width="100%" count={3} direction="column" />
+              <span className={`${P}item-label`}>text count=3 direction="column"</span>
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* ── 5d. Custom Radius ──────────────────────── */}
+      {tier !== 'lite' && (
+        <section className={`${P}section`} id="radius">
+          <h2 className={`${P}section-title`}>
+            <a href="#radius">Custom Radius</a>
+          </h2>
+          <p className={`${P}section-desc`}>
+            Override the border-radius on any variant with the radius prop.
+          </p>
+          <div className={`${P}preview`} style={{ gap: '2rem' }}>
+            <div className={`${P}labeled-item`}>
+              <Skeleton variant="rectangular" width={120} height={60} radius={0} />
+              <span className={`${P}item-label`}>radius=0</span>
+            </div>
+            <div className={`${P}labeled-item`}>
+              <Skeleton variant="rectangular" width={120} height={60} radius="1rem" />
+              <span className={`${P}item-label`}>radius="1rem"</span>
+            </div>
+            <div className={`${P}labeled-item`}>
+              <Skeleton variant="rectangular" width={120} height={60} radius="50%" />
+              <span className={`${P}item-label`}>radius="50%"</span>
             </div>
           </div>
         </section>

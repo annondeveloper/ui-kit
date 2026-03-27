@@ -217,6 +217,51 @@ describe('Alert', () => {
     })
   })
 
+  // ─── Banner mode ─────────────────────────────────────────────────
+
+  describe('banner mode', () => {
+    it('sets data-banner attribute when banner is true', () => {
+      const { container } = render(<Alert variant="info" banner>Content</Alert>)
+      expect(container.querySelector('.ui-alert')).toHaveAttribute('data-banner', 'true')
+    })
+
+    it('does not set data-banner attribute when banner is not set', () => {
+      const { container } = render(<Alert variant="info">Content</Alert>)
+      expect(container.querySelector('.ui-alert')).not.toHaveAttribute('data-banner')
+    })
+
+    it('applies banner with all variants', () => {
+      const variants = ['info', 'success', 'warning', 'error'] as const
+      variants.forEach((variant) => {
+        const { container, unmount } = render(<Alert variant={variant} banner>Content</Alert>)
+        expect(container.querySelector('.ui-alert')).toHaveAttribute('data-banner', 'true')
+        expect(container.querySelector('.ui-alert')).toHaveAttribute('data-variant', variant)
+        unmount()
+      })
+    })
+  })
+
+  // ─── Compact mode ───────────────────────────────────────────────
+
+  describe('compact mode', () => {
+    it('sets data-compact attribute when compact is true', () => {
+      const { container } = render(<Alert variant="info" compact>Content</Alert>)
+      expect(container.querySelector('.ui-alert')).toHaveAttribute('data-compact', 'true')
+    })
+
+    it('does not set data-compact attribute when compact is not set', () => {
+      const { container } = render(<Alert variant="info">Content</Alert>)
+      expect(container.querySelector('.ui-alert')).not.toHaveAttribute('data-compact')
+    })
+
+    it('can combine compact and banner modes', () => {
+      const { container } = render(<Alert variant="error" compact banner>Content</Alert>)
+      const alert = container.querySelector('.ui-alert')
+      expect(alert).toHaveAttribute('data-compact', 'true')
+      expect(alert).toHaveAttribute('data-banner', 'true')
+    })
+  })
+
   // ─── Style injection ──────────────────────────────────────────────
 
   describe('style injection', () => {
@@ -238,6 +283,81 @@ describe('Alert', () => {
       const styleTags = document.querySelectorAll('style[data-ui-style]')
       const allCSS = Array.from(styleTags).map(s => s.textContent).join('')
       expect(allCSS).toContain('@scope (.ui-alert)')
+    })
+  })
+
+  // ─── classNames prop ──────────────────────────────────────────────
+
+  describe('classNames', () => {
+    it('applies classNames.root to the alert element', () => {
+      const { container } = render(
+        <Alert variant="info" classNames={{ root: 'custom-root' }}>Content</Alert>
+      )
+      const alert = container.querySelector('.ui-alert')!
+      expect(alert.className).toContain('custom-root')
+      expect(alert.className).toContain('ui-alert')
+    })
+
+    it('applies classNames.icon to the icon element', () => {
+      const { container } = render(
+        <Alert variant="info" classNames={{ icon: 'custom-icon' }}>Content</Alert>
+      )
+      const icon = container.querySelector('.ui-alert__icon')!
+      expect(icon.className).toContain('custom-icon')
+      expect(icon.className).toContain('ui-alert__icon')
+    })
+
+    it('applies classNames.content to the content element', () => {
+      const { container } = render(
+        <Alert variant="info" classNames={{ content: 'custom-content' }}>Content</Alert>
+      )
+      const content = container.querySelector('.ui-alert__content')!
+      expect(content.className).toContain('custom-content')
+      expect(content.className).toContain('ui-alert__content')
+    })
+
+    it('applies classNames.title to the title element', () => {
+      const { container } = render(
+        <Alert variant="info" title="Title" classNames={{ title: 'custom-title' }}>Content</Alert>
+      )
+      const title = container.querySelector('.ui-alert__title')!
+      expect(title.className).toContain('custom-title')
+      expect(title.className).toContain('ui-alert__title')
+    })
+
+    it('applies classNames.body to the body element', () => {
+      const { container } = render(
+        <Alert variant="info" classNames={{ body: 'custom-body' }}>Content</Alert>
+      )
+      const body = container.querySelector('.ui-alert__body')!
+      expect(body.className).toContain('custom-body')
+      expect(body.className).toContain('ui-alert__body')
+    })
+
+    it('applies classNames.dismiss to the dismiss button', () => {
+      const { container } = render(
+        <Alert variant="info" dismissible classNames={{ dismiss: 'custom-dismiss' }}>Content</Alert>
+      )
+      const dismiss = container.querySelector('.ui-alert__dismiss')!
+      expect(dismiss.className).toContain('custom-dismiss')
+      expect(dismiss.className).toContain('ui-alert__dismiss')
+    })
+
+    it('merges classNames.root with className prop', () => {
+      const { container } = render(
+        <Alert variant="info" classNames={{ root: 'cn-root' }} className="class-prop">Content</Alert>
+      )
+      const alert = container.querySelector('.ui-alert')!
+      expect(alert.className).toContain('cn-root')
+      expect(alert.className).toContain('class-prop')
+    })
+
+    it('handles undefined classNames gracefully', () => {
+      const { container } = render(
+        <Alert variant="info" classNames={undefined}>Content</Alert>
+      )
+      const alert = container.querySelector('.ui-alert')!
+      expect(alert.className).toContain('ui-alert')
     })
   })
 

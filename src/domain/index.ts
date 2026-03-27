@@ -62,3 +62,8 @@ export { ColumnVisibilityToggle, type ColumnVisibilityToggleProps } from './colu
 export { CSVExportButton, type CSVExportButtonProps } from './csv-export'
 export { TimeSeriesChart, type TimeSeriesChartProps, type TimeSeriesData, type TimeSeriesSeries } from './time-series-chart'
 export { SwitchFaceplate, type SwitchFaceplateProps, type SwitchPort } from './switch-faceplate'
+export { JsonViewer, type JsonViewerProps } from './json-viewer'
+export { CodeEditor, type CodeEditorProps } from './code-editor'
+export { Tour, type TourProps, type TourStep } from './tour'
+export { RichTextEditor, type RichTextEditorProps } from './rich-text-editor'
+export { Cropper, type CropperProps, type CropResult } from './cropper'

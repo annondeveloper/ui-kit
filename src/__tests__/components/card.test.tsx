@@ -185,6 +185,106 @@ describe('Card', () => {
     })
   })
 
+  // ─── Loading prop ────────────────────────────────────────────────
+
+  describe('loading', () => {
+    it('sets data-loading attribute when loading is true', () => {
+      const { container } = render(<Card loading>Content</Card>)
+      expect(container.querySelector('.ui-card')).toHaveAttribute('data-loading', 'true')
+    })
+
+    it('does not set data-loading attribute when loading is false', () => {
+      const { container } = render(<Card>Content</Card>)
+      expect(container.querySelector('.ui-card')).not.toHaveAttribute('data-loading')
+    })
+
+    it('renders a Skeleton overlay when loading is true', () => {
+      const { container } = render(<Card loading>Content</Card>)
+      const skeleton = container.querySelector('.ui-skeleton')
+      expect(skeleton).toBeInTheDocument()
+    })
+
+    it('does not render a Skeleton overlay when loading is false', () => {
+      const { container } = render(<Card>Content</Card>)
+      const skeleton = container.querySelector('.ui-skeleton')
+      expect(skeleton).not.toBeInTheDocument()
+    })
+  })
+
+  // ─── Bordered prop ──────────────────────────────────────────────
+
+  describe('bordered', () => {
+    it('sets data-bordered attribute when bordered is true', () => {
+      const { container } = render(<Card bordered>Content</Card>)
+      expect(container.querySelector('.ui-card')).toHaveAttribute('data-bordered', 'true')
+    })
+
+    it('does not set data-bordered attribute when bordered is not set', () => {
+      const { container } = render(<Card>Content</Card>)
+      expect(container.querySelector('.ui-card')).not.toHaveAttribute('data-bordered')
+    })
+
+    it('can combine bordered with ghost variant', () => {
+      const { container } = render(<Card variant="ghost" bordered>Content</Card>)
+      const card = container.querySelector('.ui-card')
+      expect(card).toHaveAttribute('data-variant', 'ghost')
+      expect(card).toHaveAttribute('data-bordered', 'true')
+    })
+  })
+
+  // ─── classNames prop ──────────────────────────────────────────────
+
+  describe('classNames', () => {
+    it('applies classNames.root to the card element', () => {
+      const { container } = render(<Card classNames={{ root: 'custom-root' }}>Content</Card>)
+      const card = container.querySelector('.ui-card')!
+      expect(card.className).toContain('custom-root')
+      expect(card.className).toContain('ui-card')
+    })
+
+    it('applies classNames.header to the header element', () => {
+      const { container } = render(
+        <Card header="Title" classNames={{ header: 'custom-header' }}>Content</Card>
+      )
+      const header = container.querySelector('.ui-card__header')!
+      expect(header.className).toContain('custom-header')
+      expect(header.className).toContain('ui-card__header')
+    })
+
+    it('applies classNames.footer to the footer element', () => {
+      const { container } = render(
+        <Card footer={<button>Save</button>} classNames={{ footer: 'custom-footer' }}>Content</Card>
+      )
+      const footer = container.querySelector('.ui-card__footer')!
+      expect(footer.className).toContain('custom-footer')
+      expect(footer.className).toContain('ui-card__footer')
+    })
+
+    it('applies classNames.content to the content element when expandable', () => {
+      const { container } = render(
+        <Card expandable classNames={{ content: 'custom-content' }}>Content</Card>
+      )
+      const content = container.querySelector('.ui-card__content')!
+      expect(content.className).toContain('custom-content')
+      expect(content.className).toContain('ui-card__content')
+    })
+
+    it('merges classNames.root with className prop', () => {
+      const { container } = render(
+        <Card classNames={{ root: 'cn-root' }} className="class-prop">Content</Card>
+      )
+      const card = container.querySelector('.ui-card')!
+      expect(card.className).toContain('cn-root')
+      expect(card.className).toContain('class-prop')
+    })
+
+    it('handles undefined classNames gracefully', () => {
+      const { container } = render(<Card classNames={undefined}>Content</Card>)
+      const card = container.querySelector('.ui-card')!
+      expect(card.className).toContain('ui-card')
+    })
+  })
+
   // ─── Display name ─────────────────────────────────────────────────
 
   describe('display name', () => {

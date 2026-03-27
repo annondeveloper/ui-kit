@@ -6,6 +6,7 @@ import { useStyles } from '../core/styles/use-styles'
 import { useMotionLevel } from '../core/motion/use-motion-level'
 import { useEntrance } from '../core/motion/use-entrance'
 import { cn } from '../core/utils/cn'
+import { Skeleton } from './skeleton'
 
 export interface CardProps extends HTMLAttributes<HTMLElement> {
   as?: ElementType
@@ -21,6 +22,12 @@ export interface CardProps extends HTMLAttributes<HTMLElement> {
   expandable?: boolean
   /** Initial expanded state (default: true) */
   defaultExpanded?: boolean
+  /** When true, shows a Skeleton overlay */
+  loading?: boolean
+  /** Explicit border control independent of variant */
+  bordered?: boolean
+  /** Custom class names for internal parts */
+  classNames?: Partial<Record<'root' | 'header' | 'footer' | 'content', string>>
   /** Polymorphic pass-through: href, target, etc. */
   href?: string
   target?: string
@@ -49,15 +56,33 @@ const cardStyles = css`
         background: var(--bg-surface, oklch(22% 0.02 270));
         border: 1px solid var(--border-default, oklch(100% 0 0 / 0.1));
         box-shadow: 0 1px 3px oklch(0% 0 0 / 0.2);
+        transition: border-color 0.2s var(--ease-out, ease-out);
+      }
+      :scope[data-variant="default"]::after {
+        content: '';
+        position: absolute;
+        inset-block-start: 0;
+        inset-inline: 0;
+        block-size: 1px;
+        pointer-events: none;
+        z-index: 1;
+        background: linear-gradient(90deg,
+          transparent 0%,
+          oklch(from var(--brand, oklch(65% 0.2 270)) calc(l + 0.15) c h / 0.4) 20%,
+          oklch(from var(--brand, oklch(65% 0.2 270)) calc(l + 0.2) c h / 0.6) 50%,
+          oklch(from var(--brand, oklch(65% 0.2 270)) calc(l + 0.15) c h / 0.4) 80%,
+          transparent 100%);
       }
       :scope[data-variant="elevated"] {
         background: var(--bg-elevated, oklch(28% 0.02 270));
         border: 1px solid var(--border-subtle, oklch(100% 0 0 / 0.06));
-        box-shadow: var(--shadow-md, 0 4px 12px oklch(0% 0 0 / 0.2));
+        box-shadow: var(--shadow-md, 0 4px 12px oklch(0% 0 0 / 0.2)), 0 8px 32px oklch(from var(--brand, oklch(65% 0.2 270)) l c h / 0.06);
+        transition: border-color 0.2s var(--ease-out, ease-out);
       }
       :scope[data-variant="outlined"] {
         background: transparent;
         border: 1px solid var(--border-default, oklch(100% 0 0 / 0.12));
+        transition: border-color 0.2s var(--ease-out, ease-out);
       }
       :scope[data-variant="ghost"] {
         background: transparent;
@@ -65,9 +90,11 @@ const cardStyles = css`
       }
       :scope[data-variant="glass"] {
         background: oklch(from var(--bg-elevated) l c h / 0.5);
-        backdrop-filter: blur(20px) saturate(1.8);
+        backdrop-filter: blur(20px) saturate(2.2);
         border: 1px solid var(--border-strong);
-        box-shadow: 0 4px 24px oklch(0% 0 0 / 0.15), inset 0 1px 0 var(--border-subtle);
+        border-block-start-color: oklch(100% 0 0 / 0.15);
+        box-shadow: 0 4px 24px oklch(0% 0 0 / 0.15), inset 0 1px 0 oklch(100% 0 0 / 0.1);
+        transition: border-color 0.2s var(--ease-out, ease-out);
       }
       :scope[data-variant="gradient"] {
         background: linear-gradient(135deg, var(--bg-elevated) 0%, oklch(from var(--brand) calc(l - 0.3) 0.05 h) 100%);
@@ -145,12 +172,12 @@ const cardStyles = css`
         border-radius: inherit;
         background: radial-gradient(
           ellipse at 20% 0%,
-          oklch(from var(--aurora-1, oklch(70% 0.15 270)) l c h / 0.04) 0%,
+          oklch(from var(--aurora-1, oklch(70% 0.15 270)) l c h / 0.08) 0%,
           transparent 60%
         ),
         radial-gradient(
           ellipse at 80% 100%,
-          oklch(from var(--aurora-2, oklch(70% 0.15 330)) l c h / 0.03) 0%,
+          oklch(from var(--aurora-2, oklch(70% 0.15 330)) l c h / 0.06) 0%,
           transparent 50%
         );
         pointer-events: none;
@@ -209,6 +236,17 @@ const cardStyles = css`
         outline-offset: 2px;
       }
 
+      /* Loading state */
+      :scope[data-loading="true"] {
+        position: relative;
+        min-block-size: 120px;
+      }
+
+      /* Bordered */
+      :scope[data-bordered="true"] {
+        border: 1px solid var(--border-default);
+      }
+
       /* Touch targets */
       @media (pointer: coarse) {
         :scope[data-interactive="true"] {
@@ -265,6 +303,9 @@ export const Card = forwardRef<HTMLElement, CardProps>(
       footer,
       expandable = false,
       defaultExpanded = true,
+      loading = false,
+      bordered,
+      classNames,
       children,
       className,
       ...rest
@@ -319,34 +360,43 @@ export const Card = forwardRef<HTMLElement, CardProps>(
     return (
       <Component
         ref={setRef}
-        className={cn(cls('root'), className)}
+        className={cn(cls('root'), classNames?.root, className)}
         data-variant={variant}
         data-padding={padding}
         data-motion={motionLevel}
         data-interactive={interactive || undefined}
         data-expandable={expandable || undefined}
+        data-loading={loading || undefined}
+        data-bordered={bordered || undefined}
         onClick={handleCardClick}
         style={expandable ? { cursor: 'pointer', ...rest.style } : rest.style}
         {...rest}
       >
         {header && (
-          <div className="ui-card__header">
+          <div className={cn('ui-card__header', classNames?.header)}>
             <span>{header}</span>
             {expandToggle}
           </div>
         )}
         {!header && expandToggle && (
-          <div className="ui-card__header" style={{ borderBlockEnd: 'none', marginBlockEnd: 0 }}>
+          <div className={cn('ui-card__header', classNames?.header)} style={{ borderBlockEnd: 'none', marginBlockEnd: 0 }}>
             <span />
             {expandToggle}
           </div>
         )}
         {expandable ? (
-          <div className="ui-card__content" data-collapsed={!expanded}>
+          <div className={cn('ui-card__content', classNames?.content)} data-collapsed={!expanded}>
             <div className="ui-card__content-inner">{children}</div>
           </div>
         ) : children}
-        {footer && <div className="ui-card__footer">{footer}</div>}
+        {footer && <div className={cn('ui-card__footer', classNames?.footer)}>{footer}</div>}
+        {loading && (
+          <Skeleton
+            variant="rectangular"
+            animate
+            style={{ position: 'absolute', inset: 0, zIndex: 2, borderRadius: 'inherit' }}
+          />
+        )}
       </Component>
     )
   }

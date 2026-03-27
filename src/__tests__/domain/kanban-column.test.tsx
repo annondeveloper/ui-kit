@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, afterEach } from 'vitest'
-import { render, screen, cleanup } from '@testing-library/react'
+import { render, screen, cleanup, fireEvent } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { axe, toHaveNoViolations } from 'jest-axe'
 import { KanbanColumn, type KanbanCard } from '../../domain/kanban-column'
@@ -234,6 +234,88 @@ describe('KanbanColumn', () => {
         <KanbanColumn title="To Do" cards={cards} columnId="todo" motion={3} />
       )
       expect(container.querySelector('[data-motion="3"]')).toBeInTheDocument()
+    })
+  })
+
+  // ─── Drag and Drop ──────────────────────────────────────────────
+
+  describe('drag and drop', () => {
+    it('sets draggable on cards when onCardMove is provided', () => {
+      const { container } = render(
+        <KanbanColumn title="To Do" cards={cards} columnId="todo" onCardMove={vi.fn()} />
+      )
+      const cardEls = container.querySelectorAll('[data-card]')
+      cardEls.forEach((card) => {
+        expect(card).toHaveAttribute('draggable', 'true')
+      })
+    })
+
+    it('does not set draggable when onCardMove is not provided', () => {
+      const { container } = render(
+        <KanbanColumn title="To Do" cards={cards} columnId="todo" />
+      )
+      const cardEls = container.querySelectorAll('[data-card]')
+      cardEls.forEach((card) => {
+        expect(card).not.toHaveAttribute('draggable')
+      })
+    })
+
+    it('calls onCardMove on drop', () => {
+      const onCardMove = vi.fn()
+      const { container } = render(
+        <KanbanColumn title="To Do" cards={cards} columnId="todo" onCardMove={onCardMove} />
+      )
+      const cardsContainer = container.querySelector('.ui-kanban-column__cards')!
+      const cardEl = container.querySelectorAll('[data-card]')[0]
+
+      // Simulate drag start
+      fireEvent.dragStart(cardEl, {
+        dataTransfer: {
+          effectAllowed: '',
+          setData: vi.fn(),
+        },
+      })
+
+      // Simulate drop
+      const getData = vi.fn().mockReturnValue(JSON.stringify({ cardId: 'c1', sourceColumnId: 'todo' }))
+      fireEvent.drop(cardsContainer, {
+        dataTransfer: {
+          getData,
+          dropEffect: '',
+        },
+        clientY: 9999, // drop at end
+      })
+
+      expect(onCardMove).toHaveBeenCalledWith('c1', 'todo', expect.any(Number))
+    })
+
+    it('shows drop indicator during dragOver', () => {
+      const { container } = render(
+        <KanbanColumn title="To Do" cards={cards} columnId="todo" onCardMove={vi.fn()} />
+      )
+      const cardsContainer = container.querySelector('.ui-kanban-column__cards')!
+
+      fireEvent.dragOver(cardsContainer, {
+        dataTransfer: { dropEffect: '' },
+        clientY: 0,
+      })
+
+      const indicator = container.querySelector('.ui-kanban__drop-indicator')
+      expect(indicator).toBeInTheDocument()
+    })
+
+    it('cleans up after dragEnd', () => {
+      const { container } = render(
+        <KanbanColumn title="To Do" cards={cards} columnId="todo" onCardMove={vi.fn()} />
+      )
+      const cardEl = container.querySelectorAll('[data-card]')[0]
+
+      fireEvent.dragStart(cardEl, {
+        dataTransfer: { effectAllowed: '', setData: vi.fn() },
+      })
+      fireEvent.dragEnd(cardEl)
+
+      expect(cardEl).not.toHaveClass('ui-kanban-column__card--dragging')
     })
   })
 

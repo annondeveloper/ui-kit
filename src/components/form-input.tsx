@@ -25,6 +25,13 @@ export interface FormInputProps extends Omit<InputHTMLAttributes<HTMLInputElemen
   icon?: ReactNode
   iconEnd?: ReactNode
   motion?: 0 | 1 | 2 | 3
+  maxLength?: number
+  showCount?: boolean
+  clearable?: boolean
+  onClear?: () => void
+  required?: boolean
+  /** Custom class names for internal parts */
+  classNames?: Partial<Record<'root' | 'label' | 'field' | 'icon' | 'iconEnd' | 'description' | 'error', string>>
 }
 
 const formInputStyles = css`
@@ -63,6 +70,7 @@ const formInputStyles = css`
         font-size: var(--text-sm, 0.875rem);
         line-height: 1.5;
         outline: none;
+        box-shadow: inset 0 2px 4px oklch(0% 0 0 / 0.06), inset 0 1px 0 oklch(100% 0 0 / 0.04);
         transition: border-color 0.15s var(--ease-out, ease-out),
                     box-shadow 0.15s var(--ease-out, ease-out);
       }
@@ -123,7 +131,7 @@ const formInputStyles = css`
       /* Focus glow */
       .ui-form-input__field:focus {
         border-color: var(--brand, oklch(65% 0.2 270));
-        box-shadow: 0 0 0 3px oklch(from var(--brand, oklch(65% 0.2 270)) l c h / 0.15);
+        box-shadow: 0 0 0 3px oklch(from var(--brand, oklch(65% 0.2 270)) l c h / 0.15), 0 0 16px oklch(from var(--brand, oklch(65% 0.2 270)) l c h / 0.1), inset 0 2px 4px oklch(0% 0 0 / 0.06);
       }
 
       /* Hover */
@@ -229,6 +237,42 @@ const formInputStyles = css`
         }
       }
 
+      /* Character counter */
+      .ui-form-input__counter {
+        font-size: var(--text-xs, 0.75rem);
+        color: var(--text-tertiary, oklch(60% 0 0));
+        text-align: end;
+        line-height: 1.4;
+      }
+      .ui-form-input__counter[data-at-limit] {
+        color: var(--status-critical, oklch(65% 0.25 25));
+        font-weight: 600;
+      }
+
+      /* Clear button */
+      .ui-form-input__clear {
+        position: absolute;
+        inset-inline-end: 0.5rem;
+        inset-block: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: none;
+        background: none;
+        color: var(--text-tertiary);
+        cursor: pointer;
+        padding: 0.25rem;
+      }
+      .ui-form-input__clear:hover {
+        color: var(--text-primary);
+      }
+
+      /* Required indicator */
+      .ui-form-input__required {
+        color: var(--status-critical, oklch(65% 0.25 25));
+        margin-inline-start: 0.25rem;
+      }
+
       /* Print */
       @media print {
         .ui-form-input__field {
@@ -263,6 +307,12 @@ export const FormInput = forwardRef<HTMLInputElement, FormInputProps>(
       icon,
       iconEnd,
       motion: motionProp,
+      maxLength,
+      showCount,
+      clearable,
+      onClear,
+      required,
+      classNames,
       className,
       disabled,
       id: idProp,
@@ -317,26 +367,38 @@ export const FormInput = forwardRef<HTMLInputElement, FormInputProps>(
       [onBlurProp, fieldProps]
     )
 
+    // ── Value length for counter ───────────────────────────────────────
+    const valueStr = typeof value === 'string' ? value : typeof value === 'number' ? String(value) : ''
+    const valueLength = valueStr.length
+    const showCounter = showCount || maxLength !== undefined
+    const atLimit = maxLength !== undefined && valueLength >= maxLength
+
+    // ── Clear button visibility ────────────────────────────────────────
+    const showClearButton = clearable && valueLength > 0
+
     return (
       <div
-        className={cn(cls('root'), className)}
+        className={cn(cls('root'), classNames?.root, className)}
         data-size={size}
         data-variant={variant}
         data-motion={motionLevel}
         {...(error ? { 'data-invalid': '' } : {})}
         {...(disabled ? { 'data-disabled': '' } : {})}
         {...(icon ? { 'data-has-icon': '' } : {})}
-        {...(iconEnd ? { 'data-has-icon-end': '' } : {})}
+        {...(iconEnd || clearable ? { 'data-has-icon-end': '' } : {})}
       >
         {label && (
-          <label htmlFor={inputId} className="ui-form-input__label">
+          <label htmlFor={inputId} className={cn('ui-form-input__label', classNames?.label)}>
             {label}
+            {required && (
+              <span className="ui-form-input__required" aria-hidden="true">*</span>
+            )}
           </label>
         )}
 
         <div className="ui-form-input__field-wrapper">
           {icon && (
-            <span className="ui-form-input__icon" aria-hidden="true">
+            <span className={cn('ui-form-input__icon', classNames?.icon)} aria-hidden="true">
               {icon}
             </span>
           )}
@@ -345,32 +407,56 @@ export const FormInput = forwardRef<HTMLInputElement, FormInputProps>(
             ref={ref}
             id={inputId}
             name={name}
-            className="ui-form-input__field"
+            className={cn('ui-form-input__field', classNames?.field)}
             disabled={disabled}
             value={value as string | number | readonly string[] | undefined}
             onChange={handleChange}
             onBlur={handleBlur}
             aria-invalid={error ? true : undefined}
             aria-describedby={describedBy}
+            required={required}
+            maxLength={maxLength}
             {...rest}
           />
 
           {iconEnd && (
-            <span className="ui-form-input__icon-end" aria-hidden="true">
+            <span className={cn('ui-form-input__icon-end', classNames?.iconEnd)} aria-hidden="true">
               {iconEnd}
             </span>
+          )}
+
+          {showClearButton && (
+            <button
+              type="button"
+              className="ui-form-input__clear"
+              onClick={onClear}
+              aria-label="Clear input"
+            >
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                <path d="M4 4L12 12M12 4L4 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+              </svg>
+            </button>
           )}
         </div>
 
         {description && (
-          <span id={descriptionId} className="ui-form-input__description">
+          <span id={descriptionId} className={cn('ui-form-input__description', classNames?.description)}>
             {description}
           </span>
         )}
 
         {error && (
-          <span id={errorId} className="ui-form-input__error" role="alert">
+          <span id={errorId} className={cn('ui-form-input__error', classNames?.error)} role="alert">
             {error}
+          </span>
+        )}
+
+        {showCounter && (
+          <span
+            className="ui-form-input__counter"
+            {...(atLimit ? { 'data-at-limit': '' } : {})}
+          >
+            {maxLength !== undefined ? `${valueLength}/${maxLength}` : valueLength}
           </span>
         )}
       </div>

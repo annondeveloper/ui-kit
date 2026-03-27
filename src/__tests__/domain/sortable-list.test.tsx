@@ -253,6 +253,80 @@ describe('SortableList', () => {
     })
   })
 
+  // ─── Mouse Drag Reorder ──────────────────────────────────────────
+
+  describe('mouse drag reorder', () => {
+    it('items are draggable when not disabled', () => {
+      render(<SortableList items={items} onChange={vi.fn()} />)
+      const options = screen.getAllByRole('option')
+      options.forEach((opt) => {
+        expect(opt).toHaveAttribute('draggable', 'true')
+      })
+    })
+
+    it('items are not draggable when disabled', () => {
+      render(<SortableList items={items} onChange={vi.fn()} disabled />)
+      const options = screen.getAllByRole('option')
+      options.forEach((opt) => {
+        expect(opt).not.toHaveAttribute('draggable', 'true')
+      })
+    })
+
+    it('shows drop indicator during dragOver', () => {
+      const { container } = render(<SortableList items={items} onChange={vi.fn()} />)
+      const listbox = screen.getByRole('listbox')
+
+      // Start drag on first item
+      const options = screen.getAllByRole('option')
+      fireEvent.dragStart(options[0], {
+        dataTransfer: { effectAllowed: '', setData: vi.fn() },
+      })
+
+      // Drag over the list
+      fireEvent.dragOver(listbox, {
+        dataTransfer: { dropEffect: '' },
+        clientY: 0,
+      })
+
+      const indicator = container.querySelector('.ui-sortable-list__drop-indicator')
+      expect(indicator).toBeInTheDocument()
+    })
+
+    it('calls onChange on drop', () => {
+      const onChange = vi.fn()
+      render(<SortableList items={items} onChange={onChange} />)
+      const listbox = screen.getByRole('listbox')
+      const options = screen.getAllByRole('option')
+
+      // Simulate drag start
+      fireEvent.dragStart(options[0], {
+        dataTransfer: { effectAllowed: '', setData: vi.fn() },
+      })
+
+      // Simulate drop
+      const getData = vi.fn().mockReturnValue('1')
+      fireEvent.drop(listbox, {
+        dataTransfer: { getData },
+        clientY: 9999, // drop at end
+      })
+
+      expect(onChange).toHaveBeenCalled()
+    })
+
+    it('cleans up after dragEnd', () => {
+      const { container } = render(<SortableList items={items} onChange={vi.fn()} />)
+      const options = screen.getAllByRole('option')
+
+      fireEvent.dragStart(options[0], {
+        dataTransfer: { effectAllowed: '', setData: vi.fn() },
+      })
+      fireEvent.dragEnd(options[0])
+
+      expect(options[0]).not.toHaveClass('ui-sortable-list__item--dragging')
+      expect(container.querySelector('.ui-sortable-list__drop-indicator')).not.toBeInTheDocument()
+    })
+  })
+
   // ─── Accessibility ────────────────────────────────────────────────
 
   describe('accessibility', () => {

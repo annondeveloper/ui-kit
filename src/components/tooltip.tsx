@@ -24,6 +24,8 @@ export interface TooltipProps {
   delay?: number
   offset?: number
   disabled?: boolean
+  interactive?: boolean
+  maxWidth?: number | string
   motion?: 0 | 1 | 2 | 3
 }
 
@@ -182,6 +184,8 @@ export function Tooltip({
   delay = 300,
   offset = 8,
   disabled = false,
+  interactive = false,
+  maxWidth,
   motion: motionProp,
 }: TooltipProps) {
   useStyles('tooltip', tooltipStyles)
@@ -190,6 +194,7 @@ export function Tooltip({
 
   const [visible, setVisible] = useState(false)
   const showTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const hideTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const longPressTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const triggerRef = useRef<Element | null>(null)
   const floatingRef = useRef<HTMLDivElement | null>(null)
@@ -204,12 +209,17 @@ export function Tooltip({
   useEffect(() => {
     return () => {
       if (showTimerRef.current) clearTimeout(showTimerRef.current)
+      if (hideTimerRef.current) clearTimeout(hideTimerRef.current)
       if (longPressTimerRef.current) clearTimeout(longPressTimerRef.current)
     }
   }, [])
 
   const show = useCallback(() => {
     if (disabled) return
+    if (hideTimerRef.current) {
+      clearTimeout(hideTimerRef.current)
+      hideTimerRef.current = null
+    }
     showTimerRef.current = setTimeout(() => {
       setVisible(true)
     }, delay)
@@ -220,8 +230,27 @@ export function Tooltip({
       clearTimeout(showTimerRef.current)
       showTimerRef.current = null
     }
-    setVisible(false)
-  }, [])
+    if (interactive) {
+      hideTimerRef.current = setTimeout(() => {
+        setVisible(false)
+      }, 150)
+    } else {
+      setVisible(false)
+    }
+  }, [interactive])
+
+  const handleTooltipMouseEnter = useCallback(() => {
+    if (interactive && hideTimerRef.current) {
+      clearTimeout(hideTimerRef.current)
+      hideTimerRef.current = null
+    }
+  }, [interactive])
+
+  const handleTooltipMouseLeave = useCallback(() => {
+    if (interactive) {
+      setVisible(false)
+    }
+  }, [interactive])
 
   // Touch: dismiss on touch outside
   useEffect(() => {
@@ -343,7 +372,13 @@ export function Tooltip({
             position: 'fixed',
             left: `${position.x}px`,
             top: `${position.y}px`,
+            ...(interactive ? { pointerEvents: 'auto' as const } : {}),
+            ...(maxWidth !== undefined
+              ? { maxInlineSize: typeof maxWidth === 'number' ? `${maxWidth}px` : maxWidth }
+              : {}),
           }}
+          onMouseEnter={interactive ? handleTooltipMouseEnter : undefined}
+          onMouseLeave={interactive ? handleTooltipMouseLeave : undefined}
         >
           <div className="ui-tooltip__panel" role="tooltip" id={tooltipId}>
             {content}

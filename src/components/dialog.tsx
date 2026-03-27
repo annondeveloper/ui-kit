@@ -24,8 +24,14 @@ export interface DialogProps extends Omit<HTMLAttributes<HTMLDialogElement>, 'ti
   closeOnOverlay?: boolean
   closeOnEscape?: boolean
   showClose?: boolean
+  /** A footer area below the body for action buttons */
+  footer?: ReactNode
+  /** Prevents closing via overlay click and escape (useful for important actions) */
+  preventClose?: boolean
   children: ReactNode
   motion?: 0 | 1 | 2 | 3
+  /** Custom class names for internal parts */
+  classNames?: Partial<Record<'root' | 'header' | 'title' | 'description' | 'body' | 'close' | 'footer', string>>
 }
 
 // ─── Styles ─────────────────────────────────────────────────────────────────
@@ -123,6 +129,14 @@ const dialogStyles = css`
     scrollbar-width: thin; scrollbar-color: var(--border-strong, oklch(100% 0 0 / 0.12)) transparent;
   }
 
+  /* Footer */
+  .ui-dialog .ui-dialog__footer {
+    display: flex; align-items: center; justify-content: flex-end;
+    gap: 0.5rem; padding: 1rem 1.25rem;
+    border-block-start: 1px solid var(--border-subtle, oklch(100% 0 0 / 0.06));
+    flex-shrink: 0;
+  }
+
   /* Mobile */
   @media (max-width: 640px) {
     .ui-dialog dialog[open]:not([data-size="full"]) {
@@ -143,12 +157,12 @@ const dialogStyles = css`
     @scope (.ui-dialog) {
       /* Aurora glow ring on open */
       dialog[open] {
-        border-color: oklch(from var(--brand, oklch(65% 0.2 270)) l c h / 0.15);
+        border-color: oklch(from var(--brand, oklch(65% 0.2 270)) l c h / 0.18);
         box-shadow:
           var(--shadow-lg, 0 24px 80px oklch(0% 0 0 / 0.4)),
           0 8px 32px oklch(0% 0 0 / 0.2),
-          0 0 0 1px oklch(from var(--brand, oklch(65% 0.2 270)) l c h / 0.08),
-          0 0 60px -12px oklch(from var(--brand, oklch(65% 0.2 270)) l c h / 0.12),
+          0 0 0 1px oklch(from var(--brand, oklch(65% 0.2 270)) l c h / 0.12),
+          0 0 80px -16px oklch(from var(--brand, oklch(65% 0.2 270)) l c h / 0.18),
           inset 0 1px 0 var(--border-subtle, oklch(100% 0 0 / 0.06));
       }
 
@@ -238,8 +252,11 @@ export function Dialog({
   closeOnOverlay = true,
   closeOnEscape = true,
   showClose = true,
+  footer,
+  preventClose = false,
   children,
   motion: motionProp,
+  classNames,
   className,
   ...rest
 }: DialogProps) {
@@ -271,28 +288,30 @@ export function Dialog({
       if (e.key === 'Escape') {
         // Always prevent default native close so we control it
         e.preventDefault()
+        if (preventClose) return
         if (closeOnEscape) {
           onClose()
         }
       }
     },
-    [closeOnEscape, onClose]
+    [closeOnEscape, preventClose, onClose]
   )
 
   // ── Backdrop click (click on dialog element itself) ─────────────────
   const handleClick = useCallback(
     (e: React.MouseEvent<HTMLDialogElement>) => {
+      if (preventClose) return
       if (!closeOnOverlay) return
       // Only close if click target is the dialog element itself (backdrop area)
       if (e.target === e.currentTarget) {
         onClose()
       }
     },
-    [closeOnOverlay, onClose]
+    [closeOnOverlay, preventClose, onClose]
   )
 
   return (
-    <div className={cn('ui-dialog', className)}>
+    <div className={cn('ui-dialog', classNames?.root, className)}>
       <dialog
         ref={dialogRef}
         data-size={size}
@@ -304,15 +323,15 @@ export function Dialog({
         {...rest}
       >
         {(title || showClose) && (
-          <div className="ui-dialog__header">
+          <div className={cn('ui-dialog__header', classNames?.header)}>
             <div className="ui-dialog__header-text">
               {title && (
-                <h2 className="ui-dialog__title" id={titleId}>
+                <h2 className={cn('ui-dialog__title', classNames?.title)} id={titleId}>
                   {title}
                 </h2>
               )}
               {description && (
-                <p className="ui-dialog__description" id={descId}>
+                <p className={cn('ui-dialog__description', classNames?.description)} id={descId}>
                   {description}
                 </p>
               )}
@@ -320,7 +339,7 @@ export function Dialog({
             {showClose && (
               <button
                 type="button"
-                className="ui-dialog__close"
+                className={cn('ui-dialog__close', classNames?.close)}
                 onClick={onClose}
                 aria-label="Close"
               >
@@ -329,9 +348,10 @@ export function Dialog({
             )}
           </div>
         )}
-        <div className="ui-dialog__body">
+        <div className={cn('ui-dialog__body', classNames?.body)}>
           {children}
         </div>
+        {footer && <div className={cn('ui-dialog__footer', classNames?.footer)}>{footer}</div>}
       </dialog>
     </div>
   )
