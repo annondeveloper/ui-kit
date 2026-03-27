@@ -233,7 +233,7 @@ const SIZES = ['xs', 'sm', 'md', 'lg', 'xl'] as const
 // ─── Component ───────────────────────────────────────────────────────────────
 
 export default function SegmentedControlPage() {
-  useStyles(pageStyles)
+  useStyles('segmented-control-page', pageStyles)
 
   const [copied, setCopied] = useState(false)
   const [view, setView] = useState('list')

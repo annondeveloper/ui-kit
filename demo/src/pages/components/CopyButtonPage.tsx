@@ -243,7 +243,7 @@ const SAMPLE_TOKEN = 'sk-proj-abc123def456ghi789'
 // ─── Component ───────────────────────────────────────────────────────────────
 
 export default function CopyButtonPage() {
-  useStyles(pageStyles)
+  useStyles('copy-button-page', pageStyles)
 
   const [headerCopied, setHeaderCopied] = useState(false)
 

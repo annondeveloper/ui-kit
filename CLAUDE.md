@@ -2,10 +2,10 @@
 
 ## Project Overview
 
-`@annondeveloper/ui-kit` — A zero-dependency React component library with 146 components across 3 weight tiers (Lite/Standard/Premium), physics-based animations, OKLCH color system, and Aurora Fluid design identity.
+`@annondeveloper/ui-kit` — A zero-dependency React component library with 147 components across 3 weight tiers (Lite/Standard/Premium), physics-based animations, OKLCH color system, and Aurora Fluid design identity.
 
 **Repository:** https://github.com/annondeveloper/ui-kit
-**Current:** v2.4.1 on `main` branch
+**Current:** v2.5.0 on `main` branch
 **Legacy:** v0.4.1 on `v1` branch (archived)
 
 ## Development Philosophy
@@ -59,10 +59,10 @@ Automated via GitHub Actions on `v*` tag push:
 
 ```
 src/core/          # Foundation: styles, motion, tokens, a11y, icons, forms, utils
-src/components/    # General-purpose (72): Button, Card, Dialog, Tabs, Typography, ActionIcon, Calendar, etc.
+src/components/    # General-purpose (73): Button, Card, Dialog, Tabs, Typography, ActionIcon, Calendar, ContainerQuery, etc.
 src/domain/        # Specialized (74): MetricCard, LogViewer, TimeSeriesChart, RackDiagram, CodeEditor, Tour, etc.
 src/lite/          # Lite tier (144): minimal wrappers, no motion, ~20-30 lines each
-src/premium/       # Premium tier (144): aurora glow, spring animations, shimmer effects
+src/premium/       # Premium tier (145): aurora glow, spring animations, shimmer effects
 ```
 
 ## Style Conventions
@@ -103,11 +103,24 @@ src/premium/       # Premium tier (144): aurora glow, spring animations, shimmer
 ## CLI Tool
 
 ```bash
-npx @annondeveloper/ui-kit init          # Copy theme + utils
-npx @annondeveloper/ui-kit add <name>    # Copy component source
-npx @annondeveloper/ui-kit list          # List components
-npx @annondeveloper/ui-kit theme         # Generate theme from brand color
+npx @annondeveloper/ui-kit init                                    # Copy theme + utils
+npx @annondeveloper/ui-kit add <name> [--tier] [--out-dir]         # Copy component source
+npx @annondeveloper/ui-kit create <name> --template <template>     # Scaffold project
+npx @annondeveloper/ui-kit list                                    # List components
+npx @annondeveloper/ui-kit theme <color>                           # Generate theme from brand color
+npx @annondeveloper/ui-kit figma-export --theme <name> --output <file>  # Export Figma tokens
 ```
+
+## v2.5 Features
+
+- **Motion Choreography** — `Choreography` class, 5 presets, `useScrollChoreography` hook
+- **Container Query Design Tokens** — `<ContainerQuery>`, `useContainerSize()`, `resolveResponsive()`
+- **View Transitions API** — `useViewTransition()` with 6 presets, `assignTransitionName()`
+- **Theme Editor** — Color harmony engine (5 types), WCAG contrast audit, 4 export formats
+- **AI Component Generator** — Template gallery, custom composition, 5 framework output
+- **CLI Scaffolding** — `create` command with 5 project templates, `figma-export` command
+- **Figma Plugin** — Token export as Figma Variables JSON, plugin import
+- **Performance Dashboard** — Bundle tracking, render profiler, Web Vitals, CI regression
 
 ## Accessibility Requirements
 
@@ -121,13 +134,13 @@ npx @annondeveloper/ui-kit theme         # Generate theme from brand color
 ## Core Engine Modules
 
 - `core/styles/` — useStyles(), css tag, adoptedStyleSheets, SSR StyleCollector
-- `core/motion/` — Spring solver, WAAPI, timeline, stagger, scroll, FLIP, morph, TextSplitter, controller (~3.5KB)
+- `core/motion/` — Spring solver, WAAPI, timeline, stagger, scroll, FLIP, morph, TextSplitter, controller, choreography, view transitions (~3.5KB)
 - `core/input/` — Unified pointer, gestures, focus, gamepad, multitouch, haptics (~2.4KB)
 - `core/tokens/` — OKLCH theme, generateTheme(), applyTheme(), validateContrast()
 - `core/a11y/` — useFocusTrap, useRovingTabindex, useLiveRegion, useStableId
 - `core/icons/` — ~50 built-in SVG icons, all overridable
 - `core/forms/` — createForm, useForm, validators, Form, FieldArray
-- `core/utils/` — cn(), formatting, sanitize, clamp
+- `core/utils/` — cn(), formatting, sanitize, clamp, container breakpoints, responsive props
 
 ## Performance Budgets
 

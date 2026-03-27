@@ -246,7 +246,7 @@ const SAMPLE_TEXT =
 // ─── Component ───────────────────────────────────────────────────────────────
 
 export default function HighlightPage() {
-  useStyles(pageStyles)
+  useStyles('highlight-page', pageStyles)
 
   const [copied, setCopied] = useState(false)
   const [search, setSearch] = useState('React')

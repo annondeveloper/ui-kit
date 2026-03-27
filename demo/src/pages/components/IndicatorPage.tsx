@@ -247,7 +247,7 @@ function AvatarBox() {
 }
 
 export default function IndicatorPage() {
-  useStyles(pageStyles)
+  useStyles('indicator-page', pageStyles)
 
   const [copied, setCopied] = useState(false)
 

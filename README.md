@@ -1,6 +1,6 @@
 # @annondeveloper/ui-kit v2
 
-> Zero-dependency React component library with 146 components, physics-based animations, OKLCH color system, and Aurora Fluid design.
+> Zero-dependency React component library with 147 components, physics-based animations, OKLCH color system, and Aurora Fluid design.
 
 ## Quick Start
 
@@ -26,8 +26,8 @@ function App() {
 ## Features
 
 - **Zero dependencies** — only `react` and `react-dom` peer deps
-- **146 components** — 72 general-purpose + 74 domain-specific across 3 weight tiers
-- **3 weight tiers** — Lite (144), Standard (146), Premium (144) — optimize your bundle
+- **147 components** — 73 general-purpose + 74 domain-specific across 3 weight tiers
+- **3 weight tiers** — Lite (144), Standard (147), Premium (145) — optimize your bundle
 - **Aurora Fluid design** — deep atmospheric surfaces, ambient glows, OKLCH colors
 - **Physics animations** — real spring solver, configurable motion levels (0-3)
 - **Built-in form engine** — `createForm`, `useForm`, validators, zero external deps
@@ -46,9 +46,49 @@ function App() {
 - [Animation](docs/animation.md) -- Physics springs, timeline, stagger, scroll
 - [Design Spec](docs/superpowers/specs/2026-03-20-ui-kit-v2-design.md) -- Full architecture document
 
+### New in v2.5
+
+- [Motion Choreography](docs/choreography.md) -- Sequenced multi-step animations with 5 presets
+- [Container Queries](docs/container-queries.md) -- Container-responsive design tokens and components
+- [View Transitions](docs/view-transitions.md) -- Native View Transitions API with 6 presets
+- [Theme Editor](docs/theme-editor.md) -- Color harmony, contrast audit, multi-format export
+- [AI Generator](docs/ai-generator.md) -- Template gallery, custom composition, 5 framework output
+- [CLI Scaffolding](docs/cli-scaffolding.md) -- Project templates, component add, Figma export
+- [Figma Plugin](docs/figma-plugin.md) -- Token sync between code and Figma Variables
+- [Performance Dashboard](docs/performance-dashboard.md) -- Bundle tracking, render profiler, Web Vitals
+
+## Next-Gen Features
+
+**Motion Choreography** -- Orchestrate multi-step animation sequences with `Choreography` class, 5 presets (cascade, stagger-grid, wave, spiral, focus-in), and scroll-triggered choreography via `useScrollChoreography`.
+
+**Container Query Design Tokens** -- `<ContainerQuery>` component, `useContainerSize()` hook, `resolveResponsive()` utility, and `CONTAINER_BREAKPOINTS` for building components that adapt to their container.
+
+**View Transitions API** -- `useViewTransition()` hook with 6 presets (morph, crossfade, slide-left, slide-right, slide-up, zoom) and `assignTransitionName()` for element morphing.
+
+**Theme Editor** -- Color harmony engine (5 types), WCAG contrast audit, export to CSS/Tailwind/Figma/CSS-in-JS, and shareable URL scheme.
+
+**AI Component Generator** -- Template gallery (dashboard, form, marketing, saas, docs), custom composition builder, and code output for React, Vue, Svelte, and HTML.
+
+**CLI Scaffolding** -- `add` copies components, `create` scaffolds full projects from 5 templates, `figma-export` generates Figma Variables JSON.
+
+**Figma Plugin** -- Export theme tokens as Figma Variables and import them via the Aurora UI Kit Token Sync plugin.
+
+**Performance Dashboard** -- Bundle size tracking with budget gauge, runtime render profiler, Web Vitals integration, and CI regression detection.
+
+## CLI Commands
+
+```bash
+npx @annondeveloper/ui-kit init                                    # Copy theme + setup
+npx @annondeveloper/ui-kit add <component> [--tier] [--out-dir]    # Copy component source
+npx @annondeveloper/ui-kit create <name> --template <template>     # Scaffold project
+npx @annondeveloper/ui-kit list                                    # List all 147 components
+npx @annondeveloper/ui-kit theme <color>                           # Generate theme CSS
+npx @annondeveloper/ui-kit figma-export --theme <name> --output <file>  # Export Figma tokens
+```
+
 ## Component List
 
-### General-Purpose Components (72)
+### General-Purpose Components (73)
 
 | Component | Description |
 |-----------|-------------|
@@ -204,6 +244,12 @@ function App() {
 | `ViewTransitionLink` | View Transitions API integration |
 | `WavyBackground` | Animated SVG sine waves |
 
+### New in v2.5 (1 component)
+
+| Component | Description |
+|-----------|-------------|
+| `ContainerQuery` | Container query wrapper with render-prop size info |
+
 ### New in v2.4 (30 components)
 
 The following components were added in the v2.4 release:
@@ -240,15 +286,15 @@ import '@annondeveloper/ui-kit/css/theme.css'  // Standalone CSS (optional)
 
 | Tier | Components | Description |
 |------|-----------|-------------|
-| Standard | 146 | Full-featured with motion, theming, a11y |
+| Standard | 147 | Full-featured with motion, theming, a11y |
 | Lite | 144 | Minimal wrappers, no motion (~0.3-1.2 KB each) |
-| Premium | 144 | Aurora glow, spring animations, shimmer effects |
+| Premium | 145 | Aurora glow, spring animations, shimmer effects |
 
 ## Bundle Size
 
 | Metric | Value |
 |--------|-------|
-| Total (gzipped) | 330.9 KB |
+| Total (gzipped) | 332.1 KB |
 | Budget | 350 KB |
 | Tree-shaking | Full ESM — import only what you use |
 

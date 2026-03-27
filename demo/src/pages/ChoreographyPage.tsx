@@ -653,7 +653,7 @@ function MyComponent() {
 /* ─── Main Page Component ─────────────────────────────────────────────────── */
 
 export default function ChoreographyPage() {
-  useStyles(pageStyles)
+  useStyles('choreography-page', pageStyles)
   const [activePreset, setActivePreset] = useState<ChoreographyPreset | null>(null)
   const [builderCode, setBuilderCode] = useState('')
 

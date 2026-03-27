@@ -234,7 +234,7 @@ const VARIANTS = ['outline', 'filled', 'light'] as const
 // ─── Component ───────────────────────────────────────────────────────────────
 
 export default function ChipPage() {
-  useStyles(pageStyles)
+  useStyles('chip-page', pageStyles)
 
   const [copied, setCopied] = useState(false)
   const [filters, setFilters] = useState<Record<string, boolean>>({

@@ -245,7 +245,7 @@ const IMPORT = "import { TransferList } from '@ui/components/transfer-list'"
 // ─── Component ───────────────────────────────────────────────────────────────
 
 export default function TransferListPage() {
-  useStyles(pageStyles)
+  useStyles('transfer-list-page', pageStyles)
 
   const [copied, setCopied] = useState(false)
   const [basic, setBasic] = useState<[TransferListItem[], TransferListItem[]]>([

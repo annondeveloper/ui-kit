@@ -245,7 +245,7 @@ const IMPORT = "import { Spotlight } from '@ui/components/spotlight'"
 // ─── Component ───────────────────────────────────────────────────────────────
 
 export default function SpotlightPage() {
-  useStyles(pageStyles)
+  useStyles('spotlight-page', pageStyles)
 
   const [copied, setCopied] = useState(false)
   const [spotlightOpen, setSpotlightOpen] = useState(false)

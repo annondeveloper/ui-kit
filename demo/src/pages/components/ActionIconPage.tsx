@@ -233,7 +233,7 @@ const SIZES = ['xs', 'sm', 'md', 'lg', 'xl'] as const
 // ─── Component ───────────────────────────────────────────────────────────────
 
 export default function ActionIconPage() {
-  useStyles(pageStyles)
+  useStyles('action-icon-page', pageStyles)
 
   const [copied, setCopied] = useState(false)
 

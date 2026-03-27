@@ -1,10 +1,23 @@
 # UI Kit v2 — Documentation
 
+## v2.5.0 Features
+
+The v2.5.0 release adds 8 new features and 1 new component (`ContainerQuery`), bringing the total to 147 components.
+
+- **[Motion Choreography](choreography.md)** — `Choreography` class for sequenced multi-step animations, 5 presets (cascade, stagger-grid, wave, spiral, focus-in), `useScrollChoreography` hook for scroll-triggered sequences
+- **[Container Query Design Tokens](container-queries.md)** — `<ContainerQuery>` component, `useContainerSize()` hook, `CONTAINER_BREAKPOINTS`, `resolveResponsive()` utility for container-responsive props
+- **[View Transitions API](view-transitions.md)** — `useViewTransition()` hook with 6 presets (morph, crossfade, slide-left, slide-right, slide-up, zoom), `assignTransitionName()` for element morphing
+- **[Theme Editor](theme-editor.md)** — Color harmony engine (5 types), WCAG contrast audit, 4 export formats (CSS, Tailwind, Figma Tokens, CSS-in-JS), shareable URL scheme
+- **[AI Component Generator](ai-generator.md)** — Template gallery (4 templates), custom composition builder, code output for 5 frameworks
+- **[CLI Scaffolding](cli-scaffolding.md)** — `create` command with 5 project templates, `figma-export` command, enhanced `add` with tier and output directory flags
+- **[Figma Plugin](figma-plugin.md)** — Token export as Figma Variables JSON, plugin import into Figma, Style Dictionary compatibility
+- **[Performance Dashboard](performance-dashboard.md)** — Bundle size tracking with budget gauge, runtime render profiler, Web Vitals integration, CI regression detection
+
 ## Overview
 
-`@annondeveloper/ui-kit` is a zero-dependency React component library with 146 components, physics-based animations, an OKLCH color system, and the Aurora Fluid design identity.
+`@annondeveloper/ui-kit` is a zero-dependency React component library with 147 components, physics-based animations, an OKLCH color system, and the Aurora Fluid design identity.
 
-- **146 components** across 3 weight tiers (Lite, Standard, Premium)
+- **147 components** across 3 weight tiers (Lite, Standard, Premium)
 - **Zero dependencies** — only `react` ^19 and `react-dom` ^19 as peer deps
 - **OKLCH color system** — perceptually uniform, with relative color syntax for theme generation
 - **Physics-based motion** — real spring solver (RK4 integration), 4 motion levels
@@ -53,20 +66,20 @@ import { Button, Badge, Card } from '@annondeveloper/ui-kit/lite'
 - Pure `className` + `data-*` attribute wrappers with `forwardRef`
 - Ideal for: landing pages, static sites, email templates, SSR
 
-### Standard (default) — 146 components
+### Standard (default) — 147 components
 
 ```tsx
 import { Button, Badge, Card } from '@annondeveloper/ui-kit'
 ```
 
 - ~1.5–5 KB per component (gzipped)
-- 72 general-purpose + 74 domain-specific components
+- 73 general-purpose + 74 domain-specific components
 - Motion levels 0–3 with real spring solver
 - OKLCH theming with `adoptedStyleSheets` auto-injection
 - `@scope` CSS isolation, `@layer components` cascade
 - Full keyboard navigation and ARIA patterns
 
-### Premium — 144 components
+### Premium — 145 components
 
 ```tsx
 import { Button, Badge, Card } from '@annondeveloper/ui-kit/premium'
@@ -92,17 +105,17 @@ import { DataTable } from '@annondeveloper/ui-kit'            // full-featured t
 
 | Tier | Components | Notes |
 |------|-----------|-------|
-| Lite | 144 | All except `ui-provider` and `native-tooltip` |
-| Standard | 146 | 72 general-purpose + 74 domain-specific |
-| Premium | 144 | All except `ui-provider` and `native-tooltip` |
+| Lite | 144 | All except `ui-provider`, `native-tooltip`, and `container-query` |
+| Standard | 147 | 73 general-purpose + 74 domain-specific |
+| Premium | 145 | All except `ui-provider` and `native-tooltip` |
 
 ## Entry Points
 
 | Path | Description | Components |
 |------|-------------|-----------|
-| `@annondeveloper/ui-kit` | Standard tier (default) | 146 |
+| `@annondeveloper/ui-kit` | Standard tier (default) | 147 |
 | `@annondeveloper/ui-kit/lite` | Lite tier | 144 |
-| `@annondeveloper/ui-kit/premium` | Premium tier | 144 |
+| `@annondeveloper/ui-kit/premium` | Premium tier | 145 |
 | `@annondeveloper/ui-kit/form` | Form engine | `createForm`, `useForm`, validators |
 | `@annondeveloper/ui-kit/theme` | Theme utilities | `generateTheme`, `applyTheme`, `themeToCSS`, `validateContrast` |
 | `@annondeveloper/ui-kit/css/theme.css` | Standalone theme CSS | Dark + light mode tokens |
@@ -140,7 +153,7 @@ Motion cascade: OS `prefers-reduced-motion` > component `motion` prop > CSS `--m
 
 ## Component Reference
 
-### General-Purpose (72)
+### General-Purpose (73)
 
 #### Buttons & Actions
 - **ActionIcon** — icon-only button with tooltip, 5 variants, 5 sizes
@@ -391,7 +404,7 @@ const result = validateContrast(theme)
 
 | Metric | Value |
 |--------|-------|
-| Total (gzipped) | 330.9 KB |
+| Total (gzipped) | 332.1 KB |
 | Budget | 350 KB |
 | Standard tier | ~149 KB gzip |
 | Premium tier | ~40 KB gzip |
@@ -413,6 +426,6 @@ Typical app importing ~20 components: **~15–25 KB gzipped** after tree-shaking
 ```bash
 npx @annondeveloper/ui-kit init          # Copy theme + utils
 npx @annondeveloper/ui-kit add <name>    # Copy component source
-npx @annondeveloper/ui-kit list          # List all 146 components
+npx @annondeveloper/ui-kit list          # List all 147 components
 npx @annondeveloper/ui-kit theme         # Generate theme from brand color
 ```
