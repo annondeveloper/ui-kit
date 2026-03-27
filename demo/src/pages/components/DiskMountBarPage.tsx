@@ -609,7 +609,7 @@ function PlaygroundSection() {
 // ─── Main Component ──────────────────────────────────────────────────────────
 
 export default function DiskMountBarPage() {
-  useStyles(pageStyles)
+  useStyles('disk-mount-bar-page', pageStyles)
   const { tier, setTier } = useTier()
 
   const Component = tier === 'lite' ? LiteDiskMountBar : tier === 'premium' ? PremiumDiskMountBar : DiskMountBar

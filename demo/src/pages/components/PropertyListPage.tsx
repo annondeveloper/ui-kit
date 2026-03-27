@@ -710,7 +710,7 @@ function PlaygroundSection() {
 // ─── Main Component ──────────────────────────────────────────────────────────
 
 export default function PropertyListPage() {
-  useStyles(pageStyles)
+  useStyles('property-list-page', pageStyles)
   const { tier, setTier } = useTier()
 
   const Component = tier === 'lite' ? LitePropertyList : tier === 'premium' ? PremiumPropertyList : PropertyList

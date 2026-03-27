@@ -729,7 +729,7 @@ function PlaygroundSection() {
 // ─── Main Component ──────────────────────────────────────────────────────────
 
 export default function EntityCardPage() {
-  useStyles(pageStyles)
+  useStyles('entity-card-page', pageStyles)
   const { tier, setTier } = useTier()
 
   const Component = tier === 'lite' ? LiteEntityCard : tier === 'premium' ? PremiumEntityCard : EntityCard

@@ -665,7 +665,7 @@ function PlaygroundSection() {
 // ─── Main Component ──────────────────────────────────────────────────────────
 
 export default function ServiceStripPage() {
-  useStyles(pageStyles)
+  useStyles('service-strip-page', pageStyles)
   const { tier, setTier } = useTier()
 
   const Component = tier === 'lite' ? LiteServiceStrip : tier === 'premium' ? PremiumServiceStrip : ServiceStrip
