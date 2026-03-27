@@ -46,7 +46,9 @@
     "dist"
   ],
   "scripts": {
-    "build": "tsup && tsup --config tsup.cli.config.ts && node scripts/extract-css.js",
+    "build": "tsup && tsup --config tsup.cli.config.ts && tsup --config tsup.mcp.config.ts && node scripts/extract-css.js",
+    "build:registry": "node dist/mcp/scripts/build-registry.js",
+    "build:mcp": "tsup --config tsup.mcp.config.ts && npm run build:registry",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
@@ -98,6 +100,10 @@
   ],
   "sideEffects": false,
   "bin": {
-    "ui-kit": "dist/cli/index.js"
+    "ui-kit": "dist/cli/index.js",
+    "ui-kit-mcp": "dist/mcp/index.js"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.28.0"
   }
 }
