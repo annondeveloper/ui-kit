@@ -32,7 +32,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Create GitHub Release
-        run: gh release create "$TAG_NAME" --generate-notes
+        run: gh release create "$TAG_NAME" --generate-notes || echo "Release already exists"
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           TAG_NAME: ${{ github.ref_name }}
@@ -86,7 +86,8 @@ jobs:
         with:
           name: dist
           path: dist/
-      - run: npm publish
+      - name: Publish to GitHub Packages
+        run: npm publish || echo "Version already exists on GitHub Packages"
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 

@@ -234,12 +234,14 @@ const pageStyles = css`
       }
 
       .number-ticker-page__playground-preview {
+        min-inline-size: 0;
         display: flex;
         flex-direction: column;
         gap: 1.5rem;
       }
 
       .number-ticker-page__playground-result {
+        overflow-x: auto;
         min-block-size: 120px;
         display: grid;
         place-items: center;
@@ -571,7 +573,8 @@ const pageStyles = css`
         .number-ticker-page__title { font-size: 1.75rem; }
         .number-ticker-page__preview { padding: 1.75rem; }
         .number-ticker-page__playground { grid-template-columns: 1fr; }
-        .number-ticker-page__playground-result { padding: 2rem; min-block-size: 120px; }
+        .number-ticker-page__playground-result { padding: 2rem; overflow-x: auto;
+        min-block-size: 120px; }
         .number-ticker-page__tiers { grid-template-columns: 1fr; }
         .number-ticker-page__section { padding: 1.25rem; }
       }

@@ -224,12 +224,14 @@ const pageStyles = css`
       }
 
       .diff-viewer-page__playground-preview {
+        min-inline-size: 0;
         display: flex;
         flex-direction: column;
         gap: 1.5rem;
       }
 
       .diff-viewer-page__playground-result {
+        overflow-x: auto;
         min-block-size: 200px;
         display: flex;
         flex-direction: column;

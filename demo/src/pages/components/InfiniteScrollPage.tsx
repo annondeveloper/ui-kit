@@ -250,6 +250,7 @@ const pageStyles = css`
       }
 
       .infinite-scroll-page__playground-preview {
+        min-inline-size: 0;
         display: flex;
         flex-direction: column;
         gap: 1.5rem;

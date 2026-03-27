@@ -183,9 +183,11 @@ const pageStyles = css`
         .otp-input-page__playground-controls { position: static !important; }
       }
 
-      .otp-input-page__playground-preview { display: flex; flex-direction: column; gap: 1.5rem; }
+      .otp-input-page__playground-preview { min-inline-size: 0;
+        display: flex; flex-direction: column; gap: 1.5rem; }
 
       .otp-input-page__playground-result {
+        overflow-x: auto;
         min-block-size: 200px; display: grid; place-items: center; padding: 3rem;
         background: var(--bg-base); border-radius: var(--radius-md);
         position: relative; overflow: hidden;
@@ -431,7 +433,8 @@ const pageStyles = css`
         .otp-input-page__title { font-size: 1.75rem; }
         .otp-input-page__preview { padding: 1.75rem; }
         .otp-input-page__playground { grid-template-columns: 1fr; }
-        .otp-input-page__playground-result { padding: 2rem; min-block-size: 120px; }
+        .otp-input-page__playground-result { padding: 2rem; overflow-x: auto;
+        min-block-size: 120px; }
         .otp-input-page__states-grid { grid-template-columns: 1fr; }
         .otp-input-page__tiers { grid-template-columns: 1fr; }
         .otp-input-page__section { padding: 1.25rem; }

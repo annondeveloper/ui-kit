@@ -241,12 +241,14 @@ const pageStyles = css`
       }
 
       .wavy-page__playground-preview {
+        min-inline-size: 0;
         display: flex;
         flex-direction: column;
         gap: 1.5rem;
       }
 
       .wavy-page__playground-result {
+        overflow-x: auto;
         min-block-size: 280px;
         display: grid;
         place-items: center;
@@ -536,7 +538,8 @@ const pageStyles = css`
         .wavy-page__title { font-size: 1.75rem; }
         .wavy-page__preview { padding: 1.75rem; }
         .wavy-page__playground { grid-template-columns: 1fr; }
-        .wavy-page__playground-result { padding: 2rem; min-block-size: 200px; }
+        .wavy-page__playground-result { padding: 2rem; overflow-x: auto;
+        min-block-size: 200px; }
         .wavy-page__tiers { grid-template-columns: 1fr; }
         .wavy-page__section { padding: 1.25rem; }
       }

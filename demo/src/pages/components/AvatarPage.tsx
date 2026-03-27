@@ -219,9 +219,11 @@ const pageStyles = css`
         .avatar-page__playground-controls { position: static !important; }
       }
 
-      .avatar-page__playground-preview { display: flex; flex-direction: column; gap: 1.5rem; }
+      .avatar-page__playground-preview { min-inline-size: 0;
+        display: flex; flex-direction: column; gap: 1.5rem; }
 
       .avatar-page__playground-result {
+        overflow-x: auto;
         min-block-size: 200px;
         display: grid;
         place-items: center;
@@ -472,7 +474,8 @@ const pageStyles = css`
         .avatar-page__title { font-size: 1.75rem; }
         .avatar-page__preview { padding: 1.75rem; }
         .avatar-page__playground { grid-template-columns: 1fr; }
-        .avatar-page__playground-result { padding: 2rem; min-block-size: 120px; }
+        .avatar-page__playground-result { padding: 2rem; overflow-x: auto;
+        min-block-size: 120px; }
         .avatar-page__tiers { grid-template-columns: 1fr; }
         .avatar-page__section { padding: 1.25rem; }
       }

@@ -207,9 +207,11 @@ const pageStyles = css`
         .search-input-page__playground-controls { position: static !important; }
       }
 
-      .search-input-page__playground-preview { display: flex; flex-direction: column; gap: 1.5rem; }
+      .search-input-page__playground-preview { min-inline-size: 0;
+        display: flex; flex-direction: column; gap: 1.5rem; }
 
       .search-input-page__playground-result {
+        overflow-x: auto;
         min-block-size: 200px;
         display: grid;
         place-items: center;
@@ -384,7 +386,8 @@ const pageStyles = css`
         .search-input-page__title { font-size: 1.75rem; }
         .search-input-page__preview { padding: 1.75rem; }
         .search-input-page__playground { grid-template-columns: 1fr; }
-        .search-input-page__playground-result { padding: 2rem; min-block-size: 120px; }
+        .search-input-page__playground-result { padding: 2rem; overflow-x: auto;
+        min-block-size: 120px; }
         .search-input-page__states-grid { grid-template-columns: 1fr; }
         .search-input-page__tiers { grid-template-columns: 1fr; }
         .search-input-page__section { padding: 1.25rem; }

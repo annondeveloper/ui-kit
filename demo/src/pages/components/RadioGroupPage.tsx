@@ -245,12 +245,14 @@ const pageStyles = css`
       }
 
       .radio-group-page__playground-preview {
+        min-inline-size: 0;
         display: flex;
         flex-direction: column;
         gap: 1.5rem;
       }
 
       .radio-group-page__playground-result {
+        overflow-x: auto;
         min-block-size: 200px;
         display: grid;
         place-items: center;
@@ -603,7 +605,8 @@ const pageStyles = css`
         .radio-group-page__title { font-size: 1.75rem; }
         .radio-group-page__preview { padding: 1.75rem; }
         .radio-group-page__playground { grid-template-columns: 1fr; }
-        .radio-group-page__playground-result { padding: 2rem; min-block-size: 120px; }
+        .radio-group-page__playground-result { padding: 2rem; overflow-x: auto;
+        min-block-size: 120px; }
         .radio-group-page__tiers { grid-template-columns: 1fr; }
         .radio-group-page__section { padding: 1.25rem; }
         .radio-group-page__states-grid { grid-template-columns: 1fr; }

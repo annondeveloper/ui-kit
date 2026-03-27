@@ -242,12 +242,14 @@ const pageStyles = css`
       }
 
       .status-pulse-page__playground-preview {
+        min-inline-size: 0;
         display: flex;
         flex-direction: column;
         gap: 1.5rem;
       }
 
       .status-pulse-page__playground-result {
+        overflow-x: auto;
         min-block-size: 200px;
         display: grid;
         place-items: center;
@@ -601,7 +603,8 @@ const pageStyles = css`
         .status-pulse-page__title { font-size: 1.75rem; }
         .status-pulse-page__preview { padding: 1.75rem; }
         .status-pulse-page__playground { grid-template-columns: 1fr; }
-        .status-pulse-page__playground-result { padding: 2rem; min-block-size: 120px; }
+        .status-pulse-page__playground-result { padding: 2rem; overflow-x: auto;
+        min-block-size: 120px; }
         .status-pulse-page__labeled-row { gap: 1rem; }
         .status-pulse-page__states-grid { grid-template-columns: repeat(2, 1fr); }
         .status-pulse-page__tiers { grid-template-columns: 1fr; }

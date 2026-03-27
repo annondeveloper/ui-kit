@@ -247,12 +247,14 @@ const pageStyles = css`
       }
 
       .form-input-page__playground-preview {
+        min-inline-size: 0;
         display: flex;
         flex-direction: column;
         gap: 1.5rem;
       }
 
       .form-input-page__playground-result {
+        overflow-x: auto;
         min-block-size: 200px;
         display: grid;
         place-items: center;
@@ -613,7 +615,8 @@ const pageStyles = css`
         .form-input-page__title { font-size: 1.75rem; }
         .form-input-page__preview { padding: 1.75rem; }
         .form-input-page__playground { grid-template-columns: 1fr; }
-        .form-input-page__playground-result { padding: 2rem; min-block-size: 120px; }
+        .form-input-page__playground-result { padding: 2rem; overflow-x: auto;
+        min-block-size: 120px; }
         .form-input-page__labeled-row { gap: 1rem; }
         .form-input-page__states-grid { grid-template-columns: repeat(2, 1fr); }
         .form-input-page__tiers { grid-template-columns: 1fr; }

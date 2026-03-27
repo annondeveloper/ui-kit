@@ -219,12 +219,14 @@ const pageStyles = css`
       }
 
       .smart-table-page__playground-preview {
+        min-inline-size: 0;
         display: flex;
         flex-direction: column;
         gap: 1.5rem;
       }
 
       .smart-table-page__playground-result {
+        overflow-x: auto;
         min-block-size: 200px;
         padding: 1.5rem;
         background: var(--bg-base);

@@ -243,12 +243,14 @@ const pageStyles = css`
       }
 
       .date-picker-page__playground-preview {
+        min-inline-size: 0;
         display: flex;
         flex-direction: column;
         gap: 1.5rem;
       }
 
       .date-picker-page__playground-result {
+        overflow-x: auto;
         min-block-size: 380px;
         display: grid;
         place-items: start center;

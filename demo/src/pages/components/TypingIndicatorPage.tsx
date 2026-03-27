@@ -235,12 +235,14 @@ const pageStyles = css`
       }
 
       .typing-indicator-page__playground-preview {
+        min-inline-size: 0;
         display: flex;
         flex-direction: column;
         gap: 1.5rem;
       }
 
       .typing-indicator-page__playground-result {
+        overflow-x: auto;
         min-block-size: 200px;
         display: grid;
         place-items: center;
@@ -583,7 +585,8 @@ const pageStyles = css`
         .typing-indicator-page__title { font-size: 1.75rem; }
         .typing-indicator-page__preview { padding: 1.75rem; }
         .typing-indicator-page__playground { grid-template-columns: 1fr; }
-        .typing-indicator-page__playground-result { padding: 2rem; min-block-size: 120px; }
+        .typing-indicator-page__playground-result { padding: 2rem; overflow-x: auto;
+        min-block-size: 120px; }
         .typing-indicator-page__tiers { grid-template-columns: 1fr; }
         .typing-indicator-page__section { padding: 1.25rem; }
       }

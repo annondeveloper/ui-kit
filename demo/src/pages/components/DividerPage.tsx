@@ -243,12 +243,14 @@ const pageStyles = css`
       }
 
       .divider-page__playground-preview {
+        min-inline-size: 0;
         display: flex;
         flex-direction: column;
         gap: 1.5rem;
       }
 
       .divider-page__playground-result {
+        overflow-x: auto;
         min-block-size: 200px;
         display: flex;
         align-items: center;

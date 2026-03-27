@@ -236,12 +236,14 @@ const pageStyles = css`
       }
 
       .log-viewer-page__playground-preview {
+        min-inline-size: 0;
         display: flex;
         flex-direction: column;
         gap: 1.5rem;
       }
 
       .log-viewer-page__playground-result {
+        overflow-x: auto;
         min-block-size: 200px;
         padding: 1rem;
         background: var(--bg-surface);

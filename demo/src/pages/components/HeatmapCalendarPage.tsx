@@ -206,12 +206,14 @@ const pageStyles = css`
       }
 
       .heatmap-calendar-page__playground-preview {
+        min-inline-size: 0;
         display: flex;
         flex-direction: column;
         gap: 1.5rem;
       }
 
       .heatmap-calendar-page__playground-result {
+        overflow-x: auto;
         min-block-size: 180px;
         display: flex;
         justify-content: center;
