@@ -890,6 +890,11 @@ export default function PerformancePage() {
           Web Vitals
         </h2>
 
+        <p style={{ fontSize: 'var(--text-sm)', color: 'var(--text-secondary)', marginBlockEnd: '1rem', lineHeight: 1.6 }}>
+          Core Web Vitals measure real user experience. <strong>LCP</strong> = how fast the main content loads.
+          <strong> CLS</strong> = how much the layout shifts while loading (lower is better).
+          <strong> INP</strong> = how fast the page responds to clicks/taps. Interact with the page to see INP update.
+        </p>
         <div className="perf__card">
           <div className="perf__vitals">
             <VitalGauge
@@ -921,6 +926,10 @@ export default function PerformancePage() {
           Render Profiler
         </h2>
 
+        <p style={{ fontSize: 'var(--text-sm)', color: 'var(--text-secondary)', marginBlockEnd: '1rem', lineHeight: 1.6 }}>
+          Measures how fast this page renders over a 3-second sampling window. Lower is better.
+          {timing.status === 'sampling' ? ' Sampling in progress...' : ` Sampling complete — ${timing.renderCount} samples collected.`}
+        </p>
         <div className="perf__card">
           <div className="perf__profiler">
             <div className="perf__profiler-stat">
@@ -928,8 +937,8 @@ export default function PerformancePage() {
               <span className="perf__profiler-label">Component</span>
             </div>
             <div className="perf__profiler-stat">
-              <span className="perf__profiler-value">{timing.renderCount}</span>
-              <span className="perf__profiler-label">Renders</span>
+              <span className="perf__profiler-value">{timing.renderCount}{timing.status === 'sampling' ? '...' : ''}</span>
+              <span className="perf__profiler-label">Samples</span>
             </div>
             <div className="perf__profiler-stat">
               <span className="perf__profiler-value">{formatMs(timing.lastRenderMs)}</span>
