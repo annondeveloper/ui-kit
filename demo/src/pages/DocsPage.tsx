@@ -7,23 +7,47 @@ import migrationMd from '../../../docs/migration-v2.md?raw'
 import themingMd from '../../../docs/theming.md?raw'
 import formsMd from '../../../docs/forms.md?raw'
 import animationMd from '../../../docs/animation.md?raw'
+import choreographyMd from '../../../docs/choreography.md?raw'
+import containerQueriesMd from '../../../docs/container-queries.md?raw'
+import viewTransitionsMd from '../../../docs/view-transitions.md?raw'
+import themeEditorMd from '../../../docs/theme-editor.md?raw'
+import aiGeneratorMd from '../../../docs/ai-generator.md?raw'
+import cliScaffoldingMd from '../../../docs/cli-scaffolding.md?raw'
+import figmaPluginMd from '../../../docs/figma-plugin.md?raw'
+import performanceMd from '../../../docs/performance-dashboard.md?raw'
 
 const docTabs = [
-  { id: 'migration', label: 'Overview & API' },
+  { id: 'overview', label: 'Overview' },
   { id: 'theming', label: 'Theming' },
-  { id: 'forms', label: 'Form Engine' },
+  { id: 'forms', label: 'Forms' },
   { id: 'animation', label: 'Animation' },
+  { id: 'choreography', label: 'Choreography' },
+  { id: 'container-queries', label: 'Container Queries' },
+  { id: 'view-transitions', label: 'View Transitions' },
+  { id: 'theme-editor', label: 'Theme Editor' },
+  { id: 'ai-generator', label: 'AI Generator' },
+  { id: 'cli', label: 'CLI' },
+  { id: 'figma', label: 'Figma' },
+  { id: 'performance', label: 'Performance' },
 ]
 
 const docs: Record<string, string> = {
-  migration: migrationMd,
+  overview: migrationMd,
   theming: themingMd,
   forms: formsMd,
   animation: animationMd,
+  choreography: choreographyMd,
+  'container-queries': containerQueriesMd,
+  'view-transitions': viewTransitionsMd,
+  'theme-editor': themeEditorMd,
+  'ai-generator': aiGeneratorMd,
+  cli: cliScaffoldingMd,
+  figma: figmaPluginMd,
+  performance: performanceMd,
 }
 
 export default function DocsPage() {
-  const [activeTab, setActiveTab] = useState('migration')
+  const [activeTab, setActiveTab] = useState('overview')
 
   return (
     <div>

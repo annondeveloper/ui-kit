@@ -1,4 +1,4 @@
-import { useRef, useEffect, useState } from 'react'
+import { useRef, useState, useEffect } from 'react'
 
 export interface RenderTiming {
   componentName: string
@@ -7,32 +7,26 @@ export interface RenderTiming {
   averageRenderMs: number
 }
 
+/**
+ * Measures component render time. Only updates state ONCE on mount
+ * to avoid infinite re-render loops. Subsequent renders update refs only.
+ */
 export function useRenderTime(componentName: string): RenderTiming {
-  const renderStart = useRef(performance.now())
-  const renderCount = useRef(0)
-  const totalMs = useRef(0)
-  const [timing, setTiming] = useState<RenderTiming>({
+  const mountTime = useRef(performance.now())
+  const [timing] = useState<RenderTiming>(() => ({
     componentName,
-    renderCount: 0,
+    renderCount: 1,
     lastRenderMs: 0,
     averageRenderMs: 0,
-  })
+  }))
 
-  // Capture render start time on every render
-  renderStart.current = performance.now()
-
+  // Measure mount time once — no state updates to avoid loops
   useEffect(() => {
-    const elapsed = performance.now() - renderStart.current
-    renderCount.current += 1
-    totalMs.current += elapsed
-
-    setTiming({
-      componentName,
-      renderCount: renderCount.current,
-      lastRenderMs: Math.round(elapsed * 100) / 100,
-      averageRenderMs: Math.round((totalMs.current / renderCount.current) * 100) / 100,
-    })
-  })
+    const elapsed = performance.now() - mountTime.current
+    // Mutate the object directly to avoid re-renders
+    timing.lastRenderMs = Math.round(elapsed * 100) / 100
+    timing.averageRenderMs = timing.lastRenderMs
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   return timing
 }
