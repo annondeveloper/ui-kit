@@ -374,6 +374,52 @@ const homeStyles = css`
       text-wrap: balance;
     }
 
+    /* ─── Next-Gen Features ─── */
+    .home-features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 1rem;
+    }
+
+    .home-nextgen-card {
+      display: flex;
+      gap: 1rem;
+      padding: 1.25rem;
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--border-default);
+      background: var(--bg-elevated);
+      box-shadow: var(--shadow-sm);
+      transition: border-color 0.2s, box-shadow 0.2s, transform 0.15s;
+      color: inherit;
+    }
+    .home-nextgen-card:hover {
+      border-color: var(--brand);
+      box-shadow: var(--shadow-md), 0 0 0 1px var(--brand);
+      transform: translateY(-2px);
+    }
+    .home-nextgen-icon {
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      inline-size: 2.5rem;
+      block-size: 2.5rem;
+      border-radius: var(--radius-md);
+      background: oklch(from var(--brand) l c h / 0.12);
+      color: var(--brand);
+    }
+    .home-nextgen-title {
+      font-size: 0.9375rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-block-end: 0.25rem;
+    }
+    .home-nextgen-desc {
+      font-size: 0.8125rem;
+      color: var(--text-secondary);
+      line-height: 1.5;
+    }
+
     /* ─── Component Gallery ─── */
     .home-gallery-filters {
       display: flex;
@@ -1082,7 +1128,7 @@ export default function Home() {
 
         <div className="home-hero-entrance">
           <p className="home-hero-sub">
-            146 components. Physics-based animations. OKLCH color system.
+            147 components. Physics-based animations. OKLCH color system.
             Aurora Fluid design language. 3 weight tiers. Zero dependencies.
           </p>
         </div>
@@ -1126,7 +1172,7 @@ export default function Home() {
           <div className="home-stats">
             <div className="home-stat-cell">
               <div className="home-stat-inner">
-                <span className="home-stat-value">146</span>
+                <span className="home-stat-value">147</span>
                 <span className="home-stat-label">Components</span>
               </div>
             </div>
@@ -1151,6 +1197,34 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+      {/* ── Next-Gen Features ── */}
+      <RevealSection className="home-section">
+        <div className="home-section-header">
+          <h2>Next-Gen Features</h2>
+          <p>8 groundbreaking capabilities that set this library apart from everything else.</p>
+        </div>
+        <div className="home-features-grid">
+          {[
+            { icon: 'layers' as IconName, title: 'Motion Choreography', desc: 'Declarative multi-step animation sequences with 5 presets. Cascade, wave, spiral, stagger-grid, focus-in.', link: '/ui-kit/choreography' },
+            { icon: 'box' as IconName, title: 'Container Query Tokens', desc: 'useContainerSize() hook + responsive props. Components adapt to their container, not the viewport.', link: '/ui-kit/docs' },
+            { icon: 'zap' as IconName, title: 'View Transitions', desc: 'useViewTransition() with 6 presets. Morphing route transitions, crossfade, slide, zoom — zero config.', link: '/ui-kit/docs' },
+            { icon: 'palette' as IconName, title: 'Theme Editor', desc: 'Color harmony engine, WCAG contrast audit, 4 export formats (CSS, Tailwind, Figma, CSS-in-JS), shareable URLs.', link: '/ui-kit/themes' },
+            { icon: 'code' as IconName, title: 'AI Code Generator', desc: 'Natural language to component composition. 4 templates, 5 framework outputs (React, Vue, Angular, Svelte, HTML).', link: '/ui-kit/generator' },
+            { icon: 'bar-chart' as IconName, title: 'Performance Dashboard', desc: 'Bundle size tracking, render profiler, Web Vitals gauges, CI regression detection.', link: '/ui-kit/performance' },
+            { icon: 'terminal' as IconName, title: 'CLI Scaffolding', desc: 'ui-kit add/create commands, 5 project templates, Figma token export, interactive mode.', link: '/ui-kit/docs' },
+            { icon: 'image' as IconName, title: 'Figma Plugin', desc: 'Export design tokens as Figma Variables JSON, Style Dictionary format, component mapping.', link: '/ui-kit/docs' },
+          ].map((f, i) => (
+            <Link key={i} to={f.link} className="home-nextgen-card" style={{ textDecoration: 'none' }}>
+              <div className="home-nextgen-icon"><Icon name={f.icon} size={20} /></div>
+              <div>
+                <div className="home-nextgen-title">{f.title}</div>
+                <div className="home-nextgen-desc">{f.desc}</div>
+              </div>
+            </Link>
+          ))}
+        </div>
+      </RevealSection>
 
       {/* ── Component Gallery ── */}
       <RevealSection className="home-section">
