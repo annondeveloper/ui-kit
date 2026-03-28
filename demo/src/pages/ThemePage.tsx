@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useRef, useMemo } from 'react'
-import { generateTheme, themeToCSS, applyTheme } from '@ui/core/tokens/generator'
+import { generateTheme, themeToCSS } from '@ui/core/tokens/generator'
 import type { ThemeName } from '@ui/core/tokens/themes'
 import { ColorInput } from '@ui/components/color-input'
 import { Button } from '@ui/components/button'
@@ -250,22 +250,18 @@ export default function ThemePage() {
   const [exportTab, setExportTab] = useState<'css' | 'tailwind' | 'figma' | 'cssinjs'>('css')
   const originalThemeRef = useRef<Record<string, string> | null>(null)
 
-  // Capture original theme on mount for cleanup
+  // Capture original brand tokens on mount for cleanup
   useEffect(() => {
     const root = document.documentElement
     const original: Record<string, string> = {}
-    const vars = ['--brand', '--brand-light', '--brand-dark', '--brand-subtle', '--brand-glow',
-      '--bg-base', '--bg-surface', '--bg-elevated', '--bg-overlay',
-      '--border-subtle', '--border-default', '--border-strong', '--border-glow',
-      '--text-primary', '--text-secondary', '--text-tertiary', '--text-disabled',
-      '--status-ok', '--status-warning', '--status-critical', '--status-info',
-      '--aurora-1', '--aurora-2']
-    for (const v of vars) {
+    const brandVars = ['--brand', '--brand-light', '--brand-dark', '--brand-subtle', '--brand-glow',
+      '--border-glow', '--aurora-1', '--aurora-2']
+    for (const v of brandVars) {
       original[v] = root.style.getPropertyValue(v)
     }
     originalThemeRef.current = original
     return () => {
-      // Restore original values on unmount
+      // Restore original brand values on unmount
       if (originalThemeRef.current) {
         for (const [prop, val] of Object.entries(originalThemeRef.current)) {
           if (val) {
@@ -278,11 +274,26 @@ export default function ThemePage() {
     }
   }, [])
 
-  // Generate and apply theme when color or mode changes
+  // Generate theme — apply ONLY brand tokens to document root (not surface/text/border)
+  // Surface/text/border tokens are managed by the site's own light/dark mode toggle
   useEffect(() => {
     const mode = darkMode ? 'dark' : 'light'
     const theme = generateTheme(brandColor, mode)
-    applyTheme(theme)
+    const root = document.documentElement
+    // Only apply brand-related tokens, NOT surface/text/border tokens
+    const brandOnlyKeys: (keyof typeof theme)[] = [
+      'brand', 'brandLight', 'brandDark', 'brandSubtle', 'brandGlow',
+      'borderGlow', 'aurora1', 'aurora2',
+    ]
+    const tokenToCSS: Record<string, string> = {
+      brand: '--brand', brandLight: '--brand-light', brandDark: '--brand-dark',
+      brandSubtle: '--brand-subtle', brandGlow: '--brand-glow',
+      borderGlow: '--border-glow', aurora1: '--aurora-1', aurora2: '--aurora-2',
+    }
+    for (const key of brandOnlyKeys) {
+      const cssVar = tokenToCSS[key]
+      if (cssVar && theme[key]) root.style.setProperty(cssVar, theme[key])
+    }
   }, [brandColor, darkMode])
 
   // Sync URL hash
