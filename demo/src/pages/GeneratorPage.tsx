@@ -179,12 +179,58 @@ const styles = css`
       border-radius: 8px;
       background: var(--bg-elevated);
       cursor: pointer;
-      transition: background 0.15s;
+      transition: background 0.15s, opacity 0.15s, transform 0.15s;
       user-select: none;
 
       &:hover {
         background: var(--bg-hover);
       }
+
+      &[draggable='true'] {
+        cursor: grab;
+      }
+
+      &[draggable='true']:active {
+        cursor: grabbing;
+      }
+
+      &.gen-dragging {
+        opacity: 0.4;
+        transform: scale(0.97);
+      }
+    }
+
+    .gen-drag-handle {
+      display: flex;
+      align-items: center;
+      color: var(--text-tertiary);
+      flex-shrink: 0;
+      cursor: grab;
+      touch-action: none;
+
+      &:active {
+        cursor: grabbing;
+      }
+    }
+
+    .gen-drag-handle__icon {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      width: 12px;
+      align-items: center;
+    }
+
+    .gen-drag-handle__dots {
+      display: flex;
+      gap: 2px;
+    }
+
+    .gen-drag-handle__dot {
+      width: 3px;
+      height: 3px;
+      border-radius: 50%;
+      background: currentColor;
     }
 
     .gen-component-item__name {
@@ -209,32 +255,106 @@ const styles = css`
       display: flex;
       flex-direction: column;
       gap: 0.375rem;
+      min-height: 60px;
     }
 
     .gen-selected-item {
       display: flex;
       align-items: center;
-      justify-content: space-between;
+      gap: 0.5rem;
       padding: 0.5rem 0.75rem;
       border-radius: 8px;
       background: oklch(from var(--brand) l c h / 0.1);
       border: 1px solid oklch(from var(--brand) l c h / 0.2);
+      transition: opacity 0.15s, transform 0.15s;
+
+      &[draggable='true'] {
+        cursor: grab;
+      }
+
+      &[draggable='true']:active {
+        cursor: grabbing;
+      }
+
+      &.gen-dragging {
+        opacity: 0.4;
+        transform: scale(0.97);
+      }
     }
 
     .gen-selected-item__name {
       font-size: 0.875rem;
       font-weight: 600;
+      flex: 1;
+    }
+
+    .gen-composition-drop-zone {
+      min-height: 200px;
+      border-radius: 12px;
+      border: 2px dashed var(--border-default);
+      transition: border-color 0.2s, background 0.2s, box-shadow 0.2s;
+      padding: 0.5rem;
+    }
+
+    .gen-composition-drop-zone[data-drag-over='true'] {
+      border-color: var(--brand);
+      background: oklch(from var(--brand) l c h / 0.05);
+      box-shadow: 0 0 0 3px oklch(from var(--brand) l c h / 0.1);
     }
 
     .gen-selected-empty {
       display: flex;
+      flex-direction: column;
       align-items: center;
       justify-content: center;
       height: 200px;
-      border-radius: 12px;
-      border: 2px dashed var(--border-default);
       color: var(--text-secondary);
       font-size: 0.875rem;
+      gap: 0.5rem;
+    }
+
+    .gen-selected-empty__icon {
+      color: var(--text-tertiary);
+      opacity: 0.5;
+    }
+
+    .gen-drag-indicator {
+      height: 2px;
+      background: var(--brand);
+      border-radius: 1px;
+      margin: -1px 0;
+      transition: opacity 0.1s;
+      box-shadow: 0 0 4px oklch(from var(--brand) l c h / 0.4);
+    }
+
+    .gen-item-enter {
+      animation: gen-item-slide-in 0.2s ease-out;
+    }
+
+    @keyframes gen-item-slide-in {
+      from {
+        opacity: 0;
+        transform: translateY(-8px) scale(0.95);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+
+    .gen-item-remove {
+      animation: gen-item-slide-out 0.15s ease-in forwards;
+    }
+
+    @keyframes gen-item-slide-out {
+      from {
+        opacity: 1;
+        transform: translateX(0) scale(1);
+      }
+      to {
+        opacity: 0;
+        transform: translateX(20px) scale(0.95);
+      }
     }
 
     /* ── Layout Selector ──────────────────────────────────────────────── */
@@ -862,6 +982,22 @@ export default function GeneratorPage() {
   const [activeTier, setActiveTier] = useState<string>(tier)
   const [mode, setMode] = useState<'template' | 'custom'>('template')
 
+  // Drag-and-drop state
+  const [dragSource, setDragSource] = useState<{ type: 'available' | 'composition'; index: number; name: string } | null>(null)
+  const [dragOverComposition, setDragOverComposition] = useState(false)
+  const [dropIndicatorIndex, setDropIndicatorIndex] = useState<number | null>(null)
+  const [recentlyAdded, setRecentlyAdded] = useState<number | null>(null)
+  const compositionRef = useRef<HTMLDivElement>(null)
+  const touchStateRef = useRef<{
+    active: boolean
+    identifier: number
+    startX: number
+    startY: number
+    element: HTMLElement | null
+    ghost: HTMLElement | null
+    source: { type: 'available' | 'composition'; index: number; name: string } | null
+  }>({ active: false, identifier: -1, startX: 0, startY: 0, element: null, ghost: null, source: null })
+
   // Database
   const allComponents = useMemo(() => getComponentDatabase(), [])
   const filteredComponents = useMemo(() => searchComponents(searchQuery), [searchQuery])
@@ -882,10 +1018,19 @@ export default function GeneratorPage() {
     setMode('template')
   }, [])
 
-  const addComponent = useCallback((c: ComponentInfo) => {
-    setCustomComponents(prev => [...prev, c])
+  const addComponent = useCallback((c: ComponentInfo, atIndex?: number) => {
+    setCustomComponents(prev => {
+      if (atIndex !== undefined && atIndex >= 0 && atIndex <= prev.length) {
+        const next = [...prev]
+        next.splice(atIndex, 0, c)
+        return next
+      }
+      return [...prev, c]
+    })
     setMode('custom')
     setSelectedTemplate(null)
+    setRecentlyAdded(atIndex ?? null)
+    setTimeout(() => setRecentlyAdded(null), 250)
   }, [])
 
   const removeComponent = useCallback((index: number) => {
@@ -895,6 +1040,228 @@ export default function GeneratorPage() {
   const clearComponents = useCallback(() => {
     setCustomComponents([])
   }, [])
+
+  const moveComponent = useCallback((fromIndex: number, toIndex: number) => {
+    setCustomComponents(prev => {
+      const next = [...prev]
+      const [moved] = next.splice(fromIndex, 1)
+      const adjustedTo = toIndex > fromIndex ? toIndex - 1 : toIndex
+      next.splice(adjustedTo, 0, moved)
+      return next
+    })
+  }, [])
+
+  // ── Drag handlers for Available items ──
+  const handleAvailableDragStart = useCallback((e: React.DragEvent, c: ComponentInfo, index: number) => {
+    setDragSource({ type: 'available', index, name: c.name })
+    e.dataTransfer.setData('text/plain', JSON.stringify({ type: 'available', name: c.name, index }))
+    e.dataTransfer.effectAllowed = 'copyMove'
+    const target = e.currentTarget as HTMLElement
+    target.classList.add('gen-dragging')
+  }, [])
+
+  const handleDragEnd = useCallback((e: React.DragEvent) => {
+    const target = e.currentTarget as HTMLElement
+    target.classList.remove('gen-dragging')
+    setDragSource(null)
+    setDragOverComposition(false)
+    setDropIndicatorIndex(null)
+  }, [])
+
+  // ── Drag handlers for Composition items (reorder) ──
+  const handleCompositionDragStart = useCallback((e: React.DragEvent, index: number, name: string) => {
+    setDragSource({ type: 'composition', index, name })
+    e.dataTransfer.setData('text/plain', JSON.stringify({ type: 'composition', name, index }))
+    e.dataTransfer.effectAllowed = 'move'
+    const target = e.currentTarget as HTMLElement
+    target.classList.add('gen-dragging')
+  }, [])
+
+  // ── Drop zone handlers ──
+  const handleCompositionDragOver = useCallback((e: React.DragEvent) => {
+    e.preventDefault()
+    e.dataTransfer.dropEffect = dragSource?.type === 'available' ? 'copy' : 'move'
+    setDragOverComposition(true)
+
+    // Calculate insertion index based on mouse Y position
+    const zone = compositionRef.current
+    if (!zone) return
+    const items = zone.querySelectorAll('.gen-selected-item')
+    let insertIdx = items.length
+    for (let i = 0; i < items.length; i++) {
+      const rect = items[i].getBoundingClientRect()
+      const midY = rect.top + rect.height / 2
+      if (e.clientY < midY) {
+        insertIdx = i
+        break
+      }
+    }
+    setDropIndicatorIndex(insertIdx)
+  }, [dragSource])
+
+  const handleCompositionDragLeave = useCallback((e: React.DragEvent) => {
+    // Only handle if leaving the zone itself, not entering a child
+    const related = e.relatedTarget as Node | null
+    const zone = compositionRef.current
+    if (zone && related && zone.contains(related)) return
+    setDragOverComposition(false)
+    setDropIndicatorIndex(null)
+  }, [])
+
+  const handleCompositionDrop = useCallback((e: React.DragEvent) => {
+    e.preventDefault()
+    setDragOverComposition(false)
+    setDropIndicatorIndex(null)
+
+    let data: { type: string; name: string; index: number }
+    try {
+      data = JSON.parse(e.dataTransfer.getData('text/plain'))
+    } catch {
+      return
+    }
+
+    // Calculate drop index
+    const zone = compositionRef.current
+    let insertIdx = customComponents.length
+    if (zone) {
+      const items = zone.querySelectorAll('.gen-selected-item')
+      for (let i = 0; i < items.length; i++) {
+        const rect = items[i].getBoundingClientRect()
+        const midY = rect.top + rect.height / 2
+        if (e.clientY < midY) {
+          insertIdx = i
+          break
+        }
+      }
+    }
+
+    if (data.type === 'available') {
+      // Add from available list
+      const comp = allComponents.find(c => c.name === data.name)
+      if (comp) addComponent(comp, insertIdx)
+    } else if (data.type === 'composition') {
+      // Reorder within composition
+      moveComponent(data.index, insertIdx)
+    }
+
+    setDragSource(null)
+  }, [customComponents, allComponents, addComponent, moveComponent])
+
+  // ── Touch drag support ──
+  const createTouchGhost = useCallback((el: HTMLElement, x: number, y: number) => {
+    const ghost = el.cloneNode(true) as HTMLElement
+    ghost.style.position = 'fixed'
+    ghost.style.left = `${x - el.offsetWidth / 2}px`
+    ghost.style.top = `${y - el.offsetHeight / 2}px`
+    ghost.style.width = `${el.offsetWidth}px`
+    ghost.style.pointerEvents = 'none'
+    ghost.style.zIndex = '9999'
+    ghost.style.opacity = '0.85'
+    ghost.style.transform = 'scale(1.05)'
+    ghost.style.boxShadow = '0 8px 24px oklch(0% 0 0 / 0.25)'
+    ghost.style.borderRadius = '8px'
+    ghost.style.transition = 'transform 0.1s'
+    document.body.appendChild(ghost)
+    return ghost
+  }, [])
+
+  const handleTouchStart = useCallback((e: React.TouchEvent, source: { type: 'available' | 'composition'; index: number; name: string }) => {
+    const touch = e.touches[0]
+    const ts = touchStateRef.current
+    ts.active = false // Don't activate until move threshold
+    ts.identifier = touch.identifier
+    ts.startX = touch.clientX
+    ts.startY = touch.clientY
+    ts.element = e.currentTarget as HTMLElement
+    ts.source = source
+    ts.ghost = null
+  }, [])
+
+  const handleTouchMove = useCallback((e: React.TouchEvent) => {
+    const ts = touchStateRef.current
+    const touch = Array.from(e.touches).find(t => t.identifier === ts.identifier)
+    if (!touch || !ts.element) return
+
+    const dx = touch.clientX - ts.startX
+    const dy = touch.clientY - ts.startY
+
+    // Activate drag after threshold
+    if (!ts.active) {
+      if (Math.abs(dx) + Math.abs(dy) < 10) return
+      ts.active = true
+      ts.ghost = createTouchGhost(ts.element, touch.clientX, touch.clientY)
+      ts.element.classList.add('gen-dragging')
+      e.preventDefault()
+    }
+
+    if (!ts.active) return
+    e.preventDefault()
+
+    // Move ghost
+    if (ts.ghost) {
+      ts.ghost.style.left = `${touch.clientX - ts.element.offsetWidth / 2}px`
+      ts.ghost.style.top = `${touch.clientY - ts.element.offsetHeight / 2}px`
+    }
+
+    // Check if over composition zone
+    const zone = compositionRef.current
+    if (!zone) return
+    const zoneRect = zone.getBoundingClientRect()
+    const overZone = touch.clientX >= zoneRect.left && touch.clientX <= zoneRect.right &&
+                     touch.clientY >= zoneRect.top && touch.clientY <= zoneRect.bottom
+
+    setDragOverComposition(overZone)
+
+    if (overZone) {
+      const items = zone.querySelectorAll('.gen-selected-item')
+      let idx = items.length
+      for (let i = 0; i < items.length; i++) {
+        const rect = items[i].getBoundingClientRect()
+        if (touch.clientY < rect.top + rect.height / 2) {
+          idx = i
+          break
+        }
+      }
+      setDropIndicatorIndex(idx)
+    } else {
+      setDropIndicatorIndex(null)
+    }
+  }, [createTouchGhost])
+
+  const handleTouchEnd = useCallback((_e: React.TouchEvent) => {
+    const ts = touchStateRef.current
+    if (ts.ghost) {
+      ts.ghost.remove()
+      ts.ghost = null
+    }
+    if (ts.element) {
+      ts.element.classList.remove('gen-dragging')
+    }
+
+    if (ts.active && ts.source) {
+      const zone = compositionRef.current
+      if (dragOverComposition && zone) {
+        // Determine drop index from indicator
+        const insertIdx = dropIndicatorIndex ?? customComponents.length
+
+        if (ts.source.type === 'available') {
+          const comp = allComponents.find(c => c.name === ts.source!.name)
+          if (comp) addComponent(comp, insertIdx)
+        } else if (ts.source.type === 'composition') {
+          moveComponent(ts.source.index, insertIdx)
+        }
+      } else if (ts.source.type === 'composition') {
+        // Dragged out of composition zone — remove
+        removeComponent(ts.source.index)
+      }
+    }
+
+    ts.active = false
+    ts.source = null
+    ts.element = null
+    setDragOverComposition(false)
+    setDropIndicatorIndex(null)
+  }, [dragOverComposition, dropIndicatorIndex, customComponents, allComponents, addComponent, moveComponent, removeComponent])
 
   return (
     <div className="gen-page">
@@ -992,8 +1359,25 @@ export default function GeneratorPage() {
               style={{ marginBlockEnd: '0.75rem' }}
             />
             <div className="gen-component-list">
-              {filteredComponents.map((c) => (
-                <div key={c.name} className="gen-component-item" onClick={() => addComponent(c)}>
+              {filteredComponents.map((c, idx) => (
+                <div
+                  key={c.name}
+                  className="gen-component-item"
+                  draggable
+                  onDragStart={(e) => handleAvailableDragStart(e, c, idx)}
+                  onDragEnd={handleDragEnd}
+                  onTouchStart={(e) => handleTouchStart(e, { type: 'available', index: idx, name: c.name })}
+                  onTouchMove={handleTouchMove}
+                  onTouchEnd={handleTouchEnd}
+                  onClick={() => addComponent(c)}
+                >
+                  <span className="gen-drag-handle" aria-hidden="true">
+                    <span className="gen-drag-handle__icon">
+                      <span className="gen-drag-handle__dots"><span className="gen-drag-handle__dot" /><span className="gen-drag-handle__dot" /></span>
+                      <span className="gen-drag-handle__dots"><span className="gen-drag-handle__dot" /><span className="gen-drag-handle__dot" /></span>
+                      <span className="gen-drag-handle__dots"><span className="gen-drag-handle__dot" /><span className="gen-drag-handle__dot" /></span>
+                    </span>
+                  </span>
                   <div style={{ minWidth: 0, flex: 1 }}>
                     <div className="gen-component-item__name">{c.name}</div>
                     <div className="gen-component-item__desc">{c.description}</div>
@@ -1015,22 +1399,60 @@ export default function GeneratorPage() {
                 <Button variant="ghost" size="sm" onClick={clearComponents}>Clear All</Button>
               )}
             </div>
-            {customComponents.length === 0 ? (
-              <div className="gen-selected-empty">
-                Click components on the left to add them
-              </div>
-            ) : (
-              <div className="gen-selected-list">
-                {customComponents.map((c, i) => (
-                  <div key={`${c.name}-${i}`} className="gen-selected-item">
-                    <span className="gen-selected-item__name">{c.name}</span>
-                    <button onClick={() => removeComponent(i)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-secondary)' }}>
-                      <Icon name="x" size="sm" />
-                    </button>
-                  </div>
-                ))}
-              </div>
-            )}
+            <div
+              ref={compositionRef}
+              className="gen-composition-drop-zone"
+              data-drag-over={dragOverComposition}
+              onDragOver={handleCompositionDragOver}
+              onDragLeave={handleCompositionDragLeave}
+              onDrop={handleCompositionDrop}
+            >
+              {customComponents.length === 0 ? (
+                <div className="gen-selected-empty">
+                  <span className="gen-selected-empty__icon" aria-hidden="true">
+                    <Icon name="plus" size={28} />
+                  </span>
+                  <span>Drop components here</span>
+                  <span style={{ fontSize: '0.75rem', color: 'var(--text-tertiary)' }}>
+                    or click items on the left to add
+                  </span>
+                </div>
+              ) : (
+                <div className="gen-selected-list">
+                  {customComponents.map((c, i) => (
+                    <div key={`${c.name}-${i}`}>
+                      {dropIndicatorIndex === i && dragOverComposition && (
+                        <div className="gen-drag-indicator" />
+                      )}
+                      <div
+                        className={`gen-selected-item${recentlyAdded === i ? ' gen-item-enter' : ''}`}
+                        draggable
+                        onDragStart={(e) => handleCompositionDragStart(e, i, c.name)}
+                        onDragEnd={handleDragEnd}
+                        onTouchStart={(e) => handleTouchStart(e, { type: 'composition', index: i, name: c.name })}
+                        onTouchMove={handleTouchMove}
+                        onTouchEnd={handleTouchEnd}
+                      >
+                        <span className="gen-drag-handle" aria-hidden="true">
+                          <span className="gen-drag-handle__icon">
+                            <span className="gen-drag-handle__dots"><span className="gen-drag-handle__dot" /><span className="gen-drag-handle__dot" /></span>
+                            <span className="gen-drag-handle__dots"><span className="gen-drag-handle__dot" /><span className="gen-drag-handle__dot" /></span>
+                            <span className="gen-drag-handle__dots"><span className="gen-drag-handle__dot" /><span className="gen-drag-handle__dot" /></span>
+                          </span>
+                        </span>
+                        <span className="gen-selected-item__name">{c.name}</span>
+                        <button onClick={() => removeComponent(i)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-secondary)', flexShrink: 0 }}>
+                          <Icon name="x" size="sm" />
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                  {dropIndicatorIndex === customComponents.length && dragOverComposition && (
+                    <div className="gen-drag-indicator" />
+                  )}
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </div>
