@@ -52,7 +52,7 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
-    "test:a11y": "vitest run --grep a11y",
+    "test:a11y": "vitest run src/__tests__/core/a11y",
     "test:bundle-size": "node scripts/check-bundle-size.js",
     "changelog": "node scripts/generate-changelog.js",
     "build:report": "node scripts/generate-bundle-report.js",
