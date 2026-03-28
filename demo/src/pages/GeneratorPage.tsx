@@ -93,19 +93,15 @@ import { Sidebar } from '@ui/components/sidebar'
 import { AppShell } from '@ui/components/app-shell'
 import { BackToTop } from '@ui/components/back-to-top'
 import { Carousel } from '@ui/components/carousel'
-import { Affix } from '@ui/components/affix'
 import { ContainerQuery } from '@ui/components/container-query'
-import { UIProvider } from '@ui/components/ui-provider'
 
 // ── Additional Imports: Overlays ─────────────────────────────────────────────
-import { ConfirmDialog } from '@ui/components/confirm-dialog'
 import { Dialog } from '@ui/components/dialog'
 import { Drawer } from '@ui/components/drawer'
 import { DropdownMenu } from '@ui/components/dropdown-menu'
 import { NativeTooltip } from '@ui/components/native-tooltip'
 import { Popover } from '@ui/components/popover'
 import { Sheet } from '@ui/components/sheet'
-import { Spotlight } from '@ui/components/spotlight'
 
 // ── Additional Imports: Data Display ─────────────────────────────────────────
 import { DiffViewer } from '@ui/domain/diff-viewer'
@@ -115,7 +111,6 @@ import { JsonViewer } from '@ui/domain/json-viewer'
 import { KanbanColumn } from '@ui/domain/kanban-column'
 import { PropertyList } from '@ui/domain/property-list'
 import { ResponsiveCard } from '@ui/domain/responsive-card'
-import { SmartTable } from '@ui/domain/smart-table'
 import { SortableList } from '@ui/domain/sortable-list'
 import { StorageBar } from '@ui/domain/storage-bar'
 import { TreeView } from '@ui/domain/tree-view'
@@ -145,14 +140,9 @@ import { InfiniteScroll } from '@ui/domain/infinite-scroll'
 import { ScrollReveal } from '@ui/domain/scroll-reveal'
 import { StepWizard } from '@ui/domain/step-wizard'
 import { TimeRangeSelector } from '@ui/domain/time-range-selector'
-import { ToastProvider } from '@ui/domain/toast'
-import { ViewTransitionLink } from '@ui/domain/view-transition-link'
 import { NotificationStack } from '@ui/domain/notification-stack'
-import { CommandBar } from '@ui/domain/command-bar'
 import { CodeEditor } from '@ui/domain/code-editor'
-import { Cropper } from '@ui/domain/cropper'
 import { RichTextEditor } from '@ui/domain/rich-text-editor'
-import { Tour } from '@ui/domain/tour'
 import { ShimmerButton } from '@ui/domain/shimmer-button'
 
 // ── Additional Imports: Visual Effects ───────────────────────────────────────
@@ -182,6 +172,7 @@ import { StreamingText } from '@ui/domain/streaming-text'
 import { TypingIndicator } from '@ui/domain/typing-indicator'
 
 import { useTier } from '../App'
+import { renderComponentPreview } from '../utils/component-previews'
 import { getComponentDatabase, searchComponents, type ComponentInfo } from '../utils/component-database'
 import {
   generateFromTemplate,
@@ -1181,6 +1172,11 @@ function DataTablePreview() {
 }
 
 function CustomComponentPreview({ component }: { component: ComponentInfo }) {
+  return <>{renderComponentPreview(component.name)}</>
+}
+
+// Legacy switch kept as reference — now delegated to shared utils/component-previews.tsx
+function _LegacyCustomComponentPreview({ component }: { component: ComponentInfo }) {
   const name = component.name
   const [paginationPage, setPaginationPage] = useState(1)
 

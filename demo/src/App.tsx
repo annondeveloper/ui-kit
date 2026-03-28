@@ -859,6 +859,18 @@ const layoutStyles = css`
       font-weight: 700;
     }
 
+    /* Search result description snippet */
+    .site-search-results__desc {
+      padding: 0 0.5rem 0.375rem 1.625rem;
+      font-size: 0.6875rem;
+      color: var(--text-tertiary);
+      line-height: 1.4;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
     /* ─── Sidebar footer ─── */
     .site-sidebar-footer {
       padding: 0.75rem;
@@ -1118,35 +1130,40 @@ function SidebarContent({
   const isPremium = tier === 'premium'
   const isLite = tier === 'lite'
 
-  // Filtered results when searching
-  const searchResults = useMemo(() => {
+  // Full-text search: searches component names, descriptions, and props
+  const dbResults = useMemo(() => {
     if (!isSearching) return null
-    const q = searchQuery.toLowerCase()
-    const results: { group: ComponentGroup; items: ComponentEntry[] }[] = []
+    return searchComponents(searchQuery)
+  }, [searchQuery, isSearching])
+
+  // Map DB results back to sidebar groups for display
+  const searchResults = useMemo(() => {
+    if (!isSearching || !dbResults) return null
+    const matchedNames = new Set(dbResults.map(c => c.name))
+    const results: { group: ComponentGroup; items: ComponentEntry[]; descriptions: Map<string, string> }[] = []
+    const descMap = new Map(dbResults.map(c => [c.name, c.description]))
     for (const group of componentGroups) {
-      const matched = group.items.filter(item =>
-        item.name.toLowerCase().includes(q)
-      )
+      const matched = group.items.filter(item => matchedNames.has(item.name))
       if (matched.length > 0) {
-        results.push({ group, items: matched })
+        results.push({ group, items: matched, descriptions: descMap })
       }
     }
     return results
-  }, [searchQuery, isSearching])
+  }, [isSearching, dbResults])
 
   const totalResults = searchResults?.reduce((s, r) => s + r.items.length, 0) ?? 0
 
-  // Highlight matching text
-  const highlightMatch = (name: string) => {
-    if (!isSearching) return name
+  // Highlight matching text in any string
+  const highlightMatch = (text: string) => {
+    if (!isSearching) return text
     const q = searchQuery.toLowerCase()
-    const idx = name.toLowerCase().indexOf(q)
-    if (idx === -1) return name
+    const idx = text.toLowerCase().indexOf(q)
+    if (idx === -1) return text
     return (
       <>
-        {name.slice(0, idx)}
-        <span className="site-clink__match">{name.slice(idx, idx + searchQuery.length)}</span>
-        {name.slice(idx + searchQuery.length)}
+        {text.slice(0, idx)}
+        <span className="site-clink__match">{text.slice(idx, idx + searchQuery.length)}</span>
+        {text.slice(idx + searchQuery.length)}
       </>
     )
   }
@@ -1259,12 +1276,21 @@ function SidebarContent({
           <div className="site-search-results">
             {totalResults > 0 ? (
               <>
-                {searchResults!.map(({ group, items }) => (
+                {searchResults!.map(({ group, items, descriptions }) => (
                   <div key={group.label}>
                     <div className="site-search-results__group">
                       {group.label} ({items.length})
                     </div>
-                    {items.map(item => renderComponentLink(item, true))}
+                    {items.map(item => (
+                      <div key={item.name}>
+                        {renderComponentLink(item, true)}
+                        {descriptions.get(item.name) && (
+                          <div className="site-search-results__desc">
+                            {highlightMatch(descriptions.get(item.name)!)}
+                          </div>
+                        )}
+                      </div>
+                    ))}
                   </div>
                 ))}
               </>
@@ -1434,28 +1460,52 @@ export default function App() {
     setOpenGroups(prev => ({ ...prev, [label]: !prev[label] }))
   }, [])
 
-  // Keyboard shortcut: / or Cmd+K to focus search
+  // Keyboard shortcuts: /, Cmd+K, t, Escape
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
-      // Don't intercept if user is typing in an input/textarea
       const tag = (e.target as HTMLElement)?.tagName
-      if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') {
-        // Allow Escape to blur from search
-        if (e.key === 'Escape' && searchInputRef.current === e.target) {
+      const isInput = tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT'
+
+      // Cmd+K / Ctrl+K always focuses search, even from inputs
+      if (e.key === 'k' && (e.metaKey || e.ctrlKey)) {
+        e.preventDefault()
+        searchInputRef.current?.focus()
+        return
+      }
+
+      // Escape: blur search + clear, or close open panels
+      if (e.key === 'Escape') {
+        if (isInput && searchInputRef.current === e.target) {
           searchInputRef.current?.blur()
           setSearchQuery('')
           e.preventDefault()
+        } else if (!isInput) {
+          setSearchQuery('')
+          setDrawerOpen(false)
         }
         return
       }
-      if (e.key === '/' || (e.key === 'k' && (e.metaKey || e.ctrlKey))) {
+
+      // The rest only fire when not in an input
+      if (isInput) return
+
+      // / → focus search
+      if (e.key === '/') {
         e.preventDefault()
         searchInputRef.current?.focus()
+        return
+      }
+
+      // t → toggle theme
+      if (e.key === 't') {
+        e.preventDefault()
+        toggleLight()
+        return
       }
     }
     document.addEventListener('keydown', handler)
     return () => document.removeEventListener('keydown', handler)
-  }, [])
+  }, [toggleLight])
 
   const sharedProps = {
     searchQuery,
