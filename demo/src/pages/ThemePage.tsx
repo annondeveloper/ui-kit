@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useMemo } from 'react'
 import { generateTheme, themeToCSS, applyTheme } from '@ui/core/tokens/generator'
 import type { ThemeName } from '@ui/core/tokens/themes'
 import { ColorInput } from '@ui/components/color-input'
@@ -31,6 +31,11 @@ const presetColors: Record<ThemeName, string> = {
   violet: '#8b5cf6',
   fuchsia: '#d946ef',
   slate: '#64748b',
+  corporate: '#1e40af',
+  midnight: '#312e81',
+  forest: '#065f46',
+  wine: '#881337',
+  carbon: '#27272a',
 }
 
 const presetNames = Object.keys(presetColors) as ThemeName[]
@@ -220,10 +225,29 @@ const themePageStyles = css`
 export default function ThemePage() {
   useStyles('theme-page', themePageStyles)
 
-  const [brandColor, setBrandColor] = useState('#6366f1')
-  const [activePreset, setActivePreset] = useState<ThemeName | null>('aurora')
-  const [darkMode, setDarkMode] = useState(true)
-  const [exportTab, setExportTab] = useState<'css' | 'code'>('css')
+  // Read initial state from URL hash
+  const getInitialColor = () => {
+    if (typeof window !== 'undefined' && window.location.hash) {
+      const params = new URLSearchParams(window.location.hash.slice(1))
+      return params.get('color') || '#6366f1'
+    }
+    return '#6366f1'
+  }
+  const getInitialMode = () => {
+    if (typeof window !== 'undefined' && window.location.hash) {
+      const params = new URLSearchParams(window.location.hash.slice(1))
+      return params.get('mode') !== 'light'
+    }
+    return true
+  }
+
+  const [brandColor, setBrandColor] = useState(getInitialColor)
+  const [activePreset, setActivePreset] = useState<ThemeName | null>(() => {
+    const c = getInitialColor()
+    return (presetNames.find(n => presetColors[n].toLowerCase() === c.toLowerCase()) ?? 'aurora') as ThemeName
+  })
+  const [darkMode, setDarkMode] = useState(getInitialMode)
+  const [exportTab, setExportTab] = useState<'css' | 'tailwind' | 'figma' | 'cssinjs'>('css')
   const originalThemeRef = useRef<Record<string, string> | null>(null)
 
   // Capture original theme on mount for cleanup
@@ -261,6 +285,12 @@ export default function ThemePage() {
     applyTheme(theme)
   }, [brandColor, darkMode])
 
+  // Sync URL hash
+  useEffect(() => {
+    const hash = `#color=${encodeURIComponent(brandColor)}&mode=${darkMode ? 'dark' : 'light'}`
+    window.history.replaceState(null, '', hash)
+  }, [brandColor, darkMode])
+
   const handleColorChange = (color: string) => {
     setBrandColor(color)
     // Check if it matches any preset
@@ -293,6 +323,43 @@ applyTheme(theme)
 import { themeToCSS } from '@annondeveloper/ui-kit/theme'
 const css = themeToCSS(theme)
 `
+
+  // Tailwind config export
+  const tailwindExport = useMemo(() => {
+    const tokens = generateTheme(brandColor, mode)
+    const entries = Object.entries(tokens)
+      .map(([k, v]) => `      '${k.replace('--', '')}': '${v}',`)
+      .join('\n')
+    return `// tailwind.config.js
+module.exports = {
+  theme: {
+    extend: {
+      colors: {
+${entries}
+      },
+    },
+  },
+}`
+  }, [brandColor, mode])
+
+  // Figma JSON export
+  const figmaExport = useMemo(() => {
+    const tokens = generateTheme(brandColor, mode)
+    const figmaTokens: Record<string, { value: string; type: string }> = {}
+    for (const [k, v] of Object.entries(tokens)) {
+      figmaTokens[k.replace('--', '')] = { value: String(v), type: 'color' }
+    }
+    return JSON.stringify({ 'ui-kit-theme': figmaTokens }, null, 2)
+  }, [brandColor, mode])
+
+  // CSS-in-JS export
+  const cssInJsExport = useMemo(() => {
+    const tokens = generateTheme(brandColor, mode)
+    const entries = Object.entries(tokens)
+      .map(([k, v]) => `  '${k}': '${v}',`)
+      .join('\n')
+    return `export const theme = {\n${entries}\n} as const`
+  }, [brandColor, mode])
 
   // State for interactive previews
   const [checked, setChecked] = useState(true)
@@ -464,21 +531,18 @@ const css = themeToCSS(theme)
         </h2>
 
         <div className="theme-page__export-tabs">
-          <button
-            className={`theme-page__export-tab${exportTab === 'css' ? ' theme-page__export-tab--active' : ''}`}
-            onClick={() => setExportTab('css')}
-          >
-            CSS Custom Properties
-          </button>
-          <button
-            className={`theme-page__export-tab${exportTab === 'code' ? ' theme-page__export-tab--active' : ''}`}
-            onClick={() => setExportTab('code')}
-          >
-            JavaScript / TypeScript
-          </button>
+          {(['css', 'tailwind', 'figma', 'cssinjs'] as const).map(tab => (
+            <button
+              key={tab}
+              className={`theme-page__export-tab${exportTab === tab ? ' theme-page__export-tab--active' : ''}`}
+              onClick={() => setExportTab(tab)}
+            >
+              {tab === 'css' ? 'CSS' : tab === 'tailwind' ? 'Tailwind' : tab === 'figma' ? 'Figma JSON' : 'CSS-in-JS'}
+            </button>
+          ))}
         </div>
 
-        {exportTab === 'css' ? (
+        {exportTab === 'css' && (
           <CopyBlock
             code={fullCSS}
             language="css"
@@ -486,15 +550,259 @@ const css = themeToCSS(theme)
             showLineNumbers
             maxHeight="400px"
           />
-        ) : (
+        )}
+        {exportTab === 'tailwind' && (
           <CopyBlock
-            code={codeExample}
-            language="typescript"
-            title="Theme Setup Code"
+            code={tailwindExport}
+            language="javascript"
+            title="Tailwind Config"
             showLineNumbers
+            maxHeight="400px"
+          />
+        )}
+        {exportTab === 'figma' && (
+          <CopyBlock
+            code={figmaExport}
+            language="json"
+            title="Figma Variables JSON"
+            showLineNumbers
+            maxHeight="400px"
+          />
+        )}
+        {exportTab === 'cssinjs' && (
+          <CopyBlock
+            code={cssInJsExport}
+            language="typescript"
+            title="CSS-in-JS Theme Object"
+            showLineNumbers
+            maxHeight="400px"
           />
         )}
       </section>
+
+      {/* Section 4: Color Harmony */}
+      <section className="theme-page__section">
+        <h2 className="theme-page__section-title">
+          <Icon name="settings" size={18} />
+          Color Harmony
+        </h2>
+
+        <div className="theme-page__preview">
+          <ColorHarmonyPanel brandColor={brandColor} />
+        </div>
+      </section>
+
+      {/* Section 5: Contrast Audit */}
+      <section className="theme-page__section">
+        <h2 className="theme-page__section-title">
+          <Icon name="eye" size={18} />
+          Contrast Audit
+        </h2>
+
+        <div className="theme-page__preview">
+          <ContrastAuditPanel mode={mode} />
+        </div>
+      </section>
+    </div>
+  )
+}
+
+// ─── Color Harmony Panel ──────────────────────────────────────────────────────
+
+function hexToHSL(hex: string): [number, number, number] {
+  const r = parseInt(hex.slice(1, 3), 16) / 255
+  const g = parseInt(hex.slice(3, 5), 16) / 255
+  const b = parseInt(hex.slice(5, 7), 16) / 255
+  const max = Math.max(r, g, b), min = Math.min(r, g, b)
+  const l = (max + min) / 2
+  let h = 0, s = 0
+  if (max !== min) {
+    const d = max - min
+    s = l > 0.5 ? d / (2 - max - min) : d / (max + min)
+    if (max === r) h = ((g - b) / d + (g < b ? 6 : 0)) / 6
+    else if (max === g) h = ((b - r) / d + 2) / 6
+    else h = ((r - g) / d + 4) / 6
+  }
+  return [Math.round(h * 360), Math.round(s * 100), Math.round(l * 100)]
+}
+
+function hslToHex(h: number, s: number, l: number): string {
+  s /= 100; l /= 100
+  const a = s * Math.min(l, 1 - l)
+  const f = (n: number) => {
+    const k = (n + h / 30) % 12
+    const color = l - a * Math.max(Math.min(k - 3, 9 - k, 1), -1)
+    return Math.round(255 * color).toString(16).padStart(2, '0')
+  }
+  return `#${f(0)}${f(8)}${f(4)}`
+}
+
+const harmonyTypes = [
+  { name: 'Complementary', offsets: [180] },
+  { name: 'Analogous', offsets: [-30, 30] },
+  { name: 'Triadic', offsets: [120, 240] },
+  { name: 'Split-Complementary', offsets: [150, 210] },
+  { name: 'Tetradic', offsets: [90, 180, 270] },
+]
+
+function ColorHarmonyPanel({ brandColor }: { brandColor: string }) {
+  const [h, s, l] = hexToHSL(brandColor)
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem', width: '100%' }}>
+      {harmonyTypes.map(harmony => (
+        <div key={harmony.name}>
+          <div style={{
+            fontSize: 'var(--text-xs)', fontWeight: 600, color: 'var(--text-secondary)',
+            textTransform: 'uppercase', letterSpacing: '0.05em', marginBlockEnd: '0.5rem'
+          }}>
+            {harmony.name}
+          </div>
+          <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+            <div style={{
+              width: '48px', height: '48px', borderRadius: 'var(--radius-md, 0.5rem)',
+              background: brandColor, border: '2px solid var(--text-primary)',
+            }} title={`Base: ${brandColor}`} />
+            {harmony.offsets.map((offset, i) => {
+              const color = hslToHex((h + offset + 360) % 360, s, l)
+              return (
+                <div key={i} style={{
+                  width: '48px', height: '48px', borderRadius: 'var(--radius-md, 0.5rem)',
+                  background: color, border: '1px solid var(--border-default)',
+                }} title={`${harmony.name} ${i + 1}: ${color}`} />
+              )
+            })}
+          </div>
+        </div>
+      ))}
+    </div>
+  )
+}
+
+// ─── Contrast Audit Panel ─────────────────────────────────────────────────────
+
+const contrastPairs = [
+  { name: 'Primary text on base', fg: '--text-primary', bg: '--bg-base' },
+  { name: 'Secondary text on base', fg: '--text-secondary', bg: '--bg-base' },
+  { name: 'Primary text on surface', fg: '--text-primary', bg: '--bg-surface' },
+  { name: 'Secondary text on elevated', fg: '--text-secondary', bg: '--bg-elevated' },
+  { name: 'Brand on base', fg: '--brand', bg: '--bg-base' },
+  { name: 'Brand light on surface', fg: '--brand-light', bg: '--bg-surface' },
+  { name: 'Status OK on base', fg: '--status-ok', bg: '--bg-base' },
+  { name: 'Status warning on base', fg: '--status-warning', bg: '--bg-base' },
+  { name: 'Status critical on base', fg: '--status-critical', bg: '--bg-base' },
+]
+
+function getComputedCSSVar(varName: string): string {
+  if (typeof window === 'undefined') return ''
+  return getComputedStyle(document.documentElement).getPropertyValue(varName).trim()
+}
+
+function parseCSSColor(val: string): [number, number, number] | null {
+  // Try to parse hex
+  if (val.startsWith('#')) {
+    const r = parseInt(val.slice(1, 3), 16) / 255
+    const g = parseInt(val.slice(3, 5), 16) / 255
+    const b = parseInt(val.slice(5, 7), 16) / 255
+    return [r, g, b]
+  }
+  // Try rgb()
+  const rgbMatch = val.match(/rgb\((\d+),\s*(\d+),\s*(\d+)\)/)
+  if (rgbMatch) {
+    return [Number(rgbMatch[1]) / 255, Number(rgbMatch[2]) / 255, Number(rgbMatch[3]) / 255]
+  }
+  return null
+}
+
+function relativeLuminance(r: number, g: number, b: number): number {
+  const srgb = [r, g, b].map(c => c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4))
+  return 0.2126 * srgb[0] + 0.7152 * srgb[1] + 0.0722 * srgb[2]
+}
+
+function contrastRatio(l1: number, l2: number): number {
+  const lighter = Math.max(l1, l2)
+  const darker = Math.min(l1, l2)
+  return (lighter + 0.05) / (darker + 0.05)
+}
+
+function ContrastAuditPanel({ mode }: { mode: string }) {
+  const [results, setResults] = useState<{ name: string; ratio: number; passAA: boolean; passAAA: boolean }[]>([])
+
+  useEffect(() => {
+    // Defer to next frame so CSS vars are applied
+    requestAnimationFrame(() => {
+      const newResults = contrastPairs.map(pair => {
+        const fgVal = getComputedCSSVar(pair.fg)
+        const bgVal = getComputedCSSVar(pair.bg)
+        const fgRgb = parseCSSColor(fgVal)
+        const bgRgb = parseCSSColor(bgVal)
+
+        if (!fgRgb || !bgRgb) {
+          return { name: pair.name, ratio: 0, passAA: false, passAAA: false }
+        }
+
+        const fgLum = relativeLuminance(...fgRgb)
+        const bgLum = relativeLuminance(...bgRgb)
+        const ratio = contrastRatio(fgLum, bgLum)
+
+        return {
+          name: pair.name,
+          ratio: Math.round(ratio * 100) / 100,
+          passAA: ratio >= 4.5,
+          passAAA: ratio >= 7,
+        }
+      })
+      setResults(newResults)
+    })
+  }, [mode])
+
+  return (
+    <div style={{ width: '100%', overflowX: 'auto' }}>
+      <table style={{
+        width: '100%', borderCollapse: 'collapse', fontSize: 'var(--text-sm, 0.875rem)',
+      }}>
+        <thead>
+          <tr>
+            <th style={{ textAlign: 'start', padding: '0.5rem 0.75rem', color: 'var(--text-secondary)', fontSize: 'var(--text-xs)', textTransform: 'uppercase', letterSpacing: '0.04em', borderBlockEnd: '1px solid var(--border-default)' }}>Pair</th>
+            <th style={{ textAlign: 'end', padding: '0.5rem 0.75rem', color: 'var(--text-secondary)', fontSize: 'var(--text-xs)', textTransform: 'uppercase', letterSpacing: '0.04em', borderBlockEnd: '1px solid var(--border-default)' }}>Ratio</th>
+            <th style={{ textAlign: 'center', padding: '0.5rem 0.75rem', color: 'var(--text-secondary)', fontSize: 'var(--text-xs)', textTransform: 'uppercase', letterSpacing: '0.04em', borderBlockEnd: '1px solid var(--border-default)' }}>AA</th>
+            <th style={{ textAlign: 'center', padding: '0.5rem 0.75rem', color: 'var(--text-secondary)', fontSize: 'var(--text-xs)', textTransform: 'uppercase', letterSpacing: '0.04em', borderBlockEnd: '1px solid var(--border-default)' }}>AAA</th>
+          </tr>
+        </thead>
+        <tbody>
+          {results.map(r => (
+            <tr key={r.name}>
+              <td style={{ padding: '0.5rem 0.75rem', color: 'var(--text-primary)', borderBlockEnd: '1px solid var(--border-subtle)' }}>{r.name}</td>
+              <td style={{ textAlign: 'end', padding: '0.5rem 0.75rem', fontFamily: 'monospace', color: 'var(--text-primary)', borderBlockEnd: '1px solid var(--border-subtle)' }}>{r.ratio > 0 ? `${r.ratio}:1` : 'N/A'}</td>
+              <td style={{ textAlign: 'center', padding: '0.5rem 0.75rem', borderBlockEnd: '1px solid var(--border-subtle)' }}>
+                <span style={{
+                  display: 'inline-block', padding: '0.125rem 0.5rem', borderRadius: '1rem',
+                  fontSize: 'var(--text-xs)', fontWeight: 600,
+                  background: r.passAA ? 'var(--status-ok)' : 'var(--status-critical)',
+                  color: 'var(--bg-base)',
+                }}>
+                  {r.passAA ? 'Pass' : 'Fail'}
+                </span>
+              </td>
+              <td style={{ textAlign: 'center', padding: '0.5rem 0.75rem', borderBlockEnd: '1px solid var(--border-subtle)' }}>
+                <span style={{
+                  display: 'inline-block', padding: '0.125rem 0.5rem', borderRadius: '1rem',
+                  fontSize: 'var(--text-xs)', fontWeight: 600,
+                  background: r.passAAA ? 'var(--status-ok)' : 'var(--status-warning)',
+                  color: 'var(--bg-base)',
+                }}>
+                  {r.passAAA ? 'Pass' : 'Fail'}
+                </span>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+      {results.length === 0 && (
+        <div style={{ padding: '1rem', textAlign: 'center', color: 'var(--text-secondary)', fontSize: 'var(--text-sm)' }}>
+          Computing contrast ratios...
+        </div>
+      )}
     </div>
   )
 }

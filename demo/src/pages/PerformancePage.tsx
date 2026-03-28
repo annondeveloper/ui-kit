@@ -536,6 +536,49 @@ const styles = css`
       margin-block-start: 0.5rem;
     }
 
+    /* ── Treemap ───────────────────────────────────── */
+
+    .perf__treemap-svg {
+      width: 100%;
+      height: auto;
+    }
+
+    .perf__treemap-tooltip {
+      position: absolute;
+      top: 0.5rem;
+      inset-inline-end: 0.5rem;
+      background: var(--bg-overlay);
+      border: 1px solid var(--border-default);
+      border-radius: var(--radius-sm, 0.375rem);
+      padding: 0.375rem 0.625rem;
+      font-family: 'SF Mono', 'Cascadia Code', monospace;
+      font-size: var(--text-xs, 0.75rem);
+      color: var(--text-primary);
+      pointer-events: none;
+      backdrop-filter: blur(8px);
+    }
+
+    .perf__treemap-legend {
+      display: flex;
+      gap: 1.25rem;
+      margin-block-start: 0.75rem;
+      justify-content: center;
+    }
+
+    .perf__treemap-legend-item {
+      display: flex;
+      align-items: center;
+      gap: 0.375rem;
+      font-size: var(--text-xs, 0.75rem);
+      color: var(--text-secondary);
+    }
+
+    .perf__treemap-legend-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 2px;
+    }
+
     /* ── Loading / Error states ────────────────────── */
 
     .perf__loading {
@@ -649,6 +692,149 @@ const CpuIcon = () => (
     <line x1="1" y1="9" x2="4" y2="9" /><line x1="1" y1="14" x2="4" y2="14" />
   </svg>
 )
+
+// ─── Bundle Treemap ─────────────────────────────────────────────────────────
+
+interface TreemapRect {
+  file: BundleFile
+  x: number
+  y: number
+  w: number
+  h: number
+  color: string
+}
+
+function squarify(files: BundleFile[], x: number, y: number, w: number, h: number): TreemapRect[] {
+  if (files.length === 0 || w <= 0 || h <= 0) return []
+
+  const totalArea = w * h
+  const totalValue = files.reduce((s, f) => s + f.gzip, 0)
+  if (totalValue === 0) return []
+
+  const rects: TreemapRect[] = []
+
+  function getColor(name: string): string {
+    if (name.includes('lite') || name.includes('Lite')) return 'var(--status-ok)'
+    if (name.includes('premium') || name.includes('Premium')) return 'var(--aurora-1)'
+    return 'var(--brand)'
+  }
+
+  // Simple slice-and-dice treemap layout
+  let remaining = [...files].sort((a, b) => b.gzip - a.gzip)
+  let cx = x, cy = y, cw = w, ch = h
+  let remTotal = totalValue
+
+  while (remaining.length > 0) {
+    const isWide = cw >= ch
+    const f = remaining.shift()!
+    const ratio = f.gzip / remTotal
+    remTotal -= f.gzip
+
+    if (remaining.length === 0) {
+      rects.push({ file: f, x: cx, y: cy, w: cw, h: ch, color: getColor(f.name) })
+    } else if (isWide) {
+      const fw = cw * ratio
+      rects.push({ file: f, x: cx, y: cy, w: fw, h: ch, color: getColor(f.name) })
+      cx += fw
+      cw -= fw
+    } else {
+      const fh = ch * ratio
+      rects.push({ file: f, x: cx, y: cy, w: cw, h: fh, color: getColor(f.name) })
+      cy += fh
+      ch -= fh
+    }
+  }
+
+  return rects
+}
+
+function BundleTreemap({ files }: { files: BundleFile[] }) {
+  const [hovered, setHovered] = useState<string | null>(null)
+  const svgW = 800
+  const svgH = 400
+  const rects = useMemo(() => squarify(files, 0, 0, svgW, svgH), [files])
+
+  return (
+    <div style={{ position: 'relative' }}>
+      <svg
+        viewBox={`0 0 ${svgW} ${svgH}`}
+        className="perf__treemap-svg"
+        role="img"
+        aria-label="Bundle size treemap"
+      >
+        {rects.map((r) => (
+          <g
+            key={r.file.name}
+            onMouseEnter={() => setHovered(r.file.name)}
+            onMouseLeave={() => setHovered(null)}
+          >
+            <rect
+              x={r.x + 1}
+              y={r.y + 1}
+              width={Math.max(0, r.w - 2)}
+              height={Math.max(0, r.h - 2)}
+              rx={3}
+              fill={r.color}
+              opacity={hovered === r.file.name ? 1 : 0.75}
+              style={{ transition: 'opacity 0.15s' }}
+            >
+              <title>{r.file.name}: {formatBytes(r.file.gzip)} gzip</title>
+            </rect>
+            {r.w > 60 && r.h > 28 && (
+              <>
+                <text
+                  x={r.x + r.w / 2}
+                  y={r.y + r.h / 2 - 5}
+                  textAnchor="middle"
+                  dominantBaseline="central"
+                  fill="var(--bg-base, #09090b)"
+                  fontSize="9"
+                  fontWeight="700"
+                  fontFamily="monospace"
+                  style={{ pointerEvents: 'none' }}
+                >
+                  {r.file.name.length > r.w / 7 ? r.file.name.slice(0, Math.floor(r.w / 7) - 2) + '..' : r.file.name}
+                </text>
+                <text
+                  x={r.x + r.w / 2}
+                  y={r.y + r.h / 2 + 8}
+                  textAnchor="middle"
+                  dominantBaseline="central"
+                  fill="var(--bg-base, #09090b)"
+                  fontSize="8"
+                  fontFamily="monospace"
+                  opacity={0.7}
+                  style={{ pointerEvents: 'none' }}
+                >
+                  {formatBytes(r.file.gzip)}
+                </text>
+              </>
+            )}
+          </g>
+        ))}
+      </svg>
+      {hovered && (
+        <div className="perf__treemap-tooltip">
+          {hovered}: {formatBytes(rects.find(r => r.file.name === hovered)?.file.gzip ?? 0)} gzip
+        </div>
+      )}
+      <div className="perf__treemap-legend">
+        <span className="perf__treemap-legend-item">
+          <span className="perf__treemap-legend-dot" style={{ background: 'var(--brand)' }} />
+          Standard
+        </span>
+        <span className="perf__treemap-legend-item">
+          <span className="perf__treemap-legend-dot" style={{ background: 'var(--status-ok)' }} />
+          Lite
+        </span>
+        <span className="perf__treemap-legend-item">
+          <span className="perf__treemap-legend-dot" style={{ background: 'var(--aurora-1)' }} />
+          Premium
+        </span>
+      </div>
+    </div>
+  )
+}
 
 // ─── Page Component ──────────────────────────────────────────────────────────
 
@@ -879,6 +1065,20 @@ export default function PerformancePage() {
                 </button>
               </div>
             )}
+          </div>
+        </section>
+      )}
+
+      {/* ── Bundle Treemap ─────────────────────────────── */}
+      {report && (
+        <section className="perf__section" aria-labelledby="perf-treemap">
+          <h2 className="perf__section-title" id="perf-treemap">
+            <PackageIcon />
+            Bundle Treemap
+          </h2>
+
+          <div className="perf__card">
+            <BundleTreemap files={report.files} />
           </div>
         </section>
       )}

@@ -30,6 +30,8 @@ const pages: { path: string; label: string; icon: IconName }[] = [
   { path: '/choreography', label: 'Choreography', icon: 'activity' },
   { path: '/mcp', label: 'MCP Server', icon: 'terminal' },
   { path: '/figma', label: 'Figma Integration', icon: 'image' },
+  { path: '/comparison', label: 'Tier Comparison', icon: 'bar-chart' as IconName },
+  { path: '/embed', label: 'Embed', icon: 'code' },
 ]
 
 // ─── Component Sidebar Groups ─────────────────────────────────────────────────

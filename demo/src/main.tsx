@@ -15,6 +15,9 @@ const GeneratorPage = lazy(() => import('./pages/GeneratorPage'))
 const ChoreographyPage = lazy(() => import('./pages/ChoreographyPage'))
 const McpPage = lazy(() => import('./pages/McpPage'))
 const FigmaPage = lazy(() => import('./pages/FigmaPage'))
+const ComparisonPage = lazy(() => import('./pages/ComparisonPage'))
+const EmbedPage = lazy(() => import('./pages/EmbedPage'))
+const EmbedComponentPage = lazy(() => import('./pages/EmbedComponentPage'))
 
 // ─── Component Pages (A-Z) ──────────────────────────────────────────────────
 const AccordionPage = lazy(() => import('./pages/components/AccordionPage'))
@@ -182,6 +185,8 @@ createRoot(document.getElementById('root')!).render(
             <Route path="choreography" element={<Suspense><ChoreographyPage /></Suspense>} />
             <Route path="mcp" element={<Suspense><McpPage /></Suspense>} />
             <Route path="figma" element={<Suspense><FigmaPage /></Suspense>} />
+            <Route path="comparison" element={<Suspense><ComparisonPage /></Suspense>} />
+            <Route path="embed" element={<Suspense><EmbedPage /></Suspense>} />
 
             {/* Component pages (A-Z) */}
             <Route path="components/accordion" element={<Suspense><AccordionPage /></Suspense>} />
@@ -333,6 +338,9 @@ createRoot(document.getElementById('root')!).render(
             <Route path="components/disk-mount-bar" element={<Suspense><DiskMountBarPage /></Suspense>} />
             <Route path="components/connection-test-panel" element={<Suspense><ConnectionTestPanelPage /></Suspense>} />
           </Route>
+
+          {/* Embed route — rendered WITHOUT App shell (no sidebar/header) */}
+          <Route path="embed/:component" element={<Suspense><EmbedComponentPage /></Suspense>} />
         </Routes>
       </ToastProvider>
     </BrowserRouter>

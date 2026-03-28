@@ -54,7 +54,11 @@
     "test:watch": "vitest",
     "test:a11y": "vitest run --grep a11y",
     "test:bundle-size": "node scripts/check-bundle-size.js",
+    "changelog": "node scripts/generate-changelog.js",
     "build:report": "node scripts/generate-bundle-report.js",
+    "storybook": "storybook dev -p 6006",
+    "build:storybook": "storybook build -o storybook-static",
+    "test:visual": "playwright test",
     "preversion": "node scripts/sync-versions.js",
     "postversion": "git push && git push --tags"
   },

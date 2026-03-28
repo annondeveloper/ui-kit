@@ -19,6 +19,8 @@ jobs:
       - run: npm run typecheck
       - run: npm run build
       - run: npm test
+      - name: Generate changelog
+        run: node scripts/generate-changelog.js
       - uses: actions/upload-artifact@v4
         with:
           name: dist

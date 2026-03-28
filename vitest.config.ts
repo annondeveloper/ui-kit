@@ -8,5 +8,6 @@ export default defineConfig({
     globals: true,
     setupFiles: ['./src/__tests__/setup.ts'],
     css: true,
+    exclude: ['**/node_modules/**', '**/dist/**', '**/visual/**', '**/*.spec.ts'],
   },
 })

@@ -1,3 +1,9 @@
+[![npm version](https://img.shields.io/npm/v/@annondeveloper/ui-kit)](https://www.npmjs.com/package/@annondeveloper/ui-kit)
+[![bundle size](https://img.shields.io/bundlephobia/minzip/@annondeveloper/ui-kit)](https://bundlephobia.com/package/@annondeveloper/ui-kit)
+[![license](https://img.shields.io/npm/l/@annondeveloper/ui-kit)](https://github.com/annondeveloper/ui-kit/blob/main/LICENSE)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.0+-blue)](https://www.typescriptlang.org/)
+[![JSR](https://jsr.io/badges/@annondeveloper/ui-kit)](https://jsr.io/@annondeveloper/ui-kit)
+
 # @annondeveloper/ui-kit v2
 
 > Zero-dependency React component library with 147 components, physics-based animations, OKLCH color system, and Aurora Fluid design.
