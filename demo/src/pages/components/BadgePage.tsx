@@ -828,7 +828,7 @@ function CopyButton({ text }: { text: string }) {
   return (
     <Button
       size="sm"
-      variant="secondary"
+      variant={"secondary" as any}
       className="badge-page__copy-btn"
       onClick={() => {
         navigator.clipboard.writeText(text).then(() => {
@@ -1146,7 +1146,7 @@ function PlaygroundSection({ tier: tierProp }: { tier: Tier }) {
             <div className="badge-page__export-row">
               <Button
                 size="xs"
-                variant="secondary"
+                variant={"secondary" as any}
                 icon={<Icon name="copy" size="sm" />}
                 onClick={() => {
                   navigator.clipboard?.writeText(activeCode).then(() => {
@@ -1264,6 +1264,7 @@ export default function BadgePage() {
   const [brandColor, setBrandColor] = useState('#6366f1')
   const pageRef = useRef<HTMLDivElement>(null)
   const { mode } = useTheme()
+  const [removableTags, setRemovableTags] = useState(['React', 'TypeScript', 'Node.js', 'CSS', 'Rust'])
 
   // tier removed — premium is now a real tier
 
@@ -1577,6 +1578,96 @@ export default function BadgePage() {
           </div>
         </section>
       )}
+
+      {/* ── 6b. Removable Badges ───────────────────────── */}
+      {tier !== 'lite' && (
+        <section className="badge-page__section" id="removable">
+          <h2 className="badge-page__section-title">
+            <a href="#removable">Removable</a>
+          </h2>
+          <p className="badge-page__section-desc">
+            Set <code>removable</code> to show a close button on the badge.
+            Pair with <code>onRemove</code> to handle removal. Useful for tag inputs,
+            filter chips, and selected item lists.
+          </p>
+          <div className="badge-page__preview" style={{ gap: '0.5rem', flexWrap: 'wrap' }}>
+            {removableTags.map(tag => (
+              <BadgeComponent
+                key={tag}
+                variant="primary"
+                removable
+                onRemove={() => setRemovableTags(prev => prev.filter(t => t !== tag))}
+              >
+                {tag}
+              </BadgeComponent>
+            ))}
+            {removableTags.length === 0 && (
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                <span style={{ color: 'var(--text-tertiary)', fontSize: 'var(--text-sm)' }}>All removed!</span>
+                <Button size="xs" variant={"secondary" as any} onClick={() => setRemovableTags(['React', 'TypeScript', 'Node.js', 'CSS', 'Rust'])}>
+                  Reset Tags
+                </Button>
+              </div>
+            )}
+          </div>
+          <p style={{ fontSize: '0.75rem', color: 'var(--text-tertiary)', marginBlockStart: '0.75rem' }}>
+            Click the X on each badge to remove it.
+          </p>
+          <div style={{ marginBlockStart: '0.75rem' }}>
+            <CopyBlock
+              code={`const [tags, setTags] = useState(['React', 'TypeScript', 'Node.js'])
+
+{tags.map(tag => (
+  <Badge
+    key={tag}
+    removable
+    onRemove={() => setTags(prev => prev.filter(t => t !== tag))}
+  >
+    {tag}
+  </Badge>
+))}`}
+              language="typescript"
+            />
+          </div>
+        </section>
+      )}
+
+      {/* ── 6c. Outline Variant ─────────────────────────── */}
+      <section className="badge-page__section" id="outline">
+        <h2 className="badge-page__section-title">
+          <a href="#outline">Outline</a>
+        </h2>
+        <p className="badge-page__section-desc">
+          Use the <code>outline</code> prop to render badges with a transparent background
+          and colored border. Creates a lighter visual weight while maintaining the same color semantics.
+        </p>
+        <div className="badge-page__preview" style={{ gap: '0.5rem', flexWrap: 'wrap' }}>
+          {(['primary', 'secondary', 'success', 'warning', 'danger', 'info'] as const).map(v => (
+            <BadgeComponent key={v} variant={v} outline>
+              {v.charAt(0).toUpperCase() + v.slice(1)}
+            </BadgeComponent>
+          ))}
+        </div>
+        <p style={{ fontSize: '0.75rem', color: 'var(--text-tertiary)', marginBlockStart: '0.75rem' }}>
+          Compare: filled vs. outline side by side.
+        </p>
+        <div className="badge-page__preview" style={{ gap: '0.75rem', marginBlockStart: '0.5rem' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', alignItems: 'center' }}>
+            <BadgeComponent variant="primary">Filled</BadgeComponent>
+            <span style={{ fontSize: '0.6875rem', color: 'var(--text-tertiary)' }}>default</span>
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', alignItems: 'center' }}>
+            <BadgeComponent variant="primary" outline>Outline</BadgeComponent>
+            <span style={{ fontSize: '0.6875rem', color: 'var(--text-tertiary)' }}>outline</span>
+          </div>
+        </div>
+        <div style={{ marginBlockStart: '1rem' }}>
+          <CopyBlock
+            code={`<Badge variant="primary" outline>\n  Outline Badge\n</Badge>`}
+            language="typescript"
+          />
+        </div>
+      </section>
 
       {/* ── 7. Weight Tiers ────────────────────────────── */}
       <section className="badge-page__section" id="tiers">

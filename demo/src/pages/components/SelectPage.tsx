@@ -1822,6 +1822,106 @@ export default function SelectPage() {
         </div>
       </section>
 
+      {/* ── 5b. Searchable (Dedicated) ────────────────── */}
+      {!isLite && (
+        <section className="select-page__section" id="searchable">
+          <h2 className="select-page__section-title">
+            <a href="#searchable">Searchable</a>
+          </h2>
+          <p className="select-page__section-desc">
+            Enable real-time filtering with the <code>searchable</code> prop. Users can type
+            to narrow down options. The search input appears at the top of the dropdown and
+            matches against option labels.
+          </p>
+          <div style={{ maxWidth: 320 }}>
+            <SelectComponent
+              name="demo-searchable"
+              options={LANGUAGE_OPTIONS}
+              searchable
+              placeholder="Search and select..."
+              label="Programming Language"
+            />
+          </div>
+          <div style={{ marginBlockStart: '1rem' }}>
+            <CopyBlock
+              code={`<Select\n  name="language"\n  options={options}\n  searchable         // enables type-to-filter\n  placeholder="Search and select..."\n/>`}
+              language="typescript"
+            />
+          </div>
+        </section>
+      )}
+
+      {/* ── 5c. Multiple (Dedicated) ─────────────────── */}
+      {!isLite && (
+        <section className="select-page__section" id="multiple">
+          <h2 className="select-page__section-title">
+            <a href="#multiple">Multiple Selection</a>
+          </h2>
+          <p className="select-page__section-desc">
+            Use <code>multiple</code> to allow selecting multiple values. Selected items
+            appear as removable tags in the trigger. Combine with <code>searchable</code> for
+            a combobox-like experience.
+          </p>
+          <div style={{ maxWidth: 360 }}>
+            <SelectComponent
+              name="demo-multiple"
+              options={LANGUAGE_OPTIONS}
+              multiple
+              searchable
+              placeholder="Select languages..."
+              label="Languages (Multi)"
+            />
+          </div>
+          <div style={{ marginBlockStart: '1rem' }}>
+            <CopyBlock
+              code={`<Select\n  name="languages"\n  options={options}\n  multiple           // multi-select with tag pills\n  searchable\n  placeholder="Select languages..."\n  onChange={(values) => console.log(values)}\n/>`}
+              language="typescript"
+            />
+          </div>
+        </section>
+      )}
+
+      {/* ── 5d. Clearable (Dedicated) ────────────────── */}
+      {!isLite && (
+        <section className="select-page__section" id="clearable">
+          <h2 className="select-page__section-title">
+            <a href="#clearable">Clearable</a>
+          </h2>
+          <p className="select-page__section-desc">
+            Set <code>clearable</code> to show a clear button (X) when a value is selected.
+            Clicking it resets the select to its placeholder state. Works with both single
+            and multiple modes.
+          </p>
+          <div style={{ display: 'flex', gap: '1.5rem', flexWrap: 'wrap', maxWidth: 600 }}>
+            <div style={{ flex: '1 1 260px' }}>
+              <SelectComponent
+                name="demo-clearable-single"
+                options={TIMEZONE_OPTIONS}
+                clearable
+                placeholder="Select timezone..."
+                label="Timezone (Clearable)"
+              />
+            </div>
+            <div style={{ flex: '1 1 260px' }}>
+              <SelectComponent
+                name="demo-clearable-multi"
+                options={LANGUAGE_OPTIONS}
+                clearable
+                multiple
+                placeholder="Select languages..."
+                label="Multi + Clearable"
+              />
+            </div>
+          </div>
+          <div style={{ marginBlockStart: '1rem' }}>
+            <CopyBlock
+              code={`<Select\n  name="timezone"\n  options={options}\n  clearable          // shows X to reset selection\n  placeholder="Select timezone..."\n/>`}
+              language="typescript"
+            />
+          </div>
+        </section>
+      )}
+
       {/* ── 6. Weight Tiers ────────────────────────────── */}
       <section className="select-page__section" id="tiers">
         <h2 className="select-page__section-title">

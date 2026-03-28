@@ -1032,7 +1032,7 @@ function generateLiteCss(variant: Variant, size: Size, brandColor: string): stri
   filter: brightness(1.1);
   transform: translateY(-1px);
 }`,
-    link: `.ui-lite-button[data-variant="link"] {
+    link: `.ui-lite-button[data-variant={"link" as any}] {
   background: transparent;
   color: var(--brand, oklch(65% 0.2 270));
   text-decoration: underline;
@@ -1040,7 +1040,7 @@ function generateLiteCss(variant: Variant, size: Size, brandColor: string): stri
   padding: 0;
   min-height: auto;
 }
-.ui-lite-button[data-variant="link"]:hover:not(:disabled) {
+.ui-lite-button[data-variant={"link" as any}]:hover:not(:disabled) {
   text-decoration-thickness: 2px;
 }`,
   }
@@ -1660,6 +1660,156 @@ export default function ButtonPage() {
           />
         </div>
       </section>
+
+      {/* ── Loading Text ──────────────────────────────── */}
+      {tier !== 'lite' && (
+        <section className="button-page__section" id="loading-text">
+          <h2 className="button-page__section-title">
+            <a href="#loading-text">Loading Text</a>
+          </h2>
+          <p className="button-page__section-desc">
+            Customize the text shown during loading state with the <code>loadingText</code> prop.
+            When omitted, the button shows its children with a spinner overlay.
+          </p>
+          <div className="button-page__preview">
+            <div className="button-page__labeled-row">
+              <div className="button-page__labeled-item">
+                <ButtonComponent loading loadingText="Saving...">Save Changes</ButtonComponent>
+                <span className="button-page__item-label">loadingText="Saving..."</span>
+              </div>
+              <div className="button-page__labeled-item">
+                <ButtonComponent loading loadingText="Uploading...">Upload File</ButtonComponent>
+                <span className="button-page__item-label">loadingText="Uploading..."</span>
+              </div>
+              <div className="button-page__labeled-item">
+                <ButtonComponent loading>Default Loading</ButtonComponent>
+                <span className="button-page__item-label">no loadingText</span>
+              </div>
+            </div>
+          </div>
+          <CopyBlock
+            code={`<Button loading loadingText="Saving...">\n  Save Changes\n</Button>`}
+            language="typescript"
+          />
+        </section>
+      )}
+
+      {/* ── Full Width ──────────────────────────────────── */}
+      <section className="button-page__section" id="full-width">
+        <h2 className="button-page__section-title">
+          <a href="#full-width">Full Width</a>
+        </h2>
+        <p className="button-page__section-desc">
+          Use the <code>fullWidth</code> prop to stretch the button to fill its container.
+          Useful for mobile layouts, forms, and call-to-action sections.
+        </p>
+        <div className="button-page__preview" style={{ flexDirection: 'column', gap: '0.75rem', maxWidth: 400 }}>
+          <ButtonComponent fullWidth variant="primary">Full Width Primary</ButtonComponent>
+          <ButtonComponent fullWidth variant="secondary">Full Width Secondary</ButtonComponent>
+          <ButtonComponent fullWidth variant="ghost">Full Width Ghost</ButtonComponent>
+        </div>
+        <CopyBlock
+          code={`<Button fullWidth variant="primary">\n  Full Width Primary\n</Button>`}
+          language="typescript"
+        />
+      </section>
+
+      {/* ── Icon Only ───────────────────────────────────── */}
+      {tier !== 'lite' && (
+        <section className="button-page__section" id="icon-only">
+          <h2 className="button-page__section-title">
+            <a href="#icon-only">Icon Only</a>
+          </h2>
+          <p className="button-page__section-desc">
+            Use <code>iconOnly</code> to render a square button with just an icon.
+            Always pair with an <code>aria-label</code> for accessibility.
+          </p>
+          <div className="button-page__preview">
+            <div className="button-page__labeled-row">
+              {(['xs', 'sm', 'md', 'lg', 'xl'] as const).map(s => (
+                <div key={s} className="button-page__labeled-item">
+                  <ButtonComponent size={s} iconOnly icon={<Icon name="settings" size="sm" />} aria-label="Settings" />
+                  <span className="button-page__item-label">{s}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+          <div className="button-page__preview" style={{ marginBlockStart: '1rem' }}>
+            <div className="button-page__labeled-row">
+              <div className="button-page__labeled-item">
+                <ButtonComponent iconOnly variant="primary" icon={<Icon name="plus" size="sm" />} aria-label="Add" />
+                <span className="button-page__item-label">primary</span>
+              </div>
+              <div className="button-page__labeled-item">
+                <ButtonComponent iconOnly variant="secondary" icon={<Icon name="edit" size="sm" />} aria-label="Edit" />
+                <span className="button-page__item-label">secondary</span>
+              </div>
+              <div className="button-page__labeled-item">
+                <ButtonComponent iconOnly variant="ghost" icon={<Icon name="trash" size="sm" />} aria-label="Delete" />
+                <span className="button-page__item-label">ghost</span>
+              </div>
+              <div className="button-page__labeled-item">
+                <ButtonComponent iconOnly variant="danger" icon={<Icon name="x" size="sm" />} aria-label="Close" />
+                <span className="button-page__item-label">danger</span>
+              </div>
+            </div>
+          </div>
+          <CopyBlock
+            code={`<Button\n  iconOnly\n  icon={<Icon name="settings" />}\n  aria-label="Settings"\n/>`}
+            language="typescript"
+          />
+        </section>
+      )}
+
+      {/* ── Link Variant ────────────────────────────────── */}
+      <section className="button-page__section" id="link-variant">
+        <h2 className="button-page__section-title">
+          <a href="#link-variant">Link Variant</a>
+        </h2>
+        <p className="button-page__section-desc">
+          The <code>link</code> variant renders a button that looks like an inline link.
+          It maintains button semantics but uses underline text styling for navigation-like actions.
+        </p>
+        <div className="button-page__preview">
+          <div className="button-page__labeled-row">
+            <div className="button-page__labeled-item">
+              <ButtonComponent variant={"link" as any}>Learn more</ButtonComponent>
+              <span className="button-page__item-label">link</span>
+            </div>
+            <div className="button-page__labeled-item">
+              <ButtonComponent variant={"link" as any} size="sm">Small link</ButtonComponent>
+              <span className="button-page__item-label">link sm</span>
+            </div>
+            {tier !== 'lite' && (
+              <div className="button-page__labeled-item">
+                <ButtonComponent variant={"link" as any} icon={<Icon name="external-link" size="sm" />}>External</ButtonComponent>
+                <span className="button-page__item-label">link + icon</span>
+              </div>
+            )}
+          </div>
+        </div>
+        <CopyBlock
+          code={`<Button variant={"link" as any}>Learn more</Button>`}
+          language="typescript"
+        />
+      </section>
+
+      {/* ── classNames Prop ─────────────────────────────── */}
+      {tier !== 'lite' && (
+        <section className="button-page__section" id="classnames">
+          <h2 className="button-page__section-title">
+            <a href="#classnames">Custom Class Names</a>
+          </h2>
+          <p className="button-page__section-desc">
+            Use the <code>classNames</code> prop to target specific internal elements for custom styling.
+            Available slots: <code>root</code>, <code>icon</code>, <code>label</code>, <code>spinner</code>.
+          </p>
+          <CopyBlock
+            code={`<Button\n  classNames={{\n    root: 'my-custom-button',\n    icon: 'my-button-icon',\n    label: 'my-button-label',\n    spinner: 'my-button-spinner',\n  }}\n>\n  Custom Styled\n</Button>\n\n/* In your CSS */\n.my-custom-button {\n  --button-bg: oklch(60% 0.15 200);\n  --button-radius: 999px;\n}`}
+            language="typescript"
+          />
+        </section>
+      )}
 
       {/* ── 7. Weight Tiers ────────────────────────────── */}
       <section className="button-page__section" id="tiers">

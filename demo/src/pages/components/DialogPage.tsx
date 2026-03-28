@@ -1244,6 +1244,8 @@ export default function DialogPage() {
   const [confirmDefaultOpen, setConfirmDefaultOpen] = useState(false)
   const [confirmDangerOpen, setConfirmDangerOpen] = useState(false)
   const [confirmLoadingOpen, setConfirmLoadingOpen] = useState(false)
+  const [footerDialogOpen, setFooterDialogOpen] = useState(false)
+  const [preventCloseDialogOpen, setPreventCloseDialogOpen] = useState(false)
   const [confirmLoading, setConfirmLoading] = useState(false)
 
   const DialogComponent = tier === 'lite' ? LiteDialog : tier === 'premium' ? PremiumDialog : Dialog
@@ -1569,6 +1571,98 @@ export default function DialogPage() {
           </DialogComponent>
         )}
       </section>
+
+      {/* ── 4b. Footer Prop ────────────────────────────── */}
+      {tier !== 'lite' && (
+        <section className="dialog-page__section" id="footer">
+          <h2 className="dialog-page__section-title">
+            <a href="#footer">Footer</a>
+          </h2>
+          <p className="dialog-page__section-desc">
+            Use the <code>footer</code> prop to render a sticky footer area at the bottom
+            of the dialog. Ideal for action buttons, status text, or progress indicators.
+          </p>
+          <div className="dialog-page__feature-grid">
+            <div className="dialog-page__feature-cell">
+              <Button size="sm" variant="secondary" onClick={() => setFooterDialogOpen(true)}>
+                Dialog with Footer
+              </Button>
+              <span className="dialog-page__feature-label">footer prop</span>
+            </div>
+          </div>
+          <DialogComponent
+            open={footerDialogOpen}
+            onClose={() => setFooterDialogOpen(false)}
+            title="Terms of Service"
+            description="Please review the terms before continuing."
+            size="md"
+            footer={
+              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.5rem', padding: '0.75rem 1.25rem', borderTop: '1px solid var(--border-subtle)' }}>
+                <Button size="sm" variant="ghost" onClick={() => setFooterDialogOpen(false)}>Decline</Button>
+                <Button size="sm" variant="primary" onClick={() => setFooterDialogOpen(false)}>Accept</Button>
+              </div>
+            }
+          >
+            <p style={{ margin: 0, color: 'var(--text-secondary)', lineHeight: 1.6, fontSize: '0.875rem' }}>
+              By using this service, you agree to our terms and conditions.
+              The footer below stays fixed at the bottom of the dialog,
+              even if content scrolls. This makes action buttons always visible and accessible.
+            </p>
+          </DialogComponent>
+          <div style={{ marginBlockStart: '1rem' }}>
+            <CopyBlock
+              code={`<Dialog\n  open={open}\n  onClose={onClose}\n  title="Terms of Service"\n  footer={\n    <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'flex-end' }}>\n      <Button variant="ghost" onClick={onClose}>Decline</Button>\n      <Button variant="primary" onClick={onAccept}>Accept</Button>\n    </div>\n  }\n>\n  <p>Dialog body content here...</p>\n</Dialog>`}
+              language="typescript"
+            />
+          </div>
+        </section>
+      )}
+
+      {/* ── 4c. Prevent Close ──────────────────────────── */}
+      {tier !== 'lite' && (
+        <section className="dialog-page__section" id="prevent-close">
+          <h2 className="dialog-page__section-title">
+            <a href="#prevent-close">Prevent Close</a>
+          </h2>
+          <p className="dialog-page__section-desc">
+            Use <code>preventClose</code> to prevent the dialog from being closed by clicking
+            the backdrop or pressing Escape. Users must interact with the dialog content
+            (e.g., click a button) to close it. Useful for mandatory acknowledgements or multi-step flows.
+          </p>
+          <div className="dialog-page__feature-grid">
+            <div className="dialog-page__feature-cell">
+              <Button size="sm" variant="danger" onClick={() => setPreventCloseDialogOpen(true)}>
+                Mandatory Dialog
+              </Button>
+              <span className="dialog-page__feature-label">preventClose</span>
+            </div>
+          </div>
+          <DialogComponent
+            open={preventCloseDialogOpen}
+            onClose={() => setPreventCloseDialogOpen(false)}
+            title="Required Action"
+            description="This dialog cannot be dismissed with Escape or backdrop click."
+            size="sm"
+            preventClose
+          >
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+              <p style={{ margin: 0, color: 'var(--text-secondary)', lineHeight: 1.6, fontSize: '0.875rem' }}>
+                You must click the button below to close this dialog. Pressing Escape or
+                clicking outside will not work.
+              </p>
+              <Button size="sm" variant="primary" onClick={() => setPreventCloseDialogOpen(false)} fullWidth>
+                I Understand
+              </Button>
+            </div>
+          </DialogComponent>
+          <div style={{ marginBlockStart: '1rem' }}>
+            <CopyBlock
+              code={`<Dialog\n  open={open}\n  onClose={onClose}\n  title="Required Action"\n  preventClose    // blocks Escape and backdrop click\n>\n  <p>You must acknowledge this dialog.</p>\n  <Button onClick={onClose}>I Understand</Button>\n</Dialog>`}
+              language="typescript"
+            />
+          </div>
+        </section>
+      )}
 
       {/* ── 5. ConfirmDialog ───────────────────────────── */}
       {tier !== 'lite' && (

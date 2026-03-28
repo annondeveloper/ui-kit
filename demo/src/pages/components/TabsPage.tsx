@@ -1136,6 +1136,14 @@ function PlaygroundSection({ tier: tierProp, brandColor }: { tier: Tier; brandCo
   const [motion, setMotion] = useState<0 | 1 | 2 | 3>(3)
   const [activePlaygroundTab, setActivePlaygroundTab] = useState('tab1')
   const [copyStatus, setCopyStatus] = useState('')
+  const [badgeTab, setBadgeTab] = useState('inbox')
+  const [closeableTabs, setCloseableTabs] = useState([
+    { id: 'file1', label: 'index.tsx' },
+    { id: 'file2', label: 'styles.css' },
+    { id: 'file3', label: 'utils.ts' },
+    { id: 'file4', label: 'api.ts' },
+  ])
+  const [closeableActiveTab, setCloseableActiveTab] = useState('file1')
 
   // effectiveTier maps each tier correctly
   const effectiveTier = tier
@@ -1678,6 +1686,134 @@ export default function TabsPage() {
           </div>
         )}
       </section>
+
+      {/* ── 5b. Badge on Tabs ─────────────────────────── */}
+      {effectiveTier !== 'lite' && (
+        <section className="tabs-page__section" id="badge-tabs">
+          <h2 className="tabs-page__section-title">
+            <a href="#badge-tabs">Badge on Tabs</a>
+          </h2>
+          <p className="tabs-page__section-desc">
+            Add notification badges to tab labels using the <code>badge</code> property
+            in the tab definition. Badges can be numbers or dots, useful for showing
+            unread counts or status indicators.
+          </p>
+          <div className="tabs-page__preview tabs-page__preview--col">
+            <TabsComponent
+              tabs={[
+                { id: 'inbox', label: 'Inbox', badge: 12 },
+                { id: 'sent', label: 'Sent' },
+                { id: 'drafts', label: 'Drafts', badge: 3 },
+                { id: 'spam', label: 'Spam', badge: 'dot' },
+              ]}
+              activeTab={badgeTab}
+              onChange={setBadgeTab}
+              variant="underline"
+            >
+              <TabPanel tabId="inbox">
+                <p style={{ color: 'var(--text-secondary)', margin: 0 }}>You have 12 unread messages in your inbox.</p>
+              </TabPanel>
+              <TabPanel tabId="sent">
+                <p style={{ color: 'var(--text-secondary)', margin: 0 }}>Sent messages archive.</p>
+              </TabPanel>
+              <TabPanel tabId="drafts">
+                <p style={{ color: 'var(--text-secondary)', margin: 0 }}>3 drafts waiting to be finished.</p>
+              </TabPanel>
+              <TabPanel tabId="spam">
+                <p style={{ color: 'var(--text-secondary)', margin: 0 }}>Spam folder (dot indicator).</p>
+              </TabPanel>
+            </TabsComponent>
+          </div>
+          <div style={{ marginBlockStart: '0.75rem' }}>
+            <CopyBlock
+              code={`const tabs = [
+  { id: 'inbox', label: 'Inbox', badge: 12 },
+  { id: 'sent', label: 'Sent' },
+  { id: 'drafts', label: 'Drafts', badge: 3 },
+  { id: 'spam', label: 'Spam', badge: 'dot' },
+]
+
+<Tabs tabs={tabs} activeTab={activeTab} onChange={setActiveTab}>
+  <TabPanel tabId="inbox">...</TabPanel>
+</Tabs>`}
+              language="typescript"
+            />
+          </div>
+        </section>
+      )}
+
+      {/* ── 5c. Closeable Tabs ──────────────────────────── */}
+      {effectiveTier !== 'lite' && (
+        <section className="tabs-page__section" id="closeable-tabs">
+          <h2 className="tabs-page__section-title">
+            <a href="#closeable-tabs">Closeable Tabs</a>
+          </h2>
+          <p className="tabs-page__section-desc">
+            Set <code>closeable</code> on individual tabs to show a close button.
+            Handle removal with the <code>onClose</code> callback. When the active
+            tab is closed, focus shifts to an adjacent tab automatically.
+          </p>
+          <div className="tabs-page__preview tabs-page__preview--col">
+            <TabsComponent
+              tabs={closeableTabs.map(t => ({ ...t, closeable: true }))}
+              activeTab={closeableActiveTab}
+              onChange={setCloseableActiveTab}
+              onClose={(tabId) => {
+                setCloseableTabs(prev => {
+                  const next = prev.filter(t => t.id !== tabId)
+                  if (closeableActiveTab === tabId && next.length > 0) {
+                    setCloseableActiveTab(next[0].id)
+                  }
+                  return next
+                })
+              }}
+              variant="pills"
+            >
+              {closeableTabs.map(t => (
+                <TabPanel key={t.id} tabId={t.id}>
+                  <p style={{ color: 'var(--text-secondary)', margin: 0 }}>Content for {t.label}</p>
+                </TabPanel>
+              ))}
+            </TabsComponent>
+            {closeableTabs.length === 0 && (
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                <span style={{ color: 'var(--text-tertiary)', fontSize: 'var(--text-sm)' }}>All tabs closed!</span>
+                <Button size="xs" variant="secondary" onClick={() => {
+                  setCloseableTabs([
+                    { id: 'file1', label: 'index.tsx' },
+                    { id: 'file2', label: 'styles.css' },
+                    { id: 'file3', label: 'utils.ts' },
+                    { id: 'file4', label: 'api.ts' },
+                  ])
+                  setCloseableActiveTab('file1')
+                }}>
+                  Reset Tabs
+                </Button>
+              </div>
+            )}
+          </div>
+          <div style={{ marginBlockStart: '0.75rem' }}>
+            <CopyBlock
+              code={`const [tabs, setTabs] = useState([
+  { id: 'file1', label: 'index.tsx', closeable: true },
+  { id: 'file2', label: 'styles.css', closeable: true },
+])
+
+<Tabs
+  tabs={tabs}
+  activeTab={activeTab}
+  onChange={setActiveTab}
+  onClose={(tabId) => {
+    setTabs(prev => prev.filter(t => t.id !== tabId))
+  }}
+>
+  ...
+</Tabs>`}
+              language="typescript"
+            />
+          </div>
+        </section>
+      )}
 
       {/* ── 6. Weight Tiers ────────────────────────────── */}
       <section className="tabs-page__section" id="tiers">

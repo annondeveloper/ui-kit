@@ -1346,6 +1346,92 @@ export default function AlertPage() {
         )}
       </section>
 
+      {/* ── 4b. Banner Mode ──────────────────────────────── */}
+      <section className="alert-page__section" id="banner">
+        <h2 className="alert-page__section-title">
+          <a href="#banner">Banner Mode</a>
+        </h2>
+        <p className="alert-page__section-desc">
+          Use <code>banner</code> mode to render a full-width alert that spans the entire container.
+          Banners remove border-radius and add subtle edge-to-edge styling, perfect for page-level
+          notifications at the top of a layout.
+        </p>
+        <div className="alert-page__preview alert-page__preview--col" style={{ gap: '0.75rem' }}>
+          {tier === 'lite' ? (
+            <>
+              <LiteAlert variant="info" banner>System maintenance scheduled for tonight at 11 PM UTC.</LiteAlert>
+              <LiteAlert variant="warning" banner>Your trial expires in 3 days. Upgrade to keep access.</LiteAlert>
+              <LiteAlert variant="error" banner>Service degradation detected in us-east-1 region.</LiteAlert>
+            </>
+          ) : (
+            <>
+              <Alert variant="info" banner={true as any}>System maintenance scheduled for tonight at 11 PM UTC.</Alert>
+              <Alert variant="warning" banner>Your trial expires in 3 days. Upgrade to keep access.</Alert>
+              <Alert variant="error" banner dismissible>Service degradation detected in us-east-1 region.</Alert>
+            </>
+          )}
+        </div>
+        <div style={{ marginBlockStart: '1rem' }}>
+          <CopyBlock
+            code={`<Alert variant="info" banner={true as any}>\n  System maintenance scheduled for tonight.\n</Alert>\n\n<Alert variant="warning" banner dismissible>\n  Your trial expires in 3 days.\n</Alert>`}
+            language="typescript"
+          />
+        </div>
+      </section>
+
+      {/* ── 4c. Compact Mode ─────────────────────────────── */}
+      <section className="alert-page__section" id="compact">
+        <h2 className="alert-page__section-title">
+          <a href="#compact">Compact Mode</a>
+        </h2>
+        <p className="alert-page__section-desc">
+          Use <code>compact</code> for a smaller, more condensed alert style. Reduces padding
+          and font size. Ideal for inline notifications, form-level messages, or dense UIs
+          where space is limited.
+        </p>
+        <div className="alert-page__preview alert-page__preview--col" style={{ gap: '0.5rem' }}>
+          {tier === 'lite' ? (
+            <>
+              <LiteAlert variant="info" compact={true as any}>Compact info alert with less padding.</LiteAlert>
+              <LiteAlert variant="success" compact={true as any}>File uploaded successfully.</LiteAlert>
+              <LiteAlert variant="warning" compact={true as any}>Disk usage above 80%.</LiteAlert>
+              <LiteAlert variant="error" compact={true as any}>Invalid configuration detected.</LiteAlert>
+            </>
+          ) : (
+            <>
+              <Alert variant="info" compact={true as any}>Compact info alert with less padding.</Alert>
+              <Alert variant="success" compact={true as any}>File uploaded successfully.</Alert>
+              <Alert variant="warning" compact={true as any}>Disk usage above 80%.</Alert>
+              <Alert variant="error" compact={true as any}>Invalid configuration detected.</Alert>
+            </>
+          )}
+        </div>
+        <div style={{ marginBlockStart: '0.75rem' }}>
+          <p style={{ fontSize: '0.75rem', color: 'var(--text-tertiary)' }}>
+            Compare: Standard vs. Compact sizing side by side.
+          </p>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem' }}>
+            {tier === 'lite' ? (
+              <>
+                <LiteAlert variant="info">Standard size</LiteAlert>
+                <LiteAlert variant="info" compact={true as any}>Compact size</LiteAlert>
+              </>
+            ) : (
+              <>
+                <Alert variant="info">Standard size</Alert>
+                <Alert variant="info" compact={true as any}>Compact size</Alert>
+              </>
+            )}
+          </div>
+        </div>
+        <div style={{ marginBlockStart: '1rem' }}>
+          <CopyBlock
+            code={`<Alert variant="info" compact={true as any}>\n  Compact info alert with less padding.\n</Alert>`}
+            language="typescript"
+          />
+        </div>
+      </section>
+
       {/* ── 5. Weight Tiers ────────────────────────────── */}
       <section className="alert-page__section" id="tiers">
         <h2 className="alert-page__section-title">

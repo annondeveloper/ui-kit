@@ -1317,6 +1317,89 @@ export default function FormInputPage() {
         </section>
       )}
 
+      {/* ── 7b. Character Count ──────────────────────────── */}
+      {tier !== 'lite' && (
+        <section className="form-input-page__section" id="character-count">
+          <h2 className="form-input-page__section-title">
+            <a href="#character-count">Character Count</a>
+          </h2>
+          <p className="form-input-page__section-desc">
+            Combine <code>showCount</code> with <code>maxLength</code> to display a live
+            character counter below the input. The counter updates as the user types and
+            changes color when approaching or exceeding the limit.
+          </p>
+          <div className="form-input-page__preview" style={{ flexDirection: 'column', gap: '1.25rem', maxWidth: 400 }}>
+            <InputComponent
+              name="count-short"
+              label="Username"
+              placeholder="Enter username..."
+              maxLength={20}
+              showCount
+              size="md"
+            />
+            <InputComponent
+              name="count-bio"
+              label="Bio"
+              placeholder="Tell us about yourself..."
+              maxLength={140}
+              showCount
+              size="md"
+            />
+            <InputComponent
+              name="count-description"
+              label="Description"
+              placeholder="Project description..."
+              maxLength={500}
+              showCount
+              description="Briefly describe your project in 500 characters or less."
+              size="md"
+            />
+          </div>
+          <div style={{ marginBlockStart: '1rem' }}>
+            <CopyBlock
+              code={`<FormInput\n  name="username"\n  label="Username"\n  maxLength={20}\n  showCount       // shows "0/20" counter\n  placeholder="Enter username..."\n/>\n\n<FormInput\n  name="bio"\n  label="Bio"\n  maxLength={140}\n  showCount\n/>`}
+              language="typescript"
+            />
+          </div>
+        </section>
+      )}
+
+      {/* ── 7c. Clearable ──────────────────────────────── */}
+      {tier !== 'lite' && (
+        <section className="form-input-page__section" id="clearable">
+          <h2 className="form-input-page__section-title">
+            <a href="#clearable">Clearable</a>
+          </h2>
+          <p className="form-input-page__section-desc">
+            Use the <code>clearable</code> prop to show a clear button (X) when the input
+            has a value. Clicking it resets the input to empty and fires the <code>onChange</code> callback.
+          </p>
+          <div className="form-input-page__preview" style={{ flexDirection: 'column', gap: '1.25rem', maxWidth: 400 }}>
+            <InputComponent
+              name="clearable-search"
+              label="Search"
+              placeholder="Type to search..."
+              clearable
+              icon="search"
+              size="md"
+            />
+            <InputComponent
+              name="clearable-url"
+              label="Website URL"
+              placeholder="https://example.com"
+              clearable
+              size="md"
+            />
+          </div>
+          <div style={{ marginBlockStart: '1rem' }}>
+            <CopyBlock
+              code={`<FormInput\n  name="search"\n  label="Search"\n  placeholder="Type to search..."\n  clearable       // shows X button when input has value\n  icon="search"\n/>`}
+              language="typescript"
+            />
+          </div>
+        </section>
+      )}
+
       {/* ── 8. Weight Tiers ────────────────────────────── */}
       <section className="form-input-page__section" id="tiers">
         <h2 className="form-input-page__section-title">

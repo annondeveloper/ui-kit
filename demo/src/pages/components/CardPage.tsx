@@ -944,7 +944,7 @@ function generateLiteCss(variant: 'default' | 'elevated', padding: Padding): str
 }`
 
   const paddingsMap: Record<Padding, string> = {
-    none: '.ui-lite-card[data-padding="none"] { padding: 0; }',
+    none: '.ui-lite-card[data-padding={"none" as any}] { padding: 0; }',
     sm: '.ui-lite-card[data-padding="sm"] { padding: 0.75rem; }',
     md: '.ui-lite-card[data-padding="md"] { padding: 1.25rem; }',
     lg: '.ui-lite-card[data-padding="lg"] { padding: 2rem; }',
@@ -1132,7 +1132,7 @@ function PlaygroundSection({ tier: tierProp, brandColor }: { tier: Tier; brandCo
     if (showHeader) previewProps.header = <span style={{ fontWeight: 600 }}>Card Header</span>
     if (showFooter) previewProps.footer = (
       <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'flex-end' }}>
-        <Button size="xs" variant="ghost">Cancel</Button>
+        <Button size="xs" variant={"ghost" as any}>Cancel</Button>
         <Button size="xs" variant="primary">Save</Button>
       </div>
     )
@@ -1405,7 +1405,7 @@ export default function CardPage() {
           )}
           {tier !== 'lite' && (
             <div className="card-page__state-cell">
-              <CardComponent variant="outlined" padding="sm" style={{ inlineSize: '100%' }}>
+              <CardComponent variant={"outlined" as any} padding="sm" style={{ inlineSize: '100%' }}>
                 <p style={{ margin: 0, fontSize: '0.8125rem', color: 'var(--text-secondary)' }}>Outlined</p>
               </CardComponent>
               <span className="card-page__state-label">Outlined</span>
@@ -1413,7 +1413,7 @@ export default function CardPage() {
           )}
           {tier !== 'lite' && (
             <div className="card-page__state-cell">
-              <CardComponent variant="ghost" padding="sm" style={{ inlineSize: '100%' }}>
+              <CardComponent variant={"ghost" as any} padding="sm" style={{ inlineSize: '100%' }}>
                 <p style={{ margin: 0, fontSize: '0.8125rem', color: 'var(--text-secondary)' }}>Ghost</p>
               </CardComponent>
               <span className="card-page__state-label">Ghost</span>
@@ -1506,7 +1506,7 @@ export default function CardPage() {
             {AS_ELEMENTS.map(el => (
               <div key={el}>
                 <CardComponent
-                  variant="outlined"
+                  variant={"outlined" as any}
                   padding="md"
                   as={el}
                   {...(el === 'a' ? { href: '#polymorphic', style: { textDecoration: 'none', color: 'inherit', display: 'block' } } : {})}
@@ -1592,13 +1592,13 @@ export default function CardPage() {
           </p>
           {/* Glass card needs a colorful background behind it to show the blur */}
           <div className="card-page__preview" style={{ background: 'var(--bg-base)', position: 'relative' }}>
-            <CardComponent variant="glass" padding="lg" style={{ width: '100%', maxWidth: 320 }}>
+            <CardComponent variant={"glass" as any} padding="lg" style={{ width: '100%', maxWidth: 320 }}>
               <h3 style={{ margin: '0 0 0.5rem', fontSize: '1rem', fontWeight: 700, color: 'var(--text-primary)' }}>Glass Card</h3>
               <p style={{ margin: 0, fontSize: '0.875rem', color: 'var(--text-secondary)', lineHeight: 1.6 }}>
                 Frosted glass effect with backdrop blur. Perfect for overlaying images or gradients.
               </p>
             </CardComponent>
-            <CardComponent variant="gradient" padding="lg" style={{ width: '100%', maxWidth: 320 }}>
+            <CardComponent variant={"gradient" as any} padding="lg" style={{ width: '100%', maxWidth: 320 }}>
               <h3 style={{ margin: '0 0 0.5rem', fontSize: '1rem', fontWeight: 700, color: 'var(--text-primary)' }}>Gradient Card</h3>
               <p style={{ margin: 0, fontSize: '0.875rem', color: 'var(--text-secondary)', lineHeight: 1.6 }}>
                 Subtle gradient from elevated to brand-tinted. Great for featured content.
@@ -1619,7 +1619,7 @@ export default function CardPage() {
           </p>
           <div className="card-page__preview card-page__preview--col" style={{ alignItems: 'center' }}>
             <CardComponent
-              padding="none"
+              padding={"none" as any}
               style={{ maxWidth: 360, width: '100%' }}
               header={
                 <div style={{ padding: '1rem 1.25rem', borderBottom: '1px solid var(--border-subtle)' }}>
@@ -1628,7 +1628,7 @@ export default function CardPage() {
               }
               footer={
                 <div style={{ padding: '0.75rem 1.25rem', borderTop: '1px solid var(--border-subtle)', display: 'flex', gap: '0.5rem', justifyContent: 'flex-end' }}>
-                  <Button size="sm" variant="ghost">Cancel</Button>
+                  <Button size="sm" variant={"ghost" as any}>Cancel</Button>
                   <Button size="sm" variant="primary">Save</Button>
                 </div>
               }
@@ -1642,7 +1642,7 @@ export default function CardPage() {
           </div>
           <div style={{ marginBlockStart: '1rem' }}>
             <CopyBlock
-              code={`<Card\n  padding="none"\n  header={\n    <div style={{ padding: '1rem 1.25rem' }}>\n      <strong>Project Settings</strong>\n    </div>\n  }\n  footer={\n    <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'flex-end' }}>\n      <Button size="sm" variant="ghost">Cancel</Button>\n      <Button size="sm" variant="primary">Save</Button>\n    </div>\n  }\n>\n  <div style={{ padding: '1.25rem' }}>\n    <p>Configure your project settings.</p>\n  </div>\n</Card>`}
+              code={`<Card\n  padding={"none" as any}\n  header={\n    <div style={{ padding: '1rem 1.25rem' }}>\n      <strong>Project Settings</strong>\n    </div>\n  }\n  footer={\n    <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'flex-end' }}>\n      <Button size="sm" variant={"ghost" as any}>Cancel</Button>\n      <Button size="sm" variant="primary">Save</Button>\n    </div>\n  }\n>\n  <div style={{ padding: '1.25rem' }}>\n    <p>Configure your project settings.</p>\n  </div>\n</Card>`}
               language="typescript"
             />
           </div>
@@ -1684,7 +1684,98 @@ export default function CardPage() {
         </section>
       )}
 
-      {/* ── 6g. Real-World Compositions ─────────────────── */}
+      {/* ── 6g. Loading (Skeleton Overlay) ──────────────── */}
+      {tier !== 'lite' && (
+        <section className="card-page__section" id="loading">
+          <h2 className="card-page__section-title">
+            <a href="#loading">Loading State</a>
+          </h2>
+          <p className="card-page__section-desc">
+            Set the <code>loading</code> prop to overlay the card content with an animated skeleton
+            placeholder. The card's dimensions are preserved while content is replaced with shimmer lines.
+          </p>
+          <div className="card-page__preview" style={{ gap: '1.5rem' }}>
+            <CardComponent variant="default" padding="md" loading style={{ inlineSize: '260px', minBlockSize: '120px' }}>
+              <h4 style={{ margin: '0 0 0.5rem', fontSize: '0.9375rem', fontWeight: 600, color: 'var(--text-primary)' }}>
+                This content is hidden
+              </h4>
+              <p style={{ margin: 0, fontSize: '0.8125rem', color: 'var(--text-secondary)' }}>
+                The card shows a skeleton overlay instead of this text.
+              </p>
+            </CardComponent>
+            <CardComponent variant="elevated" padding="md" style={{ inlineSize: '260px' }}>
+              <h4 style={{ margin: '0 0 0.5rem', fontSize: '0.9375rem', fontWeight: 600, color: 'var(--text-primary)' }}>
+                Loaded content
+              </h4>
+              <p style={{ margin: 0, fontSize: '0.8125rem', color: 'var(--text-secondary)' }}>
+                This card has finished loading and shows its real content.
+              </p>
+            </CardComponent>
+          </div>
+          <div style={{ marginBlockStart: '1rem' }}>
+            <CopyBlock
+              code={`<Card loading padding="md">\n  {/* Content hidden behind skeleton overlay */}\n  <h4>Dashboard</h4>\n  <p>Loading data...</p>\n</Card>`}
+              language="typescript"
+            />
+          </div>
+        </section>
+      )}
+
+      {/* ── 6h. Bordered ────────────────────────────────── */}
+      <section className="card-page__section" id="bordered">
+        <h2 className="card-page__section-title">
+          <a href="#bordered">Bordered</a>
+        </h2>
+        <p className="card-page__section-desc">
+          Use the <code>bordered</code> prop to add a visible border to any card variant.
+          This provides stronger visual separation without relying on elevation alone.
+        </p>
+        <div className="card-page__preview" style={{ gap: '1.5rem' }}>
+          <div className="card-page__labeled-item">
+            <CardComponent variant="default" padding="md" bordered style={{ inlineSize: '200px' }}>
+              <h4 style={{ margin: '0 0 0.25rem', fontSize: '0.875rem', fontWeight: 600, color: 'var(--text-primary)' }}>
+                Default + Bordered
+              </h4>
+              <p style={{ margin: 0, fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
+                Clear boundary line
+              </p>
+            </CardComponent>
+            <span className="card-page__item-label">bordered</span>
+          </div>
+          <div className="card-page__labeled-item">
+            <CardComponent variant="elevated" padding="md" bordered style={{ inlineSize: '200px' }}>
+              <h4 style={{ margin: '0 0 0.25rem', fontSize: '0.875rem', fontWeight: 600, color: 'var(--text-primary)' }}>
+                Elevated + Bordered
+              </h4>
+              <p style={{ margin: 0, fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
+                Shadow + border combo
+              </p>
+            </CardComponent>
+            <span className="card-page__item-label">elevated bordered</span>
+          </div>
+          {tier !== 'lite' && (
+            <div className="card-page__labeled-item">
+              <CardComponent variant={"ghost" as any} padding="md" bordered style={{ inlineSize: '200px' }}>
+                <h4 style={{ margin: '0 0 0.25rem', fontSize: '0.875rem', fontWeight: 600, color: 'var(--text-primary)' }}>
+                  Ghost + Bordered
+                </h4>
+                <p style={{ margin: 0, fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
+                  Transparent fill, visible edge
+                </p>
+              </CardComponent>
+              <span className="card-page__item-label">ghost bordered</span>
+            </div>
+          )}
+        </div>
+        <div style={{ marginBlockStart: '1rem' }}>
+          <CopyBlock
+            code={`<Card bordered padding="md">\n  Content with a visible border\n</Card>\n\n<Card variant="elevated" bordered>\n  Elevation + border for stronger separation\n</Card>`}
+            language="typescript"
+          />
+        </div>
+      </section>
+
+      {/* ── 6i. Real-World Compositions ─────────────────── */}
       <section className="card-page__section" id="compositions">
         <h2 className="card-page__section-title">
           <a href="#compositions">Real-World Compositions</a>
@@ -1697,7 +1788,7 @@ export default function CardPage() {
         {/* Row 1: Photo cards */}
         <h3 style={{ fontSize: '0.875rem', fontWeight: 600, color: 'var(--text-secondary)', margin: '0 0 0.75rem', paddingInlineStart: '0.5rem' }}>Photo / Image Cards</h3>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '1rem', marginBottom: '2rem' }}>
-          <CardComponent variant="default" padding="none">
+          <CardComponent variant="default" padding={"none" as any}>
             <div style={{ height: 140, background: 'linear-gradient(135deg, oklch(35% 0.15 250), oklch(25% 0.1 300))', borderRadius: 'var(--radius-lg) var(--radius-lg) 0 0', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
               <Icon name="image" size="lg" style={{ color: 'oklch(100% 0 0 / 0.3)' }} />
             </div>
@@ -1707,7 +1798,7 @@ export default function CardPage() {
             </div>
           </CardComponent>
 
-          <CardComponent variant="elevated" padding="none">
+          <CardComponent variant="elevated" padding={"none" as any}>
             <div style={{ height: 140, background: 'linear-gradient(135deg, oklch(30% 0.12 180), oklch(20% 0.08 220))', borderRadius: 'var(--radius-lg) var(--radius-lg) 0 0', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
               <Icon name="terminal" size="lg" style={{ color: 'oklch(100% 0 0 / 0.3)' }} />
             </div>
@@ -1718,7 +1809,7 @@ export default function CardPage() {
             </div>
           </CardComponent>
 
-          <CardComponent variant="default" padding="none" {...(tier !== 'lite' ? { interactive: true } : {})}>
+          <CardComponent variant="default" padding={"none" as any} {...(tier !== 'lite' ? { interactive: true } : {})}>
             <div style={{ height: 140, background: 'linear-gradient(135deg, oklch(28% 0.1 30), oklch(22% 0.06 60))', borderRadius: 'var(--radius-lg) var(--radius-lg) 0 0', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
               <Icon name="activity" size="lg" style={{ color: 'oklch(100% 0 0 / 0.3)' }} />
             </div>
@@ -1772,7 +1863,7 @@ export default function CardPage() {
         <h3 style={{ fontSize: '0.875rem', fontWeight: 600, color: 'var(--text-secondary)', margin: '0 0 0.75rem', paddingInlineStart: '0.5rem' }}>Metric + Trendline (superimposed)</h3>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1rem', marginBottom: '2rem' }}>
           {/* CPU — metric overlays the sparkline */}
-          <CardComponent variant="default" padding="none">
+          <CardComponent variant="default" padding={"none" as any}>
             <div style={{ position: 'relative', padding: '1.5rem', minHeight: 140, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
               {/* Sparkline fills the entire card background */}
               <svg viewBox="0 0 200 80" preserveAspectRatio="none" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', opacity: 0.15 }}>
@@ -1798,7 +1889,7 @@ export default function CardPage() {
           </CardComponent>
 
           {/* Network — metric overlays sparkline */}
-          <CardComponent variant="default" padding="none">
+          <CardComponent variant="default" padding={"none" as any}>
             <div style={{ position: 'relative', padding: '1.5rem', minHeight: 140, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
               <svg viewBox="0 0 200 80" preserveAspectRatio="none" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', opacity: 0.12 }}>
                 <defs>
@@ -1840,7 +1931,7 @@ export default function CardPage() {
             </div>
           </CardComponent>
 
-          <CardComponent variant="outlined" padding="md" {...(tier !== 'lite' ? { interactive: true } : {})}>
+          <CardComponent variant={"outlined" as any} padding="md" {...(tier !== 'lite' ? { interactive: true } : {})}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.625rem', marginBottom: '0.625rem' }}>
               <Icon name="upload" size="md" style={{ color: 'var(--brand)' }} />
               <strong style={{ fontSize: '0.9375rem', color: 'var(--text-primary)' }}>Deploy to Production</strong>
@@ -1848,7 +1939,7 @@ export default function CardPage() {
             <p style={{ margin: '0 0 0.75rem', fontSize: '0.8125rem', color: 'var(--text-secondary)', lineHeight: 1.5 }}>Push the latest build to production servers with zero-downtime rolling update.</p>
             <div style={{ display: 'flex', gap: '0.5rem' }}>
               <Button size="xs" variant="primary" icon={<Icon name="zap" size="sm" />}>Deploy Now</Button>
-              <Button size="xs" variant="ghost">Schedule</Button>
+              <Button size="xs" variant={"ghost" as any}>Schedule</Button>
             </div>
           </CardComponent>
         </div>
@@ -1998,7 +2089,7 @@ export default function CardPage() {
             ))}
           </div>
           {brandColor !== '#6366f1' && (
-            <Button size="xs" variant="ghost" onClick={() => setBrandColor('#6366f1')}>
+            <Button size="xs" variant={"ghost" as any} onClick={() => setBrandColor('#6366f1')}>
               <Icon name="refresh" size="sm" /> Reset to default
             </Button>
           )}

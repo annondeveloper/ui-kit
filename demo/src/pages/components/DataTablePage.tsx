@@ -1487,7 +1487,221 @@ const [totalRows, setTotalRows] = useState(0)
         />
       </section>
 
-      {/* ── 9. Weight Tiers ──────────────────────────────── */}
+      {/* ── 9. Column Resize & Reorder ─────────────────── */}
+      <section className="datatable-page__section" id="resize-reorder">
+        <h2 className="datatable-page__section-title">
+          <a href="#resize-reorder">Column Resize & Reorder</a>
+        </h2>
+        <p className="datatable-page__section-desc">
+          Drag column edges to resize and drag column headers to reorder.
+          Enable with the <code>resizable</code> and <code>reorderable</code> props.
+          Column widths persist during the session.
+        </p>
+        <DataTable
+          data={sampleData.slice(0, 8)}
+          columns={basicColumns}
+          resizable
+          reorderable
+          sortable
+          stickyHeader
+          bordered
+        />
+        <p style={{ fontSize: '0.75rem', color: 'var(--text-tertiary)', marginBlockStart: '0.75rem' }}>
+          Try dragging column edges to resize, or drag a column header to reorder columns.
+        </p>
+        <CopyBlock
+          code={`<DataTable
+  data={servers}
+  columns={columns}
+  resizable      // drag column edges to resize
+  reorderable    // drag headers to reorder
+  sortable
+  bordered
+/>`}
+          language="typescript"
+        />
+      </section>
+
+      {/* ── 10. Export ──────────────────────────────────── */}
+      <section className="datatable-page__section" id="export">
+        <h2 className="datatable-page__section-title">
+          <a href="#export">Export</a>
+        </h2>
+        <p className="datatable-page__section-desc">
+          Enable CSV and JSON export with a single prop. When <code>exportable</code> is set,
+          the DataTable renders export buttons in the toolbar area. Users can download
+          the current (filtered/sorted) data instantly.
+        </p>
+        <DataTable
+          data={sampleData}
+          columns={basicColumns}
+          exportable
+          searchable
+          sortable
+          paginated
+          pageSize={10}
+        />
+        <CopyBlock
+          code={`<DataTable
+  data={servers}
+  columns={columns}
+  exportable    // adds CSV & JSON export buttons
+  searchable
+  sortable
+/>`}
+          language="typescript"
+        />
+      </section>
+
+      {/* ── 11. Card Layout (Responsive Mode) ────────── */}
+      <section className="datatable-page__section" id="card-layout">
+        <h2 className="datatable-page__section-title">
+          <a href="#card-layout">Card Layout (Responsive Mode)</a>
+        </h2>
+        <p className="datatable-page__section-desc">
+          Switch to card layout for mobile-friendly data display. Each row renders as a
+          standalone card with label-value pairs. Set <code>responsiveMode="card"</code> to
+          force card layout, or let it auto-switch based on container width.
+        </p>
+        <DataTable
+          data={sampleData.slice(0, 6)}
+          columns={[
+            { id: 'hostname', header: 'Hostname', accessor: 'hostname' },
+            { id: 'region', header: 'Region', accessor: 'region' },
+            { id: 'cpu', header: 'CPU %', accessor: 'cpu', cell: (v) => <PercentBar value={v as number} /> },
+            { id: 'memory', header: 'Memory %', accessor: 'memory', cell: (v) => <PercentBar value={v as number} /> },
+            { id: 'status', header: 'Status', accessor: 'status', cell: (v) => <StatusBadge status={v as string} /> },
+          ]}
+          responsiveMode="card"
+          sortable
+        />
+        <CopyBlock
+          code={`<DataTable
+  data={servers}
+  columns={columns}
+  responsiveMode="card"   // renders each row as a card
+  sortable
+/>`}
+          language="typescript"
+        />
+      </section>
+
+      {/* ── 12. Sticky Header ──────────────────────────── */}
+      <section className="datatable-page__section" id="sticky-header">
+        <h2 className="datatable-page__section-title">
+          <a href="#sticky-header">Sticky Header</a>
+        </h2>
+        <p className="datatable-page__section-desc">
+          Keep column headers visible while scrolling through long tables.
+          The <code>stickyHeader</code> prop uses <code>position: sticky</code> so
+          headers remain pinned to the top of the scroll container.
+        </p>
+        <div style={{ height: 300, overflow: 'auto' }}>
+          <DataTable
+            data={sampleData}
+            columns={basicColumns}
+            stickyHeader
+            sortable
+            bordered
+          />
+        </div>
+        <p style={{ fontSize: '0.75rem', color: 'var(--text-tertiary)', marginBlockStart: '0.75rem' }}>
+          Scroll the table above -- the header row stays pinned at the top.
+        </p>
+        <CopyBlock
+          code={`<div style={{ height: 300, overflow: 'auto' }}>
+  <DataTable
+    data={servers}
+    columns={columns}
+    stickyHeader    // header stays pinned while scrolling
+    sortable
+    bordered
+  />
+</div>`}
+          language="typescript"
+        />
+      </section>
+
+      {/* ── 13. Custom Toolbar ─────────────────────────── */}
+      <section className="datatable-page__section" id="toolbar">
+        <h2 className="datatable-page__section-title">
+          <a href="#toolbar">Custom Toolbar</a>
+        </h2>
+        <p className="datatable-page__section-desc">
+          Inject custom actions into the DataTable toolbar area with the <code>toolbar</code> prop.
+          This renders alongside built-in search and export controls.
+        </p>
+        <DataTable
+          data={sampleData.slice(0, 8)}
+          columns={basicColumns}
+          sortable
+          searchable
+          toolbar={
+            <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+              <Button size="xs" variant="secondary" icon={<Icon name="plus" size="sm" />}>Add Server</Button>
+              <Button size="xs" variant="ghost" icon={<Icon name="refresh-cw" size="sm" />}>Refresh</Button>
+              <span style={{ fontSize: '0.75rem', color: 'var(--text-tertiary)' }}>Last updated: 30s ago</span>
+            </div>
+          }
+        />
+        <CopyBlock
+          code={`<DataTable
+  data={servers}
+  columns={columns}
+  searchable
+  toolbar={
+    <div style={{ display: 'flex', gap: '0.5rem' }}>
+      <Button size="xs" icon={<Icon name="plus" />}>
+        Add Server
+      </Button>
+      <Button size="xs" variant="ghost" icon={<Icon name="refresh-cw" />}>
+        Refresh
+      </Button>
+    </div>
+  }
+/>`}
+          language="typescript"
+        />
+      </section>
+
+      {/* ── 14. AI Suggestions ─────────────────────────── */}
+      <section className="datatable-page__section" id="ai-suggestions">
+        <h2 className="datatable-page__section-title">
+          <a href="#ai-suggestions">AI Suggestions</a>
+        </h2>
+        <p className="datatable-page__section-desc">
+          Enable intelligent suggestions with <code>showSuggestions</code>. The DataTable
+          can surface smart filter and sort recommendations based on the current data shape,
+          helping users discover insights faster.
+        </p>
+        <DataTable
+          data={sampleData}
+          columns={fullColumns}
+          showSuggestions
+          searchable
+          sortable
+          filterable
+          stickyHeader
+          paginated
+          pageSize={10}
+        />
+        <p style={{ fontSize: '0.75rem', color: 'var(--text-tertiary)', marginBlockStart: '0.75rem' }}>
+          Look for the suggestion chips above the table. They recommend filters and sorts based on data patterns.
+        </p>
+        <CopyBlock
+          code={`<DataTable
+  data={servers}
+  columns={columns}
+  showSuggestions   // AI-powered filter/sort suggestions
+  searchable
+  sortable
+  filterable
+/>`}
+          language="typescript"
+        />
+      </section>
+
+      {/* ── 15. Weight Tiers ──────────────────────────────── */}
       <section className="datatable-page__section" id="tiers">
         <h2 className="datatable-page__section-title">
           <a href="#tiers">Weight Tiers</a>
