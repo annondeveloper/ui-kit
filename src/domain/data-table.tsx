@@ -16,6 +16,8 @@ import { css } from '../core/styles/css-tag'
 import { useStyles } from '../core/styles/use-styles'
 import { useMotionLevel } from '../core/motion/use-motion-level'
 import { cn } from '../core/utils/cn'
+import { analyzeData } from './data-table-ai'
+import { DataTableSuggestions } from './data-table-suggestions'
 
 // ─── Types ────────────────────────────────────────────────────────────
 
@@ -123,6 +125,9 @@ export interface DataTableProps<T extends object>
 
   // Auto-size
   autoSizeColumns?: boolean
+
+  // AI suggestions
+  showSuggestions?: boolean
 }
 
 // ─── Styles ───────────────────────────────────────────────────────────
@@ -1528,6 +1533,8 @@ function DataTableInner<T extends object>(
     onFetchData,
     // Auto-size
     autoSizeColumns = false,
+    // AI suggestions
+    showSuggestions = false,
     className,
     ...rest
   }: DataTableProps<T>,
@@ -1536,6 +1543,12 @@ function DataTableInner<T extends object>(
   const cls = useStyles('data-table', dataTableStyles)
   useStyles('data-table-filter-portal', filterPortalStyles)
   const motionLevel = useMotionLevel(motionProp)
+
+  // ─── AI Suggestions ─────────────────────────────────────────────────
+  const aiInsights = useMemo(
+    () => (showSuggestions ? analyzeData(data, columnsProp) : []),
+    [showSuggestions, data, columnsProp]
+  )
 
   // ─── Search state ───────────────────────────────────────────────────
   const [searchQuery, setSearchQuery] = useState('')
@@ -2677,6 +2690,11 @@ function DataTableInner<T extends object>(
       {...(openFilterCol ? { 'data-filter-open': '' } : {})}
       {...rest}
     >
+      {/* ── AI Suggestions ──────────────────────────────────────────── */}
+      {showSuggestions && aiInsights.length > 0 && (
+        <DataTableSuggestions insights={aiInsights} />
+      )}
+
       {/* ── Toolbar ────────────────────────────────────────────────── */}
       {showToolbar && (
         <div className="ui-data-table__toolbar" role="toolbar" aria-label="Table controls">
