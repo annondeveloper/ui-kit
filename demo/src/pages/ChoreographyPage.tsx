@@ -91,8 +91,9 @@ const pageStyles = css`
       gap: 0.75rem;
       padding: 1rem;
       border-radius: var(--radius-lg);
-      border: 1px solid var(--border-subtle);
+      border: 1px solid var(--border-default);
       background: var(--bg-elevated);
+      box-shadow: var(--shadow-sm);
       cursor: pointer;
       transition: border-color 0.2s, box-shadow 0.2s;
     }
@@ -130,8 +131,8 @@ const pageStyles = css`
     .choreo-grid-square {
       aspect-ratio: 1;
       border-radius: var(--radius-sm);
-      opacity: 0;
-      transform: scale(0.8);
+      opacity: 1;
+      transform: scale(1);
     }
 
     .choreo-grid-square[data-ready='true'] {

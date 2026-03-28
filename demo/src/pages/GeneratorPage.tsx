@@ -81,7 +81,7 @@ const styles = css`
       position: relative;
       padding: 1.25rem;
       border-radius: 12px;
-      background: var(--surface-secondary, oklch(20% 0.02 270));
+      background: var(--bg-elevated);
       border: 2px solid transparent;
       cursor: pointer;
       transition: border-color 0.2s, box-shadow 0.2s, transform 0.15s;
@@ -173,7 +173,7 @@ const styles = css`
       gap: 0.75rem;
       padding: 0.625rem 0.75rem;
       border-radius: 8px;
-      background: var(--surface-secondary, oklch(20% 0.02 270));
+      background: var(--bg-elevated);
       cursor: pointer;
       transition: background 0.15s;
       user-select: none;
@@ -228,7 +228,7 @@ const styles = css`
       justify-content: center;
       height: 200px;
       border-radius: 12px;
-      border: 2px dashed oklch(40% 0.02 270);
+      border: 2px dashed var(--border-default);
       color: var(--text-secondary);
       font-size: 0.875rem;
     }
@@ -243,7 +243,7 @@ const styles = css`
     .gen-layout-btn {
       padding: 0.5rem 1rem;
       border-radius: 8px;
-      border: 1px solid oklch(30% 0.02 270);
+      border: 1px solid var(--border-subtle);
       background: transparent;
       color: var(--text-primary);
       cursor: pointer;
@@ -272,7 +272,7 @@ const styles = css`
     .gen-tier-btn {
       padding: 0.375rem 0.875rem;
       border-radius: 20px;
-      border: 1px solid oklch(30% 0.02 270);
+      border: 1px solid var(--border-subtle);
       background: transparent;
       color: var(--text-primary);
       cursor: pointer;
@@ -326,7 +326,7 @@ const styles = css`
       gap: 0.375rem;
       padding: 0.375rem 0.75rem;
       border-radius: 6px;
-      border: 1px solid oklch(30% 0.02 270);
+      border: 1px solid var(--border-subtle);
       background: transparent;
       color: var(--text-secondary);
       cursor: pointer;
@@ -494,7 +494,7 @@ const styles = css`
     .gen-inline-input select {
       padding: 0.5rem 0.75rem;
       border-radius: 8px;
-      border: 1px solid oklch(30% 0.02 270);
+      border: 1px solid var(--border-subtle);
       background: oklch(18% 0.02 270);
       color: inherit;
       font-size: 0.875rem;

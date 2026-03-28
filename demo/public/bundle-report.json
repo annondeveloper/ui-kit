@@ -1,0 +1,70 @@
+{
+  "generated": "2026-03-28T02:16:22.010Z",
+  "budget": 358400,
+  "files": [
+    {
+      "name": "chunk-WTNFZQ7X.js",
+      "raw": 1262591,
+      "gzip": 195250
+    },
+    {
+      "name": "premium.js",
+      "raw": 441077,
+      "gzip": 53476
+    },
+    {
+      "name": "chunk-GM4JEAJE.js",
+      "raw": 349626,
+      "gzip": 52614
+    },
+    {
+      "name": "lite.js",
+      "raw": 112873,
+      "gzip": 21884
+    },
+    {
+      "name": "index.js",
+      "raw": 31240,
+      "gzip": 8625
+    },
+    {
+      "name": "chunk-LSA42R3D.js",
+      "raw": 16609,
+      "gzip": 3880
+    },
+    {
+      "name": "chunk-ANYYVDY6.js",
+      "raw": 8422,
+      "gzip": 2764
+    },
+    {
+      "name": "chunk-AKGTNIRE.js",
+      "raw": 1866,
+      "gzip": 634
+    },
+    {
+      "name": "chunk-SZSXXQ3D.js",
+      "raw": 673,
+      "gzip": 335
+    },
+    {
+      "name": "chunk-AOSHQP7D.js",
+      "raw": 473,
+      "gzip": 279
+    },
+    {
+      "name": "theme.js",
+      "raw": 302,
+      "gzip": 207
+    },
+    {
+      "name": "form.js",
+      "raw": 253,
+      "gzip": 171
+    }
+  ],
+  "total": {
+    "raw": 2226005,
+    "gzip": 340119
+  }
+}
