@@ -98,10 +98,11 @@ const styles = css`
       min-width: 140px;
     }
 
-    .figma-controls .ui-select {
-      background: var(--bg-surface, oklch(97% 0.005 270));
+    .figma-controls .ui-select__trigger {
+      background: var(--bg-elevated);
       border: 1px solid var(--border-default);
       border-radius: var(--radius-md, 0.5rem);
+      box-shadow: var(--shadow-sm);
     }
 
     /* ── Token Grid ──────────────────────────────────────────── */

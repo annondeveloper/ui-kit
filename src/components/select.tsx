@@ -76,8 +76,9 @@ const selectStyles = css`
         inline-size: 100%;
         border: 1px solid var(--border-default, oklch(100% 0 0 / 0.12));
         border-radius: var(--radius-md, 0.375rem);
-        background: var(--surface-default);
+        background: var(--bg-elevated);
         color: var(--text-primary, oklch(90% 0 0));
+        box-shadow: var(--shadow-sm);
         font-family: inherit;
         font-size: var(--text-sm, 0.875rem);
         line-height: 1.5;
