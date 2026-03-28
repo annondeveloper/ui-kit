@@ -90,12 +90,18 @@ const styles = css`
       display: flex;
       gap: 0.75rem;
       flex-wrap: wrap;
-      margin-block-end: 1.25rem;
+      margin-block-end: 1.5rem;
       align-items: flex-end;
     }
 
     .figma-controls > * {
       min-width: 140px;
+    }
+
+    .figma-controls .ui-select {
+      background: var(--bg-surface, oklch(97% 0.005 270));
+      border: 1px solid var(--border-default);
+      border-radius: var(--radius-md, 0.5rem);
     }
 
     /* ── Token Grid ──────────────────────────────────────────── */
@@ -104,6 +110,9 @@ const styles = css`
       grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
       gap: 0.5rem;
       margin-block-end: 1.5rem;
+      max-height: 400px;
+      overflow-y: auto;
+      padding-inline-end: 0.25rem;
     }
 
     .figma-token {
@@ -112,7 +121,7 @@ const styles = css`
       gap: 0.5rem;
       padding: 0.5rem 0.625rem;
       border-radius: var(--radius-sm, 0.375rem);
-      background: var(--bg-base, oklch(8% 0.02 270));
+      background: var(--bg-base);
       border: 1px solid var(--border-subtle);
       transition: border-color 0.15s;
     }
@@ -127,6 +136,7 @@ const styles = css`
       border-radius: var(--radius-xs, 0.25rem);
       border: 1px solid var(--border-default);
       flex-shrink: 0;
+      box-shadow: inset 0 0 0 1px oklch(50% 0 0 / 0.1);
     }
 
     .figma-token__info {
@@ -159,21 +169,25 @@ const styles = css`
 
     .figma-export-output {
       margin-block-start: 0.75rem;
+      max-height: 420px;
+      overflow-y: auto;
     }
 
     /* ── Import Section ──────────────────────────────────────── */
     .figma-import-area {
       width: 100%;
       min-height: 200px;
+      max-height: 400px;
       padding: 0.75rem;
       border-radius: var(--radius-md, 0.5rem);
       border: 2px dashed var(--border-default);
-      background: var(--bg-base, oklch(8% 0.02 270));
+      background: var(--bg-base);
       color: var(--text-primary);
       font-family: 'SF Mono', 'Fira Code', monospace;
       font-size: 0.8125rem;
       resize: vertical;
       transition: border-color 0.15s;
+      box-sizing: border-box;
     }
 
     .figma-import-area:focus {
@@ -200,8 +214,8 @@ const styles = css`
       flex-direction: column;
       gap: 0.375rem;
       padding: 0.75rem;
-      background: var(--bg-surface, oklch(12% 0.015 270));
-      border: 1px solid var(--border-subtle);
+      background: var(--bg-surface);
+      border: 1px solid var(--border-default);
       border-radius: var(--radius-sm, 0.375rem);
       font-size: 0.8125rem;
       font-family: 'SF Mono', 'Fira Code', monospace;
@@ -312,10 +326,42 @@ const styles = css`
       padding: 0.625rem 1rem;
       border-radius: var(--radius-sm, 0.375rem);
       background: var(--status-ok, oklch(72% 0.19 145));
-      color: oklch(15% 0.02 145);
+      color: var(--text-on-status, oklch(15% 0.02 145));
       font-size: 0.8125rem;
       font-weight: 600;
       margin-block-start: 0.75rem;
+    }
+
+    /* ── Light mode adjustments ──────────────────────────────── */
+    @media (prefers-color-scheme: light) {
+      .figma-token {
+        border-color: var(--border-default);
+      }
+
+      .figma-import-area {
+        background: var(--bg-surface);
+      }
+
+      .figma-mapped-tokens {
+        background: var(--bg-surface);
+        border-color: var(--border-default);
+      }
+    }
+
+    :root[data-theme="light"] .figma-token,
+    [data-mode="light"] .figma-token {
+      border-color: var(--border-default);
+    }
+
+    :root[data-theme="light"] .figma-import-area,
+    [data-mode="light"] .figma-import-area {
+      background: var(--bg-surface);
+    }
+
+    :root[data-theme="light"] .figma-mapped-tokens,
+    [data-mode="light"] .figma-mapped-tokens {
+      background: var(--bg-surface);
+      border-color: var(--border-default);
     }
 
     @media (max-width: 640px) {
@@ -676,7 +722,7 @@ export default function FigmaPage() {
           </div>
 
           {parsedTokens === null && importJSON.trim() !== '' && (
-            <div style={{ marginTop: '0.75rem', fontSize: '0.8125rem', color: 'var(--status-critical, oklch(62% 0.22 25))' }}>
+            <div style={{ marginBlockStart: '0.75rem', fontSize: '0.8125rem', color: 'var(--status-critical)' }}>
               Could not parse the JSON. Make sure it is valid Figma Variables format.
             </div>
           )}
@@ -736,7 +782,7 @@ export default function FigmaPage() {
                 <div className="figma-plugin-step__desc">
                   Use the CLI to generate Figma-compatible token files:
                 </div>
-                <div style={{ marginTop: '0.5rem' }}>
+                <div style={{ marginBlockStart: '0.5rem' }}>
                   <CopyBlock
                     code={`# Export Figma Variables JSON
 npx @annondeveloper/ui-kit figma-export --format figma --theme aurora

@@ -12,6 +12,50 @@ import { FormInput } from '@ui/components/form-input'
 import { Select } from '@ui/components/select'
 import { MetricCard } from '@ui/domain/metric-card'
 import { DataTable, type ColumnDef } from '@ui/domain/data-table'
+
+// Forms
+import { Textarea } from '@ui/components/textarea'
+import { NumberInput } from '@ui/components/number-input'
+import { PasswordInput } from '@ui/components/password-input'
+import { Checkbox } from '@ui/components/checkbox'
+import { ToggleSwitch } from '@ui/components/toggle-switch'
+import { Slider } from '@ui/components/slider'
+import { Rating } from '@ui/components/rating'
+import { RadioGroup } from '@ui/components/radio-group'
+import { DatePicker } from '@ui/components/date-picker'
+import { TagInput } from '@ui/components/tag-input'
+import { FileUpload } from '@ui/components/file-upload'
+import { ColorInput } from '@ui/components/color-input'
+
+// Navigation
+import { Tabs, TabPanel } from '@ui/components/tabs'
+import { Breadcrumbs } from '@ui/components/breadcrumbs'
+import { Pagination } from '@ui/components/pagination'
+import { Accordion } from '@ui/components/accordion'
+
+// Data Display
+import { Progress } from '@ui/components/progress'
+import { Sparkline } from '@ui/domain/sparkline'
+import { StatusBadge } from '@ui/components/status-badge'
+import { StatusPulse } from '@ui/components/status-pulse'
+import { Skeleton } from '@ui/components/skeleton'
+import { Avatar } from '@ui/components/avatar'
+import { Divider } from '@ui/components/divider'
+import { Typography } from '@ui/components/typography'
+import { Kbd } from '@ui/components/kbd'
+import { Alert } from '@ui/components/alert'
+
+// Overlays
+import { Tooltip } from '@ui/components/tooltip'
+
+// Domain
+import { TimeSeriesChart } from '@ui/domain/time-series-chart'
+import { RingChart } from '@ui/domain/ring-chart'
+import { CoreChart } from '@ui/domain/core-chart'
+import { ThresholdGauge } from '@ui/domain/threshold-gauge'
+import { UtilizationBar } from '@ui/domain/utilization-bar'
+import { LogViewer } from '@ui/domain/log-viewer'
+import { CopyBlock } from '@ui/domain/copy-block'
 import { useTier } from '../App'
 import { getComponentDatabase, searchComponents, type ComponentInfo } from '../utils/component-database'
 import {
@@ -384,6 +428,118 @@ const styles = css`
         border-color: var(--brand);
         color: var(--brand-light);
       }
+    }
+
+    /* ── Columns Selector ──────────────────────────────────────────────── */
+    .gen-columns-selector {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-block-end: 1rem;
+    }
+
+    .gen-columns-selector__label {
+      font-size: 0.8125rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+    }
+
+    .gen-columns-selector__btns {
+      display: flex;
+      gap: 0.25rem;
+    }
+
+    .gen-col-btn {
+      padding: 0.375rem 0.625rem;
+      border-radius: 6px;
+      border: 1px solid var(--border-subtle);
+      background: transparent;
+      color: var(--text-primary);
+      cursor: pointer;
+      font-size: 0.75rem;
+      font-weight: 600;
+      min-width: 2rem;
+      text-align: center;
+      transition: all 0.15s;
+
+      &:hover {
+        background: var(--bg-hover);
+      }
+
+      &[data-active='true'] {
+        background: oklch(from var(--brand) l c h / 0.15);
+        border-color: var(--brand);
+        color: var(--brand-light);
+      }
+    }
+
+    /* ── Composition Grid ──────────────────────────────────────────────── */
+    .gen-composition-grid {
+      display: grid;
+      grid-template-columns: repeat(var(--gen-cols, 2), 1fr);
+      gap: 0.75rem;
+      min-height: 60px;
+
+      @media (max-width: 600px) {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .gen-composition-item {
+      grid-column: span var(--gen-span, 1);
+    }
+
+    /* ── Span Control ──────────────────────────────────────────────────── */
+    .gen-span-control {
+      display: flex;
+      align-items: center;
+      gap: 0.25rem;
+      margin-inline-start: auto;
+      flex-shrink: 0;
+    }
+
+    .gen-span-label {
+      font-size: 0.625rem;
+      color: var(--text-tertiary);
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .gen-span-btn {
+      width: 1.375rem;
+      height: 1.375rem;
+      border-radius: 4px;
+      border: 1px solid var(--border-subtle);
+      background: transparent;
+      color: var(--text-secondary);
+      cursor: pointer;
+      font-size: 0.625rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0;
+      transition: all 0.12s;
+
+      &:hover {
+        background: var(--bg-hover);
+      }
+
+      &[data-active='true'] {
+        background: oklch(from var(--brand) l c h / 0.2);
+        border-color: var(--brand);
+        color: var(--brand-light);
+      }
+    }
+
+    .gen-resize-handle {
+      display: flex;
+      align-items: center;
+      color: var(--text-tertiary);
+      font-size: 0.75rem;
+      opacity: 0.4;
+      margin-inline-end: 0.125rem;
     }
 
     /* ── Tier Selector ────────────────────────────────────────────────── */
@@ -780,36 +936,47 @@ function CopyButton({ text }: { text: string }) {
 
 // ─── Inline Preview Components ──────────────────────────────────────────────
 
+// ─── Composition Item Type ───────────────────────────────────────────────────
+
+interface CompositionItem {
+  component: ComponentInfo
+  colSpan: number
+}
+
 function DashboardPreview() {
   const metrics = [
-    { title: 'Revenue', value: '$48,230', change: { value: 12.5 }, trend: 'up' as const },
-    { title: 'Users', value: '2,847', change: { value: 8.2 }, trend: 'up' as const },
-    { title: 'Conversion', value: '3.24%', change: { value: -1.8 }, trend: 'down' as const },
-    { title: 'Response', value: '142ms', change: { value: -5.3 }, trend: 'up' as const },
+    { title: 'Revenue', value: '$48,230', change: { value: 12.5 }, trend: 'up' as const, icon: <Icon name="activity" size="sm" /> },
+    { title: 'Users', value: '2,847', change: { value: 8.2 }, trend: 'up' as const, icon: <Icon name="user" size="sm" /> },
+    { title: 'Conversion', value: '3.24%', change: { value: -1.8 }, trend: 'down' as const, icon: <Icon name="zap" size="sm" /> },
+    { title: 'Response', value: '142ms', change: { value: -5.3 }, trend: 'up' as const, icon: <Icon name="clock" size="sm" /> },
   ]
 
   type DashRow = { name: string; status: string; revenue: string; date: string }
   const dashColumns: ColumnDef<DashRow>[] = [
     { id: 'name', header: 'Name', accessor: 'name', sortable: true },
-    { id: 'status', header: 'Status', accessor: 'status' },
+    { id: 'status', header: 'Status', accessor: 'status', cell: (val) => (
+      <StatusBadge status={val === 'Active' ? 'ok' : 'warning'} label={val as string} />
+    )},
     { id: 'revenue', header: 'Revenue', accessor: 'revenue', sortable: true },
-    { id: 'date', header: 'Date', accessor: 'date' },
+    { id: 'date', header: 'Date', accessor: 'date', sortable: true },
   ]
   const dashData: DashRow[] = [
     { name: 'Widget Pro', status: 'Active', revenue: '$12,400', date: '2026-03-15' },
     { name: 'Dashboard X', status: 'Active', revenue: '$8,200', date: '2026-03-14' },
     { name: 'Analytics+', status: 'Paused', revenue: '$4,100', date: '2026-03-13' },
+    { name: 'Server Monitor', status: 'Active', revenue: '$6,700', date: '2026-03-12' },
+    { name: 'Form Builder', status: 'Active', revenue: '$3,200', date: '2026-03-11' },
   ]
 
   return (
     <>
       <div className="gen-inline-grid">
         {metrics.map(m => (
-          <MetricCard key={m.title} title={m.title} value={m.value} change={m.change} trend={m.trend} />
+          <MetricCard key={m.title} title={m.title} value={m.value} change={m.change} trend={m.trend} icon={m.icon} />
         ))}
       </div>
       <div style={{ marginBlockStart: '1rem' }}>
-        <DataTable columns={dashColumns} data={dashData} sortable pageSize={5} />
+        <DataTable columns={dashColumns} data={dashData} searchable sortable pageSize={5} />
       </div>
     </>
   )
@@ -858,20 +1025,23 @@ function MarketingPreview() {
 }
 
 function DataTablePreview() {
-  type TeamRow = { name: string; role: string; status: string; email: string }
+  type TeamRow = { name: string; role: string; status: string; value: string; updated: string }
   const columns: ColumnDef<TeamRow>[] = [
     { id: 'name', header: 'Name', accessor: 'name', sortable: true },
     { id: 'role', header: 'Role', accessor: 'role', sortable: true },
-    { id: 'status', header: 'Status', accessor: 'status', cell: (val) => (
-      <Badge variant={val === 'Active' ? 'success' : 'warning'} size="sm">{val as string}</Badge>
+    { id: 'status', header: 'Status', accessor: 'status', sortable: true, cell: (val) => (
+      <StatusBadge status={val === 'Active' ? 'ok' : val === 'Away' ? 'warning' : 'info'} label={val as string} />
     )},
-    { id: 'email', header: 'Email', accessor: 'email' },
+    { id: 'value', header: 'Value', accessor: 'value', sortable: true },
+    { id: 'updated', header: 'Updated', accessor: 'updated', sortable: true },
   ]
   const data: TeamRow[] = [
-    { name: 'Alice Johnson', role: 'Engineer', status: 'Active', email: 'alice@example.com' },
-    { name: 'Bob Smith', role: 'Designer', status: 'Active', email: 'bob@example.com' },
-    { name: 'Carol Williams', role: 'PM', status: 'Away', email: 'carol@example.com' },
-    { name: 'Dave Brown', role: 'Engineer', status: 'Active', email: 'dave@example.com' },
+    { name: 'Alice Johnson', role: 'Engineer', status: 'Active', value: '$12,400', updated: '2026-03-25' },
+    { name: 'Bob Smith', role: 'Designer', status: 'Active', value: '$9,800', updated: '2026-03-24' },
+    { name: 'Carol Williams', role: 'PM', status: 'Away', value: '$7,200', updated: '2026-03-23' },
+    { name: 'Dave Brown', role: 'Engineer', status: 'Active', value: '$11,600', updated: '2026-03-22' },
+    { name: 'Eve Davis', role: 'QA', status: 'Review', value: '$5,400', updated: '2026-03-21' },
+    { name: 'Frank Miller', role: 'DevOps', status: 'Active', value: '$8,900', updated: '2026-03-20' },
   ]
 
   return (
@@ -880,16 +1050,25 @@ function DataTablePreview() {
       data={data}
       searchable
       sortable
-      pageSize={10}
+      pageSize={5}
     />
   )
 }
 
 function CustomComponentPreview({ component }: { component: ComponentInfo }) {
   const name = component.name
+  const [paginationPage, setPaginationPage] = useState(1)
+
   switch (name) {
+    // ── Buttons & Basic ──
     case 'Button':
-      return <Button variant="primary">Sample Button</Button>
+      return (
+        <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+          <Button variant="primary">Primary</Button>
+          <Button variant="outline">Outline</Button>
+          <Button variant="ghost">Ghost</Button>
+        </div>
+      )
     case 'Badge':
       return (
         <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
@@ -906,7 +1085,7 @@ function CustomComponentPreview({ component }: { component: ComponentInfo }) {
         </Card>
       )
     case 'MetricCard':
-      return <MetricCard title="Revenue" value="$48,230" change={{ value: 12.5 }} trend="up" />
+      return <MetricCard title="Revenue" value="$48,230" change={{ value: 12.5 }} trend="up" icon={<Icon name="activity" size="sm" />} />
     case 'Select':
       return (
         <Select
@@ -925,29 +1104,228 @@ function CustomComponentPreview({ component }: { component: ComponentInfo }) {
       type SampleRow = { name: string; status: string; updated: string }
       const cols: ColumnDef<SampleRow>[] = [
         { id: 'name', header: 'Name', accessor: 'name', sortable: true },
-        { id: 'status', header: 'Status', accessor: 'status' },
-        { id: 'updated', header: 'Updated', accessor: 'updated' },
+        { id: 'status', header: 'Status', accessor: 'status', cell: (val) => (
+          <StatusBadge status={val === 'Active' ? 'ok' : 'warning'} label={val as string} />
+        )},
+        { id: 'updated', header: 'Updated', accessor: 'updated', sortable: true },
       ]
       const rows: SampleRow[] = [
         { name: 'Item A', status: 'Active', updated: '2026-03-25' },
         { name: 'Item B', status: 'Pending', updated: '2026-03-24' },
+        { name: 'Item C', status: 'Active', updated: '2026-03-23' },
       ]
-      return <DataTable columns={cols} data={rows} sortable pageSize={5} />
+      return <DataTable columns={cols} data={rows} searchable sortable pageSize={5} />
     }
     case 'SearchInput':
-      return <SearchInput placeholder="Search..." value="" onChange={() => {}} />
-    default:
+      return <SearchInput placeholder="Search..." />
+
+    // ── Forms ──
+    case 'Textarea':
+      return <Textarea name="demo-textarea" label="Message" placeholder="Type your message here..." />
+    case 'NumberInput':
+      return <NumberInput name="demo-number" label="Quantity" />
+    case 'PasswordInput':
+      return <PasswordInput name="demo-password" label="Password" />
+    case 'Checkbox':
+      return <Checkbox label="Accept terms and conditions" />
+    case 'ToggleSwitch':
+      return <ToggleSwitch label="Enable notifications" />
+    case 'Slider':
+      return <Slider label="Volume" />
+    case 'Rating':
+      return <Rating />
+    case 'RadioGroup':
       return (
-        <Card style={{ padding: '0.75rem 1rem' }}>
-          <div style={{ fontWeight: 600, fontSize: '0.875rem', marginBlockEnd: '0.25rem' }}>{name}</div>
-          <code style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>&lt;{name} /&gt;</code>
+        <RadioGroup
+          name="demo-radio"
+          label="Select an option"
+          options={[
+            { value: 'a', label: 'Option A' },
+            { value: 'b', label: 'Option B' },
+            { value: 'c', label: 'Option C' },
+          ]}
+        />
+      )
+    case 'DatePicker':
+      return <DatePicker name="demo-date" label="Date" />
+    case 'TagInput':
+      return <TagInput name="demo-tags" label="Tags" />
+    case 'FileUpload':
+      return <FileUpload />
+    case 'ColorInput':
+      return <ColorInput name="demo-color" label="Color" />
+
+    // ── Navigation ──
+    case 'Tabs':
+      return (
+        <Tabs tabs={[{ id: '1', label: 'Tab 1' }, { id: '2', label: 'Tab 2' }, { id: '3', label: 'Tab 3' }]} defaultTab="1">
+          <TabPanel tabId="1"><div style={{ padding: '0.75rem' }}>Tab 1 content</div></TabPanel>
+          <TabPanel tabId="2"><div style={{ padding: '0.75rem' }}>Tab 2 content</div></TabPanel>
+          <TabPanel tabId="3"><div style={{ padding: '0.75rem' }}>Tab 3 content</div></TabPanel>
+        </Tabs>
+      )
+    case 'Breadcrumbs':
+      return <Breadcrumbs items={[{ label: 'Home', href: '#' }, { label: 'Products', href: '#' }, { label: 'Current Page' }]} />
+    case 'Pagination':
+      return <Pagination page={paginationPage} totalPages={10} onChange={setPaginationPage} />
+    case 'Accordion':
+      return (
+        <Accordion
+          type="single"
+          items={[
+            { id: '1', trigger: 'What is UI Kit?', content: 'A zero-dependency React component library with physics-based animations.' },
+            { id: '2', trigger: 'How many components?', content: '116 components across 3 weight tiers.' },
+            { id: '3', trigger: 'What design system?', content: 'Aurora Fluid design with OKLCH color system.' },
+          ]}
+        />
+      )
+
+    // ── Data Display ──
+    case 'Progress':
+      return <Progress value={65} label="Upload Progress" />
+    case 'Sparkline':
+      return <Sparkline data={[10, 25, 15, 30, 20, 35, 28, 40, 32]} />
+    case 'StatusBadge':
+      return (
+        <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+          <StatusBadge status="ok" label="Healthy" pulse />
+          <StatusBadge status="warning" label="Degraded" />
+          <StatusBadge status="critical" label="Down" />
+        </div>
+      )
+    case 'StatusPulse':
+      return (
+        <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+          <StatusPulse status="ok" label="Online" />
+          <StatusPulse status="warning" label="Degraded" />
+          <StatusPulse status="critical" label="Offline" />
+        </div>
+      )
+    case 'Skeleton':
+      return <Skeleton variant="text" lines={3} />
+    case 'Avatar':
+      return (
+        <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+          <Avatar name="John Doe" />
+          <Avatar name="Jane Smith" />
+          <Avatar name="Bob Wilson" />
+        </div>
+      )
+    case 'Divider':
+      return (
+        <div>
+          <p style={{ fontSize: '0.875rem', marginBlockEnd: '0.5rem' }}>Content above</p>
+          <Divider />
+          <p style={{ fontSize: '0.875rem', marginBlockStart: '0.5rem' }}>Content below</p>
+        </div>
+      )
+    case 'Typography':
+      return (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
+          <Typography variant="h3">Heading</Typography>
+          <Typography variant="body" color="secondary">Body text with secondary color</Typography>
+        </div>
+      )
+    case 'Kbd':
+      return (
+        <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+          <Kbd>Ctrl</Kbd> + <Kbd>K</Kbd>
+        </div>
+      )
+    case 'Alert':
+      return (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+          <Alert variant="info" title="Information">This is an informational alert message.</Alert>
+          <Alert variant="warning" title="Warning">Please check your configuration.</Alert>
+        </div>
+      )
+
+    // ── Overlays ──
+    case 'Dialog':
+      return <Button variant="outline" onClick={() => {}}>Open Dialog</Button>
+    case 'Tooltip':
+      return (
+        <Tooltip content="This is a tooltip">
+          <Button variant="outline">Hover me</Button>
+        </Tooltip>
+      )
+    case 'Toast':
+      return <Button variant="outline" onClick={() => {}}>Show Toast</Button>
+
+    // ── Domain ──
+    case 'TimeSeriesChart':
+      return (
+        <TimeSeriesChart
+          series={[{
+            id: 'cpu',
+            label: 'CPU Usage',
+            data: [
+              { timestamp: Date.now() - 3600000, value: 45 },
+              { timestamp: Date.now() - 2700000, value: 52 },
+              { timestamp: Date.now() - 1800000, value: 38 },
+              { timestamp: Date.now() - 900000, value: 65 },
+              { timestamp: Date.now(), value: 72 },
+            ],
+          }]}
+          height={200}
+        />
+      )
+    case 'RingChart':
+      return <RingChart value={72} size="md" showValue />
+    case 'CoreChart':
+      return <CoreChart cores={Array.from({ length: 8 }, (_, i) => ({ id: i, usage: Math.random() * 100 }))} />
+    case 'ThresholdGauge':
+      return <ThresholdGauge value={72} />
+    case 'UtilizationBar':
+      return <UtilizationBar segments={[{ label: 'Used', value: 65, color: 'oklch(65% 0.2 270)' }, { label: 'Free', value: 35, color: 'oklch(70% 0.05 270)' }]} />
+    case 'LogViewer':
+      return (
+        <LogViewer
+          lines={[
+            { id: 1, timestamp: new Date(Date.now() - 60000), level: 'info', message: 'Server started on port 3000' },
+            { id: 2, timestamp: new Date(Date.now() - 30000), level: 'info', message: 'Connected to database' },
+            { id: 3, timestamp: new Date(), level: 'warn', message: 'High memory usage detected' },
+          ]}
+          style={{ height: '150px' }}
+        />
+      )
+    case 'CopyBlock':
+      return <CopyBlock code="npm install @annondeveloper/ui-kit" language="bash" />
+
+    default: {
+      // Rich fallback for ALL 100+ components not explicitly handled above
+      const dbEntry = getComponentDatabase().find(c => c.name === name)
+      const kebab = name.replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase()
+      return (
+        <Card style={{ padding: '1rem' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBlockEnd: '0.5rem' }}>
+            <span style={{ fontWeight: 700, fontSize: '0.9375rem', color: 'var(--text-primary)' }}>{name}</span>
+            {dbEntry && <Badge variant="info" size="xs">{dbEntry.category}</Badge>}
+          </div>
+          {dbEntry && (
+            <p style={{ fontSize: '0.8125rem', color: 'var(--text-secondary)', lineHeight: 1.5, marginBlockEnd: '0.5rem' }}>
+              {dbEntry.description}
+            </p>
+          )}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
+            <code style={{ fontSize: '0.6875rem', color: 'var(--brand-light)', background: 'var(--bg-hover)', padding: '0.125rem 0.375rem', borderRadius: '4px' }}>
+              &lt;{name} /&gt;
+            </code>
+            {dbEntry?.props.slice(0, 3).map(p => (
+              <Badge key={p} variant="default" size="xs">{p}</Badge>
+            ))}
+            <a href={`/ui-kit/components/${kebab}`} target="_blank" rel="noopener" style={{ fontSize: '0.75rem', color: 'var(--brand)', marginInlineStart: 'auto' }}>
+              View Demo →
+            </a>
+          </div>
         </Card>
       )
+    }
   }
 }
 
-function CustomPreview({ components }: { components: ComponentInfo[] }) {
-  if (components.length === 0) {
+function CustomPreview({ items, columns }: { items: CompositionItem[]; columns: number }) {
+  if (items.length === 0) {
     return (
       <div className="gen-preview__placeholder">
         <Icon name="plus" size={32} className="gen-preview__placeholder-icon" />
@@ -957,10 +1335,17 @@ function CustomPreview({ components }: { components: ComponentInfo[] }) {
   }
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-      {components.map((c, i) => (
-        <div key={`${c.name}-${i}`} style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-          <CustomComponentPreview component={c} />
+    <div
+      className="gen-composition-grid"
+      style={{ '--gen-cols': columns } as React.CSSProperties}
+    >
+      {items.map((item, i) => (
+        <div
+          key={`${item.component.name}-${i}`}
+          className="gen-composition-item"
+          style={{ '--gen-span': Math.min(item.colSpan, columns) } as React.CSSProperties}
+        >
+          <CustomComponentPreview component={item.component} />
         </div>
       ))}
     </div>
@@ -975,12 +1360,16 @@ export default function GeneratorPage() {
 
   // State
   const [selectedTemplate, setSelectedTemplate] = useState<LayoutTemplate | null>('dashboard')
-  const [customComponents, setCustomComponents] = useState<ComponentInfo[]>([])
+  const [compositionItems, setCompositionItems] = useState<CompositionItem[]>([])
+  const [columns, setColumns] = useState(2)
   const [customLayout, setCustomLayout] = useState<'stack' | 'grid' | 'sidebar'>('stack')
   const [searchQuery, setSearchQuery] = useState('')
   const [activeFramework, setActiveFramework] = useState<Framework>('react')
   const [activeTier, setActiveTier] = useState<string>(tier)
   const [mode, setMode] = useState<'template' | 'custom'>('template')
+
+  // Derived: flat component list for code generation
+  const customComponents = useMemo(() => compositionItems.map(item => item.component), [compositionItems])
 
   // Drag-and-drop state
   const [dragSource, setDragSource] = useState<{ type: 'available' | 'composition'; index: number; name: string } | null>(null)
@@ -1019,13 +1408,14 @@ export default function GeneratorPage() {
   }, [])
 
   const addComponent = useCallback((c: ComponentInfo, atIndex?: number) => {
-    setCustomComponents(prev => {
+    const newItem: CompositionItem = { component: c, colSpan: 1 }
+    setCompositionItems(prev => {
       if (atIndex !== undefined && atIndex >= 0 && atIndex <= prev.length) {
         const next = [...prev]
-        next.splice(atIndex, 0, c)
+        next.splice(atIndex, 0, newItem)
         return next
       }
-      return [...prev, c]
+      return [...prev, newItem]
     })
     setMode('custom')
     setSelectedTemplate(null)
@@ -1034,21 +1424,25 @@ export default function GeneratorPage() {
   }, [])
 
   const removeComponent = useCallback((index: number) => {
-    setCustomComponents(prev => prev.filter((_, i) => i !== index))
+    setCompositionItems(prev => prev.filter((_, i) => i !== index))
   }, [])
 
   const clearComponents = useCallback(() => {
-    setCustomComponents([])
+    setCompositionItems([])
   }, [])
 
   const moveComponent = useCallback((fromIndex: number, toIndex: number) => {
-    setCustomComponents(prev => {
+    setCompositionItems(prev => {
       const next = [...prev]
       const [moved] = next.splice(fromIndex, 1)
       const adjustedTo = toIndex > fromIndex ? toIndex - 1 : toIndex
       next.splice(adjustedTo, 0, moved)
       return next
     })
+  }, [])
+
+  const setItemSpan = useCallback((index: number, span: number) => {
+    setCompositionItems(prev => prev.map((item, i) => i === index ? { ...item, colSpan: span } : item))
   }, [])
 
   // ── Drag handlers for Available items ──
@@ -1122,7 +1516,7 @@ export default function GeneratorPage() {
 
     // Calculate drop index
     const zone = compositionRef.current
-    let insertIdx = customComponents.length
+    let insertIdx = compositionItems.length
     if (zone) {
       const items = zone.querySelectorAll('.gen-selected-item')
       for (let i = 0; i < items.length; i++) {
@@ -1145,7 +1539,7 @@ export default function GeneratorPage() {
     }
 
     setDragSource(null)
-  }, [customComponents, allComponents, addComponent, moveComponent])
+  }, [compositionItems, allComponents, addComponent, moveComponent])
 
   // ── Touch drag support ──
   const createTouchGhost = useCallback((el: HTMLElement, x: number, y: number) => {
@@ -1242,7 +1636,7 @@ export default function GeneratorPage() {
       const zone = compositionRef.current
       if (dragOverComposition && zone) {
         // Determine drop index from indicator
-        const insertIdx = dropIndicatorIndex ?? customComponents.length
+        const insertIdx = dropIndicatorIndex ?? compositionItems.length
 
         if (ts.source.type === 'available') {
           const comp = allComponents.find(c => c.name === ts.source!.name)
@@ -1261,7 +1655,7 @@ export default function GeneratorPage() {
     ts.element = null
     setDragOverComposition(false)
     setDropIndicatorIndex(null)
-  }, [dragOverComposition, dropIndicatorIndex, customComponents, allComponents, addComponent, moveComponent, removeComponent])
+  }, [dragOverComposition, dropIndicatorIndex, compositionItems, allComponents, addComponent, moveComponent, removeComponent])
 
   return (
     <div className="gen-page">
@@ -1333,17 +1727,35 @@ export default function GeneratorPage() {
         </div>
 
         {/* Layout selector */}
-        <div className="gen-layout-selector">
-          {(['stack', 'grid', 'sidebar'] as const).map((l) => (
-            <button
-              key={l}
-              className="gen-layout-btn"
-              data-active={customLayout === l}
-              onClick={() => { setCustomLayout(l); if (customComponents.length > 0) setMode('custom') }}
-            >
-              {l.charAt(0).toUpperCase() + l.slice(1)}
-            </button>
-          ))}
+        <div style={{ display: 'flex', gap: '1.5rem', flexWrap: 'wrap', alignItems: 'center', marginBlockEnd: '1rem' }}>
+          <div className="gen-layout-selector" style={{ marginBlockEnd: 0 }}>
+            {(['stack', 'grid', 'sidebar'] as const).map((l) => (
+              <button
+                key={l}
+                className="gen-layout-btn"
+                data-active={customLayout === l}
+                onClick={() => { setCustomLayout(l); if (compositionItems.length > 0) setMode('custom') }}
+              >
+                {l.charAt(0).toUpperCase() + l.slice(1)}
+              </button>
+            ))}
+          </div>
+
+          <div className="gen-columns-selector" style={{ marginBlockEnd: 0 }}>
+            <span className="gen-columns-selector__label">Columns:</span>
+            <div className="gen-columns-selector__btns">
+              {([1, 2, 3, 4] as const).map((n) => (
+                <button
+                  key={n}
+                  className="gen-col-btn"
+                  data-active={columns === n}
+                  onClick={() => setColumns(n)}
+                >
+                  {n}
+                </button>
+              ))}
+            </div>
+          </div>
         </div>
 
         <div className="gen-builder">
@@ -1395,7 +1807,7 @@ export default function GeneratorPage() {
           <div className="gen-builder__panel">
             <div className="gen-builder__panel-header">
               <span className="gen-builder__panel-title">Composition</span>
-              {customComponents.length > 0 && (
+              {compositionItems.length > 0 && (
                 <Button variant="ghost" size="sm" onClick={clearComponents}>Clear All</Button>
               )}
             </div>
@@ -1407,7 +1819,7 @@ export default function GeneratorPage() {
               onDragLeave={handleCompositionDragLeave}
               onDrop={handleCompositionDrop}
             >
-              {customComponents.length === 0 ? (
+              {compositionItems.length === 0 ? (
                 <div className="gen-selected-empty">
                   <span className="gen-selected-empty__icon" aria-hidden="true">
                     <Icon name="plus" size={28} />
@@ -1419,17 +1831,17 @@ export default function GeneratorPage() {
                 </div>
               ) : (
                 <div className="gen-selected-list">
-                  {customComponents.map((c, i) => (
-                    <div key={`${c.name}-${i}`}>
+                  {compositionItems.map((item, i) => (
+                    <div key={`${item.component.name}-${i}`}>
                       {dropIndicatorIndex === i && dragOverComposition && (
                         <div className="gen-drag-indicator" />
                       )}
                       <div
                         className={`gen-selected-item${recentlyAdded === i ? ' gen-item-enter' : ''}`}
                         draggable
-                        onDragStart={(e) => handleCompositionDragStart(e, i, c.name)}
+                        onDragStart={(e) => handleCompositionDragStart(e, i, item.component.name)}
                         onDragEnd={handleDragEnd}
-                        onTouchStart={(e) => handleTouchStart(e, { type: 'composition', index: i, name: c.name })}
+                        onTouchStart={(e) => handleTouchStart(e, { type: 'composition', index: i, name: item.component.name })}
                         onTouchMove={handleTouchMove}
                         onTouchEnd={handleTouchEnd}
                       >
@@ -1440,14 +1852,31 @@ export default function GeneratorPage() {
                             <span className="gen-drag-handle__dots"><span className="gen-drag-handle__dot" /><span className="gen-drag-handle__dot" /></span>
                           </span>
                         </span>
-                        <span className="gen-selected-item__name">{c.name}</span>
+                        <span className="gen-selected-item__name">{item.component.name}</span>
+                        <div className="gen-span-control">
+                          <span className="gen-resize-handle" aria-hidden="true">
+                            <Icon name="grid" size={12} />
+                          </span>
+                          <span className="gen-span-label">Span</span>
+                          {([1, 2, 3, 4] as const).map((s) => (
+                            <button
+                              key={s}
+                              className="gen-span-btn"
+                              data-active={item.colSpan === s}
+                              onClick={(e) => { e.stopPropagation(); setItemSpan(i, s) }}
+                              title={`Span ${s} column${s > 1 ? 's' : ''}`}
+                            >
+                              {s}
+                            </button>
+                          ))}
+                        </div>
                         <button onClick={() => removeComponent(i)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-secondary)', flexShrink: 0 }}>
                           <Icon name="x" size="sm" />
                         </button>
                       </div>
                     </div>
                   ))}
-                  {dropIndicatorIndex === customComponents.length && dragOverComposition && (
+                  {dropIndicatorIndex === compositionItems.length && dragOverComposition && (
                     <div className="gen-drag-indicator" />
                   )}
                 </div>
@@ -1482,7 +1911,7 @@ export default function GeneratorPage() {
             {mode === 'template' && selectedTemplate === 'form' && <FormPreview />}
             {mode === 'template' && selectedTemplate === 'marketing' && <MarketingPreview />}
             {mode === 'template' && selectedTemplate === 'data-table' && <DataTablePreview />}
-            {mode === 'custom' && <CustomPreview components={customComponents} />}
+            {mode === 'custom' && <CustomPreview items={compositionItems} columns={columns} />}
             {!selectedTemplate && mode === 'template' && (
               <div className="gen-preview__placeholder">
                 <Icon name="eye" size={32} className="gen-preview__placeholder-icon" />
