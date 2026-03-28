@@ -1,94 +1,41 @@
 'use client'
 
-import { useState, useMemo, lazy, Suspense } from 'react'
+import { useState, useMemo } from 'react'
 import { css } from '@ui/core/styles/css-tag'
 import { useStyles } from '@ui/core/styles/use-styles'
+import { renderComponentPreview } from '../utils/component-previews'
+import { getComponentDatabase } from '../utils/component-database'
 
-// ─── Component Registry ────────────────────────────────────────────────────────
+// ─── Size estimates by tier ────────────────────────────────────────────────────
 
-interface ComponentDef {
-  name: string
-  slug: string
-  hasLite: boolean
-  hasPremium: boolean
-  approxSize: string
+function tierSize(standardKB: number, tier: 'lite' | 'standard' | 'premium'): string {
+  if (tier === 'lite') return `~${(standardKB * 0.15).toFixed(1)} KB`
+  if (tier === 'premium') return `~${(standardKB * 1.6).toFixed(1)} KB`
+  return `~${standardKB.toFixed(1)} KB`
 }
 
-const components: ComponentDef[] = [
-  { name: 'Accordion', slug: 'accordion', hasLite: true, hasPremium: true, approxSize: '2.1 KB' },
-  { name: 'ActionIcon', slug: 'action-icon', hasLite: true, hasPremium: true, approxSize: '1.2 KB' },
-  { name: 'Affix', slug: 'affix', hasLite: true, hasPremium: true, approxSize: '0.9 KB' },
-  { name: 'Alert', slug: 'alert', hasLite: true, hasPremium: true, approxSize: '1.8 KB' },
-  { name: 'AnimatedCounter', slug: 'animated-counter', hasLite: true, hasPremium: true, approxSize: '1.5 KB' },
-  { name: 'AppShell', slug: 'app-shell', hasLite: true, hasPremium: true, approxSize: '3.2 KB' },
-  { name: 'Avatar', slug: 'avatar', hasLite: true, hasPremium: true, approxSize: '1.4 KB' },
-  { name: 'AvatarUpload', slug: 'avatar-upload', hasLite: true, hasPremium: true, approxSize: '2.5 KB' },
-  { name: 'BackToTop', slug: 'back-to-top', hasLite: true, hasPremium: true, approxSize: '0.8 KB' },
-  { name: 'Badge', slug: 'badge', hasLite: true, hasPremium: true, approxSize: '0.9 KB' },
-  { name: 'Breadcrumbs', slug: 'breadcrumbs', hasLite: true, hasPremium: true, approxSize: '1.3 KB' },
-  { name: 'Button', slug: 'button', hasLite: true, hasPremium: true, approxSize: '1.6 KB' },
-  { name: 'ButtonGroup', slug: 'button-group', hasLite: true, hasPremium: true, approxSize: '1.0 KB' },
-  { name: 'Calendar', slug: 'calendar', hasLite: true, hasPremium: true, approxSize: '4.2 KB' },
-  { name: 'Card', slug: 'card', hasLite: true, hasPremium: true, approxSize: '1.1 KB' },
-  { name: 'Carousel', slug: 'carousel', hasLite: true, hasPremium: true, approxSize: '3.0 KB' },
-  { name: 'Checkbox', slug: 'checkbox', hasLite: true, hasPremium: true, approxSize: '1.2 KB' },
-  { name: 'Chip', slug: 'chip', hasLite: true, hasPremium: true, approxSize: '1.0 KB' },
-  { name: 'ColorInput', slug: 'color-input', hasLite: true, hasPremium: true, approxSize: '2.1 KB' },
-  { name: 'ComboBox', slug: 'combobox', hasLite: true, hasPremium: true, approxSize: '3.5 KB' },
-  { name: 'CommandBar', slug: 'command-bar', hasLite: true, hasPremium: true, approxSize: '4.0 KB' },
-  { name: 'ConfirmDialog', slug: 'confirm-dialog', hasLite: true, hasPremium: true, approxSize: '2.0 KB' },
-  { name: 'CopyButton', slug: 'copy-button', hasLite: true, hasPremium: true, approxSize: '0.8 KB' },
-  { name: 'DataTable', slug: 'data-table', hasLite: true, hasPremium: true, approxSize: '5.5 KB' },
-  { name: 'DatePicker', slug: 'date-picker', hasLite: true, hasPremium: true, approxSize: '4.5 KB' },
-  { name: 'Dialog', slug: 'dialog', hasLite: true, hasPremium: true, approxSize: '2.2 KB' },
-  { name: 'Divider', slug: 'divider', hasLite: true, hasPremium: true, approxSize: '0.5 KB' },
-  { name: 'Drawer', slug: 'drawer', hasLite: true, hasPremium: true, approxSize: '2.4 KB' },
-  { name: 'DropdownMenu', slug: 'dropdown-menu', hasLite: true, hasPremium: true, approxSize: '2.8 KB' },
-  { name: 'EmptyState', slug: 'empty-state', hasLite: true, hasPremium: true, approxSize: '1.3 KB' },
-  { name: 'FormInput', slug: 'form-input', hasLite: true, hasPremium: true, approxSize: '1.5 KB' },
-  { name: 'Indicator', slug: 'indicator', hasLite: true, hasPremium: true, approxSize: '0.7 KB' },
-  { name: 'MetricCard', slug: 'metric-card', hasLite: true, hasPremium: true, approxSize: '3.8 KB' },
-  { name: 'Pagination', slug: 'pagination', hasLite: true, hasPremium: true, approxSize: '2.0 KB' },
-  { name: 'Popover', slug: 'popover', hasLite: true, hasPremium: true, approxSize: '2.5 KB' },
-  { name: 'Progress', slug: 'progress', hasLite: true, hasPremium: true, approxSize: '1.0 KB' },
-  { name: 'RadioGroup', slug: 'radio-group', hasLite: true, hasPremium: true, approxSize: '1.4 KB' },
-  { name: 'Rating', slug: 'rating', hasLite: true, hasPremium: true, approxSize: '1.6 KB' },
-  { name: 'SearchInput', slug: 'search-input', hasLite: true, hasPremium: true, approxSize: '1.8 KB' },
-  { name: 'SegmentedControl', slug: 'segmented-control', hasLite: true, hasPremium: true, approxSize: '2.0 KB' },
-  { name: 'Select', slug: 'select', hasLite: true, hasPremium: true, approxSize: '2.3 KB' },
-  { name: 'Skeleton', slug: 'skeleton', hasLite: true, hasPremium: true, approxSize: '0.6 KB' },
-  { name: 'Slider', slug: 'slider', hasLite: true, hasPremium: true, approxSize: '2.0 KB' },
-  { name: 'Sparkline', slug: 'sparkline', hasLite: true, hasPremium: true, approxSize: '1.8 KB' },
-  { name: 'StatusBadge', slug: 'status-badge', hasLite: true, hasPremium: true, approxSize: '1.0 KB' },
-  { name: 'Tabs', slug: 'tabs', hasLite: true, hasPremium: true, approxSize: '2.2 KB' },
-  { name: 'Toast', slug: 'toast', hasLite: true, hasPremium: true, approxSize: '2.5 KB' },
-  { name: 'ToggleSwitch', slug: 'toggle-switch', hasLite: true, hasPremium: true, approxSize: '1.1 KB' },
-  { name: 'Tooltip', slug: 'tooltip', hasLite: true, hasPremium: true, approxSize: '1.5 KB' },
-  { name: 'Typography', slug: 'typography', hasLite: true, hasPremium: true, approxSize: '0.8 KB' },
-]
-
-// ─── Dynamic Import Map ────────────────────────────────────────────────────────
-
-type PreviewModule = { default: React.ComponentType }
-
-function loadPreview(slug: string, tier: 'lite' | 'standard' | 'premium'): React.LazyExoticComponent<React.ComponentType> {
-  return lazy(() => import(`./comparison-previews/${slug}-${tier}.tsx`).catch(() => ({
-    default: () => <div className="comp__unavailable">Preview not available</div>,
-  })) as Promise<PreviewModule>)
+function tierDescription(tier: 'lite' | 'standard' | 'premium'): string {
+  if (tier === 'lite') return 'No motion, no style injection, minimal wrapper'
+  if (tier === 'premium') return 'Aurora glow, spring physics, shimmer, particles'
+  return 'Full features, CSS scoped styles, motion levels 0-3'
 }
 
-// ─── Fallback Preview ──────────────────────────────────────────────────────────
+// Rough standard-tier sizes by component type
+const SIZE_MAP: Record<string, number> = {
+  // Small
+  Badge: 0.9, Divider: 0.5, Kbd: 0.4, Typography: 0.8, StatusPulse: 0.7,
+  Indicator: 0.7, CopyButton: 0.8, Chip: 1.0, BackToTop: 0.8, Skeleton: 0.6,
+  // Medium
+  Button: 1.6, Card: 1.1, Alert: 1.8, Avatar: 1.4, Progress: 1.0,
+  Checkbox: 1.2, ToggleSwitch: 1.1, FormInput: 1.5, SearchInput: 1.8,
+  Select: 2.3, Tabs: 2.2, Tooltip: 1.5, Breadcrumbs: 1.3, Pagination: 2.0,
+  // Large
+  DataTable: 5.5, MetricCard: 3.8, Dialog: 2.2, DatePicker: 4.5,
+  CommandBar: 4.0, Calendar: 4.2, TimeSeriesChart: 4.8,
+}
 
-function FallbackPreview({ name, tier }: { name: string; tier: string }) {
-  return (
-    <div className="comp__placeholder">
-      <div className="comp__placeholder-name">{name}</div>
-      <div className="comp__placeholder-tier">{tier} tier</div>
-      <div className="comp__placeholder-hint">
-        Select a component to preview all 3 tiers side by side.
-      </div>
-    </div>
-  )
+function getStandardSize(name: string): number {
+  return SIZE_MAP[name] ?? 1.8
 }
 
 // ─── Styles ────────────────────────────────────────────────────────────────────
@@ -99,257 +46,186 @@ const styles = css`
       max-width: 1400px;
       margin: 0 auto;
     }
-
     .comp__header {
       margin-block-end: 2rem;
     }
-
     .comp__title {
       font-size: var(--text-2xl, 1.875rem);
       font-weight: 800;
       letter-spacing: -0.02em;
       margin-block-end: 0.25rem;
-      text-wrap: balance;
     }
-
     .comp__subtitle {
       font-size: var(--text-sm, 0.875rem);
       color: var(--text-secondary);
+      line-height: 1.6;
     }
 
-    /* ── Selector ──────────────────────────────────── */
-
+    /* Selector */
     .comp__selector {
       margin-block-end: 2rem;
     }
-
     .comp__select {
       width: 100%;
       max-width: 400px;
       padding: 0.625rem 1rem;
-      background: var(--bg-surface);
+      background: var(--bg-elevated);
       border: 1px solid var(--border-default);
       border-radius: var(--radius-md, 0.5rem);
       color: var(--text-primary);
-      font-size: var(--text-sm, 0.875rem);
+      font-size: var(--text-sm);
       font-family: inherit;
       cursor: pointer;
       outline: none;
-      transition: border-color 0.15s;
+      box-shadow: var(--shadow-sm);
     }
-
     .comp__select:focus {
       border-color: var(--brand);
     }
 
-    .comp__select option {
-      background: var(--bg-base);
-      color: var(--text-primary);
-    }
-
-    /* ── Grid ──────────────────────────────────────── */
-
+    /* Grid */
     .comp__grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
       gap: 1.5rem;
     }
-
     @media (max-width: 900px) {
       .comp__grid {
         grid-template-columns: 1fr;
       }
     }
 
-    /* ── Column ────────────────────────────────────── */
-
+    /* Column */
     .comp__col {
       display: flex;
       flex-direction: column;
-      gap: 1rem;
+      gap: 0.75rem;
+      min-width: 0;
     }
-
     .comp__col-header {
       display: flex;
       align-items: center;
       gap: 0.5rem;
       padding-block-end: 0.75rem;
-      border-block-end: 1px solid var(--border-default);
+      border-block-end: 2px solid var(--border-default);
     }
-
+    .comp__col-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+    }
+    .comp__col-dot--lite { background: var(--status-ok); }
+    .comp__col-dot--standard { background: var(--brand); }
+    .comp__col-dot--premium { background: oklch(65% 0.18 300); }
     .comp__col-label {
-      font-size: var(--text-sm, 0.875rem);
+      font-size: var(--text-sm);
       font-weight: 700;
       text-transform: uppercase;
       letter-spacing: 0.05em;
     }
+    .comp__col-label--lite { color: var(--status-ok); }
+    .comp__col-label--standard { color: var(--brand); }
+    .comp__col-label--premium { color: oklch(65% 0.18 300); }
 
-    .comp__col-label--lite {
-      color: var(--status-ok);
-    }
-
-    .comp__col-label--standard {
-      color: var(--brand-light);
-    }
-
-    .comp__col-label--premium {
-      color: var(--aurora-1);
-    }
-
-    .comp__col-dot {
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-    }
-
-    .comp__col-dot--lite { background: var(--status-ok); }
-    .comp__col-dot--standard { background: var(--brand-light); }
-    .comp__col-dot--premium { background: var(--aurora-1); }
-
-    /* ── Preview card ──────────────────────────────── */
-
+    /* Preview */
     .comp__preview {
       background: var(--bg-elevated);
       border: 1px solid var(--border-default);
       border-radius: var(--radius-lg, 0.75rem);
-      padding: 1.5rem;
-      min-height: 120px;
+      padding: 1.25rem;
+      min-height: 140px;
       display: flex;
       align-items: center;
       justify-content: center;
+      overflow: auto;
+      box-shadow: var(--shadow-sm);
+    }
+    .comp__preview > * {
+      max-width: 100%;
     }
 
-    /* ── Import block ──────────────────────────────── */
+    /* Tier description */
+    .comp__tier-desc {
+      font-size: 0.75rem;
+      color: var(--text-tertiary);
+      line-height: 1.4;
+      font-style: italic;
+    }
 
+    /* Import */
     .comp__import {
       background: var(--bg-surface);
       border: 1px solid var(--border-subtle);
-      border-radius: var(--radius-sm, 0.375rem);
-      padding: 0.625rem 0.75rem;
-      font-family: 'SF Mono', 'Cascadia Code', 'Fira Code', monospace;
-      font-size: var(--text-xs, 0.75rem);
+      border-radius: var(--radius-sm);
+      padding: 0.5rem 0.75rem;
+      font-family: 'SF Mono', 'Cascadia Code', monospace;
+      font-size: 0.6875rem;
       color: var(--text-secondary);
       overflow-x: auto;
       white-space: nowrap;
     }
 
+    /* Size */
     .comp__size {
-      font-size: var(--text-xs, 0.75rem);
-      color: var(--text-tertiary);
-      text-align: end;
-    }
-
-    /* ── Placeholder ───────────────────────────────── */
-
-    .comp__placeholder {
+      font-size: 0.75rem;
+      font-weight: 600;
       text-align: center;
-      padding: 2rem 1rem;
+      padding: 0.375rem 0.75rem;
+      border-radius: var(--radius-sm);
+      background: var(--bg-hover);
     }
+    .comp__size--lite { color: var(--status-ok); }
+    .comp__size--standard { color: var(--brand); }
+    .comp__size--premium { color: oklch(65% 0.18 300); }
 
-    .comp__placeholder-name {
-      font-size: var(--text-lg, 1.125rem);
-      font-weight: 700;
-      color: var(--text-primary);
-    }
-
-    .comp__placeholder-tier {
-      font-size: var(--text-xs, 0.75rem);
+    /* Empty state */
+    .comp__empty {
+      text-align: center;
+      padding: 3rem 1rem;
       color: var(--text-tertiary);
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      margin-block-start: 0.25rem;
+      font-size: var(--text-sm);
     }
 
-    .comp__placeholder-hint {
-      font-size: var(--text-sm, 0.875rem);
-      color: var(--text-secondary);
-      margin-block-start: 1rem;
-      max-width: 20rem;
-      margin-inline: auto;
-      line-height: 1.5;
-    }
-
-    .comp__unavailable {
-      font-size: var(--text-sm, 0.875rem);
-      color: var(--text-tertiary);
-      font-style: italic;
-    }
-
-    /* ── Info row ───────────────────────────────────── */
-
+    /* Info */
     .comp__info {
-      display: flex;
-      flex-direction: column;
-      gap: 0.5rem;
       margin-block-start: 2rem;
-      padding: 1.5rem;
+      padding: 1.25rem;
       background: var(--bg-elevated);
       border: 1px solid var(--border-default);
-      border-radius: var(--radius-lg, 0.75rem);
+      border-radius: var(--radius-lg);
     }
-
     .comp__info-title {
-      font-size: var(--text-sm, 0.875rem);
+      font-size: var(--text-sm);
       font-weight: 700;
-      color: var(--text-primary);
+      margin-block-end: 0.5rem;
     }
-
     .comp__info-text {
-      font-size: var(--text-sm, 0.875rem);
+      font-size: var(--text-sm);
       color: var(--text-secondary);
       line-height: 1.6;
-    }
-
-    .comp__info-list {
-      list-style: none;
-      padding: 0;
-      margin: 0;
-      display: flex;
-      flex-direction: column;
-      gap: 0.375rem;
-    }
-
-    .comp__info-list li {
-      font-size: var(--text-sm, 0.875rem);
-      color: var(--text-secondary);
-      padding-inline-start: 1rem;
-      position: relative;
-    }
-
-    .comp__info-list li::before {
-      content: '';
-      position: absolute;
-      inset-inline-start: 0;
-      top: 0.5em;
-      width: 6px;
-      height: 6px;
-      border-radius: 50%;
-      background: var(--brand);
     }
   }
 `
 
-// ─── Page Component ────────────────────────────────────────────────────────────
+// ─── Page ──────────────────────────────────────────────────────────────────────
 
 export default function ComparisonPage() {
   useStyles('comparison-page', styles)
-  const [selected, setSelected] = useState<string>('')
+  const allComponents = useMemo(() => getComponentDatabase(), [])
+  const [selected, setSelected] = useState('')
 
-  const selectedComponent = useMemo(
-    () => components.find(c => c.slug === selected),
-    [selected]
-  )
+  const comp = allComponents.find(c => c.name === selected)
 
   return (
     <div className="comp">
       <header className="comp__header">
         <h1 className="comp__title">Tier Comparison</h1>
         <p className="comp__subtitle">
-          Compare Lite, Standard, and Premium tiers side by side. Each tier offers different features, animations, and bundle sizes.
+          Compare Lite, Standard, and Premium tiers side by side.
+          Select any of the 147 components to see how they render in each tier.
         </p>
       </header>
 
-      {/* Component selector */}
       <div className="comp__selector">
         <select
           className="comp__select"
@@ -358,63 +234,56 @@ export default function ComparisonPage() {
           aria-label="Select a component to compare"
         >
           <option value="">Select a component...</option>
-          {components.map(c => (
-            <option key={c.slug} value={c.slug}>{c.name}</option>
+          {allComponents.map(c => (
+            <option key={c.name} value={c.name}>{c.name} — {c.category}</option>
           ))}
         </select>
       </div>
 
-      {/* 3-column comparison grid */}
-      <div className="comp__grid">
-        {(['lite', 'standard', 'premium'] as const).map(tier => (
-          <div key={tier} className="comp__col">
-            <div className="comp__col-header">
-              <span className={`comp__col-dot comp__col-dot--${tier}`} />
-              <span className={`comp__col-label comp__col-label--${tier}`}>
-                {tier}
-              </span>
-            </div>
+      {!comp ? (
+        <div className="comp__empty">
+          Choose a component above to see the Lite / Standard / Premium comparison.
+        </div>
+      ) : (
+        <div className="comp__grid">
+          {(['lite', 'standard', 'premium'] as const).map(tier => {
+            const stdSize = getStandardSize(comp.name)
+            return (
+              <div key={tier} className="comp__col">
+                <div className="comp__col-header">
+                  <span className={`comp__col-dot comp__col-dot--${tier}`} />
+                  <span className={`comp__col-label comp__col-label--${tier}`}>{tier}</span>
+                </div>
 
-            <div className="comp__preview">
-              {selectedComponent ? (
-                <Suspense fallback={<div className="comp__unavailable">Loading...</div>}>
-                  <FallbackPreview name={selectedComponent.name} tier={tier} />
-                </Suspense>
-              ) : (
-                <FallbackPreview name="Component" tier={tier} />
-              )}
-            </div>
+                <div className="comp__preview">
+                  {renderComponentPreview(comp.name)}
+                </div>
 
-            {selectedComponent && (
-              <>
+                <div className="comp__tier-desc">{tierDescription(tier)}</div>
+
                 <div className="comp__import">
                   {tier === 'standard'
-                    ? `import { ${selectedComponent.name} } from '@annondeveloper/ui-kit'`
-                    : `import { ${selectedComponent.name} } from '@annondeveloper/ui-kit/${tier}'`
+                    ? `import { ${comp.name} } from '@annondeveloper/ui-kit'`
+                    : `import { ${comp.name} } from '@annondeveloper/ui-kit/${tier}'`
                   }
                 </div>
-                <div className="comp__size">
-                  ~{selectedComponent.approxSize} gzip
-                  {tier === 'lite' && ' (minimal)'}
-                  {tier === 'premium' && ' (with effects)'}
-                </div>
-              </>
-            )}
-          </div>
-        ))}
-      </div>
 
-      {/* Info section */}
+                <div className={`comp__size comp__size--${tier}`}>
+                  {tierSize(stdSize, tier)} gzip
+                </div>
+              </div>
+            )
+          })}
+        </div>
+      )}
+
       <div className="comp__info">
         <div className="comp__info-title">About Weight Tiers</div>
         <p className="comp__info-text">
-          Every component in ui-kit ships in 3 weight tiers so you can optimize your bundle for your use case:
+          <strong>Lite</strong> (~15% of Standard) — Minimal forwardRef wrappers, no animation, no style injection. 20-30 lines each.
+          <br /><strong>Standard</strong> (default) — Full CSS scoped styles, motion levels 0-3, keyboard navigation, ARIA patterns.
+          <br /><strong>Premium</strong> (~160% of Standard) — Aurora glow, spring physics, shimmer gradients, particle effects on top of Standard.
         </p>
-        <ul className="comp__info-list">
-          <li><strong>Lite</strong> -- Minimal wrappers with no animations or effects. Ideal for server-rendered pages, emails, or bundle-critical apps. Each component is ~20-30 lines.</li>
-          <li><strong>Standard</strong> -- Full-featured components with CSS transitions and complete interactivity. The default tier.</li>
-          <li><strong>Premium</strong> -- Aurora glow effects, spring-based physics animations, shimmer overlays, and cinematic motion. For apps where visual polish is paramount.</li>
-        </ul>
       </div>
     </div>
   )
