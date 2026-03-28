@@ -4,6 +4,20 @@ All notable changes to this project will be documented in this file.
 
 This changelog is auto-generated from [conventional commits](https://www.conventionalcommits.org/).
 
+## 2.6.0 (2026-03-28)
+
+### Features
+
+- **v2:** Complete polish — tests, CI, docs, community, new pages (`b3ddbf7`)
+
+### Bug Fixes
+
+- CI failures — a11y script + storybook build resilience (`a0e7ea9`)
+
+### Chores
+
+- bump to v2.6.0 (`c9e6381`)
+
 ## 2.5.1 (2026-03-28)
 
 ### Chores

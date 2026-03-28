@@ -11,6 +11,9 @@ jobs:
       contents: read
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          fetch-tags: true
       - uses: actions/setup-node@v4
         with:
           node-version: 22
@@ -20,7 +23,7 @@ jobs:
       - run: npm run build
       - run: npm test
       - name: Generate changelog
-        run: node scripts/generate-changelog.js
+        run: node scripts/generate-changelog.js || echo "Changelog generation skipped"
       - uses: actions/upload-artifact@v4
         with:
           name: dist
