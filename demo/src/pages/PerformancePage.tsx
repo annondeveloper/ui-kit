@@ -74,7 +74,7 @@ function BudgetGauge({ used, budget }: { used: number; budget: number }) {
           cy={center}
           r={radius}
           fill="none"
-          stroke="oklch(30% 0.01 270 / 0.3)"
+          stroke="var(--border-subtle)"
           strokeWidth={stroke}
         />
         {/* Used arc */}
@@ -276,8 +276,8 @@ const styles = css`
     /* ── Cards ─────────────────────────────────────── */
 
     .perf__card {
-      background: oklch(18% 0.01 270 / 0.6);
-      border: 1px solid oklch(35% 0.02 270 / 0.3);
+      background: var(--bg-elevated);
+      border: 1px solid var(--border-default);
       border-radius: 1rem;
       padding: 1.5rem;
       backdrop-filter: blur(12px);
@@ -339,7 +339,7 @@ const styles = css`
       flex-wrap: wrap;
       margin-block-start: 1rem;
       padding-block-start: 1rem;
-      border-block-start: 1px solid oklch(35% 0.02 270 / 0.2);
+      border-block-start: 1px solid var(--border-default);
     }
 
     .perf__stat {
@@ -390,7 +390,7 @@ const styles = css`
       cursor: pointer;
       user-select: none;
       white-space: nowrap;
-      border-block-end: 1px solid oklch(35% 0.02 270 / 0.3);
+      border-block-end: 1px solid var(--border-default);
     }
 
     .perf__table th:hover {
@@ -398,13 +398,13 @@ const styles = css`
     }
 
     .perf__table th[aria-sort] {
-      color: oklch(72% 0.17 270);
+      color: var(--brand-light);
     }
 
     .perf__table td {
       font-family: 'SF Mono', 'Cascadia Code', 'Fira Code', monospace;
       color: var(--text-primary, #e4e4e7);
-      border-block-end: 1px solid oklch(30% 0.01 270 / 0.15);
+      border-block-end: 1px solid var(--border-subtle);
     }
 
     .perf__table td:first-child {
@@ -415,7 +415,7 @@ const styles = css`
     }
 
     .perf__table tr:hover td {
-      background: oklch(25% 0.02 270 / 0.3);
+      background: var(--bg-hover);
     }
 
     .perf__sort-icon {
@@ -435,7 +435,7 @@ const styles = css`
     .perf__size-bar {
       height: 6px;
       border-radius: 3px;
-      background: oklch(68% 0.17 270);
+      background: var(--brand);
       min-width: 2px;
       transition: width 0.3s ease-out;
     }
@@ -460,9 +460,9 @@ const styles = css`
       align-items: center;
       text-align: center;
       padding: 1.25rem 1rem;
-      background: oklch(20% 0.01 270 / 0.4);
+      background: var(--bg-elevated);
       border-radius: 0.75rem;
-      border: 1px solid oklch(35% 0.02 270 / 0.2);
+      border: 1px solid var(--border-default);
     }
 
     .perf__vital-value {
@@ -507,16 +507,16 @@ const styles = css`
       flex-direction: column;
       align-items: center;
       padding: 1rem;
-      background: oklch(20% 0.01 270 / 0.4);
+      background: var(--bg-elevated);
       border-radius: 0.75rem;
-      border: 1px solid oklch(35% 0.02 270 / 0.2);
+      border: 1px solid var(--border-default);
     }
 
     .perf__profiler-value {
       font-size: var(--text-2xl, 1.5rem);
       font-weight: 800;
       font-variant-numeric: tabular-nums;
-      color: oklch(72% 0.17 270);
+      color: var(--brand-light);
     }
 
     .perf__profiler-label {
@@ -572,8 +572,8 @@ const styles = css`
       width: 100%;
       max-width: 320px;
       padding: 0.5rem 0.75rem;
-      background: oklch(15% 0.01 270 / 0.6);
-      border: 1px solid oklch(35% 0.02 270 / 0.3);
+      background: var(--bg-surface);
+      border: 1px solid var(--border-default);
       border-radius: 0.5rem;
       color: var(--text-primary, #e4e4e7);
       font-size: var(--text-sm, 0.875rem);
@@ -587,7 +587,7 @@ const styles = css`
     }
 
     .perf__filter-input:focus {
-      border-color: oklch(65% 0.17 270);
+      border-color: var(--brand);
     }
 
     /* ── Show more ─────────────────────────────────── */
@@ -599,8 +599,8 @@ const styles = css`
     }
 
     .perf__show-more-btn {
-      background: oklch(25% 0.02 270 / 0.5);
-      border: 1px solid oklch(40% 0.02 270 / 0.3);
+      background: var(--bg-hover);
+      border: 1px solid var(--border-default);
       border-radius: 0.5rem;
       color: var(--text-secondary, #a1a1aa);
       padding: 0.375rem 1rem;
@@ -610,7 +610,7 @@ const styles = css`
     }
 
     .perf__show-more-btn:hover {
-      background: oklch(30% 0.03 270 / 0.6);
+      background: var(--bg-active);
       color: var(--text-primary, #e4e4e7);
     }
   }

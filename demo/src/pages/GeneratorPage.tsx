@@ -8,6 +8,10 @@ import { Button } from '@ui/components/button'
 import { Card } from '@ui/components/card'
 import { Badge } from '@ui/components/badge'
 import { SearchInput } from '@ui/components/search-input'
+import { FormInput } from '@ui/components/form-input'
+import { Select } from '@ui/components/select'
+import { MetricCard } from '@ui/domain/metric-card'
+import { DataTable, type ColumnDef } from '@ui/domain/data-table'
 import { useTier } from '../App'
 import { getComponentDatabase, searchComponents, type ComponentInfo } from '../utils/component-database'
 import {
@@ -88,12 +92,12 @@ const styles = css`
 
       &:hover {
         transform: translateY(-2px);
-        box-shadow: 0 8px 24px oklch(0% 0 0 / 0.3);
+        box-shadow: var(--shadow-md);
       }
 
       &[data-active='true'] {
-        border-color: oklch(65% 0.25 270);
-        box-shadow: 0 0 0 3px oklch(65% 0.25 270 / 0.15);
+        border-color: var(--brand);
+        box-shadow: 0 0 0 3px oklch(from var(--brand) l c h / 0.15);
       }
     }
 
@@ -101,12 +105,12 @@ const styles = css`
       width: 40px;
       height: 40px;
       border-radius: 10px;
-      background: oklch(65% 0.2 270 / 0.15);
+      background: oklch(from var(--brand) l c h / 0.15);
       display: flex;
       align-items: center;
       justify-content: center;
       margin-block-end: 0.75rem;
-      color: oklch(70% 0.2 270);
+      color: var(--brand-light);
     }
 
     .gen-template-card__title {
@@ -179,7 +183,7 @@ const styles = css`
       user-select: none;
 
       &:hover {
-        background: var(--surface-tertiary, oklch(25% 0.02 270));
+        background: var(--bg-hover);
       }
     }
 
@@ -213,8 +217,8 @@ const styles = css`
       justify-content: space-between;
       padding: 0.5rem 0.75rem;
       border-radius: 8px;
-      background: oklch(65% 0.2 270 / 0.1);
-      border: 1px solid oklch(65% 0.2 270 / 0.2);
+      background: oklch(from var(--brand) l c h / 0.1);
+      border: 1px solid oklch(from var(--brand) l c h / 0.2);
     }
 
     .gen-selected-item__name {
@@ -252,13 +256,13 @@ const styles = css`
       transition: all 0.15s;
 
       &:hover {
-        background: oklch(25% 0.02 270);
+        background: var(--bg-hover);
       }
 
       &[data-active='true'] {
-        background: oklch(65% 0.2 270 / 0.15);
-        border-color: oklch(65% 0.25 270);
-        color: oklch(80% 0.15 270);
+        background: oklch(from var(--brand) l c h / 0.15);
+        border-color: var(--brand);
+        color: var(--brand-light);
       }
     }
 
@@ -281,13 +285,13 @@ const styles = css`
       transition: all 0.15s;
 
       &:hover {
-        background: oklch(25% 0.02 270);
+        background: var(--bg-hover);
       }
 
       &[data-active='true'] {
-        background: oklch(65% 0.2 270 / 0.15);
-        border-color: oklch(65% 0.25 270);
-        color: oklch(80% 0.15 270);
+        background: oklch(from var(--brand) l c h / 0.15);
+        border-color: var(--brand);
+        color: var(--brand-light);
       }
     }
 
@@ -297,9 +301,9 @@ const styles = css`
     }
 
     .gen-code-block {
-      background: oklch(12% 0.02 270);
+      background: var(--bg-base);
       border-radius: 12px;
-      border: 1px solid oklch(25% 0.02 270);
+      border: 1px solid var(--border-default);
       overflow: hidden;
     }
 
@@ -308,8 +312,8 @@ const styles = css`
       align-items: center;
       justify-content: space-between;
       padding: 0.625rem 1rem;
-      background: oklch(15% 0.02 270);
-      border-block-end: 1px solid oklch(25% 0.02 270);
+      background: var(--bg-surface);
+      border-block-end: 1px solid var(--border-default);
     }
 
     .gen-code-block__lang {
@@ -335,7 +339,7 @@ const styles = css`
       transition: all 0.15s;
 
       &:hover {
-        background: oklch(25% 0.02 270);
+        background: var(--bg-hover);
         color: var(--text-primary);
       }
 
@@ -358,14 +362,14 @@ const styles = css`
       font-size: 0.8125rem;
       line-height: 1.6;
       white-space: pre;
-      color: oklch(80% 0.02 270);
+      color: var(--text-primary);
       tab-size: 2;
     }
 
     /* ── Preview ──────────────────────────────────────────────────────── */
     .gen-preview {
       border-radius: 12px;
-      border: 1px solid oklch(25% 0.02 270);
+      border: 1px solid var(--border-default);
       overflow: hidden;
       margin-block-end: 1.5rem;
     }
@@ -375,8 +379,8 @@ const styles = css`
       align-items: center;
       justify-content: space-between;
       padding: 0.625rem 1rem;
-      background: oklch(15% 0.02 270);
-      border-block-end: 1px solid oklch(25% 0.02 270);
+      background: var(--bg-surface);
+      border-block-end: 1px solid var(--border-default);
     }
 
     .gen-preview__title {
@@ -401,7 +405,7 @@ const styles = css`
     .gen-preview__content {
       padding: 1.5rem;
       min-height: 200px;
-      background: oklch(13% 0.015 270);
+      background: var(--bg-base);
     }
 
     .gen-preview__placeholder {
@@ -416,7 +420,7 @@ const styles = css`
     }
 
     .gen-preview__placeholder-icon {
-      color: oklch(50% 0.1 270);
+      color: var(--text-tertiary);
     }
 
     /* ── Inline Preview Components ────────────────────────────────────── */
@@ -429,8 +433,8 @@ const styles = css`
     .gen-inline-metric {
       padding: 1rem;
       border-radius: 10px;
-      background: oklch(18% 0.02 270);
-      border: 1px solid oklch(25% 0.02 270);
+      background: var(--bg-surface);
+      border: 1px solid var(--border-default);
     }
 
     .gen-inline-metric__label {
@@ -459,7 +463,7 @@ const styles = css`
     .gen-inline-table th {
       text-align: start;
       padding: 0.5rem 0.75rem;
-      border-block-end: 1px solid oklch(25% 0.02 270);
+      border-block-end: 1px solid var(--border-default);
       color: var(--text-secondary);
       font-weight: 600;
       font-size: 0.75rem;
@@ -469,7 +473,7 @@ const styles = css`
 
     .gen-inline-table td {
       padding: 0.5rem 0.75rem;
-      border-block-end: 1px solid oklch(20% 0.02 270);
+      border-block-end: 1px solid var(--border-subtle);
     }
 
     .gen-inline-form {
@@ -495,7 +499,7 @@ const styles = css`
       padding: 0.5rem 0.75rem;
       border-radius: 8px;
       border: 1px solid var(--border-subtle);
-      background: oklch(18% 0.02 270);
+      background: var(--bg-surface);
       color: inherit;
       font-size: 0.875rem;
     }
@@ -528,8 +532,8 @@ const styles = css`
     .gen-inline-feature {
       padding: 1rem;
       border-radius: 10px;
-      background: oklch(18% 0.02 270);
-      border: 1px solid oklch(25% 0.02 270);
+      background: var(--bg-surface);
+      border: 1px solid var(--border-default);
     }
 
     .gen-inline-feature h4 {
@@ -553,13 +557,13 @@ const styles = css`
     }
 
     .gen-inline-btn--primary {
-      background: oklch(65% 0.25 270);
+      background: var(--brand);
       color: white;
     }
 
     .gen-inline-btn--outline {
       background: transparent;
-      border: 1px solid oklch(40% 0.02 270);
+      border: 1px solid var(--border-strong);
       color: var(--text-primary);
       margin-inline-start: 0.5rem;
     }
@@ -658,40 +662,35 @@ function CopyButton({ text }: { text: string }) {
 
 function DashboardPreview() {
   const metrics = [
-    { label: 'Revenue', value: '$48,230', change: '+12.5%', up: true },
-    { label: 'Users', value: '2,847', change: '+8.2%', up: true },
-    { label: 'Conversion', value: '3.24%', change: '-1.8%', up: false },
-    { label: 'Response', value: '142ms', change: '-5.3%', up: true },
+    { title: 'Revenue', value: '$48,230', change: { value: 12.5 }, trend: 'up' as const },
+    { title: 'Users', value: '2,847', change: { value: 8.2 }, trend: 'up' as const },
+    { title: 'Conversion', value: '3.24%', change: { value: -1.8 }, trend: 'down' as const },
+    { title: 'Response', value: '142ms', change: { value: -5.3 }, trend: 'up' as const },
   ]
-  const rows = [
-    ['Widget Pro', 'Active', '$12,400', '2026-03-15'],
-    ['Dashboard X', 'Active', '$8,200', '2026-03-14'],
-    ['Analytics+', 'Paused', '$4,100', '2026-03-13'],
+
+  type DashRow = { name: string; status: string; revenue: string; date: string }
+  const dashColumns: ColumnDef<DashRow>[] = [
+    { id: 'name', header: 'Name', accessor: 'name', sortable: true },
+    { id: 'status', header: 'Status', accessor: 'status' },
+    { id: 'revenue', header: 'Revenue', accessor: 'revenue', sortable: true },
+    { id: 'date', header: 'Date', accessor: 'date' },
+  ]
+  const dashData: DashRow[] = [
+    { name: 'Widget Pro', status: 'Active', revenue: '$12,400', date: '2026-03-15' },
+    { name: 'Dashboard X', status: 'Active', revenue: '$8,200', date: '2026-03-14' },
+    { name: 'Analytics+', status: 'Paused', revenue: '$4,100', date: '2026-03-13' },
   ]
 
   return (
     <>
       <div className="gen-inline-grid">
         {metrics.map(m => (
-          <div key={m.label} className="gen-inline-metric">
-            <div className="gen-inline-metric__label">{m.label}</div>
-            <div className="gen-inline-metric__value">{m.value}</div>
-            <div className="gen-inline-metric__change" style={{ color: m.up ? 'oklch(75% 0.2 150)' : 'oklch(70% 0.2 25)' }}>
-              {m.change}
-            </div>
-          </div>
+          <MetricCard key={m.title} title={m.title} value={m.value} change={m.change} trend={m.trend} />
         ))}
       </div>
-      <table className="gen-inline-table">
-        <thead>
-          <tr><th>Name</th><th>Status</th><th>Revenue</th><th>Date</th></tr>
-        </thead>
-        <tbody>
-          {rows.map((r, i) => (
-            <tr key={i}><td>{r[0]}</td><td>{r[1]}</td><td>{r[2]}</td><td>{r[3]}</td></tr>
-          ))}
-        </tbody>
-      </table>
+      <div style={{ marginBlockStart: '1rem' }}>
+        <DataTable columns={dashColumns} data={dashData} sortable pageSize={5} />
+      </div>
     </>
   )
 }
@@ -699,21 +698,19 @@ function DashboardPreview() {
 function FormPreview() {
   return (
     <div className="gen-inline-form">
-      <div className="gen-inline-input">
-        <label>Full Name</label>
-        <input placeholder="Jane Doe" readOnly />
-      </div>
-      <div className="gen-inline-input">
-        <label>Email</label>
-        <input placeholder="jane@example.com" readOnly />
-      </div>
-      <div className="gen-inline-input">
-        <label>Category</label>
-        <select disabled>
-          <option>General Inquiry</option>
-        </select>
-      </div>
-      <button className="gen-inline-btn gen-inline-btn--primary">Send Message</button>
+      <FormInput label="Full Name" placeholder="Jane Doe" name="name" />
+      <FormInput label="Email" placeholder="jane@example.com" name="email" type="email" />
+      <Select
+        name="category"
+        label="Category"
+        placeholder="Select a category"
+        options={[
+          { value: 'general', label: 'General Inquiry' },
+          { value: 'support', label: 'Support' },
+          { value: 'feedback', label: 'Feedback' },
+        ]}
+      />
+      <Button variant="primary">Send Message</Button>
     </div>
   )
 }
@@ -724,16 +721,16 @@ function MarketingPreview() {
       <Badge variant="primary" size="sm">New in v2.3</Badge>
       <h2 style={{ marginBlockStart: '0.75rem' }}>Build beautiful interfaces</h2>
       <p>A revolutionary component library with physics-based animations.</p>
-      <div>
-        <button className="gen-inline-btn gen-inline-btn--primary">Get Started</button>
-        <button className="gen-inline-btn gen-inline-btn--outline">Documentation</button>
+      <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'center' }}>
+        <Button variant="primary">Get Started</Button>
+        <Button variant="outline">Documentation</Button>
       </div>
       <div className="gen-inline-cards">
         {['Zero Dependencies', 'Physics Animations', 'OKLCH Colors', 'Three Tiers'].map(f => (
-          <div key={f} className="gen-inline-feature">
-            <h4>{f}</h4>
-            <p>Feature description goes here.</p>
-          </div>
+          <Card key={f} style={{ padding: '1rem' }}>
+            <h4 style={{ fontSize: '0.875rem', marginBlockEnd: '0.25rem' }}>{f}</h4>
+            <p style={{ fontSize: '0.75rem', margin: 0, color: 'var(--text-secondary)' }}>Feature description goes here.</p>
+          </Card>
         ))}
       </div>
     </div>
@@ -741,43 +738,92 @@ function MarketingPreview() {
 }
 
 function DataTablePreview() {
-  const rows = [
-    ['Alice Johnson', 'Engineer', 'Active', 'alice@example.com'],
-    ['Bob Smith', 'Designer', 'Active', 'bob@example.com'],
-    ['Carol Williams', 'PM', 'Away', 'carol@example.com'],
-    ['Dave Brown', 'Engineer', 'Active', 'dave@example.com'],
+  type TeamRow = { name: string; role: string; status: string; email: string }
+  const columns: ColumnDef<TeamRow>[] = [
+    { id: 'name', header: 'Name', accessor: 'name', sortable: true },
+    { id: 'role', header: 'Role', accessor: 'role', sortable: true },
+    { id: 'status', header: 'Status', accessor: 'status', cell: (val) => (
+      <Badge variant={val === 'Active' ? 'success' : 'warning'} size="sm">{val as string}</Badge>
+    )},
+    { id: 'email', header: 'Email', accessor: 'email' },
+  ]
+  const data: TeamRow[] = [
+    { name: 'Alice Johnson', role: 'Engineer', status: 'Active', email: 'alice@example.com' },
+    { name: 'Bob Smith', role: 'Designer', status: 'Active', email: 'bob@example.com' },
+    { name: 'Carol Williams', role: 'PM', status: 'Away', email: 'carol@example.com' },
+    { name: 'Dave Brown', role: 'Engineer', status: 'Active', email: 'dave@example.com' },
   ]
 
   return (
-    <>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBlockEnd: '1rem' }}>
-        <span style={{ fontWeight: 600 }}>Team Members</span>
-        <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
-          <input placeholder="Search..." readOnly style={{
-            padding: '0.375rem 0.75rem',
-            borderRadius: '6px',
-            border: '1px solid oklch(30% 0.02 270)',
-            background: 'oklch(18% 0.02 270)',
-            color: 'inherit',
-            fontSize: '0.8125rem',
-          }} />
-          <button className="gen-inline-btn gen-inline-btn--primary" style={{ fontSize: '0.75rem', padding: '0.375rem 0.75rem' }}>
-            Add
-          </button>
-        </div>
-      </div>
-      <table className="gen-inline-table">
-        <thead>
-          <tr><th>Name</th><th>Role</th><th>Status</th><th>Email</th></tr>
-        </thead>
-        <tbody>
-          {rows.map((r, i) => (
-            <tr key={i}><td>{r[0]}</td><td>{r[1]}</td><td>{r[2]}</td><td>{r[3]}</td></tr>
-          ))}
-        </tbody>
-      </table>
-    </>
+    <DataTable
+      columns={columns}
+      data={data}
+      searchable
+      sortable
+      pageSize={10}
+    />
   )
+}
+
+function CustomComponentPreview({ component }: { component: ComponentInfo }) {
+  const name = component.name
+  switch (name) {
+    case 'Button':
+      return <Button variant="primary">Sample Button</Button>
+    case 'Badge':
+      return (
+        <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+          <Badge variant="primary">Primary</Badge>
+          <Badge variant="success">Success</Badge>
+          <Badge variant="warning">Warning</Badge>
+        </div>
+      )
+    case 'Card':
+      return (
+        <Card style={{ padding: '1rem' }}>
+          <h4 style={{ fontSize: '0.875rem', fontWeight: 600, marginBlockEnd: '0.25rem' }}>Sample Card</h4>
+          <p style={{ fontSize: '0.8125rem', margin: 0, color: 'var(--text-secondary)' }}>Card content goes here.</p>
+        </Card>
+      )
+    case 'MetricCard':
+      return <MetricCard title="Revenue" value="$48,230" change={{ value: 12.5 }} trend="up" />
+    case 'Select':
+      return (
+        <Select
+          name="preview-select"
+          placeholder="Choose an option"
+          options={[
+            { value: '1', label: 'Option A' },
+            { value: '2', label: 'Option B' },
+            { value: '3', label: 'Option C' },
+          ]}
+        />
+      )
+    case 'FormInput':
+      return <FormInput label="Sample Input" placeholder="Type something..." name="preview-input" />
+    case 'DataTable': {
+      type SampleRow = { name: string; status: string; updated: string }
+      const cols: ColumnDef<SampleRow>[] = [
+        { id: 'name', header: 'Name', accessor: 'name', sortable: true },
+        { id: 'status', header: 'Status', accessor: 'status' },
+        { id: 'updated', header: 'Updated', accessor: 'updated' },
+      ]
+      const rows: SampleRow[] = [
+        { name: 'Item A', status: 'Active', updated: '2026-03-25' },
+        { name: 'Item B', status: 'Pending', updated: '2026-03-24' },
+      ]
+      return <DataTable columns={cols} data={rows} sortable pageSize={5} />
+    }
+    case 'SearchInput':
+      return <SearchInput placeholder="Search..." value="" onChange={() => {}} />
+    default:
+      return (
+        <Card style={{ padding: '0.75rem 1rem' }}>
+          <div style={{ fontWeight: 600, fontSize: '0.875rem', marginBlockEnd: '0.25rem' }}>{name}</div>
+          <code style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>&lt;{name} /&gt;</code>
+        </Card>
+      )
+  }
 }
 
 function CustomPreview({ components }: { components: ComponentInfo[] }) {
@@ -793,14 +839,8 @@ function CustomPreview({ components }: { components: ComponentInfo[] }) {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
       {components.map((c, i) => (
-        <div key={`${c.name}-${i}`} style={{
-          padding: '0.75rem 1rem',
-          borderRadius: '8px',
-          background: 'oklch(18% 0.02 270)',
-          border: '1px solid oklch(25% 0.02 270)',
-        }}>
-          <div style={{ fontWeight: 600, fontSize: '0.875rem', marginBlockEnd: '0.25rem' }}>{c.name}</div>
-          <code style={{ fontSize: '0.75rem', color: 'oklch(70% 0.15 270)' }}>{c.example.split('\n')[0]}</code>
+        <div key={`${c.name}-${i}`} style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+          <CustomComponentPreview component={c} />
         </div>
       ))}
     </div>
