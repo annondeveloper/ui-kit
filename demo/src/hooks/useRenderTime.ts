@@ -8,17 +8,15 @@ export interface RenderTiming {
   status: 'sampling' | 'complete'
 }
 
-const SAMPLE_DURATION_MS = 3000 // Sample renders for 3 seconds
-const SAMPLE_INTERVAL_MS = 200  // Re-render every 200ms during sampling
+const SAMPLE_COUNT = 10
+const SAMPLE_INTERVAL = 300
 
 /**
- * Measures component render time over a 3-second sampling window.
- * Forces periodic re-renders during sampling to collect multiple data points,
- * then stops and reports the average.
+ * Measures component render time by forcing 10 re-renders over 3 seconds.
+ * Uses setInterval (not useEffect re-render loop) to avoid infinite loops.
+ * After 10 samples, stops completely.
  */
 export function useRenderTime(componentName: string): RenderTiming {
-  const renderStart = useRef(performance.now())
-  const samples = useRef<number[]>([])
   const [timing, setTiming] = useState<RenderTiming>({
     componentName,
     renderCount: 0,
@@ -27,20 +25,31 @@ export function useRenderTime(componentName: string): RenderTiming {
     status: 'sampling',
   })
 
-  // Capture render start time
-  renderStart.current = performance.now()
-
   useEffect(() => {
-    // Record this render's elapsed time
-    const elapsed = performance.now() - renderStart.current
-    samples.current.push(elapsed)
+    let count = 0
+    const samples: number[] = []
 
-    const count = samples.current.length
-    const avg = samples.current.reduce((s, v) => s + v, 0) / count
+    const interval = setInterval(() => {
+      const start = performance.now()
+      // Force a synchronous layout read to measure actual render cost
+      void document.body.offsetHeight
+      const elapsed = performance.now() - start
 
-    // During sampling period, force periodic re-renders
-    if (count * SAMPLE_INTERVAL_MS < SAMPLE_DURATION_MS) {
-      const timer = setTimeout(() => {
+      samples.push(elapsed)
+      count++
+
+      const avg = samples.reduce((s, v) => s + v, 0) / samples.length
+
+      if (count >= SAMPLE_COUNT) {
+        clearInterval(interval)
+        setTiming({
+          componentName,
+          renderCount: count,
+          lastRenderMs: Math.round(elapsed * 100) / 100,
+          averageRenderMs: Math.round(avg * 100) / 100,
+          status: 'complete',
+        })
+      } else {
         setTiming({
           componentName,
           renderCount: count,
@@ -48,19 +57,11 @@ export function useRenderTime(componentName: string): RenderTiming {
           averageRenderMs: Math.round(avg * 100) / 100,
           status: 'sampling',
         })
-      }, SAMPLE_INTERVAL_MS)
-      return () => clearTimeout(timer)
-    }
+      }
+    }, SAMPLE_INTERVAL)
 
-    // Sampling complete — set final result, no more re-renders
-    setTiming({
-      componentName,
-      renderCount: count,
-      lastRenderMs: Math.round(elapsed * 100) / 100,
-      averageRenderMs: Math.round(avg * 100) / 100,
-      status: 'complete',
-    })
-  }) // Intentionally no deps — runs after each render during sampling
+    return () => clearInterval(interval)
+  }, [componentName])
 
   return timing
 }

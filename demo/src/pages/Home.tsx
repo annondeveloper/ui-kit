@@ -1206,14 +1206,14 @@ export default function Home() {
         </div>
         <div className="home-features-grid">
           {[
-            { icon: 'activity' as IconName, title: 'Motion Choreography', desc: 'Declarative multi-step animation sequences with 5 presets. Cascade, wave, spiral, stagger-grid, focus-in.', link: '/ui-kit/choreography' },
-            { icon: 'copy' as IconName, title: 'Container Query Tokens', desc: 'useContainerSize() hook + responsive props. Components adapt to their container, not the viewport.', link: '/ui-kit/docs' },
-            { icon: 'zap' as IconName, title: 'View Transitions', desc: 'useViewTransition() with 6 presets. Morphing route transitions, crossfade, slide, zoom — zero config.', link: '/ui-kit/docs' },
-            { icon: 'settings' as IconName, title: 'Theme Editor', desc: 'Color harmony engine, WCAG contrast audit, 4 export formats (CSS, Tailwind, Figma, CSS-in-JS), shareable URLs.', link: '/ui-kit/themes' },
-            { icon: 'code' as IconName, title: 'AI Code Generator', desc: 'Natural language to component composition. 4 templates, 5 framework outputs (React, Vue, Angular, Svelte, HTML).', link: '/ui-kit/generator' },
-            { icon: 'bar-chart' as IconName, title: 'Performance Dashboard', desc: 'Bundle size tracking, render profiler, Web Vitals gauges, CI regression detection.', link: '/ui-kit/performance' },
-            { icon: 'terminal' as IconName, title: 'CLI Scaffolding', desc: 'ui-kit add/create commands, 5 project templates, Figma token export, interactive mode.', link: '/ui-kit/docs' },
-            { icon: 'download' as IconName, title: 'Figma Plugin', desc: 'Export design tokens as Figma Variables JSON, Style Dictionary format, component mapping.', link: '/ui-kit/docs' },
+            { icon: 'activity' as IconName, title: 'Motion Choreography', desc: 'Declarative multi-step animation sequences with 5 presets. Cascade, wave, spiral, stagger-grid, focus-in.', link: '/choreography' },
+            { icon: 'copy' as IconName, title: 'Container Query Tokens', desc: 'useContainerSize() hook + responsive props. Components adapt to their container, not the viewport.', link: '/docs' },
+            { icon: 'zap' as IconName, title: 'View Transitions', desc: 'useViewTransition() with 6 presets. Morphing route transitions, crossfade, slide, zoom — zero config.', link: '/docs' },
+            { icon: 'settings' as IconName, title: 'Theme Editor', desc: 'Color harmony engine, WCAG contrast audit, 4 export formats (CSS, Tailwind, Figma, CSS-in-JS), shareable URLs.', link: '/themes' },
+            { icon: 'code' as IconName, title: 'AI Code Generator', desc: 'Natural language to component composition. 4 templates, 5 framework outputs (React, Vue, Angular, Svelte, HTML).', link: '/generator' },
+            { icon: 'bar-chart' as IconName, title: 'Performance Dashboard', desc: 'Bundle size tracking, render profiler, Web Vitals gauges, CI regression detection.', link: '/performance' },
+            { icon: 'terminal' as IconName, title: 'CLI Scaffolding', desc: 'ui-kit add/create commands, 5 project templates, Figma token export, interactive mode.', link: '/docs' },
+            { icon: 'download' as IconName, title: 'Figma Plugin', desc: 'Export design tokens as Figma Variables JSON, Style Dictionary format, component mapping.', link: '/docs' },
           ].map((f, i) => (
             <Link key={i} to={f.link} className="home-nextgen-card" style={{ textDecoration: 'none' }}>
               <div className="home-nextgen-icon"><Icon name={f.icon} size={20} /></div>
