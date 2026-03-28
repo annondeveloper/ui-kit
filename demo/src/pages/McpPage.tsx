@@ -206,31 +206,41 @@ const styles = css`
       margin: 0;
       display: flex;
       flex-direction: column;
-      gap: 0.375rem;
+      gap: 0.25rem;
+      max-block-size: 400px;
+      overflow-y: auto;
     }
 
     .mcp-comp-list__item {
-      display: flex;
+      display: grid;
+      grid-template-columns: 140px auto 1fr;
       align-items: center;
       gap: 0.5rem;
-      padding: 0.375rem 0.5rem;
+      padding: 0.375rem 0.75rem;
       border-radius: var(--radius-sm, 0.375rem);
       font-size: 0.8125rem;
       transition: background 0.15s;
+      min-block-size: 0;
     }
 
     .mcp-comp-list__item:hover {
-      background: var(--bg-elevated, oklch(16% 0.02 270));
+      background: var(--bg-hover);
     }
 
     .mcp-comp-list__name {
       font-weight: 600;
       color: var(--text-primary);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
     .mcp-comp-list__cat {
       color: var(--text-tertiary);
       font-size: 0.75rem;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
     /* ── Icon Grid ──────────────────────────────────────────── */

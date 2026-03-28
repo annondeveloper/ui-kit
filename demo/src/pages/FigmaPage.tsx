@@ -524,8 +524,8 @@ export default function FigmaPage() {
               </label>
               <ToggleSwitch
                 checked={mode === 'light'}
-                onChange={(checked) => {
-                  setMode(checked ? 'light' : 'dark')
+                onChange={(e) => {
+                  setMode(e.target.checked ? 'light' : 'dark')
                   setExportFormat(null)
                   setExportOutput('')
                 }}
