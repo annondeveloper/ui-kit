@@ -178,7 +178,7 @@ const styles = css`
       width: 100%;
       border: 1px solid var(--border-default);
       border-radius: var(--radius-md, 0.5rem);
-      background: var(--bg-base);
+      background: var(--bg-base, oklch(12% 0.02 270));
     }
 
     /* ── Info cards ─────────────────────────────────── */
@@ -349,6 +349,7 @@ export default function EmbedPage() {
             src={embedUrl}
             width={width}
             height={height}
+            style={{ colorScheme: theme === 'dark' ? 'dark' : 'light' }}
             title={`${component} embed preview`}
             loading="lazy"
           />

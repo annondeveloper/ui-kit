@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useSearchParams } from 'react-router-dom'
 import { Tabs, TabPanel } from '@ui/components/tabs'
 import { Badge } from '@ui/components/badge'
 import { Icon, type IconName } from '@ui/core/icons/icon'
@@ -209,7 +210,9 @@ const docs: Record<string, string> = {
 }
 
 export default function DocsPage() {
-  const [activeTab, setActiveTab] = useState('overview')
+  const [searchParams] = useSearchParams()
+  const initialTab = searchParams.get('tab') || 'overview'
+  const [activeTab, setActiveTab] = useState(initialTab)
   useStyles('docs-page', styles)
 
   const jumpToTab = (id: string) => {

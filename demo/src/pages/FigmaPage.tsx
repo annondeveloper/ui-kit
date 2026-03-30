@@ -105,6 +105,24 @@ const styles = css`
       box-shadow: var(--shadow-sm);
     }
 
+    .figma-controls .ui-select__content {
+      background: var(--surface-elevated, oklch(20% 0.02 270));
+      border: 1px solid var(--border-default);
+      border-radius: var(--radius-md, 0.5rem);
+      box-shadow: var(--shadow-lg);
+      z-index: 50;
+    }
+
+    .figma-controls .ui-select__item {
+      padding: 0.5rem 0.75rem;
+      cursor: pointer;
+      color: var(--text-primary);
+    }
+
+    .figma-controls .ui-select__item:hover {
+      background: var(--bg-hover, oklch(100% 0 0 / 0.06));
+    }
+
     /* ── Token Grid ──────────────────────────────────────────── */
     .figma-tokens {
       display: grid;
