@@ -20,7 +20,8 @@ export function useStyles(name: string, cssDef: CSSDefinition): ClassNameBuilder
   useEffect(() => {
     if (collector) return // SSR mode, skip DOM injection
 
-    const id = idRef.current
+    const id = cssDef.id
+    idRef.current = id
     globalRegistry.add(id, cssDef.css)
     injectCSS(id, cssDef.css)
 

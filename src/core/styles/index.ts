@@ -1,7 +1,7 @@
 export { css, type CSSDefinition } from './css-tag'
 export { useStyles } from './use-styles'
 export { StyleRegistry } from './registry'
-export { injectCSS, removeCSS } from './dom-injector'
+export { injectCSS, removeCSS, batchStyles } from './dom-injector'
 export { StyleCollector } from './ssr'
 export { ServerStyleSheet } from './server-style-sheet'
 export { StyleProvider, useStyleCollector } from './style-context'
