@@ -2,6 +2,7 @@ import { McpServer, ResourceTemplate } from '@modelcontextprotocol/sdk/server/mc
 import { z } from 'zod'
 import { loadRegistry, getComponent, searchComponents } from './registry/loader.js'
 import { logToolCall } from './analytics.js'
+import process from 'process'
 
 export function createServer() {
   const reg = loadRegistry()
@@ -219,6 +220,16 @@ export function ${scenario ? scenario.replace(/[^a-zA-Z0-9]/g, '').slice(0, 30) 
     if (!comp) return { contents: [{ uri: uri.href, mimeType: 'text/plain', text: `Component "${name}" not found` }] }
     const propsDoc = comp.props.map(p => `- \`${p.name}${p.required ? '' : '?'}: ${p.type}\` ${p.default ? `(default: ${p.default})` : ''} — ${p.description}`).join('\n')
     return { contents: [{ uri: uri.href, mimeType: 'text/markdown', text: `# ${comp.name}\n\n${comp.description}\n\n## Import\n\`\`\`tsx\n${comp.importStatement}\n\`\`\`\n\n## Props\n${propsDoc}\n\n## Examples\n${comp.examples.map(e => `\`\`\`tsx\n${e.code}\n\`\`\``).join('\n\n')}` }] }
+  })
+
+  //handle global errors
+
+  process.on('uncaughtException', (error: unknown) => {
+    console.error('[ui-kit-mcp] uncaughtException', error)
+  })
+
+  process.on('unhandledRejection', (reason: unknown) => {
+    console.error('[ui-kit-mcp] unhandledRejection', reason)
   })
 
   return server
