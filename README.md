@@ -60,6 +60,7 @@ function App() {
 - [Theme Editor](docs/theme-editor.md) -- Color harmony, contrast audit, multi-format export
 - [AI Generator](docs/ai-generator.md) -- Template gallery, custom composition, 5 framework output
 - [CLI Scaffolding](docs/cli-scaffolding.md) -- Project templates, component add, Figma export
+- [Cursor MCP Setup](docs/guides/cursor-mcp-setup.md) -- Connect the MCP server to Cursor with a practical local setup flow
 - [Figma Plugin](docs/figma-plugin.md) -- Token sync between code and Figma Variables
 - [Performance Dashboard](docs/performance-dashboard.md) -- Bundle tracking, render profiler, Web Vitals
 
