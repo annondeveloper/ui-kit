@@ -1115,30 +1115,30 @@ export default function Home() {
         {/* Staggered hero entrance */}
         <div className="home-hero-entrance">
           <Badge variant="primary" size="sm" dot pulse>
-            v2.0 -- Aurora Fluid Design System
+            v2.7 -- AI-Native Component Library
           </Badge>
         </div>
 
         <div className="home-hero-entrance" style={{ marginBlockStart: '1.5rem' }}>
           <h1>
-            The component library<br />
-            that needs nothing else
+            The first component library<br />
+            built for AI agents
           </h1>
         </div>
 
         <div className="home-hero-entrance">
           <p className="home-hero-sub">
-            147 components. Physics-based animations. OKLCH color system.
-            Aurora Fluid design language. 3 weight tiers. Zero dependencies.
+            147 zero-dependency React components that AI assistants can discover, understand, and use via MCP.
+            Physics-based animations. OKLCH color system. 3 weight tiers.
           </p>
         </div>
 
         <div className="home-hero-entrance">
           <div className="home-hero-actions">
-            <Link to="/components/button" style={{ textDecoration: 'none' }}>
+            <Link to="/mcp" style={{ textDecoration: 'none' }}>
               <ShimmerButton size="lg" shimmerColor="oklch(70% 0.2 270)">
                 <Icon name="zap" size="sm" />
-                Explore Components
+                Set Up MCP
               </ShimmerButton>
             </Link>
             <Button
@@ -1178,8 +1178,8 @@ export default function Home() {
             </div>
             <div className="home-stat-cell">
               <div className="home-stat-inner">
-                <span className="home-stat-value">144</span>
-                <span className="home-stat-label">Premium</span>
+                <span className="home-stat-value">6</span>
+                <span className="home-stat-label">MCP Tools</span>
               </div>
             </div>
             <div className="home-stat-cell">
@@ -1496,7 +1496,7 @@ export default function Home() {
         <Divider orientation="vertical" />
         <Link to="/docs">Documentation</Link>
         <Divider orientation="vertical" />
-        <Badge variant="default" size="sm">v2.0.1</Badge>
+        <Badge variant="default" size="sm">v2.7.0</Badge>
         <div className="home-footer-built">
           Built with zero dependencies. Powered by Aurora Fluid design.
         </div>

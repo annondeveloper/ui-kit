@@ -5,6 +5,7 @@ import { componentRegistry } from './registry.js'
 import { addCommand } from './commands/add.js'
 import { createCommand, TEMPLATE_NAMES } from './commands/create.js'
 import { figmaExportCommand } from './commands/figma-export.js'
+import { mcpSetupCommand } from './commands/mcp-setup.js'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = dirname(__filename)
@@ -44,6 +45,12 @@ switch (command) {
     break
   case 'figma-export':
     runFigmaExport(args.slice(1))
+    break
+  case 'mcp':
+    runMcpSetup()
+    break
+  case 'stats':
+    runStats()
     break
   case 'help':
   case '--help':
@@ -98,6 +105,40 @@ function runCreate(argv: string[]) {
   createCommand(name, { template: flags['template'], tier: flags['tier'], theme: flags['theme'] })
 }
 
+function runMcpSetup() {
+  mcpSetupCommand()
+}
+
+function runStats() {
+  try {
+    // Dynamic import since analytics.ts is in the MCP module
+    import('../mcp/analytics.js').then(({ getStats }) => {
+      const stats = getStats()
+      if (stats.total === 0) {
+        console.log('\nNo MCP usage data found.')
+        console.log('Enable telemetry: UI_KIT_TELEMETRY=1')
+        console.log('Analytics are stored locally in ~/.ui-kit/analytics.jsonl\n')
+        return
+      }
+      console.log(`\n@annondeveloper/ui-kit — MCP Usage Stats\n`)
+      console.log(`Total tool calls: ${stats.total}\n`)
+      console.log('By tool:')
+      for (const [tool, count] of Object.entries(stats.byTool)) {
+        console.log(`  ${tool}: ${count}`)
+      }
+      if (stats.topComponents.length > 0) {
+        console.log('\nTop requested components:')
+        for (const [name, count] of stats.topComponents) {
+          console.log(`  ${name}: ${count}`)
+        }
+      }
+      console.log()
+    })
+  } catch {
+    console.log('Stats not available. Build the MCP module first: npm run build:mcp')
+  }
+}
+
 function runFigmaExport(argv: string[]) {
   const flags = parseFlags(argv)
   if (!flags['theme'] || !flags['output']) {
@@ -141,6 +182,8 @@ Commands:
   list                             List all available components
   theme <hex>                      Generate theme from brand color
   figma-export --theme <name|hex> --output <path>  Export Figma variables JSON
+  mcp                              Set up MCP server config for Claude/Cursor
+  stats                            Show MCP tool usage statistics
   help                             Show this help message
 
 Templates (for create):

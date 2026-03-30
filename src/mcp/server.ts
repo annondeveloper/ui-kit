@@ -1,6 +1,7 @@
 import { McpServer, ResourceTemplate } from '@modelcontextprotocol/sdk/server/mcp.js'
 import { z } from 'zod'
 import { loadRegistry, getComponent, searchComponents } from './registry/loader.js'
+import { logToolCall } from './analytics.js'
 
 export function createServer() {
   const reg = loadRegistry()
@@ -14,28 +15,36 @@ export function createServer() {
     category: z.string().optional().describe('Filter by category'),
     tier: z.string().optional().describe('Filter by tier: standard, lite, or premium'),
   }, async ({ category, tier }) => {
-    const reg = loadRegistry()
-    let components = Object.values(reg.components)
-    if (category) components = components.filter(c => c.category === category)
-    if (tier) components = components.filter(c => c.tier.includes(tier))
-    const list = components.map(c => `- **${c.name}** (${c.category}) — ${c.description}\n  Import: \`${c.importStatement}\``)
-    return { content: [{ type: 'text' as const, text: `# Components (${components.length})\n\n${list.join('\n\n')}` }] }
+    try {
+      logToolCall('list_components', { query: [category, tier].filter(Boolean).join(',') || undefined })
+      const reg = loadRegistry()
+      let components = Object.values(reg.components)
+      if (category) components = components.filter(c => c.category === category)
+      if (tier) components = components.filter(c => c.tier.includes(tier))
+      const list = components.map(c => `- **${c.name}** (${c.category}) — ${c.description}\n  Import: \`${c.importStatement}\``)
+      return { content: [{ type: 'text' as const, text: `# Components (${components.length})\n\n${list.join('\n\n')}` }] }
+    } catch (error) {
+      console.error('[ui-kit-mcp]', 'list_components', error)
+      return { content: [{ type: 'text' as const, text: `Error in list_components: ${(error as Error).message}` }], isError: true }
+    }
   })
 
   // Tool 2: get_component
   server.tool('get_component', 'Get full API documentation for a specific component', {
     name: z.string().describe('Component name, e.g. "Button" or "Calendar"'),
   }, async ({ name }) => {
-    const comp = getComponent(name)
-    if (!comp) return { content: [{ type: 'text' as const, text: `Component "${name}" not found.` }] }
+    try {
+      logToolCall('get_component', { components: [name] })
+      const comp = getComponent(name)
+      if (!comp) return { content: [{ type: 'text' as const, text: `Component "${name}" not found.` }] }
 
-    const propsTable = comp.props.map(p =>
-      `| \`${p.name}\` | \`${p.type}\` | ${p.required ? 'Yes' : 'No'} | ${p.default || '-'} | ${p.description} |`
-    ).join('\n')
+      const propsTable = comp.props.map(p =>
+        `| \`${p.name}\` | \`${p.type}\` | ${p.required ? 'Yes' : 'No'} | ${p.default || '-'} | ${p.description} |`
+      ).join('\n')
 
-    const examples = comp.examples.map(e => `### ${e.title}\n\`\`\`tsx\n${e.code}\n\`\`\``).join('\n\n')
+      const examples = comp.examples.map(e => `### ${e.title}\n\`\`\`tsx\n${e.code}\n\`\`\``).join('\n\n')
 
-    const text = `# ${comp.name}
+      const text = `# ${comp.name}
 
 ${comp.description}
 
@@ -60,7 +69,11 @@ ${comp.relatedComponents.join(', ') || 'None'}
 
 **Category:** ${comp.category} | **Tiers:** ${comp.tier.join(', ')}`
 
-    return { content: [{ type: 'text' as const, text }] }
+      return { content: [{ type: 'text' as const, text }] }
+    } catch (error) {
+      console.error('[ui-kit-mcp]', 'get_component', error)
+      return { content: [{ type: 'text' as const, text: `Error in get_component: ${(error as Error).message}` }], isError: true }
+    }
   })
 
   // Tool 3: search_components
@@ -68,10 +81,16 @@ ${comp.relatedComponents.join(', ') || 'None'}
     query: z.string().describe('Natural language search, e.g. "date selection with range"'),
     limit: z.number().optional().default(10).describe('Max results'),
   }, async ({ query, limit }) => {
-    const results = searchComponents(query, limit)
-    if (results.length === 0) return { content: [{ type: 'text' as const, text: `No components found for "${query}"` }] }
-    const text = results.map((r, i) => `${i + 1}. **${r.name}** (score: ${r.score}) — ${r.description}\n   ${r.reason}\n   \`${r.importStatement}\``).join('\n\n')
-    return { content: [{ type: 'text' as const, text: `# Search results for "${query}"\n\n${text}` }] }
+    try {
+      logToolCall('search_components', { query })
+      const results = searchComponents(query, limit)
+      if (results.length === 0) return { content: [{ type: 'text' as const, text: `No components found for "${query}"` }] }
+      const text = results.map((r, i) => `${i + 1}. **${r.name}** (score: ${r.score}) — ${r.description}\n   ${r.reason}\n   \`${r.importStatement}\``).join('\n\n')
+      return { content: [{ type: 'text' as const, text: `# Search results for "${query}"\n\n${text}` }] }
+    } catch (error) {
+      console.error('[ui-kit-mcp]', 'search_components', error)
+      return { content: [{ type: 'text' as const, text: `Error in search_components: ${(error as Error).message}` }], isError: true }
+    }
   })
 
   // Tool 4: generate_snippet
@@ -79,56 +98,75 @@ ${comp.relatedComponents.join(', ') || 'None'}
     components: z.array(z.string()).describe('Component names to use'),
     scenario: z.string().optional().describe('Description of what to build'),
   }, async ({ components: names, scenario }) => {
-    const comps = names.map(n => getComponent(n)).filter(Boolean)
-    if (comps.length === 0) return { content: [{ type: 'text' as const, text: 'No valid components found.' }] }
+    try {
+      logToolCall('generate_snippet', { components: names })
+      const comps = names.map(n => getComponent(n)).filter(Boolean)
+      if (comps.length === 0) return { content: [{ type: 'text' as const, text: 'No valid components found.' }] }
 
-    // Deduplicate imports by package path
-    const importSet = new Set(comps.map(c => c!.importStatement))
-    const imports = Array.from(importSet).join('\n')
+      // Deduplicate imports by package path
+      const importSet = new Set(comps.map(c => c!.importStatement))
+      const imports = Array.from(importSet).join('\n')
 
-    // Build composable JSX — nest components logically
-    const jsxParts: string[] = []
-    for (const comp of comps) {
-      if (!comp) continue
-      const c = comp
-      // Use first example if available, otherwise build from props
-      if (c.examples.length > 0) {
-        jsxParts.push(c.examples[0].code)
-      } else {
-        // Build minimal valid JSX from required props
-        const requiredProps = c.props.filter(p => p.required)
-        const propStr = requiredProps.map(p => {
-          if (p.type.includes('string')) return `${p.name}="${p.name}"`
-          if (p.type.includes('number')) return `${p.name}={0}`
-          if (p.type.includes('boolean')) return p.name
-          return `${p.name}={undefined}`
-        }).join(' ')
-        const hasChildren = c.props.some(p => p.name === 'children')
-        jsxParts.push(hasChildren
-          ? `<${c.name} ${propStr}>${c.name} content</${c.name}>`
-          : `<${c.name} ${propStr} />`)
+      // Build composable JSX — nest components logically
+      const jsxParts: string[] = []
+      for (const comp of comps) {
+        if (!comp) continue
+        const c = comp
+        // Use first example if available, otherwise build from props
+        if (c.examples.length > 0) {
+          // Extract just the JSX from the example, skip import lines
+          const exampleCode = c.examples[0].code
+          const jsxOnly = exampleCode.split('\n').filter(line => !line.startsWith('import ')).join('\n').trim()
+          jsxParts.push(jsxOnly)
+        } else {
+          // Build minimal valid JSX from required props
+          const requiredProps = c.props.filter(p => p.required)
+          const propStr = requiredProps.map(p => {
+            if (p.type.includes('|')) {
+              const match = p.type.match(/'([^']*)'/)
+              if (match) return `${p.name}="${match[1]}"`
+            }
+            if (p.type.includes('string')) return `${p.name}="${p.name}"`
+            if (p.type.includes('number')) return `${p.name}={0}`
+            if (p.type.includes('boolean')) return p.name
+            if (p.type.includes('=>') || p.type.includes('Function') || p.type.includes('function')) return `${p.name}={() => {}}`
+            if (p.type.includes('[]') || p.type.includes('Array')) return `${p.name}={[]}`
+            if (p.type.includes('Record') || p.type.includes('object') || p.type.trimStart().startsWith('{')) return `${p.name}={{}}`
+            return `${p.name}={undefined}`
+          }).join(' ')
+          const hasChildren = c.props.some(p => p.name === 'children')
+          jsxParts.push(hasChildren
+            ? `<${c.name} ${propStr}>${c.name} content</${c.name}>`
+            : `<${c.name} ${propStr} />`)
+        }
       }
-    }
 
-    const indent = '      '
-    const snippet = jsxParts.join(`\n${indent}`)
-    const code = `${imports}
+      const indent = '        '
+      const snippet = jsxParts.join(`\n${indent}`)
+      const code = `${imports}
+import { UIProvider } from '@annondeveloper/ui-kit'
 
 export function ${scenario ? scenario.replace(/[^a-zA-Z0-9]/g, '').slice(0, 30) || 'Example' : 'Example'}() {
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-      ${snippet}
-    </div>
+    <UIProvider>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+        ${snippet}
+      </div>
+    </UIProvider>
   )
 }`
 
-    const notes = [
-      `Components used: ${comps.map(c => c!.name).join(', ')}`,
-      comps.some(c => c!.tier.includes('premium')) ? 'Tip: Import from "@annondeveloper/ui-kit/premium" for enhanced animations' : '',
-      'Wrap your app in <UIProvider> for theme and motion support',
-    ].filter(Boolean).join('\n')
+      const notes = [
+        `Components used: ${comps.map(c => c!.name).join(', ')}`,
+        comps.some(c => c!.tier.includes('premium')) ? 'Tip: Import from "@annondeveloper/ui-kit/premium" for enhanced animations' : '',
+        'Output is wrapped in <UIProvider> for theme and motion support',
+      ].filter(Boolean).join('\n')
 
-    return { content: [{ type: 'text' as const, text: `# Generated Snippet${scenario ? `: ${scenario}` : ''}\n\n\`\`\`tsx\n${code}\n\`\`\`\n\n## Notes\n${notes}` }] }
+      return { content: [{ type: 'text' as const, text: `# Generated Snippet${scenario ? `: ${scenario}` : ''}\n\n\`\`\`tsx\n${code}\n\`\`\`\n\n## Notes\n${notes}` }] }
+    } catch (error) {
+      console.error('[ui-kit-mcp]', 'generate_snippet', error)
+      return { content: [{ type: 'text' as const, text: `Error in generate_snippet: ${(error as Error).message}` }], isError: true }
+    }
   })
 
   // Tool 5: get_theme
@@ -136,22 +174,34 @@ export function ${scenario ? scenario.replace(/[^a-zA-Z0-9]/g, '').slice(0, 30) 
     name: z.string().describe('Theme name: aurora, sunset, rose, amber, ocean, emerald, cyan, violet, fuchsia, slate, corporate, midnight, forest, wine, carbon'),
     mode: z.enum(['dark', 'light']).optional().default('dark').describe('Color mode'),
   }, async ({ name, mode }) => {
-    const reg = loadRegistry()
-    const key = `${name}-${mode}`
-    const theme = reg.themes[key] || reg.themes[name]
-    if (!theme) return { content: [{ type: 'text' as const, text: `Theme "${name}" not found. Available: ${Object.keys(reg.themes).join(', ')}` }] }
-    return { content: [{ type: 'text' as const, text: `# Theme: ${theme.name} (${mode})\n\nHex: \`${theme.hex}\`\n\n## CSS Tokens\n\`\`\`css\n${theme.css}\n\`\`\`\n\n## Usage\n\`\`\`tsx\nimport { applyTheme, generateTheme } from '@annondeveloper/ui-kit/theme'\n\nconst theme = generateTheme('${theme.hex}', '${mode}')\napplyTheme(theme)\n\`\`\`` }] }
+    try {
+      logToolCall('get_theme', { query: `${name}-${mode}` })
+      const reg = loadRegistry()
+      const key = `${name}-${mode}`
+      const theme = reg.themes[key] || reg.themes[name]
+      if (!theme) return { content: [{ type: 'text' as const, text: `Theme "${name}" not found. Available: ${Object.keys(reg.themes).join(', ')}` }] }
+      return { content: [{ type: 'text' as const, text: `# Theme: ${theme.name} (${mode})\n\nHex: \`${theme.hex}\`\n\n## CSS Tokens\n\`\`\`css\n${theme.css}\n\`\`\`\n\n## Usage\n\`\`\`tsx\nimport { applyTheme, generateTheme } from '@annondeveloper/ui-kit/theme'\n\nconst theme = generateTheme('${theme.hex}', '${mode}')\napplyTheme(theme)\n\`\`\`` }] }
+    } catch (error) {
+      console.error('[ui-kit-mcp]', 'get_theme', error)
+      return { content: [{ type: 'text' as const, text: `Error in get_theme: ${(error as Error).message}` }], isError: true }
+    }
   })
 
   // Tool 6: get_icons
   server.tool('get_icons', 'Browse built-in SVG icons', {
     search: z.string().optional().describe('Filter icons by name'),
   }, async ({ search }) => {
-    const reg = loadRegistry()
-    let icons = Object.values(reg.icons)
-    if (search) icons = icons.filter(i => i.name.includes(search.toLowerCase()) || i.keywords.some(k => k.includes(search.toLowerCase())))
-    const list = icons.map(i => `- **${i.name}** — \`<Icon name="${i.name}" />\``).join('\n')
-    return { content: [{ type: 'text' as const, text: `# Icons (${icons.length})\n\nImport: \`import { Icon } from '@annondeveloper/ui-kit'\`\n\n${list}` }] }
+    try {
+      logToolCall('get_icons', { query: search })
+      const reg = loadRegistry()
+      let icons = Object.values(reg.icons)
+      if (search) icons = icons.filter(i => i.name.includes(search.toLowerCase()) || i.keywords.some(k => k.includes(search.toLowerCase())))
+      const list = icons.map(i => `- **${i.name}** — \`<Icon name="${i.name}" />\``).join('\n')
+      return { content: [{ type: 'text' as const, text: `# Icons (${icons.length})\n\nImport: \`import { Icon } from '@annondeveloper/ui-kit'\`\n\n${list}` }] }
+    } catch (error) {
+      console.error('[ui-kit-mcp]', 'get_icons', error)
+      return { content: [{ type: 'text' as const, text: `Error in get_icons: ${(error as Error).message}` }], isError: true }
+    }
   })
 
   // Resources: component://

@@ -1076,7 +1076,7 @@ function BrandArea({ tier }: { tier: Tier }) {
         <div className="site-brand__tagline">Aurora Fluid v2</div>
       </div>
       <span className="site-brand__version">
-        <Badge variant="primary" size="xs">v2.0</Badge>
+        <Badge variant="primary" size="xs">v2.7</Badge>
       </span>
     </div>
   )

@@ -35,11 +35,10 @@ jobs:
           npm run build
 
       - name: Build Storybook
-        run: npm run build:storybook || echo "Storybook build skipped"
-        continue-on-error: true
+        run: npm run build:storybook
 
       - name: Copy Storybook to demo dist
-        run: test -d storybook-static && cp -r storybook-static demo/dist/storybook || echo "No storybook to copy"
+        run: cp -r storybook-static demo/dist/storybook
 
       - uses: actions/upload-pages-artifact@v3
         with:

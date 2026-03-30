@@ -2,8 +2,12 @@ import { createServer as createHttpServer, type IncomingMessage, type ServerResp
 import { SSEServerTransport } from '@modelcontextprotocol/sdk/server/sse.js'
 import { createServer } from '../server.js'
 
+const SESSION_IDLE_TIMEOUT = 30 * 60 * 1000 // 30 minutes
+const CLEANUP_INTERVAL = 60 * 1000 // 60 seconds
+
 export async function startSSE(port: number) {
   const sessions = new Map<string, SSEServerTransport>()
+  const sessionActivity = new Map<string, { created: number; lastActive: number }>()
 
   const httpServer = createHttpServer(async (req: IncomingMessage, res: ServerResponse) => {
     // CORS headers
@@ -23,11 +27,19 @@ export async function startSSE(port: number) {
     if (req.method === 'GET' && url.pathname === '/sse') {
       const mcpServer = createServer()
       const transport = new SSEServerTransport('/messages', res)
+      const now = Date.now()
       sessions.set(transport.sessionId, transport)
+      sessionActivity.set(transport.sessionId, { created: now, lastActive: now })
 
       transport.onclose = () => {
         sessions.delete(transport.sessionId)
+        sessionActivity.delete(transport.sessionId)
       }
+
+      res.on('close', () => {
+        sessions.delete(transport.sessionId)
+        sessionActivity.delete(transport.sessionId)
+      })
 
       // connect() handles transport start internally
       await mcpServer.connect(transport)
@@ -44,6 +56,8 @@ export async function startSSE(port: number) {
       }
 
       const transport = sessions.get(sessionId)!
+      const activity = sessionActivity.get(sessionId)
+      if (activity) activity.lastActive = Date.now()
       // Collect body
       const chunks: Buffer[] = []
       req.on('data', (chunk: Buffer) => chunks.push(chunk))
@@ -70,8 +84,31 @@ export async function startSSE(port: number) {
     res.end('Not found')
   })
 
+  // Periodic cleanup of idle sessions
+  const cleanupTimer = setInterval(() => {
+    const now = Date.now()
+    for (const [sessionId, activity] of sessionActivity) {
+      if (now - activity.lastActive > SESSION_IDLE_TIMEOUT) {
+        const transport = sessions.get(sessionId)
+        if (transport) {
+          try { transport.close?.() } catch { /* ignore */ }
+        }
+        sessions.delete(sessionId)
+        sessionActivity.delete(sessionId)
+      }
+    }
+  }, CLEANUP_INTERVAL)
+  cleanupTimer.unref()
+
   httpServer.listen(port, () => {
     console.error(`[ui-kit-mcp] SSE server listening on http://localhost:${port}`)
     console.error(`[ui-kit-mcp] SSE endpoint: http://localhost:${port}/sse`)
+  })
+
+  // Clean up on server shutdown
+  httpServer.on('close', () => {
+    clearInterval(cleanupTimer)
+    sessions.clear()
+    sessionActivity.clear()
   })
 }

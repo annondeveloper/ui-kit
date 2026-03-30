@@ -5,7 +5,7 @@
 `@annondeveloper/ui-kit` — A zero-dependency React component library with 147 components across 3 weight tiers (Lite/Standard/Premium), physics-based animations, OKLCH color system, and Aurora Fluid design identity.
 
 **Repository:** https://github.com/annondeveloper/ui-kit
-**Current:** v2.5.0 on `main` branch
+**Current:** v2.7.0 on `main` branch
 **Legacy:** v0.4.1 on `v1` branch (archived)
 
 ## Development Philosophy
@@ -109,7 +109,22 @@ npx @annondeveloper/ui-kit create <name> --template <template>     # Scaffold pr
 npx @annondeveloper/ui-kit list                                    # List components
 npx @annondeveloper/ui-kit theme <color>                           # Generate theme from brand color
 npx @annondeveloper/ui-kit figma-export --theme <name> --output <file>  # Export Figma tokens
+npx @annondeveloper/ui-kit mcp                                     # Set up MCP server for Claude/Cursor
+npx @annondeveloper/ui-kit stats                                   # Show MCP usage statistics
 ```
+
+## MCP Server
+
+The MCP server enables AI assistants to discover and use components programmatically.
+
+```bash
+npx @annondeveloper/ui-kit mcp    # Auto-configure Claude/Cursor MCP settings
+```
+
+**6 tools:** list_components, get_component, search_components, generate_snippet, get_theme, get_icons
+**Resources:** component://{name} for structured component docs
+**Transports:** stdio (default, for Claude/Cursor) and SSE (for web clients)
+**Analytics:** Opt-in local logging via `UI_KIT_TELEMETRY=1`, view with `npx ui-kit stats`
 
 ## v2.5 Features
 
@@ -144,10 +159,16 @@ npx @annondeveloper/ui-kit figma-export --theme <name> --output <file>  # Export
 
 ## Performance Budgets
 
+Per-component budgets (tree-shaken imports):
 - Core primitive: < 2KB JS gzip, < 0.5KB CSS gzip
 - Medium component: < 5KB JS gzip, < 1.5KB CSS gzip
 - Complex domain: < 8KB JS gzip, < 2KB CSS gzip
-- Full library: < 85KB JS gzip, < 20KB CSS gzip
+
+Full un-tree-shaken bundle budget:
+- Full library: < 350KB JS gzip (current: ~332KB, 95% of budget)
+- Full CSS: < 20KB gzip
+
+Engine modules:
 - Motion engine: ~3.5KB gzip
 - Input engine: ~2.4KB gzip
 - Style engine + a11y: ~2.5KB gzip

@@ -120,7 +120,8 @@
     "ui-kit": "dist/cli/index.js",
     "ui-kit-mcp": "dist/mcp/index.js"
   },
-  "dependencies": {
-    "@modelcontextprotocol/sdk": "^1.28.0"
+  "optionalDependencies": {
+    "@modelcontextprotocol/sdk": "^1.28.0",
+    "zod": "^4.3.6"
   }
 }

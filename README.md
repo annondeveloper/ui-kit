@@ -1,3 +1,4 @@
+[![Made for AI Assistants](https://img.shields.io/badge/Made_for-AI_Assistants-blueviolet?style=flat-square&logo=anthropic&logoColor=white)](https://modelcontextprotocol.io)
 [![npm version](https://img.shields.io/npm/v/@annondeveloper/ui-kit)](https://www.npmjs.com/package/@annondeveloper/ui-kit)
 [![bundle size](https://img.shields.io/bundlephobia/minzip/@annondeveloper/ui-kit)](https://bundlephobia.com/package/@annondeveloper/ui-kit)
 [![license](https://img.shields.io/npm/l/@annondeveloper/ui-kit)](https://github.com/annondeveloper/ui-kit/blob/main/LICENSE)
@@ -6,9 +7,86 @@
 
 # @annondeveloper/ui-kit v2
 
-> Zero-dependency React component library with 147 components, physics-based animations, OKLCH color system, and Aurora Fluid design.
+> The first React component library built for AI agents. 147 zero-dependency components that AI assistants can discover, understand, and use via MCP.
+
+## How It Works
+
+**Step 1.** Install the library
+
+```bash
+npm install @annondeveloper/ui-kit
+```
+
+**Step 2.** Connect your AI assistant
+
+```bash
+npx @annondeveloper/ui-kit mcp
+```
+
+**Step 3.** Ask your AI to build
+
+> "Build a dashboard with MetricCard, DataTable, and TimeSeriesChart using ui-kit"
+
+Your AI generates production code directly:
+
+```tsx
+import { UIProvider, MetricCard, DataTable, TimeSeriesChart } from '@annondeveloper/ui-kit'
+
+function Dashboard({ metrics, tableData, series }) {
+  return (
+    <UIProvider>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1rem' }}>
+        <MetricCard title="Requests" value="12.4K" trend="up" />
+        <MetricCard title="Latency" value="42ms" trend="down" />
+        <MetricCard title="Error Rate" value="0.12%" trend="down" />
+      </div>
+      <TimeSeriesChart series={series} height={300} />
+      <DataTable columns={columns} data={tableData} searchPlaceholder="Search..." />
+    </UIProvider>
+  )
+}
+```
+
+## MCP Server
+
+The built-in MCP server exposes 6 tools that give AI assistants structured access to the full component library:
+
+| Tool | What it does |
+|------|-------------|
+| `list_components` | Browse all 147 components with descriptions, filterable by category or tier |
+| `get_component` | Get full API reference for any component — props, types, defaults, code examples |
+| `search_components` | Semantic search across components by use case (e.g., "data visualization", "form inputs") |
+| `get_theme` | Retrieve theme tokens, OKLCH color system details, and customization API |
+| `generate_snippet` | Generate working TSX code with correct imports for any component combination |
+| `get_icons` | Browse 50+ built-in SVG icons with search and usage examples |
+
+Start the server:
+
+```bash
+npx @annondeveloper/ui-kit mcp
+```
+
+Or add it to your MCP config (e.g., `claude_desktop_config.json`):
+
+```json
+{
+  "mcpServers": {
+    "ui-kit": {
+      "command": "npx",
+      "args": ["@annondeveloper/ui-kit", "mcp"]
+    }
+  }
+}
+```
+
+Your AI assistant can now use ui-kit components directly. Try asking:
+- "Build a dashboard with MetricCard, DataTable, and TimeSeriesChart using ui-kit"
+- "Create a multi-step form wizard with validation"
+- "Add a real-time log viewer with severity filtering"
 
 ## Quick Start
+
+For manual usage without an AI assistant:
 
 ```bash
 npm install @annondeveloper/ui-kit
@@ -34,11 +112,11 @@ function App() {
 - **Zero dependencies** — only `react` and `react-dom` peer deps
 - **147 components** — 73 general-purpose + 74 domain-specific across 3 weight tiers
 - **3 weight tiers** — Lite (144), Standard (147), Premium (145) — optimize your bundle
+- **MCP server** — Model Context Protocol integration for AI-assisted development workflows
 - **Aurora Fluid design** — deep atmospheric surfaces, ambient glows, OKLCH colors
 - **Physics animations** — real spring solver, configurable motion levels (0-3)
 - **Built-in form engine** — `createForm`, `useForm`, validators, zero external deps
 - **15 pre-built themes** — including 5 new themes added in v2.4
-- **MCP server** — Model Context Protocol integration for AI-assisted workflows
 - **`classNames` prop** — deep customization of internal component elements
 - **Accessibility** — WAI-ARIA patterns, keyboard navigation, screen reader support
 - **Responsive** — container queries, fluid typography, touch/mouse/gamepad support
@@ -52,6 +130,13 @@ function App() {
 - [Animation](docs/animation.md) -- Physics springs, timeline, stagger, scroll
 - [Design Spec](docs/superpowers/specs/2026-03-20-ui-kit-v2-design.md) -- Full architecture document
 
+### New in v2.7
+
+- [AI DataTable](docs/ai-datatable.md) -- AI-powered filter suggestions for DataTable
+- [RSC Support](docs/rsc.md) -- React Server Components compatibility
+- [Web Components](docs/web-components.md) -- Web Components wrapper for framework-agnostic usage
+- [MCP Server](docs/mcp-server.md) -- Model Context Protocol server for AI-assisted workflows
+
 ### New in v2.5
 
 - [Motion Choreography](docs/choreography.md) -- Sequenced multi-step animations with 5 presets
@@ -64,6 +149,14 @@ function App() {
 - [Performance Dashboard](docs/performance-dashboard.md) -- Bundle tracking, render profiler, Web Vitals
 
 ## Next-Gen Features
+
+**AI DataTable Suggestions** -- DataTable with AI-powered filter suggestions that analyze column data to surface outliers, patterns, and top-N values automatically.
+
+**RSC Support** -- Full React Server Components compatibility. Components work in both client and server rendering contexts without extra configuration.
+
+**Web Components Wrapper** -- Use ui-kit components in any framework (Vue, Svelte, vanilla JS) via custom elements. Import the wrapper and register components as `<ui-button>`, `<ui-card>`, etc.
+
+**MCP Server** -- Built-in Model Context Protocol server that exposes component discovery, API reference, code generation, and theme tools to AI assistants.
 
 **Motion Choreography** -- Orchestrate multi-step animation sequences with `Choreography` class, 5 presets (cascade, stagger-grid, wave, spiral, focus-in), and scroll-triggered choreography via `useScrollChoreography`.
 
@@ -90,6 +183,7 @@ npx @annondeveloper/ui-kit create <name> --template <template>     # Scaffold pr
 npx @annondeveloper/ui-kit list                                    # List all 147 components
 npx @annondeveloper/ui-kit theme <color>                           # Generate theme CSS
 npx @annondeveloper/ui-kit figma-export --theme <name> --output <file>  # Export Figma tokens
+npx @annondeveloper/ui-kit mcp                                     # Start MCP server for AI assistants
 ```
 
 ## Component List
@@ -354,12 +448,10 @@ npx jsr add @annondeveloper/ui-kit
 ### Peer Dependencies
 
 ```bash
-npm install react react-dom framer-motion lucide-react clsx tailwind-merge sonner \
-  @radix-ui/react-select @radix-ui/react-alert-dialog @radix-ui/react-tooltip \
-  @radix-ui/react-popover @radix-ui/react-dropdown-menu
+npm install react react-dom
 ```
 
-`react-hook-form` is an optional peer dependency -- only needed if you use the `@annondeveloper/ui-kit/form` entry point.
+v2 has zero external dependencies -- only `react` ^19 and `react-dom` ^19 are required as peer dependencies.
 
 ### Theme Setup
 
@@ -374,18 +466,21 @@ Or copy the CSS custom properties into your own stylesheet. See [Theme System](#
 ### Minimal Example
 
 ```tsx
-import { Button, MetricCard, StatusBadge, Toaster } from '@annondeveloper/ui-kit'
-import { Activity } from 'lucide-react'
+import { Button, MetricCard, StatusBadge, ToastProvider, useToast } from '@annondeveloper/ui-kit'
 
 function App() {
   return (
-    <>
-      <MetricCard label="CPU Usage" value={72.4} format={n => `${n.toFixed(1)}%`} icon={Activity} status="warning" />
+    <ToastProvider>
+      <MetricCard label="CPU Usage" value={72.4} format={n => `${n.toFixed(1)}%`} status="warning" />
       <StatusBadge status="active" pulse />
-      <Button variant="primary" loading={isPending}>Deploy</Button>
-      <Toaster />
-    </>
+      <DeployButton />
+    </ToastProvider>
   )
+}
+
+function DeployButton() {
+  const toast = useToast()
+  return <Button variant="primary" onClick={() => toast.success('Deployed!')}>Deploy</Button>
 }
 ```
 
@@ -463,14 +558,14 @@ const SeverityBadge = createBadgeVariant({
 
 #### Card
 
-A styled card container with subcomponents for semantic structure.
+A styled card container with semantic structure via children.
 
 ```tsx
-import { Card, CardHeader, CardTitle, CardContent } from '@annondeveloper/ui-kit'
+import { Card } from '@annondeveloper/ui-kit'
 
 <Card variant="interactive" padding="lg">
-  <CardHeader><CardTitle>Server Health</CardTitle></CardHeader>
-  <CardContent>...</CardContent>
+  <h2>Server Health</h2>
+  <p>All systems operational</p>
 </Card>
 ```
 
@@ -479,7 +574,7 @@ import { Card, CardHeader, CardTitle, CardContent } from '@annondeveloper/ui-kit
 | `variant` | `'default' \| 'elevated' \| 'outlined' \| 'interactive'` | `'default'` | Visual variant (`interactive` adds hover effect) |
 | `padding` | `'none' \| 'sm' \| 'md' \| 'lg'` | `'md'` | Padding preset |
 
-Subcomponents: `CardHeader`, `CardTitle`, `CardDescription`, `CardContent`, `CardFooter`. All support `ref` forwarding.
+Supports `ref` forwarding and all native HTML attributes.
 
 ---
 
@@ -649,7 +744,7 @@ import { FormInput } from '@annondeveloper/ui-kit'
 | `hint` | `string` | -- | Help text below input |
 | `autoComplete` | `string` | -- | Autocomplete attribute |
 
-Also exports `INPUT_CLS`, `LABEL_CLS`, and `TEXTAREA_CLS` constants for building custom inputs with consistent styling.
+Supports `ref` forwarding and all native input attributes.
 
 ---
 
@@ -1432,19 +1527,23 @@ import { Inbox } from 'lucide-react'
 
 ---
 
-#### Skeleton / SkeletonText / SkeletonCard
+#### Skeleton
 
-Shimmer loading placeholders.
+Shimmer loading placeholder.
 
 ```tsx
-import { Skeleton, SkeletonText, SkeletonCard } from '@annondeveloper/ui-kit'
+import { Skeleton } from '@annondeveloper/ui-kit'
 
-<Skeleton className="h-8 w-32" />
-<SkeletonText lines={3} />
-<SkeletonCard />
+<Skeleton width={128} height={32} />
+<Skeleton width="100%" height={16} />
+<Skeleton variant="circle" width={40} height={40} />
 ```
 
-`SkeletonText` props: `lines?: number` (default 1).
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `width` | `string \| number` | `'100%'` | Skeleton width |
+| `height` | `string \| number` | `'1em'` | Skeleton height |
+| `variant` | `'rect' \| 'circle'` | `'rect'` | Shape variant |
 
 ---
 
@@ -1496,7 +1595,6 @@ import { Avatar } from '@annondeveloper/ui-kit'
 #### InfiniteScroll
 
 Virtualized infinite-scroll list using IntersectionObserver.
-
 ```tsx
 import { InfiniteScroll } from '@annondeveloper/ui-kit'
 
@@ -1527,25 +1625,23 @@ Features: optional height-based virtualization, scroll-to-top button, skeleton p
 Drag-and-drop reorderable list with smooth layout animations.
 
 ```tsx
-import { SortableList, DragHandle } from '@annondeveloper/ui-kit'
+import { SortableList } from '@annondeveloper/ui-kit'
 
 <SortableList
-  items={rules} onReorder={setRules}
-  renderItem={(item, i, dragProps) => (
-    <div className="flex items-center gap-2 p-3">
-      <DragHandle {...dragProps} />
-      <span>{item.name}</span>
-    </div>
-  )}
+  items={[
+    { id: '1', content: <span>Rule 1</span> },
+    { id: '2', content: <span>Rule 2</span> },
+  ]}
+  onChange={setRules}
 />
 ```
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
-| `items` | `T[]` (each needs `id: string`) | -- | Items to display |
-| `onReorder` | `(items: T[]) => void` | -- | Reorder callback |
-| `renderItem` | `(item, index, dragHandleProps) => JSX.Element` | -- | Item renderer |
-| `direction` | `'vertical' \| 'horizontal'` | `'vertical'` | Layout direction |
+| `items` | `SortableItem[]` | -- | `{ id: string, content: ReactNode }` |
+| `onChange` | `(items: SortableItem[]) => void` | -- | Reorder callback |
+| `handle` | `boolean` | -- | Show drag handle |
+| `orientation` | `'vertical' \| 'horizontal'` | `'vertical'` | Layout direction |
 
 Features: pointer-based drag (no external DnD library), keyboard reordering (Space to pick, arrows to move, Enter to drop), touch support, drop indicator line.
 
@@ -1598,25 +1694,35 @@ import { HeatmapCalendar } from '@annondeveloper/ui-kit'
 
 ---
 
-#### Toaster / toast
+#### ToastProvider / useToast
 
-Pre-themed Sonner toast container. Import once, use `toast()` anywhere.
+Toast notification system using `ToastProvider` and the `useToast` hook.
 
 ```tsx
-// In layout:
-import { Toaster } from '@annondeveloper/ui-kit'
-<Toaster theme="dark" position="bottom-right" />
+import { ToastProvider, useToast, Button } from '@annondeveloper/ui-kit'
 
-// Anywhere:
-import { toast } from '@annondeveloper/ui-kit'
-toast.success('Deployment complete')
-toast.error('Connection failed')
+function App() {
+  return (
+    <ToastProvider position="bottom-right">
+      <Content />
+    </ToastProvider>
+  )
+}
+
+function Content() {
+  const toast = useToast()
+  return (
+    <>
+      <Button onClick={() => toast.success('Deployment complete')}>Deploy</Button>
+      <Button onClick={() => toast.error('Connection failed')}>Test Error</Button>
+    </>
+  )
+}
 ```
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
-| `theme` | `'dark' \| 'light'` | `'dark'` | Toast theme |
-| `position` | Sonner positions | `'bottom-right'` | Screen position |
+| `position` | `'top-right' \| 'top-left' \| 'bottom-right' \| 'bottom-left'` | `'bottom-right'` | Screen position |
 | `duration` | `number` | `4000` | Auto-dismiss (ms) |
 
 ---
@@ -1651,31 +1757,15 @@ cn('px-4 py-2', isActive && 'bg-blue-500', className)
 
 | Function | Example | Output |
 |----------|---------|--------|
-| `fmtBps(n)` | `fmtBps(1_000_000_000)` | `"1.0 Gbps"` |
-| `fmtSpeed(n)` | `fmtSpeed(10_000_000_000)` | `"10G"` |
+| `fmtBps(n)` | `fmtBps(1_000_000_000)` | `"1.0 GB/s"` |
 | `fmtBytes(n)` | `fmtBytes(1_073_741_824)` | `"1.0 GB"` |
 | `fmtPct(n, d?)` | `fmtPct(95.6)` | `"95.6%"` |
-| `fmtUptime(secs)` | `fmtUptime(90061)` | `"1d 1h"` |
-| `fmtRelative(iso)` | `fmtRelative('2024-01-01')` | `"3d ago"` |
+| `fmtUptime(ratio)` | `fmtUptime(0.999)` | `"99.90%"` |
+| `fmtRelative(timestamp)` | `fmtRelative(Date.now() - 3600000)` | `"1 hour ago"` |
 | `fmtCompact(n)` | `fmtCompact(480_933_305)` | `"480.9M"` |
 | `fmtDuration(secs)` | `fmtDuration(0.003)` | `"3ms"` |
-| `fmtUtil(bps, speed)` | `fmtUtil(500_000_000, 1_000_000_000)` | `"50%"` |
 | `stripCidr(ip)` | `stripCidr('10.0.0.1/32')` | `"10.0.0.1"` |
 | `clamp(v, min, max)` | `clamp(150, 0, 100)` | `100` |
-
-### utilColor
-
-Returns a Tailwind class based on utilization percentage:
-
-```tsx
-import { utilColor, defaultUtilColorMap } from '@annondeveloper/ui-kit'
-
-utilColor(85)                        // "text-[hsl(var(--status-critical))]"
-utilColor(45)                        // "text-[hsl(var(--status-ok))]"
-utilColor(75, customColorMap)        // uses your thresholds
-```
-
-The `defaultUtilColorMap` thresholds: >= 80% critical (red), >= 60% warning (yellow), < 60% ok (green).
 
 ### createBadgeVariant
 
@@ -1775,50 +1865,42 @@ npx @annondeveloper/ui-kit list
 
 ---
 
-## Form Integration
+## Form Engine
 
-Install the optional peer dependency:
-
-```bash
-npm install react-hook-form
-```
-
-Import from the dedicated entry point:
+The built-in form engine requires no external dependencies. Import from the dedicated entry point:
 
 ```tsx
-import { RHFFormInput, RHFSelect, RHFCheckbox, RHFToggleSwitch } from '@annondeveloper/ui-kit/form'
+import { createForm, useForm, Form, v } from '@annondeveloper/ui-kit/form'
 ```
 
 ### Example with Validation
 
 ```tsx
-import { useForm } from 'react-hook-form'
-import { RHFFormInput, RHFSelect } from '@annondeveloper/ui-kit/form'
+import { createForm, useForm, Form } from '@annondeveloper/ui-kit/form'
 import { Button } from '@annondeveloper/ui-kit'
 
+const credentialForm = createForm({
+  hostname: { initial: '', validator: v.required('Hostname is required') },
+  protocol: { initial: '', validator: v.required('Select a protocol') },
+})
+
 function CredentialForm() {
-  const { control, handleSubmit } = useForm({
-    defaultValues: { hostname: '', protocol: '' },
-  })
+  const form = useForm(credentialForm)
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)}>
-      <RHFFormInput
-        control={control} name="hostname" label="Hostname"
-        rules={{ required: 'Hostname is required' }} placeholder="10.0.0.1"
-      />
-      <RHFSelect
-        control={control} name="protocol" label="Protocol"
-        options={[{ value: 'snmp', label: 'SNMP' }, { value: 'ssh', label: 'SSH' }]}
-        rules={{ required: 'Select a protocol' }}
-      />
+    <Form form={form} onSubmit={(values) => console.log(values)}>
+      <input name="hostname" placeholder="10.0.0.1" />
+      <select name="protocol">
+        <option value="snmp">SNMP</option>
+        <option value="ssh">SSH</option>
+      </select>
       <Button type="submit" variant="primary">Save</Button>
-    </form>
+    </Form>
   )
 }
 ```
 
-All RHF wrappers automatically display validation errors from `fieldState.error`.
+The form engine includes `createForm`, `useForm`, `Form`, `FieldArray`, and validators (`v`).
 
 ---
 

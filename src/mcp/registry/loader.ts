@@ -44,15 +44,38 @@ export function searchComponents(query: string, limit = 10): SearchResult[] {
     for (const word of words) {
       if (nameLower === word) { score += 100; reasons.push(`Exact name match: ${name}`) }
       else if (nameLower.includes(word)) { score += 50; reasons.push(`Name contains "${word}"`) }
-      if (comp.keywords.some(k => k.includes(word))) { score += 30; reasons.push(`Keyword match`) }
+      if (comp.keywords.some(k => k === word || k.startsWith(word + '-') || k.endsWith('-' + word))) { score += 30; reasons.push(`Keyword match`) }
       if (comp.description.toLowerCase().includes(word)) { score += 20; reasons.push(`Description match`) }
       if (comp.props.some(p => p.name.toLowerCase().includes(word))) { score += 10; reasons.push(`Prop match`) }
+      if (comp.category.toLowerCase().includes(word)) { score += 15; reasons.push(`Category match: ${comp.category}`) }
     }
 
     if (score > 0) {
       // Deduplicate reasons, join up to 3
       const uniqueReasons = [...new Set(reasons)].slice(0, 3).join('; ')
       results.push({ name, description: comp.description, score, reason: uniqueReasons, importStatement: comp.importStatement })
+    }
+  }
+
+  // Boost related components: if a component scored, give +5 to its related components
+  const scoreMap = new Map(results.map(r => [r.name, r]))
+  for (const r of [...results]) {
+    const comp = reg.components[r.name]
+    if (!comp) continue
+    for (const rel of comp.relatedComponents) {
+      const existing = scoreMap.get(rel)
+      if (existing) {
+        existing.score += 5
+        // Don't add reason — it's a subtle boost
+      } else {
+        // Related component didn't match directly; add it with a small score
+        const relComp = reg.components[rel]
+        if (relComp) {
+          const entry: SearchResult = { name: rel, description: relComp.description, score: 5, reason: `Related to ${r.name}`, importStatement: relComp.importStatement }
+          results.push(entry)
+          scoreMap.set(rel, entry)
+        }
+      }
     }
   }
 
