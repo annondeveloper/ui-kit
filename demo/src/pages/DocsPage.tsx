@@ -1,6 +1,5 @@
 import { useState } from 'react'
 import { Tabs, TabPanel } from '@ui/components/tabs'
-import { Card } from '@ui/components/card'
 import { Badge } from '@ui/components/badge'
 import { Icon, type IconName } from '@ui/core/icons/icon'
 import { css } from '@ui/core/styles/css-tag'
@@ -46,6 +45,7 @@ const styles = css`
       font-size: 0.875rem;
       line-height: 1.5;
       max-width: 60ch;
+      overflow-wrap: break-word;
     }
 
     .docs-quick-links {

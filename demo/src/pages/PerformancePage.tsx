@@ -334,12 +334,19 @@ const styles = css`
     /* ── Stats row ─────────────────────────────────── */
 
     .perf__stats {
-      display: flex;
+      display: grid;
+      grid-template-columns: repeat(4, auto);
       gap: 2rem;
-      flex-wrap: wrap;
       margin-block-start: 1rem;
       padding-block-start: 1rem;
       border-block-start: 1px solid var(--border-default);
+    }
+
+    @media (max-width: 500px) {
+      .perf__stats {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1rem;
+      }
     }
 
     .perf__stat {
@@ -707,7 +714,6 @@ interface TreemapRect {
 function squarify(files: BundleFile[], x: number, y: number, w: number, h: number): TreemapRect[] {
   if (files.length === 0 || w <= 0 || h <= 0) return []
 
-  const totalArea = w * h
   const totalValue = files.reduce((s, f) => s + f.gzip, 0)
   if (totalValue === 0) return []
 

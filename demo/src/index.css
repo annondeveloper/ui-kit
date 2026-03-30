@@ -30,6 +30,17 @@ a {
 
 code {
   font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', monospace;
+  overflow-wrap: break-word;
+}
+
+pre {
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+pre code {
+  overflow-wrap: normal;
+  word-break: break-all;
 }
 
 /* Minimalistic scrollbar */

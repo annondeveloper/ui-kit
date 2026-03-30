@@ -99,6 +99,16 @@ const styles = css`
     }
 
     @media (max-width: 500px) {
+      .icons-toolbar {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      .icons-search-wrap {
+        max-width: 100%;
+      }
+      .icons-size-group {
+        justify-content: flex-start;
+      }
       .icons-grid {
         grid-template-columns: repeat(2, 1fr);
       }
