@@ -230,6 +230,13 @@ const homeStyles = css`
       100% { transform: translate(15px, -5px) scale(1.05); }
     }
 
+    /* Pause hero animations when scrolled out of view */
+    .home-hero[data-visible="false"] .home-hero-aurora,
+    .home-hero[data-visible="false"] .home-hero-orb,
+    .home-hero[data-visible="false"] .home-hero-grid-cell {
+      animation-play-state: paused;
+    }
+
     @media (prefers-reduced-motion: reduce) {
       .home-hero-aurora,
       .home-hero-orb,
@@ -431,6 +438,8 @@ const homeStyles = css`
 
     .home-gallery-group {
       margin-block-end: 2.25rem;
+      content-visibility: auto;
+      contain-intrinsic-size: auto 400px;
     }
 
     .home-gallery-grid {
@@ -1088,6 +1097,18 @@ function GalleryCard({ item }: { item: GalleryItem }) {
 export default function Home() {
   useStyles('home', homeStyles)
   const [galleryFilter, setGalleryFilter] = useState<string | null>(null)
+  const heroRef = useRef<HTMLElement>(null)
+
+  // Pause hero animations when scrolled out of view to save GPU
+  useEffect(() => {
+    const el = heroRef.current
+    if (!el) return
+    const obs = new IntersectionObserver(([entry]) => {
+      el.dataset.visible = String(entry.isIntersecting)
+    }, { threshold: 0.1 })
+    obs.observe(el)
+    return () => obs.disconnect()
+  }, [])
 
   const filteredGroups = galleryFilter
     ? galleryGroups.filter(g => g.label === galleryFilter)
@@ -1097,7 +1118,7 @@ export default function Home() {
     <div className="home">
 
       {/* ── Hero ── */}
-      <section className="home-hero">
+      <section ref={heroRef} className="home-hero">
         {/* Aurora background */}
         <div className="home-hero-aurora" aria-hidden="true" />
         <div className="home-hero-orb home-hero-orb--1" aria-hidden="true" />

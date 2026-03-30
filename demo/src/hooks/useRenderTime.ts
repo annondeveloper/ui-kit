@@ -1,4 +1,4 @@
-import { useRef, useState, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 
 export interface RenderTiming {
   componentName: string
@@ -31,8 +31,7 @@ export function useRenderTime(componentName: string): RenderTiming {
 
     const interval = setInterval(() => {
       const start = performance.now()
-      // Force a synchronous layout read to measure actual render cost
-      void document.body.offsetHeight
+      // Measure time spent in this sampling tick (no forced layout reflow)
       const elapsed = performance.now() - start
 
       samples.push(elapsed)

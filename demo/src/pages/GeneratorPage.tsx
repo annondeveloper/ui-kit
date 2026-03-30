@@ -207,6 +207,8 @@ const styles = css`
       font-size: var(--text-sm, 0.875rem);
       color: var(--text-secondary);
       max-width: 600px;
+      overflow-wrap: break-word;
+      text-wrap: balance;
     }
 
     /* ── Section Headers ──────────────────────────────────────────────── */
@@ -666,6 +668,7 @@ const styles = css`
       display: flex;
       gap: 0.5rem;
       margin-block-end: 1.5rem;
+      flex-wrap: wrap;
     }
 
     .gen-tier-btn {

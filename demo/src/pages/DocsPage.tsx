@@ -50,9 +50,21 @@ const styles = css`
 
     .docs-quick-links {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      grid-template-columns: repeat(3, 1fr);
       gap: 0.75rem;
       margin-block-end: 2rem;
+    }
+
+    @media (max-width: 768px) {
+      .docs-quick-links {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (max-width: 500px) {
+      .docs-quick-links {
+        grid-template-columns: 1fr;
+      }
     }
 
     .docs-quick-link {
@@ -89,6 +101,7 @@ const styles = css`
       display: flex;
       flex-direction: column;
       gap: 0.125rem;
+      min-width: 0;
     }
 
     .docs-quick-link-title {
@@ -115,12 +128,19 @@ const styles = css`
       display: flex;
       align-items: center;
       gap: 0.5rem;
+      flex-wrap: wrap;
     }
 
     .docs-new-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      grid-template-columns: repeat(2, 1fr);
       gap: 0.5rem;
+    }
+
+    @media (max-width: 500px) {
+      .docs-new-grid {
+        grid-template-columns: 1fr;
+      }
     }
 
     .docs-new-item {

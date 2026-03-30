@@ -24,6 +24,7 @@ const styles = css`
       color: var(--text-secondary);
       font-size: 0.875rem;
       line-height: 1.5;
+      text-wrap: balance;
     }
 
     .icons-toolbar {
@@ -31,6 +32,7 @@ const styles = css`
       gap: 0.75rem;
       margin-block-end: 1.5rem;
       align-items: center;
+      flex-wrap: wrap;
       flex-wrap: wrap;
     }
 
@@ -70,6 +72,7 @@ const styles = css`
     .icons-size-group {
       display: flex;
       gap: 0.25rem;
+      flex-wrap: wrap;
     }
 
     .icons-size-btn {
@@ -93,6 +96,12 @@ const styles = css`
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
       gap: 0.5rem;
+    }
+
+    @media (max-width: 500px) {
+      .icons-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
     }
 
     .icons-card {
