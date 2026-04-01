@@ -619,15 +619,13 @@ const pageStyles = css`
 // ─── Props Data ───────────────────────────────────────────────────────────────
 
 const sidebarProps: PropDef[] = [
-  { name: 'collapsed', type: 'boolean', default: 'false', description: 'Whether the sidebar is in collapsed (icon-only) state.' },
-  { name: 'onCollapse', type: '(collapsed: boolean) => void', description: 'Callback fired when the collapse toggle is clicked.' },
-  { name: 'width', type: 'number | string', default: '240', description: 'Expanded width of the sidebar. Number values are treated as pixels.' },
-  { name: 'collapsedWidth', type: 'number | string', default: '64', description: 'Width when collapsed. Number values are treated as pixels.' },
-  { name: 'position', type: "'left' | 'right'", default: "'left'", description: 'Which side the sidebar attaches to. Affects border placement.' },
-  { name: 'children', type: 'ReactNode', required: true, description: 'Sidebar content. Use SidebarHeader, SidebarContent, and SidebarFooter sub-components.' },
-  { name: 'motion', type: '0 | 1 | 2 | 3', description: 'Animation intensity for the collapse/expand transition.' },
-  { name: 'className', type: 'string', description: 'Additional CSS class name merged with the component class.' },
-  { name: 'ref', type: 'Ref<HTMLElement>', description: 'Forwarded ref to the underlying <aside> element.' },
+  { name: 'collapsed', type: 'boolean', default: 'false', description: 'Collapsed toggle.' },
+  { name: 'onCollapse', type: '(collapsed: boolean) => void', description: 'On collapse toggle callback.' },
+  { name: 'width', type: 'number | string', default: '240', description: 'Width.' },
+  { name: 'collapsedWidth', type: 'number | string', default: '64', description: 'Collapsed width.' },
+  { name: 'position', type: "'left' | 'right'", default: "'left'", description: 'Position.' },
+  { name: 'children', type: 'ReactNode', required: true, description: 'Child content.' },
+  { name: 'motion', type: '0 | 1 | 2 | 3', description: 'Animation intensity (0=none, 1=subtle, 2=expressive, 3=cinematic).' },
 ]
 
 const sidebarItemProps: PropDef[] = [

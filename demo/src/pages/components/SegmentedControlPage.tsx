@@ -213,17 +213,24 @@ const pageStyles = css`
 // ─── Props Data ──────────────────────────────────────────────────────────────
 
 const PROPS: PropDef[] = [
-  { name: 'data', type: 'string[] | SegmentedControlOption[]', required: true, description: 'Array of segment options (strings or objects with value, label, icon, disabled).' },
-  { name: 'value', type: 'string', description: 'Controlled selected value.' },
-  { name: 'defaultValue', type: 'string', description: 'Initial value for uncontrolled usage.' },
-  { name: 'onChange', type: '(value: string) => void', description: 'Callback when the selection changes.' },
-  { name: 'size', type: "'xs' | 'sm' | 'md' | 'lg' | 'xl'", default: "'md'", description: 'Size of the control and its segments.' },
-  { name: 'fullWidth', type: 'boolean', default: 'false', description: 'Whether the control stretches to fill its container.' },
-  { name: 'orientation', type: "'horizontal' | 'vertical'", default: "'horizontal'", description: 'Layout direction of the segments.' },
-  { name: 'color', type: 'string', description: 'Brand color override for the sliding indicator.' },
-  { name: 'disabled', type: 'boolean', default: 'false', description: 'Disables all segments.' },
-  { name: 'readOnly', type: 'boolean', default: 'false', description: 'Makes the control non-interactive but visually active.' },
-  { name: 'motion', type: '0 | 1 | 2 | 3', description: 'Motion intensity for the sliding indicator animation.' },
+  { name: 'data', type: 'SegmentedControlOption[] | string[]', required: true, description: 'Data for segment options.' },
+  { name: 'value', type: 'string', description: 'Controlled value.' },
+  { name: 'defaultValue', type: 'string', description: 'Initial uncontrolled value.' },
+  { name: 'onChange', type: '(value: string) => void', description: 'Callback on value change.' },
+  { name: 'size', type: "'xs' | 'sm' | 'md' | 'lg' | 'xl'", default: "'md'", description: 'Component size.' },
+  { name: 'fullWidth', type: 'boolean', default: 'false', description: 'Fills container width.' },
+  { name: 'orientation', type: "'horizontal' | 'vertical'", default: "'horizontal'", description: 'Horizontal or vertical layout.' },
+  { name: 'color', type: 'string', description: 'Color variant or custom color.' },
+  { name: 'disabled', type: 'boolean', default: 'false', description: 'Disables interaction.' },
+  { name: 'readOnly', type: 'boolean', default: 'false', description: 'Makes read-only.' },
+  { name: 'motion', type: '0 | 1 | 2 | 3', description: 'Animation intensity (0=none, 1=subtle, 2=expressive, 3=cinematic).' },
+]
+
+const OPTION_SUB_TYPE_PROPS: PropDef[] = [
+  { name: 'value', type: 'string', required: true, description: 'Controlled value.' },
+  { name: 'label', type: 'ReactNode', required: true, description: 'Label text above input.' },
+  { name: 'icon', type: 'ReactNode', description: 'Leading icon element.' },
+  { name: 'disabled', type: 'boolean', description: 'Disables interaction.' },
 ]
 
 const IMPORT = "import { SegmentedControl } from '@ui/components/segmented-control'"
@@ -350,6 +357,10 @@ export default function SegmentedControlPage() {
         </p>
         <Card variant="default" padding="md">
           <PropsTable props={PROPS} />
+        </Card>
+        <Card variant="default" padding="md" style={{ marginBlockStart: '1rem' }}>
+          <h3 style={{ fontSize: '0.875rem', fontWeight: 700, marginBottom: '0.75rem', color: 'var(--text-primary)' }}>SegmentedControlOption (sub-type)</h3>
+          <PropsTable props={OPTION_SUB_TYPE_PROPS} />
         </Card>
       </section>
     </div>

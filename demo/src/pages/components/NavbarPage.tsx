@@ -732,15 +732,13 @@ const pageStyles = css`
 // ─── Props Data ───────────────────────────────────────────────────────────────
 
 const navbarProps: PropDef[] = [
-  { name: 'logo', type: 'ReactNode', description: 'Logo element rendered at the start of the navbar.' },
-  { name: 'children', type: 'ReactNode', description: 'Navigation items rendered in the center nav slot. Hidden on mobile, shown in hamburger menu.' },
-  { name: 'actions', type: 'ReactNode', description: 'Action elements (buttons, avatars) rendered at the end of the navbar.' },
-  { name: 'sticky', type: 'boolean', default: 'true', description: 'Makes the navbar stick to the top with backdrop blur effect.' },
-  { name: 'bordered', type: 'boolean', default: 'true', description: 'Shows a subtle bottom border for visual separation.' },
-  { name: 'transparent', type: 'boolean', default: 'false', description: 'Makes the background transparent. Combines with sticky for a glass effect.' },
-  { name: 'height', type: 'number', default: '56', description: 'Navbar height in pixels. Sets the --navbar-height CSS custom property.' },
-  { name: 'className', type: 'string', description: 'Additional CSS class name merged with the component class.' },
-  { name: 'ref', type: 'Ref<HTMLElement>', description: 'Forwarded ref to the underlying <header> element.' },
+  { name: 'logo', type: 'ReactNode', description: 'Logo content.' },
+  { name: 'children', type: 'ReactNode', description: 'Child content.' },
+  { name: 'actions', type: 'ReactNode', description: 'Actions content.' },
+  { name: 'sticky', type: 'boolean', default: 'true', description: 'Sticky toggle.' },
+  { name: 'bordered', type: 'boolean', default: 'true', description: 'Bordered toggle.' },
+  { name: 'transparent', type: 'boolean', default: 'false', description: 'Transparent toggle.' },
+  { name: 'height', type: 'number', default: '56', description: 'Height.' },
 ]
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────

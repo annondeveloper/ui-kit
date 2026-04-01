@@ -431,7 +431,11 @@ const heatmapProps: PropDef[] = [
   { name: 'showTooltip', type: 'boolean', default: 'false', description: 'Show date and value tooltip on cell hover (standard tier only).' },
   { name: 'onDateClick', type: '(date: string) => void', description: 'Handler called when a cell is clicked. Makes cells interactive with pointer cursor.' },
   { name: 'motion', type: '0 | 1 | 2 | 3', description: 'Animation intensity override.' },
-  { name: 'className', type: 'string', description: 'Additional CSS class name merged with the component class.' },
+]
+
+const heatmapDataProps: PropDef[] = [
+  { name: 'date', type: 'string', required: true, description: 'Date string in YYYY-MM-DD format.' },
+  { name: 'value', type: 'number', required: true, description: 'Numeric intensity value for the cell.' },
 ]
 
 // ─── Sample Data Generators ──────────────────────────────────────────────────
@@ -1020,6 +1024,11 @@ export default function HeatmapCalendarPage() {
         </p>
         <Card variant="default" padding="md">
           <PropsTable props={heatmapProps} />
+        </Card>
+        <h3 className="heatmap-calendar-page__section-title" style={{ marginBlockStart: '1.5rem' }}>HeatmapData</h3>
+        <p className="heatmap-calendar-page__section-desc">Shape of each entry in the <code>data</code> array.</p>
+        <Card variant="default" padding="md">
+          <PropsTable props={heatmapDataProps} />
         </Card>
       </section>
 

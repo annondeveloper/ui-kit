@@ -208,13 +208,21 @@ const TOC_ITEMS = [
 ]
 
 const propsData: PropDef[] = [
-  { name: 'items', type: 'TocItem[]', required: true, description: 'Array of items with id, label, and heading level.' },
-  { name: 'activeId', type: 'string', description: 'Currently active section id (for scroll spy highlighting).' },
-  { name: 'variant', type: "'default' | 'filled' | 'dots'", default: "'default'", description: 'Visual style of the table of contents.' },
-  { name: 'scrollSpy', type: 'boolean', default: 'false', description: 'Automatically track and highlight the visible section.' },
-  { name: 'scrollOffset', type: 'number', default: '80', description: 'Offset in px for scroll spy threshold calculation.' },
-  { name: 'onItemClick', type: '(id: string) => void', description: 'Callback when a TOC item is clicked.' },
-  { name: 'className', type: 'string', description: 'Additional CSS class for the root element.' },
+  { name: 'items', type: 'TocItem[]', required: true, description: 'Array of items to render.' },
+  { name: 'activeId', type: 'string', description: 'Active item id.' },
+  { name: 'onItemClick', type: '(id: string) => void', description: 'On item click callback.' },
+  { name: 'scrollSpy', type: 'boolean', default: 'false', description: 'Scroll spy toggle.' },
+  { name: 'scrollOffset', type: 'number', default: '0', description: 'Scroll offset.' },
+  { name: 'size', type: "'sm' | 'md' | 'lg'", default: "'md'", description: 'Component size.' },
+  { name: 'variant', type: "'default' | 'filled' | 'dots'", default: "'default'", description: 'Visual style variant.' },
+  { name: 'motion', type: '0 | 1 | 2 | 3', description: 'Animation intensity (0=none, 1=subtle, 2=expressive, 3=cinematic).' },
+]
+
+const tocItemSubTypeProps: PropDef[] = [
+  { name: 'id', type: 'string', required: true, description: 'Unique identifier.' },
+  { name: 'label', type: 'string', required: true, description: 'Label text.' },
+  { name: 'level', type: 'number', required: true, description: 'Heading level (e.g. 1, 2, 3).' },
+  { name: 'children', type: 'TocItem[]', description: 'Nested child items.' },
 ]
 
 // ─── Component ───────────────────────────────────────────────────────────────
@@ -304,6 +312,10 @@ export default function TableOfContentsPage() {
         </p>
         <Card variant="default" padding="md">
           <PropsTable props={propsData} />
+        </Card>
+        <Card variant="default" padding="md" style={{ marginBlockStart: '1rem' }}>
+          <h3 style={{ fontSize: '0.875rem', fontWeight: 700, marginBottom: '0.75rem', color: 'var(--text-primary)' }}>TocItem (sub-type)</h3>
+          <PropsTable props={tocItemSubTypeProps} />
         </Card>
       </section>
     </div>

@@ -650,12 +650,16 @@ const pageStyles = css`
 // ─── Props Data ───────────────────────────────────────────────────────────────
 
 const breadcrumbsProps: PropDef[] = [
-  { name: 'items', type: 'BreadcrumbItem[]', required: true, description: 'Array of breadcrumb items with label, optional href, and optional icon.' },
-  { name: 'separator', type: 'ReactNode', default: '<ChevronRight />', description: 'Custom separator element between items. Defaults to a chevron-right SVG icon.' },
-  { name: 'maxVisible', type: 'number', description: 'Maximum number of visible items. When exceeded, middle items collapse to an ellipsis.' },
-  { name: 'onNavigate', type: '(href: string) => void', description: 'Custom navigation handler. When provided, prevents default link behavior for SPA routing.' },
-  { name: 'className', type: 'string', description: 'Additional CSS class name merged with the component class.' },
-  { name: 'ref', type: 'Ref<HTMLElement>', description: 'Forwarded ref to the underlying <nav> element.' },
+  { name: 'items', type: 'BreadcrumbItem[]', required: true, description: 'Array of items to render.' },
+  { name: 'separator', type: 'ReactNode', description: 'Separator between items.' },
+  { name: 'maxVisible', type: 'number', description: 'Max visible items.' },
+  { name: 'onNavigate', type: '(href: string) => void', description: 'On navigate callback.' },
+]
+
+const breadcrumbItemSubTypeProps: PropDef[] = [
+  { name: 'label', type: 'ReactNode', required: true, description: 'Label text above input.' },
+  { name: 'href', type: 'string', description: 'Link URL.' },
+  { name: 'icon', type: 'ReactNode', description: 'Leading icon element.' },
 ]
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -1427,6 +1431,10 @@ function MyPage() {
         </p>
         <Card variant="default" padding="md">
           <PropsTable props={breadcrumbsProps} />
+        </Card>
+        <Card variant="default" padding="md" style={{ marginBlockStart: '1rem' }}>
+          <h3 style={{ fontSize: '0.875rem', fontWeight: 700, marginBottom: '0.75rem', color: 'var(--text-primary)' }}>BreadcrumbItem (sub-type)</h3>
+          <PropsTable props={breadcrumbItemSubTypeProps} />
         </Card>
       </section>
 

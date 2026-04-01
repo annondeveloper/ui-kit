@@ -642,14 +642,12 @@ const pageStyles = css`
 // ─── Props Data ───────────────────────────────────────────────────────────────
 
 const appShellProps: PropDef[] = [
-  { name: 'navbar', type: 'ReactNode', description: 'Navbar content rendered at the top, spanning full width.' },
-  { name: 'sidebar', type: 'ReactNode', description: 'Sidebar content rendered alongside main area.' },
-  { name: 'footer', type: 'ReactNode', description: 'Footer content rendered at the bottom, spanning full width.' },
-  { name: 'sidebarCollapsed', type: 'boolean', default: 'false', description: 'Controls whether the sidebar is in collapsed state.' },
-  { name: 'sidebarPosition', type: "'left' | 'right'", default: "'left'", description: 'Which side the sidebar renders on.' },
-  { name: 'children', type: 'ReactNode', required: true, description: 'Main content area.' },
-  { name: 'className', type: 'string', description: 'Additional CSS class name merged with the component class.' },
-  { name: 'ref', type: 'Ref<HTMLDivElement>', description: 'Forwarded ref to the root element.' },
+  { name: 'navbar', type: 'ReactNode', description: 'Navbar slot content.' },
+  { name: 'sidebar', type: 'ReactNode', description: 'Sidebar slot content.' },
+  { name: 'footer', type: 'ReactNode', description: 'Footer slot content.' },
+  { name: 'sidebarCollapsed', type: 'boolean', default: 'false', description: 'Sidebar collapsed toggle.' },
+  { name: 'sidebarPosition', type: "'left' | 'right'", default: "'left'", description: 'Sidebar position.' },
+  { name: 'children', type: 'ReactNode', required: true, description: 'Child content.' },
 ]
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────

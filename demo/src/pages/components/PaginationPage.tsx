@@ -656,16 +656,14 @@ const pageStyles = css`
 // ─── Props Data ───────────────────────────────────────────────────────────────
 
 const paginationProps: PropDef[] = [
-  { name: 'page', type: 'number', required: true, description: 'Current active page (1-indexed).' },
-  { name: 'totalPages', type: 'number', required: true, description: 'Total number of pages.' },
-  { name: 'onChange', type: '(page: number) => void', required: true, description: 'Callback when page changes.' },
-  { name: 'siblingCount', type: 'number', default: '1', description: 'Number of sibling pages visible around the current page.' },
-  { name: 'showFirst', type: 'boolean', default: 'false', description: 'Show first/last page navigation buttons (double chevrons).' },
-  { name: 'showPrevNext', type: 'boolean', default: 'true', description: 'Show previous/next navigation buttons.' },
-  { name: 'size', type: "'xs' | 'sm' | 'md' | 'lg' | 'xl'", default: "'md'", description: 'Button size controlling dimensions and font-size.' },
-  { name: 'motion', type: '0 | 1 | 2 | 3', description: 'Animation intensity override. Cascades from OS > prop > CSS --motion > UIProvider.' },
-  { name: 'className', type: 'string', description: 'Additional CSS class name merged with the component class.' },
-  { name: 'ref', type: 'Ref<HTMLElement>', description: 'Forwarded ref to the underlying <nav> element.' },
+  { name: 'page', type: 'number', required: true, description: 'Current page.' },
+  { name: 'totalPages', type: 'number', required: true, description: 'Total pages.' },
+  { name: 'onChange', type: '(page: number) => void', required: true, description: 'Callback on value change.' },
+  { name: 'siblingCount', type: 'number', description: 'Sibling count.' },
+  { name: 'showFirst', type: 'boolean', description: 'Show first toggle.' },
+  { name: 'showPrevNext', type: 'boolean', description: 'Show prev next toggle.' },
+  { name: 'size', type: "'xs' | 'sm' | 'md' | 'lg' | 'xl'", description: 'Component size.' },
+  { name: 'motion', type: '0 | 1 | 2 | 3', description: 'Animation intensity (0=none, 1=subtle, 2=expressive, 3=cinematic).' },
 ]
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────

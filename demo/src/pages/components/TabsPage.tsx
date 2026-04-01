@@ -699,20 +699,26 @@ const pageStyles = css`
 // ─── Props Data ───────────────────────────────────────────────────────────────
 
 const tabsProps: PropDef[] = [
-  { name: 'tabs', type: 'Tab[]', description: 'Array of tab definitions: { id, label, icon?, disabled? }.' },
-  { name: 'activeTab', type: 'string', description: 'Controlled active tab ID. Use with onChange for controlled mode.' },
-  { name: 'defaultTab', type: 'string', description: 'Uncontrolled default active tab ID. Falls back to first tab.' },
-  { name: 'onChange', type: '(tabId: string) => void', description: 'Called when the active tab changes.' },
-  { name: 'variant', type: "'underline' | 'pills' | 'enclosed'", default: "'underline'", description: 'Visual style of the tab list.' },
-  { name: 'size', type: "'xs' | 'sm' | 'md' | 'lg' | 'xl'", default: "'md'", description: 'Controls padding and font-size of tabs.' },
-  { name: 'orientation', type: "'horizontal' | 'vertical'", default: "'horizontal'", description: 'Layout direction. Vertical places tabs on the left.' },
-  { name: 'lazy', type: 'boolean', default: 'false', description: 'Only render active panel content. Unmounts inactive panels.' },
-  { name: 'motion', type: '0 | 1 | 2 | 3', description: 'Animation intensity override. Cascades from OS > prop > CSS --motion > UIProvider.' },
-  { name: 'children', type: 'ReactNode', description: 'TabPanel children mapping to tab IDs.' },
-  { name: 'className', type: 'string', description: 'Additional CSS class name merged with the component class.' },
-  { name: 'badge (Tab)', type: 'ReactNode', description: 'Badge/count shown next to tab label.' },
-  { name: 'closeable (Tab)', type: 'boolean', description: 'Shows a close button on the tab.' },
-  { name: 'onClose', type: '(tabId: string) => void', description: 'Called when a tab close button is clicked.' },
+  { name: 'tabs', type: 'Tab[]', required: true, description: 'Array of tab definitions.' },
+  { name: 'activeTab', type: 'string', description: 'Currently active tab ID.' },
+  { name: 'defaultTab', type: 'string', description: 'Initial active tab ID.' },
+  { name: 'onChange', type: '(tabId: string) => void', description: 'Callback on value change.' },
+  { name: 'onClose', type: '(tabId: string) => void', description: 'Callback on close.' },
+  { name: 'variant', type: "'underline' | 'pills' | 'enclosed'", default: "'underline'", description: 'Visual style variant.' },
+  { name: 'size', type: "'xs' | 'sm' | 'md' | 'lg' | 'xl'", default: "'md'", description: 'Component size.' },
+  { name: 'orientation', type: "'horizontal' | 'vertical'", default: "'horizontal'", description: 'Horizontal or vertical layout.' },
+  { name: 'lazy', type: 'boolean', default: 'false', description: 'Lazy-load content.' },
+  { name: 'motion', type: '0 | 1 | 2 | 3', description: 'Animation intensity (0=none, 1=subtle, 2=expressive, 3=cinematic).' },
+  { name: 'children', type: 'ReactNode', required: true, description: 'Child content.' },
+]
+
+const tabSubTypeProps: PropDef[] = [
+  { name: 'id', type: 'string', required: true, description: 'Unique identifier for the tab.' },
+  { name: 'label', type: 'ReactNode', required: true, description: 'Label text above input.' },
+  { name: 'icon', type: 'ReactNode', description: 'Leading icon element.' },
+  { name: 'disabled', type: 'boolean', description: 'Disables interaction.' },
+  { name: 'badge', type: 'ReactNode', description: 'Badge/count shown next to label.' },
+  { name: 'closeable', type: 'boolean', description: 'Shows close button.' },
 ]
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -1999,6 +2005,10 @@ export default function TabsPage() {
         </p>
         <Card variant="default" padding="md">
           <PropsTable props={tabsProps} />
+        </Card>
+        <Card variant="default" padding="md" style={{ marginBlockStart: '1rem' }}>
+          <h3 style={{ fontSize: '0.875rem', fontWeight: 700, marginBottom: '0.75rem', color: 'var(--text-primary)' }}>Tab (sub-type)</h3>
+          <PropsTable props={tabSubTypeProps} />
         </Card>
       </section>
 

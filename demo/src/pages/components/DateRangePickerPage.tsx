@@ -197,6 +197,11 @@ const drpProps: PropDef[] = [
   { name: 'name', type: 'string', description: 'Form field name for hidden input serialization.' },
 ]
 
+const drpPresetProps: PropDef[] = [
+  { name: 'label', type: 'string', required: true, description: 'Display label for the preset button.' },
+  { name: 'range', type: '[Date, Date]', required: true, description: 'Start and end dates for the preset range.' },
+]
+
 // ─── Helpers ────────────────────────────────────────────────────────────────
 
 function CopyButton({ text }: { text: string }) {
@@ -293,6 +298,11 @@ export default function DateRangePickerPage() {
         </p>
         <Card variant="default" padding="md">
           <PropsTable props={drpProps} />
+        </Card>
+        <h3 className="drp-page__section-title" style={{ marginBlockStart: '1.5rem' }}>DateRangePreset</h3>
+        <p className="drp-page__section-desc">Shape of each entry in the <code>presets</code> array.</p>
+        <Card variant="default" padding="md">
+          <PropsTable props={drpPresetProps} />
         </Card>
       </section>
     </div>
