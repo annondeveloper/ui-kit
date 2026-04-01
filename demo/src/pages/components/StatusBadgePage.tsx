@@ -656,8 +656,6 @@ const statusBadgeProps: PropDef[] = [
   { name: 'size', type: "'xs' | 'sm' | 'md' | 'lg' | 'xl'", default: "'sm'", description: 'Controls padding, font-size, and gap. Five sizes available.' },
   { name: 'pulse', type: 'boolean', default: 'false', description: 'Adds a pulsing ring animation to the status dot (motion level 2+).' },
   { name: 'motion', type: '0 | 1 | 2 | 3', description: 'Animation intensity override. Cascades from OS > prop > CSS --motion > UIProvider.' },
-  { name: 'className', type: 'string', description: 'Additional CSS class name merged with the component class.' },
-  { name: 'ref', type: 'Ref<HTMLSpanElement>', description: 'Forwarded ref to the underlying <span> element.' },
 ]
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────

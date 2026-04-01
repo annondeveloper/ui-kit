@@ -510,8 +510,6 @@ const avatarPropsData: PropDef[] = [
   { name: 'size', type: "'xs' | 'sm' | 'md' | 'lg' | 'xl'", default: "'md'", description: 'Avatar diameter from 22px (xs) to 64px (xl).' },
   { name: 'status', type: "'online' | 'offline' | 'away' | 'busy'", description: 'Status indicator dot displayed at bottom-right.' },
   { name: 'icon', type: 'ReactNode', description: 'Custom icon fallback when no src or name is provided.' },
-  { name: 'className', type: 'string', description: 'Additional CSS class name merged with the component class.' },
-  { name: 'ref', type: 'Ref<HTMLDivElement>', description: 'Forwarded ref to the root element.' },
 ]
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────

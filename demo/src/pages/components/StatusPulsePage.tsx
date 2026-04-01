@@ -650,8 +650,6 @@ const statusPulseProps: PropDef[] = [
   { name: 'size', type: "'sm' | 'md' | 'lg'", default: "'md'", description: 'Controls the overall bounding box and dot size.' },
   { name: 'label', type: 'string', description: 'Accessible label for the status indicator. Used as aria-label.' },
   { name: 'motion', type: '0 | 1 | 2 | 3', description: 'Animation intensity. 0 = static, 1 = opacity pulse, 2+ = radiating rings.' },
-  { name: 'className', type: 'string', description: 'Additional CSS class name merged with the component class.' },
-  { name: 'ref', type: 'Ref<HTMLSpanElement>', description: 'Forwarded ref to the underlying <span> element.' },
 ]
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────

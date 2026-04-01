@@ -196,16 +196,16 @@ const pageStyles = css`
 const IMPORT_STR = "import { AvatarUpload } from '@ui/components/avatar-upload'"
 
 const propsData: PropDef[] = [
-  { name: 'value', type: 'string | null', description: 'Current image URL or data URI for the preview.' },
-  { name: 'onChange', type: '(file: File | null) => void', description: 'Callback when a file is selected or cleared.' },
-  { name: 'size', type: "'sm' | 'md' | 'lg' | 'xl'", default: "'lg'", description: 'Size of the upload area and preview.' },
-  { name: 'shape', type: "'circle' | 'square'", default: "'circle'", description: 'Shape of the avatar preview.' },
+  { name: 'value', type: 'string', description: 'Controlled image URL or data URI for the preview.' },
+  { name: 'onChange', type: '(file: File, preview: string) => void', description: 'Callback when a file is selected. Receives the File and a data URI preview string.' },
+  { name: 'onRemove', type: '() => void', description: 'Called when the remove button is clicked.' },
+  { name: 'size', type: 'number', default: '120', description: 'Width and height of the upload area in pixels.' },
   { name: 'accept', type: 'string', default: "'image/*'", description: 'Accepted file MIME types.' },
-  { name: 'maxSize', type: 'number', default: '5242880', description: 'Maximum file size in bytes (default 5MB).' },
+  { name: 'maxSize', type: 'number', description: 'Maximum file size in bytes.' },
   { name: 'placeholder', type: 'ReactNode', description: 'Custom placeholder content when no image is set.' },
-  { name: 'disabled', type: 'boolean', default: 'false', description: 'Disable the upload interaction.' },
-  { name: 'onError', type: '(error: string) => void', description: 'Callback when a validation error occurs (file too large, wrong type).' },
-  { name: 'className', type: 'string', description: 'Additional CSS class for the root element.' },
+  { name: 'disabled', type: 'boolean', default: 'false', description: 'Disables the upload interaction.' },
+  { name: 'shape', type: "'circle' | 'square'", default: "'circle'", description: 'Shape of the avatar preview area.' },
+  { name: 'motion', type: '0 | 1 | 2 | 3', description: 'Animation intensity override. Cascades from OS > prop > CSS --motion > UIProvider.' },
 ]
 
 // ─── Component ───────────────────────────────────────────────────────────────

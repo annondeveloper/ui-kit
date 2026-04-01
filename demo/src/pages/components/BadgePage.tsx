@@ -785,13 +785,10 @@ const badgeProps: PropDef[] = [
   { name: 'count', type: 'number', description: 'Display a numeric count instead of children. When set, replaces children content.' },
   { name: 'maxCount', type: 'number', default: '99', description: 'Maximum count before showing overflow (e.g. "99+"). Only applies when count is set.' },
   { name: 'icon', type: 'ReactNode', description: 'Leading icon element rendered before the badge content.' },
-  { name: 'motion', type: '0 | 1 | 2 | 3', description: 'Animation intensity override. Cascades from OS > prop > CSS --motion > UIProvider.' },
-  { name: 'className', type: 'string', description: 'Additional CSS class name merged with the component class.' },
-  { name: 'children', type: 'ReactNode', description: 'Badge label content. Overridden by count prop when set.' },
-  { name: 'ref', type: 'Ref<HTMLSpanElement>', description: 'Forwarded ref to the underlying <span> element.' },
   { name: 'removable', type: 'boolean', default: 'false', description: 'Shows a remove (X) button.' },
   { name: 'onRemove', type: '() => void', description: 'Called when remove button is clicked.' },
   { name: 'outline', type: 'boolean', default: 'false', description: 'Outline variant with transparent background.' },
+  { name: 'motion', type: '0 | 1 | 2 | 3', description: 'Animation intensity override. Cascades from OS > prop > CSS --motion > UIProvider.' },
 ]
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────

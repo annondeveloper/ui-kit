@@ -666,9 +666,6 @@ const kbdProps: PropDef[] = [
   { name: 'size', type: "'xs' | 'sm' | 'md'", default: "'sm'", description: 'Size controlling font-size, padding, and minimum dimensions.' },
   { name: 'variant', type: "'default' | 'ghost'", default: "'default'", description: 'Visual variant. Default has border and shadow, ghost is transparent.' },
   { name: 'motion', type: '0 | 1 | 2 | 3', description: 'Animation intensity. Level 2+ enables hover lift effect.' },
-  { name: 'className', type: 'string', description: 'Additional CSS class name merged with the component class.' },
-  { name: 'children', type: 'ReactNode', description: 'Key label content (single key or symbol).' },
-  { name: 'ref', type: 'Ref<HTMLElement>', description: 'Forwarded ref to the underlying <kbd> element.' },
 ]
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
