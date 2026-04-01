@@ -56,6 +56,25 @@ const sampleData: Server[] = [
   { id: 15, hostname: 'vpn-gateway-01', ip: '10.0.5.60', region: 'eu-central-1', os: 'Alpine 3.19', cpu: 12, memory: 18, disk: 5, status: 'online', uptime: '365d', lastSeen: '5s ago' },
 ]
 
+// ─── Employee Data (Aggregation & Edit Demos) ───────────────────────────────
+
+interface Employee {
+  id: number
+  name: string
+  department: string
+  salary: number
+  rating: number
+}
+
+const EMPLOYEES: Employee[] = [
+  { id: 1, name: 'Alice', department: 'Engineering', salary: 95000, rating: 4.5 },
+  { id: 2, name: 'Bob', department: 'Engineering', salary: 102000, rating: 4.2 },
+  { id: 3, name: 'Carol', department: 'Design', salary: 88000, rating: 4.8 },
+  { id: 4, name: 'Dan', department: 'Design', salary: 91000, rating: 4.1 },
+  { id: 5, name: 'Eve', department: 'Marketing', salary: 78000, rating: 3.9 },
+  { id: 6, name: 'Frank', department: 'Marketing', salary: 82000, rating: 4.3 },
+]
+
 function generateLargeDataset(count: number): Server[] {
   return Array.from({ length: count }, (_, i) => ({
     id: i + 1,
@@ -917,6 +936,301 @@ function generateSvelteCode(tier: Tier): string {
 />`
 }
 
+// ─── Aggregations Demo Component ────────────────────────────────────────────
+
+function AggregationsDemo() {
+  const [expandedGroups, setExpandedGroups] = useState<Set<string>>(() => new Set(['Engineering', 'Design', 'Marketing']))
+
+  const handleGroupToggle = (groupKey: string) => {
+    setExpandedGroups(prev => {
+      const next = new Set(prev)
+      if (next.has(groupKey)) {
+        next.delete(groupKey)
+      } else {
+        next.add(groupKey)
+      }
+      return next
+    })
+  }
+
+  const employeeColumns: ColumnDef<Employee>[] = [
+    { id: 'name', header: 'Name', accessor: 'name', sortable: true },
+    { id: 'department', header: 'Department', accessor: 'department', sortable: true },
+    {
+      id: 'salary',
+      header: 'Salary',
+      accessor: 'salary',
+      sortable: true,
+      cell: (v) => (
+        <span style={{ fontVariantNumeric: 'tabular-nums', color: 'var(--text-primary)' }}>
+          {new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(v as number)}
+        </span>
+      ),
+    },
+    {
+      id: 'rating',
+      header: 'Rating',
+      accessor: 'rating',
+      sortable: true,
+      cell: (v) => (
+        <span style={{ display: 'flex', alignItems: 'center', gap: '0.25rem', fontVariantNumeric: 'tabular-nums' }}>
+          <span style={{ color: 'oklch(75% 0.18 80)' }}>★</span>
+          {(v as number).toFixed(1)}
+        </span>
+      ),
+    },
+  ]
+
+  return (
+    <>
+      <div className="datatable-page__preview">
+        <DataTable
+          data={EMPLOYEES}
+          columns={employeeColumns}
+          groupBy="department"
+          aggregations={{ salary: 'avg', rating: 'max' }}
+          expandedGroups={expandedGroups}
+          onGroupToggle={handleGroupToggle}
+          sortable
+          stickyHeader
+          bordered
+        />
+      </div>
+      <div className="datatable-page__info-bar">
+        <span>Groups open: <strong>{expandedGroups.size} / 3</strong></span>
+        <span>Salary: <strong>avg per department</strong></span>
+        <span>Rating: <strong>max per department</strong></span>
+      </div>
+      <CopyBlock
+        code={`const [expandedGroups, setExpandedGroups] = useState<Set<string>>(
+  () => new Set(['Engineering', 'Design', 'Marketing'])
+)
+
+const employeeColumns: ColumnDef<Employee>[] = [
+  { id: 'name', header: 'Name', accessor: 'name', sortable: true },
+  { id: 'department', header: 'Department', accessor: 'department', sortable: true },
+  { id: 'salary', header: 'Salary', accessor: 'salary', sortable: true },
+  { id: 'rating', header: 'Rating', accessor: 'rating', sortable: true },
+]
+
+<DataTable
+  data={EMPLOYEES}
+  columns={employeeColumns}
+  groupBy="department"
+  aggregations={{ salary: 'avg', rating: 'max' }}
+  expandedGroups={expandedGroups}
+  onGroupToggle={(groupKey) => {
+    setExpandedGroups(prev => {
+      const next = new Set(prev)
+      next.has(groupKey) ? next.delete(groupKey) : next.add(groupKey)
+      return next
+    })
+  }}
+  sortable
+  bordered
+/>`}
+        language="typescript"
+      />
+    </>
+  )
+}
+
+// ─── Editable Cells Demo Component ──────────────────────────────────────────
+
+function EditableCellsDemo() {
+  const [editData, setEditData] = useState<Employee[]>(() => [...EMPLOYEES])
+
+  const handleCellEdit = useCallback((rowIndex: number, columnId: string, value: unknown) => {
+    setEditData(prev => prev.map((row, i) => i === rowIndex ? { ...row, [columnId]: value } : row))
+  }, [])
+
+  const editableEmployeeColumns: ColumnDef<Employee>[] = [
+    { id: 'name', header: 'Name', accessor: 'name', editable: true, sortable: true },
+    { id: 'department', header: 'Department', accessor: 'department', editable: true, sortable: true },
+    {
+      id: 'salary',
+      header: 'Salary',
+      accessor: 'salary',
+      editable: true,
+      sortable: true,
+      cell: (v) => (
+        <span style={{ fontVariantNumeric: 'tabular-nums' }}>
+          {new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(v as number)}
+        </span>
+      ),
+    },
+    {
+      id: 'rating',
+      header: 'Rating',
+      accessor: 'rating',
+      editable: true,
+      sortable: true,
+      cell: (v) => (
+        <span style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+          <span style={{ color: 'oklch(75% 0.18 80)' }}>★</span>
+          {(v as number).toFixed(1)}
+        </span>
+      ),
+    },
+  ]
+
+  return (
+    <>
+      <div className="datatable-page__preview">
+        <DataTable
+          data={editData}
+          columns={editableEmployeeColumns}
+          editable
+          onCellEdit={handleCellEdit}
+          sortable
+          stickyHeader
+          bordered
+        />
+      </div>
+      <p style={{ fontSize: '0.75rem', color: 'var(--text-tertiary)', marginBlockStart: '0.75rem' }}>
+        Double-click any cell to edit. Changes are reflected immediately in the table state.
+      </p>
+      <div className="datatable-page__info-bar">
+        <span>Current data: <strong>{editData.length} rows</strong></span>
+        {editData.map(e => (
+          <span key={e.id} style={{ fontVariantNumeric: 'tabular-nums' }}>
+            {e.name}: <strong>{new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(e.salary)}</strong>
+          </span>
+        ))}
+      </div>
+      <CopyBlock
+        code={`const [editData, setEditData] = useState([...EMPLOYEES])
+
+const columns: ColumnDef<Employee>[] = [
+  { id: 'name', header: 'Name', accessor: 'name', editable: true },
+  { id: 'department', header: 'Department', accessor: 'department', editable: true },
+  { id: 'salary', header: 'Salary', accessor: 'salary', editable: true },
+  { id: 'rating', header: 'Rating', accessor: 'rating', editable: true },
+]
+
+<DataTable
+  data={editData}
+  columns={columns}
+  editable
+  onCellEdit={(rowIndex, columnId, value) => {
+    setEditData(prev =>
+      prev.map((row, i) =>
+        i === rowIndex ? { ...row, [columnId]: value } : row
+      )
+    )
+  }}
+  sortable
+  bordered
+/>`}
+        language="typescript"
+      />
+    </>
+  )
+}
+
+// ─── Column Filters Demo Component ──────────────────────────────────────────
+
+function ColumnFiltersDemo() {
+  const [filters, setFilters] = useState<Record<string, { value: string; operator: string }>>({})
+
+  const activeFilterCount = Object.keys(filters).filter(k => filters[k]?.value).length
+
+  const filterableColumns: ColumnDef<Server>[] = [
+    { id: 'hostname', header: 'Hostname', accessor: 'hostname', filterable: true, filterType: 'text' },
+    { id: 'region', header: 'Region', accessor: 'region', filterable: true, filterType: 'select', sortable: true },
+    { id: 'os', header: 'OS', accessor: 'os', filterable: true, filterType: 'select', sortable: true },
+    {
+      id: 'cpu',
+      header: 'CPU %',
+      accessor: 'cpu',
+      filterable: true,
+      filterType: 'number',
+      sortable: true,
+      cell: (v) => <PercentBar value={v as number} />,
+    },
+    {
+      id: 'status',
+      header: 'Status',
+      accessor: 'status',
+      filterable: true,
+      filterType: 'select',
+      sortable: true,
+      cell: (v) => <StatusBadge status={v as string} />,
+    },
+  ]
+
+  return (
+    <>
+      <div className="datatable-page__preview">
+        <DataTable
+          data={sampleData}
+          columns={filterableColumns}
+          filterable
+          filters={filters}
+          onFilterChange={setFilters}
+          sortable
+          stickyHeader
+          paginated
+          pageSize={8}
+        />
+      </div>
+      <div className="datatable-page__info-bar">
+        <span>Active filters: <strong>{activeFilterCount}</strong></span>
+        {activeFilterCount > 0 && (
+          <>
+            {Object.entries(filters)
+              .filter(([, f]) => f?.value)
+              .map(([col, f]) => (
+                <span key={col}>
+                  <strong>{col}</strong>: {f.operator} &quot;{f.value}&quot;
+                </span>
+              ))}
+            <Button
+              size="xs"
+              variant="ghost"
+              onClick={() => setFilters({})}
+            >
+              Clear all
+            </Button>
+          </>
+        )}
+        {activeFilterCount === 0 && <span>Click filter icons in column headers to filter</span>}
+      </div>
+      <CopyBlock
+        code={`const [filters, setFilters] = useState<
+  Record<string, { value: string; operator: string }>
+>({})
+
+const columns: ColumnDef<Server>[] = [
+  { id: 'hostname', header: 'Hostname', accessor: 'hostname',
+    filterable: true, filterType: 'text' },
+  { id: 'region', header: 'Region', accessor: 'region',
+    filterable: true, filterType: 'select' },
+  { id: 'cpu', header: 'CPU %', accessor: 'cpu',
+    filterable: true, filterType: 'number' },
+  { id: 'status', header: 'Status', accessor: 'status',
+    filterable: true, filterType: 'select' },
+]
+
+<DataTable
+  data={servers}
+  columns={columns}
+  filterable
+  filters={filters}
+  onFilterChange={setFilters}
+  sortable
+  paginated
+  pageSize={8}
+/>
+
+// Reset filters programmatically
+<button onClick={() => setFilters({})}>Clear all filters</button>`}
+        language="typescript"
+      />
+    </>
+  )
+}
+
 // ─── Playground Section ─────────────────────────────────────────────────────
 
 function PlaygroundSection({ tier, brandColor }: { tier: Tier; brandColor: string }) {
@@ -1324,6 +1638,21 @@ export default function DataTablePage() {
         />
       </section>
 
+
+      {/* ── 4b. Column Filters Demo ─────────────────────── */}
+      <section className="datatable-page__section" id="column-filters">
+        <h2 className="datatable-page__section-title">
+          <a href="#column-filters">Column Filters — Controlled State</a>
+        </h2>
+        <p className="datatable-page__section-desc">
+          Use the <code>filters</code> and <code>onFilterChange</code> props to manage filter
+          state externally. This lets you read, reset, or programmatically set filters from
+          outside the table. The active filter summary below the table reflects the current
+          controlled state in real-time.
+        </p>
+        <ColumnFiltersDemo />
+      </section>
+
       {/* ── 5. Row Grouping & Aggregation ────────────────── */}
       <section className="datatable-page__section" id="grouping">
         <h2 className="datatable-page__section-title">
@@ -1354,6 +1683,21 @@ export default function DataTablePage() {
 />`}
           language="typescript"
         />
+      </section>
+
+
+      {/* ── 5b. Aggregations Demo ────────────────────────── */}
+      <section className="datatable-page__section" id="aggregations">
+        <h2 className="datatable-page__section-title">
+          <a href="#aggregations">Aggregations with Expandable Groups</a>
+        </h2>
+        <p className="datatable-page__section-desc">
+          Combine <code>groupBy</code> with <code>aggregations</code> to compute per-group
+          statistics. Control which groups are open with <code>expandedGroups</code> and
+          <code> onGroupToggle</code>. This example uses employee data grouped by
+          department, showing average salary and maximum rating per group.
+        </p>
+        <AggregationsDemo />
       </section>
 
       {/* ── 6. Cell Editing ──────────────────────────────── */}
@@ -1403,6 +1747,20 @@ export default function DataTablePage() {
 />`}
           language="typescript"
         />
+      </section>
+
+
+      {/* ── 6b. Editable Cells Demo ─────────────────────── */}
+      <section className="datatable-page__section" id="editable-cells">
+        <h2 className="datatable-page__section-title">
+          <a href="#editable-cells">Editable Cells — Live State Update</a>
+        </h2>
+        <p className="datatable-page__section-desc">
+          Each <code>onCellEdit</code> call receives the row index, column ID, and the new
+          value. The example below uses employee data so you can see names, salaries, and
+          ratings update instantly as you edit. Double-click any cell to start editing.
+        </p>
+        <EditableCellsDemo />
       </section>
 
       {/* ── 7. Server-Side Mode ──────────────────────────── */}
