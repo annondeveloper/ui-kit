@@ -609,7 +609,6 @@ const sheetProps: PropDef[] = [
   { name: 'showClose', type: 'boolean', default: 'true', description: 'Whether to show the close button in the header.' },
   { name: 'children', type: 'ReactNode', required: true, description: 'Content rendered inside the sheet body.' },
   { name: 'motion', type: '0 | 1 | 2 | 3', description: 'Animation intensity override. Cascades from OS > prop > CSS --motion > UIProvider.' },
-  { name: 'className', type: 'string', description: 'Additional CSS class name for the sheet root wrapper.' },
 ]
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────

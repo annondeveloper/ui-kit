@@ -199,13 +199,13 @@ const propsData: PropDef[] = [
   { name: 'open', type: 'boolean', required: true, description: 'Whether the confirmation dialog is visible.' },
   { name: 'onConfirm', type: '() => void', required: true, description: 'Callback when the user confirms the action.' },
   { name: 'onCancel', type: '() => void', required: true, description: 'Callback when the user cancels or dismisses.' },
-  { name: 'title', type: 'string', default: "'Are you sure?'", description: 'Dialog heading text.' },
-  { name: 'description', type: 'string', description: 'Supporting text explaining the action and its consequences.' },
-  { name: 'confirmLabel', type: 'string', default: "'Confirm'", description: 'Label for the confirm button.' },
-  { name: 'cancelLabel', type: 'string', default: "'Cancel'", description: 'Label for the cancel button.' },
-  { name: 'variant', type: "'default' | 'danger'", default: "'default'", description: 'Visual style. Danger uses red confirm button for destructive actions.' },
-  { name: 'loading', type: 'boolean', default: 'false', description: 'Show loading spinner on the confirm button.' },
-  { name: 'className', type: 'string', description: 'Additional CSS class for the dialog element.' },
+  { name: 'title', type: 'ReactNode', required: true, description: 'Dialog heading text.' },
+  { name: 'description', type: 'ReactNode', description: 'Supporting text explaining the action and its consequences.' },
+  { name: 'confirmLabel', type: 'string', description: 'Label for the confirm button.' },
+  { name: 'cancelLabel', type: 'string', description: 'Label for the cancel button.' },
+  { name: 'variant', type: "'default' | 'danger'", description: 'Visual style. Danger uses red confirm button for destructive actions.' },
+  { name: 'loading', type: 'boolean', description: 'Shows loading spinner on the confirm button.' },
+  { name: 'motion', type: '0 | 1 | 2 | 3', description: 'Animation intensity override. Cascades from OS > prop > CSS --motion > UIProvider.' },
 ]
 
 // ─── Component ───────────────────────────────────────────────────────────────

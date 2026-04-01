@@ -754,30 +754,32 @@ const pageStyles = css`
 // ─── Props Data ───────────────────────────────────────────────────────────────
 
 const dialogProps: PropDef[] = [
-  { name: 'open', type: 'boolean', description: 'Whether the dialog is open.' },
-  { name: 'onClose', type: '() => void', description: 'Called when the dialog should close (overlay click, escape key, or close button).' },
+  { name: 'open', type: 'boolean', required: true, description: 'Whether the dialog is open.' },
+  { name: 'onClose', type: '() => void', required: true, description: 'Called when the dialog should close (overlay click, escape key, or close button).' },
   { name: 'title', type: 'ReactNode', description: 'Title text displayed in the dialog header.' },
-  { name: 'description', type: 'string', description: 'Description text below the title. Standard/Premium only.' },
-  { name: 'size', type: "'sm' | 'md' | 'lg' | 'full'", default: "'md'", description: 'Controls max-width. Lite supports sm/md/lg only.' },
-  { name: 'closeOnOverlay', type: 'boolean', default: 'true', description: 'Close when clicking the backdrop overlay. Standard/Premium only.' },
-  { name: 'closeOnEscape', type: 'boolean', default: 'true', description: 'Close when pressing the Escape key. Standard/Premium only.' },
-  { name: 'showClose', type: 'boolean', default: 'true', description: 'Show the close button in the header. Standard/Premium only.' },
-  { name: 'children', type: 'ReactNode', description: 'Content rendered inside the dialog body.' },
-  { name: 'motion', type: '0 | 1 | 2 | 3', description: 'Animation intensity override. Standard/Premium only.' },
-  { name: 'className', type: 'string', description: 'Additional CSS class name merged with the component class.' },
+  { name: 'description', type: 'string', description: 'Description text below the title.' },
+  { name: 'size', type: "'sm' | 'md' | 'lg' | 'full'", default: "'md'", description: 'Controls the maximum width of the dialog.' },
+  { name: 'closeOnOverlay', type: 'boolean', default: 'true', description: 'Close when clicking the backdrop overlay.' },
+  { name: 'closeOnEscape', type: 'boolean', default: 'true', description: 'Close when pressing the Escape key.' },
+  { name: 'showClose', type: 'boolean', default: 'true', description: 'Show the close button in the dialog header.' },
+  { name: 'footer', type: 'ReactNode', description: 'Footer area below the body, typically used for action buttons.' },
+  { name: 'preventClose', type: 'boolean', default: 'false', description: 'Prevents closing via overlay click and escape key (useful for important actions).' },
+  { name: 'children', type: 'ReactNode', required: true, description: 'Content rendered inside the dialog body.' },
+  { name: 'motion', type: '0 | 1 | 2 | 3', description: 'Animation intensity override. Cascades from OS > prop > CSS --motion > UIProvider.' },
+  { name: 'classNames', type: "Partial<Record<'root' | 'header' | 'title' | 'description' | 'body' | 'close' | 'footer', string>>", description: 'Custom class names for individual internal parts of the dialog.' },
 ]
 
 const confirmDialogProps: PropDef[] = [
-  { name: 'open', type: 'boolean', description: 'Whether the confirm dialog is open.' },
-  { name: 'onConfirm', type: '() => void', description: 'Called when the confirm button is clicked.' },
-  { name: 'onCancel', type: '() => void', description: 'Called when the cancel button or close action is triggered.' },
-  { name: 'title', type: 'ReactNode', description: 'Title text displayed in the dialog header.' },
+  { name: 'open', type: 'boolean', required: true, description: 'Whether the confirm dialog is open.' },
+  { name: 'onConfirm', type: '() => void', required: true, description: 'Called when the confirm button is clicked.' },
+  { name: 'onCancel', type: '() => void', required: true, description: 'Called when the cancel button or close action is triggered.' },
+  { name: 'title', type: 'ReactNode', required: true, description: 'Title text displayed in the dialog header.' },
   { name: 'description', type: 'ReactNode', description: 'Description text displayed in the dialog body.' },
-  { name: 'confirmLabel', type: 'string', default: "'Confirm'", description: 'Label for the confirm button.' },
-  { name: 'cancelLabel', type: 'string', default: "'Cancel'", description: 'Label for the cancel button.' },
-  { name: 'variant', type: "'default' | 'danger'", default: "'default'", description: 'Visual variant. Danger variant uses a red confirm button.' },
-  { name: 'loading', type: 'boolean', default: 'false', description: 'Shows loading state on the confirm button.' },
-  { name: 'motion', type: '0 | 1 | 2 | 3', description: 'Animation intensity override.' },
+  { name: 'confirmLabel', type: 'string', description: 'Label for the confirm button.' },
+  { name: 'cancelLabel', type: 'string', description: 'Label for the cancel button.' },
+  { name: 'variant', type: "'default' | 'danger'", description: 'Visual variant. Danger variant uses a red confirm button.' },
+  { name: 'loading', type: 'boolean', description: 'Shows loading spinner on the confirm button.' },
+  { name: 'motion', type: '0 | 1 | 2 | 3', description: 'Animation intensity override. Cascades from OS > prop > CSS --motion > UIProvider.' },
 ]
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────

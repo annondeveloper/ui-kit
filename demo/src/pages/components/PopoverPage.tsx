@@ -654,9 +654,8 @@ const popoverProps: PropDef[] = [
   { name: 'offset', type: 'number', default: '8', description: 'Distance in pixels between the trigger and popover.' },
   { name: 'arrow', type: 'boolean', default: 'true', description: 'Whether to show a directional arrow pointing to the trigger.' },
   { name: 'modal', type: 'boolean', default: 'false', description: 'When true, traps focus inside the popover panel.' },
-  { name: 'motion', type: '0 | 1 | 2 | 3', description: 'Animation intensity override. Cascades from OS > prop > CSS --motion > UIProvider.' },
   { name: 'className', type: 'string', description: 'Additional CSS class name for the popover root.' },
-  { name: 'aria-label', type: 'string', description: 'Accessible label for the popover dialog.' },
+  { name: 'motion', type: '0 | 1 | 2 | 3', description: 'Animation intensity override. Cascades from OS > prop > CSS --motion > UIProvider.' },
 ]
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────

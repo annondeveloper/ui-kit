@@ -717,12 +717,14 @@ const pageStyles = css`
 // ─── Props Data ───────────────────────────────────────────────────────────────
 
 const tooltipProps: PropDef[] = [
-  { name: 'content', type: 'ReactNode', description: 'The tooltip content to display. Can be a string or any React node for rich content.' },
-  { name: 'children', type: 'ReactElement', description: 'The trigger element that the tooltip attaches to. Must be a single React element.' },
+  { name: 'content', type: 'ReactNode', required: true, description: 'The tooltip content to display. Can be a string or any React node for rich content.' },
+  { name: 'children', type: 'ReactElement', required: true, description: 'The trigger element that the tooltip attaches to. Must be a single React element.' },
   { name: 'placement', type: "'top' | 'bottom' | 'left' | 'right'", default: "'top'", description: 'Preferred placement of the tooltip relative to the trigger element.' },
   { name: 'delay', type: 'number', default: '300', description: 'Delay in milliseconds before the tooltip appears on hover.' },
   { name: 'offset', type: 'number', default: '8', description: 'Distance in pixels between the tooltip and the trigger element.' },
   { name: 'disabled', type: 'boolean', default: 'false', description: 'When true, the tooltip will not appear on hover or focus.' },
+  { name: 'interactive', type: 'boolean', default: 'false', description: 'Enables hover and click interactions within the tooltip panel.' },
+  { name: 'maxWidth', type: 'number | string', description: 'Maximum width of the tooltip panel.' },
   { name: 'motion', type: '0 | 1 | 2 | 3', description: 'Animation intensity override. Cascades from OS > prop > CSS --motion > UIProvider.' },
 ]
 

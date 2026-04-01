@@ -706,8 +706,6 @@ const drawerProps: PropDef[] = [
   { name: 'overlay', type: 'boolean', default: 'true', description: 'Show a semi-transparent backdrop behind the drawer.' },
   { name: 'children', type: 'ReactNode', required: true, description: 'Content rendered inside the drawer body.' },
   { name: 'motion', type: '0 | 1 | 2 | 3', description: 'Animation intensity override. Cascades from OS > prop > CSS --motion > UIProvider.' },
-  { name: 'className', type: 'string', description: 'Additional CSS class name merged with the component class.' },
-  { name: 'ref', type: 'Ref<HTMLDivElement>', description: 'Forwarded ref to the root drawer element.' },
 ]
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
