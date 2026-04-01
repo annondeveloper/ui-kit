@@ -1,15 +1,9 @@
-import { forwardRef, type InputHTMLAttributes, type ReactNode } from 'react'
+import { forwardRef } from 'react'
+import { ToggleSwitch as StandardToggleSwitch, type ToggleSwitchProps } from '../components/toggle-switch'
 
-export interface LiteToggleSwitchProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 'type'> {
-  label?: ReactNode
-}
+export type LiteToggleSwitchProps = Omit<ToggleSwitchProps, 'motion'>
 
 export const ToggleSwitch = forwardRef<HTMLInputElement, LiteToggleSwitchProps>(
-  ({ label, className, ...rest }, ref) => (
-    <label className={`ui-lite-toggle${className ? ` ${className}` : ''}`}>
-      <input ref={ref} type="checkbox" role="switch" {...rest} />
-      {label != null && <span>{label}</span>}
-    </label>
-  )
+  (props, ref) => <StandardToggleSwitch ref={ref} motion={0} {...props} />
 )
 ToggleSwitch.displayName = 'ToggleSwitch'

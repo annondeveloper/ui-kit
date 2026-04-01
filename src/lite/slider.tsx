@@ -1,17 +1,9 @@
-import { forwardRef, type InputHTMLAttributes, type ReactNode } from 'react'
+import { forwardRef } from 'react'
+import { Slider as StandardSlider, type SliderProps } from '../components/slider'
 
-export interface LiteSliderProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 'type' | 'size'> {
-  label?: ReactNode
-  showValue?: boolean
-}
+export type LiteSliderProps = Omit<SliderProps, 'motion'>
 
-export const Slider = forwardRef<HTMLInputElement, LiteSliderProps>(
-  ({ label, showValue, className, value, defaultValue, ...rest }, ref) => (
-    <div className={`ui-lite-slider${className ? ` ${className}` : ''}`}>
-      {label && <label>{label}</label>}
-      <input ref={ref} type="range" value={value} defaultValue={defaultValue} {...rest} />
-      {showValue && <output>{value ?? defaultValue ?? 50}</output>}
-    </div>
-  )
+export const Slider = forwardRef<HTMLDivElement, LiteSliderProps>(
+  (props, ref) => <StandardSlider ref={ref} motion={0} {...props} />
 )
 Slider.displayName = 'Slider'

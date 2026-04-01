@@ -1,15 +1,9 @@
-import { forwardRef, type InputHTMLAttributes } from 'react'
+import { forwardRef } from 'react'
+import { SearchInput as StandardSearchInput, type SearchInputProps } from '../components/search-input'
 
-export interface LiteSearchInputProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 'type' | 'size'> {
-  size?: 'sm' | 'md' | 'lg'
-}
+export type LiteSearchInputProps = Omit<SearchInputProps, 'motion'>
 
 export const SearchInput = forwardRef<HTMLInputElement, LiteSearchInputProps>(
-  ({ size = 'md', className, ...rest }, ref) => (
-    <div className={`ui-lite-search-input${className ? ` ${className}` : ''}`} data-size={size}>
-      <span className="ui-lite-search-input__icon" aria-hidden="true">&#x1F50D;</span>
-      <input ref={ref} type="search" {...rest} />
-    </div>
-  )
+  (props, ref) => <StandardSearchInput ref={ref} motion={0} {...props} />
 )
 SearchInput.displayName = 'SearchInput'

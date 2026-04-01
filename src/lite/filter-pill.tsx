@@ -1,31 +1,9 @@
-import { forwardRef, type ButtonHTMLAttributes } from 'react'
+import { forwardRef } from 'react'
+import { FilterPill as StandardFilterPill, type FilterPillProps } from '../components/filter-pill'
 
-export interface LiteFilterPillProps extends ButtonHTMLAttributes<HTMLButtonElement> {
-  active?: boolean
-  removable?: boolean
-  onRemove?: () => void
-}
+export type LiteFilterPillProps = Omit<FilterPillProps, 'motion'>
 
 export const FilterPill = forwardRef<HTMLButtonElement, LiteFilterPillProps>(
-  ({ active, removable, onRemove, className, children, ...rest }, ref) => (
-    <button
-      ref={ref}
-      className={`ui-lite-filter-pill${className ? ` ${className}` : ''}`}
-      data-active={active ? '' : undefined}
-      {...rest}
-    >
-      {children}
-      {removable && (
-        <span
-          role="button"
-          tabIndex={0}
-          aria-label="Remove"
-          className="ui-lite-filter-pill__remove"
-          onClick={e => { e.stopPropagation(); onRemove?.() }}
-          onKeyDown={e => { if (e.key === 'Enter') { e.stopPropagation(); onRemove?.() } }}
-        >&times;</span>
-      )}
-    </button>
-  )
+  (props, ref) => <StandardFilterPill ref={ref} motion={0} {...props} />
 )
 FilterPill.displayName = 'FilterPill'

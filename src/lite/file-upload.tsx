@@ -1,19 +1,9 @@
-import { forwardRef, type InputHTMLAttributes, type ReactNode } from 'react'
+import { forwardRef } from 'react'
+import { FileUpload as StandardFileUpload, type FileUploadProps } from '../components/file-upload'
 
-export interface LiteFileUploadProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 'type' | 'size'> {
-  label?: ReactNode
-  hint?: string
-}
+export type LiteFileUploadProps = Omit<FileUploadProps, 'motion'>
 
-export const FileUpload = forwardRef<HTMLInputElement, LiteFileUploadProps>(
-  ({ label, hint, className, ...rest }, ref) => (
-    <div className={`ui-lite-file-upload${className ? ` ${className}` : ''}`}>
-      <label>
-        {label ?? 'Choose file'}
-        <input ref={ref} type="file" {...rest} />
-      </label>
-      {hint && <span className="ui-lite-file-upload__hint">{hint}</span>}
-    </div>
-  )
+export const FileUpload = forwardRef<HTMLDivElement, LiteFileUploadProps>(
+  (props, ref) => <StandardFileUpload ref={ref} motion={0} {...props} />
 )
 FileUpload.displayName = 'FileUpload'

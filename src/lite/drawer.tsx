@@ -1,35 +1,9 @@
-import { forwardRef, useEffect, useRef, type HTMLAttributes, type ReactNode } from 'react'
+import { forwardRef } from 'react'
+import { Drawer as StandardDrawer, type DrawerProps } from '../components/drawer'
 
-export interface LiteDrawerProps extends Omit<HTMLAttributes<HTMLDialogElement>, 'title'> {
-  open: boolean
-  onClose: () => void
-  side?: 'left' | 'right' | 'top' | 'bottom'
-  children: ReactNode
-}
+export type LiteDrawerProps = Omit<DrawerProps, 'motion'>
 
-export const Drawer = forwardRef<HTMLDialogElement, LiteDrawerProps>(
-  ({ open, onClose, side = 'right', className, children, ...rest }, ref) => {
-    const internalRef = useRef<HTMLDialogElement>(null)
-    const dialogRef = (ref as React.RefObject<HTMLDialogElement>) ?? internalRef
-
-    useEffect(() => {
-      const el = dialogRef.current
-      if (!el) return
-      if (open && !el.open) el.showModal()
-      if (!open && el.open) el.close()
-    }, [open, dialogRef])
-
-    return (
-      <dialog
-        ref={dialogRef}
-        className={`ui-lite-sheet${className ? ` ${className}` : ''}`}
-        data-side={side}
-        onClose={onClose}
-        {...rest}
-      >
-        <div className="ui-lite-sheet__body">{children}</div>
-      </dialog>
-    )
-  }
+export const Drawer = forwardRef<HTMLDivElement, LiteDrawerProps>(
+  (props, ref) => <StandardDrawer ref={ref} motion={0} {...props} />
 )
 Drawer.displayName = 'Drawer'

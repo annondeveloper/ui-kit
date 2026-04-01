@@ -1,16 +1,9 @@
-import { forwardRef, type HTMLAttributes } from 'react'
+import { forwardRef } from 'react'
+import { AnimatedCounter as StandardAnimatedCounter, type AnimatedCounterProps } from '../components/animated-counter'
 
-export interface LiteAnimatedCounterProps extends HTMLAttributes<HTMLSpanElement> {
-  value: number
-  format?: (value: number) => string
-}
+export type LiteAnimatedCounterProps = Omit<AnimatedCounterProps, 'motion'>
 
-/** Lite animated counter — static display, no animation */
 export const AnimatedCounter = forwardRef<HTMLSpanElement, LiteAnimatedCounterProps>(
-  ({ value, format, className, ...rest }, ref) => (
-    <span ref={ref} className={`ui-lite-animated-counter${className ? ` ${className}` : ''}`} {...rest}>
-      {format ? format(value) : value}
-    </span>
-  )
+  (props, ref) => <StandardAnimatedCounter ref={ref} motion={0} {...props} />
 )
 AnimatedCounter.displayName = 'AnimatedCounter'

@@ -1,19 +1,8 @@
-import { forwardRef, type HTMLAttributes } from 'react'
+import { Tooltip as StandardTooltip, type TooltipProps } from '../components/tooltip'
 
-export interface LiteTooltipProps extends HTMLAttributes<HTMLSpanElement> {
-  content: string
+export type LiteTooltipProps = Omit<TooltipProps, 'motion'>
+
+export function Tooltip(props: LiteTooltipProps) {
+  return <StandardTooltip motion={0} {...props} />
 }
-
-export const Tooltip = forwardRef<HTMLSpanElement, LiteTooltipProps>(
-  ({ content, className, children, ...rest }, ref) => (
-    <span
-      ref={ref}
-      className={`ui-lite-tooltip${className ? ` ${className}` : ''}`}
-      title={content}
-      {...rest}
-    >
-      {children}
-    </span>
-  )
-)
 Tooltip.displayName = 'Tooltip'

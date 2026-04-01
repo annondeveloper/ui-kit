@@ -1,19 +1,9 @@
-import { forwardRef, type HTMLAttributes } from 'react'
+import { forwardRef } from 'react'
+import { Card as StandardCard, type CardProps } from '../components/card'
 
-export interface LiteCardProps extends HTMLAttributes<HTMLDivElement> {
-  variant?: 'default' | 'elevated' | 'outlined' | 'ghost' | 'glass' | 'gradient'
-  padding?: 'none' | 'sm' | 'md' | 'lg'
-}
+export type LiteCardProps = Omit<CardProps, 'motion'>
 
-export const Card = forwardRef<HTMLDivElement, LiteCardProps>(
-  ({ variant = 'default', padding = 'md', className, ...rest }, ref) => (
-    <div
-      ref={ref}
-      className={`ui-lite-card${className ? ` ${className}` : ''}`}
-      data-variant={variant}
-      data-padding={padding}
-      {...rest}
-    />
-  )
+export const Card = forwardRef<HTMLElement, LiteCardProps>(
+  (props, ref) => <StandardCard ref={ref} motion={0} {...props} />
 )
 Card.displayName = 'Card'
