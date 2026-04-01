@@ -284,7 +284,7 @@ export default function CopyButtonPage() {
             <span>{SAMPLE_CODE}</span>
             <CopyButton value={SAMPLE_CODE}>
               {({ copied, copy }) => (
-                <Button size="xs" variant={copied ? 'filled' : 'secondary'} onClick={copy}
+                <Button size="xs" variant={copied ? 'primary' : 'secondary'} onClick={copy}
                   icon={<Icon name={copied ? 'check' : 'copy'} size="sm" />}>
                   {copied ? 'Copied!' : 'Copy'}
                 </Button>
@@ -295,7 +295,7 @@ export default function CopyButtonPage() {
             <span style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>{SAMPLE_TOKEN}</span>
             <CopyButton value={SAMPLE_TOKEN} timeout={2000}>
               {({ copied, copy }) => (
-                <Button size="xs" variant={copied ? 'filled' : 'outline'} onClick={copy}
+                <Button size="xs" variant={copied ? 'primary' : 'ghost'} onClick={copy}
                   icon={<Icon name={copied ? 'check-circle' : 'clipboard'} size="sm" />}>
                   {copied ? 'Done' : 'Copy'}
                 </Button>

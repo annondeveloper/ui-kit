@@ -216,11 +216,11 @@ const pageStyles = css`
 const IMPORT_STR = "import { Affix } from '@ui/components/affix'"
 
 const propsData: PropDef[] = [
+  { name: 'position', type: '{ top?: number; bottom?: number; left?: number; right?: number }', default: '{ bottom: 20 }', description: 'Fixed position offsets in pixels.' },
+  { name: 'zIndex', type: 'number', description: 'CSS z-index for the fixed container.' },
+  { name: 'withinPortal', type: 'boolean', description: 'Render inside a portal to escape parent stacking contexts.' },
+  { name: 'target', type: 'React.RefObject<HTMLElement>', description: 'Link target element.' },
   { name: 'children', type: 'ReactNode', required: true, description: 'Content to render in the fixed position.' },
-  { name: 'position', type: "{ top?: number; right?: number; bottom?: number; left?: number }", default: '{ bottom: 20, right: 20 }', description: 'Fixed position offsets in pixels.' },
-  { name: 'zIndex', type: 'number', default: '100', description: 'CSS z-index for the fixed container.' },
-  { name: 'withinPortal', type: 'boolean', default: 'true', description: 'Render inside a portal to escape parent stacking contexts.' },
-  { name: 'className', type: 'string', description: 'Additional CSS class for the wrapper element.' },
 ]
 
 const POSITIONS = [
@@ -296,7 +296,7 @@ export default function AffixPage() {
           </p>
         </div>
         <Affix position={{ bottom: 80, left: 20 }}>
-          <Button size="sm" variant="outline">
+          <Button size="sm" variant="secondary">
             <Icon name="help-circle" size="sm" /> Help
           </Button>
         </Affix>

@@ -314,7 +314,7 @@ export default function CodeEditorPage() {
             <Button
               key={l}
               size="sm"
-              variant={lang === l ? 'primary' : 'outline'}
+              variant={lang === l ? 'primary' : 'secondary'}
               onClick={() => { setLang(l); setCode(SAMPLES[l]) }}
             >
               {l}

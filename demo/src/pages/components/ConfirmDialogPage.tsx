@@ -273,7 +273,7 @@ export default function ConfirmDialogPage() {
           Red-tinted confirm button for destructive actions like deletion. Draws user attention to the severity.
         </p>
         <div className="confirm-dialog-page__preview">
-          <Button variant="outline" onClick={() => setDangerOpen(true)}>
+          <Button variant="secondary" onClick={() => setDangerOpen(true)}>
             <Icon name="trash" size="sm" /> Delete Account
           </Button>
         </div>
@@ -296,7 +296,7 @@ export default function ConfirmDialogPage() {
           The dialog remains open until the operation completes.
         </p>
         <div className="confirm-dialog-page__preview">
-          <Button variant="outline" onClick={() => setLoadingOpen(true)}>
+          <Button variant="secondary" onClick={() => setLoadingOpen(true)}>
             <Icon name="upload" size="sm" /> Deploy
           </Button>
         </div>

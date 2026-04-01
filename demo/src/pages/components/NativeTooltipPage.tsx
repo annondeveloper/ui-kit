@@ -258,7 +258,7 @@ export default function NativeTooltipPage() {
             <Button>Save</Button>
           </NativeTooltip>
           <NativeTooltip content="Discard and go back">
-            <Button variant="outline">Cancel</Button>
+            <Button variant="secondary">Cancel</Button>
           </NativeTooltip>
           <NativeTooltip content="Remove this item permanently">
             <Button variant="ghost">Delete</Button>
@@ -298,7 +298,7 @@ export default function NativeTooltipPage() {
         </p>
         <div className="native-tooltip-page__preview">
           <NativeTooltip content="This action will permanently delete all selected items from your account. This cannot be undone. Please make sure you have backed up any important data before proceeding.">
-            <Button variant="outline">Hover for details</Button>
+            <Button variant="secondary">Hover for details</Button>
           </NativeTooltip>
         </div>
       </section>

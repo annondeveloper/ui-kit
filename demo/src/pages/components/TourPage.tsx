@@ -301,7 +301,7 @@ export default function TourPage() {
             <div className="tour-page__mock-item" id="tour-mini-a">Item A</div>
             <div className="tour-page__mock-item" id="tour-mini-b">Item B</div>
           </div>
-          <Button variant="outline" onClick={() => setMinimalTourOpen(true)}>Start Minimal Tour</Button>
+          <Button variant="secondary" onClick={() => setMinimalTourOpen(true)}>Start Minimal Tour</Button>
         </div>
         <Tour
           steps={MINIMAL_STEPS}

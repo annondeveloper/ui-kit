@@ -671,12 +671,6 @@ const linkProps: PropDef[] = [
   { name: 'external', type: 'boolean', default: 'false', description: 'Marks link as external. Adds arrow indicator, target="_blank", and rel="noopener noreferrer".' },
   { name: 'size', type: "'xs' | 'sm' | 'md' | 'lg' | 'xl'", default: "'md'", description: 'Font size of the link.' },
   { name: 'motion', type: '0 | 1 | 2 | 3', description: 'Animation intensity. Level 2+ enables the slide-in underline effect on hover.' },
-  { name: 'href', type: 'string', description: 'URL destination of the link.' },
-  { name: 'target', type: 'string', description: 'Link target. Auto-set to "_blank" for external links.' },
-  { name: 'rel', type: 'string', description: 'Link relationship. Auto-set to "noopener noreferrer" for external links.' },
-  { name: 'className', type: 'string', description: 'Additional CSS class name merged with the component class.' },
-  { name: 'children', type: 'ReactNode', description: 'Link text content.' },
-  { name: 'ref', type: 'Ref<HTMLAnchorElement>', description: 'Forwarded ref to the underlying <a> element.' },
 ]
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────

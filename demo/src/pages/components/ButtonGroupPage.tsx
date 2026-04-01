@@ -247,25 +247,25 @@ export default function ButtonGroupPage() {
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', alignItems: 'center' }}>
             <span className="button-group-page__label">horizontal</span>
             <ButtonGroup>
-              <Button variant="outline">Left</Button>
-              <Button variant="outline">Center</Button>
-              <Button variant="outline">Right</Button>
+              <Button variant="secondary">Left</Button>
+              <Button variant="secondary">Center</Button>
+              <Button variant="secondary">Right</Button>
             </ButtonGroup>
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', alignItems: 'center' }}>
             <span className="button-group-page__label">horizontal attached</span>
             <ButtonGroup attached>
-              <Button variant="outline"><Icon name="align-left" size="sm" /></Button>
-              <Button variant="outline"><Icon name="align-center" size="sm" /></Button>
-              <Button variant="outline"><Icon name="align-right" size="sm" /></Button>
+              <Button variant="secondary"><Icon name="align-left" size="sm" /></Button>
+              <Button variant="secondary"><Icon name="align-center" size="sm" /></Button>
+              <Button variant="secondary"><Icon name="align-right" size="sm" /></Button>
             </ButtonGroup>
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', alignItems: 'center' }}>
             <span className="button-group-page__label">vertical attached</span>
             <ButtonGroup orientation="vertical" attached>
-              <Button variant="outline"><Icon name="chevron-up" size="sm" /></Button>
-              <Button variant="outline"><Icon name="minus" size="sm" /></Button>
-              <Button variant="outline"><Icon name="chevron-down" size="sm" /></Button>
+              <Button variant="secondary"><Icon name="chevron-up" size="sm" /></Button>
+              <Button variant="secondary"><Icon name="minus" size="sm" /></Button>
+              <Button variant="secondary"><Icon name="chevron-down" size="sm" /></Button>
             </ButtonGroup>
           </div>
         </div>
@@ -282,9 +282,9 @@ export default function ButtonGroupPage() {
             <div key={size} style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', alignItems: 'center' }}>
               <span className="button-group-page__label">{size}</span>
               <ButtonGroup size={size} attached>
-                <Button variant="outline">Day</Button>
-                <Button variant="outline">Week</Button>
-                <Button variant="outline">Month</Button>
+                <Button variant="secondary">Day</Button>
+                <Button variant="secondary">Week</Button>
+                <Button variant="secondary">Month</Button>
               </ButtonGroup>
             </div>
           ))}
@@ -300,7 +300,7 @@ export default function ButtonGroupPage() {
         <div className="button-group-page__preview">
           <ButtonGroup attached>
             {['day', 'week', 'month', 'year'].map(period => (
-              <Button key={period} variant={selected === period ? 'solid' : 'outline'} onClick={() => setSelected(period)}>
+              <Button key={period} variant={selected === period ? 'primary' : 'secondary'} onClick={() => setSelected(period)}>
                 {period.charAt(0).toUpperCase() + period.slice(1)}
               </Button>
             ))}

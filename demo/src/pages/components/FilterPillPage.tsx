@@ -663,10 +663,7 @@ const filterPillProps: PropDef[] = [
   { name: 'count', type: 'number', description: 'Optional count badge displayed after the label.' },
   { name: 'icon', type: 'ReactNode', description: 'Optional leading icon element.' },
   { name: 'size', type: "'sm' | 'md'", default: "'md'", description: 'Controls padding and font-size.' },
-  { name: 'motion', type: '0 | 1 | 2 | 3', description: 'Animation intensity. 2+ enables entry animation.' },
-  { name: 'onClick', type: '(e: MouseEvent) => void', description: 'Click handler for toggling the filter.' },
-  { name: 'className', type: 'string', description: 'Additional CSS class name merged with the component class.' },
-  { name: 'ref', type: 'Ref<HTMLButtonElement>', description: 'Forwarded ref to the underlying <button> element.' },
+  { name: 'motion', type: '0 | 1 | 2 | 3', description: 'Animation intensity (0=none, 1=subtle, 2=expressive, 3=cinematic).' },
 ]
 
 const filterPillGroupProps: PropDef[] = [

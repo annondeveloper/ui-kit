@@ -232,12 +232,12 @@ const ITEM_PROPS: PropDef[] = [
 const PROPS: PropDef[] = [
   { name: 'value', type: '[TransferListItem[], TransferListItem[]]', required: true, description: 'Tuple of items in the left and right panels.' },
   { name: 'onChange', type: '(value: [TransferListItem[], TransferListItem[]]) => void', required: true, description: 'Called when items are transferred between panels.' },
-  { name: 'titles', type: '[string, string]', default: "['Available', 'Selected']", description: 'Heading labels for the left and right panels.' },
-  { name: 'searchable', type: 'boolean', default: 'false', description: 'Shows a search input in each panel for filtering items.' },
-  { name: 'showTransferAll', type: 'boolean', default: 'false', description: 'Shows buttons to transfer all items at once.' },
+  { name: 'titles', type: '[string, string]', description: 'Heading labels for the left and right panels.' },
+  { name: 'searchable', type: 'boolean', description: 'Shows a search input in each panel for filtering items.' },
+  { name: 'showTransferAll', type: 'boolean', description: 'Shows buttons to transfer all items at once.' },
   { name: 'listHeight', type: 'number | string', description: 'Fixed height for the item lists (enables scrolling).' },
-  { name: 'size', type: "'sm' | 'md' | 'lg'", default: "'md'", description: 'Size of the transfer list controls.' },
-  { name: 'motion', type: '0 | 1 | 2 | 3', description: 'Motion intensity level.' },
+  { name: 'size', type: "'sm' | 'md' | 'lg'", description: 'Component size.' },
+  { name: 'motion', type: '0 | 1 | 2 | 3', description: 'Animation intensity (0=none, 1=subtle, 2=expressive, 3=cinematic).' },
 ]
 
 const IMPORT = "import { TransferList } from '@ui/components/transfer-list'"

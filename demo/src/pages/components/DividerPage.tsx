@@ -665,8 +665,6 @@ const dividerProps: PropDef[] = [
   { name: 'variant', type: "'solid' | 'dashed' | 'dotted'", default: "'solid'", description: 'Line style variant.' },
   { name: 'label', type: 'ReactNode', description: 'Optional text label rendered centered on the divider. Renders a div with role="separator" instead of hr.' },
   { name: 'spacing', type: "'sm' | 'md' | 'lg'", default: "'md'", description: 'Margin spacing above and below (or left/right for vertical).' },
-  { name: 'className', type: 'string', description: 'Additional CSS class name merged with the component class.' },
-  { name: 'ref', type: 'Ref<HTMLHRElement>', description: 'Forwarded ref to the underlying <hr> or <div> element.' },
 ]
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────

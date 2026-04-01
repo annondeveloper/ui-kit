@@ -698,11 +698,10 @@ const pageStyles = css`
 // ─── Props Data ───────────────────────────────────────────────────────────────
 
 const truncatedTextProps: PropDef[] = [
-  { name: 'text', type: 'string', description: 'The text content to display with truncation.' },
+  { name: 'text', type: 'string', required: true, description: 'The text content to display with truncation.' },
   { name: 'lines', type: 'number', default: '1', description: 'Number of lines before truncation. 1 = single-line ellipsis, 2+ = multi-line clamp.' },
   { name: 'expandable', type: 'boolean', default: 'false', description: 'Show a "Show more" / "Show less" toggle button below the text.' },
   { name: 'showTooltip', type: 'boolean', default: 'true', description: 'Show the full text as a native title tooltip on hover when truncated.' },
-  { name: 'className', type: 'string', description: 'Additional CSS class name merged with the component class.' },
 ]
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────

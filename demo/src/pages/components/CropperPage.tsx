@@ -294,7 +294,7 @@ export default function CropperPage() {
             <Button
               key={r.label}
               size="sm"
-              variant={aspectRatio === r.value ? 'primary' : 'outline'}
+              variant={aspectRatio === r.value ? 'primary' : 'secondary'}
               onClick={() => setAspectRatio(r.value)}
             >
               {r.label}

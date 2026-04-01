@@ -197,10 +197,10 @@ const pageStyles = css`
 const IMPORT_STR = "import { Stepper } from '@ui/components/stepper'"
 
 const STEPS = [
-  { label: 'Account', description: 'Create your account' },
-  { label: 'Profile', description: 'Set up your profile' },
-  { label: 'Billing', description: 'Add payment method' },
-  { label: 'Review', description: 'Confirm and finish' },
+  { id: 'account', label: 'Account', description: 'Create your account' },
+  { id: 'profile', label: 'Profile', description: 'Set up your profile' },
+  { id: 'billing', label: 'Billing', description: 'Add payment method' },
+  { id: 'review', label: 'Review', description: 'Confirm and finish' },
 ]
 
 const propsData: PropDef[] = [
@@ -264,7 +264,7 @@ export default function StepperPage() {
         <div className="stepper-page__preview stepper-page__preview--col">
           <Stepper steps={STEPS} activeStep={active} onStepClick={setActive} />
           <div className="stepper-page__nav-row">
-            <Button size="sm" variant="outline" disabled={active === 0} onClick={() => setActive(a => Math.max(0, a - 1))}>
+            <Button size="sm" variant="secondary" disabled={active === 0} onClick={() => setActive(a => Math.max(0, a - 1))}>
               <Icon name="chevron-left" size="sm" /> Back
             </Button>
             <Button size="sm" disabled={active === STEPS.length - 1} onClick={() => setActive(a => Math.min(STEPS.length - 1, a + 1))}>
@@ -281,7 +281,7 @@ export default function StepperPage() {
           Numbered shows step numbers, dots shows minimal indicators, and progress shows a connecting bar.
         </p>
         <div className="stepper-page__preview stepper-page__preview--col" style={{ gap: '2.5rem' }}>
-          {(['numbered', 'dots', 'progress'] as const).map(variant => (
+          {(['default', 'dots', 'progress'] as const).map(variant => (
             <div key={variant}>
               <p style={{ fontSize: 'var(--text-xs)', color: 'var(--text-tertiary)', marginBlockEnd: '0.75rem', fontFamily: 'monospace' }}>{variant}</p>
               <Stepper steps={STEPS} activeStep={2} variant={variant} />

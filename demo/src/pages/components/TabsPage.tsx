@@ -1364,6 +1364,14 @@ export default function TabsPage() {
 
   const { tier, setTier } = useTier()
   const [brandColor, setBrandColor] = useState('#6366f1')
+  const [badgeTab, setBadgeTab] = useState('inbox')
+  const [closeableTabs, setCloseableTabs] = useState([
+    { id: 'file1', label: 'index.tsx' },
+    { id: 'file2', label: 'styles.css' },
+    { id: 'file3', label: 'utils.ts' },
+    { id: 'file4', label: 'api.ts' },
+  ])
+  const [closeableActiveTab, setCloseableActiveTab] = useState('file1')
   const pageRef = useRef<HTMLDivElement>(null)
   const { mode } = useTheme()
 

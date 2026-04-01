@@ -214,13 +214,12 @@ const pageStyles = css`
 const IMPORT_STR = "import { BackToTop } from '@ui/components/back-to-top'"
 
 const propsData: PropDef[] = [
-  { name: 'threshold', type: 'number', default: '300', description: 'Scroll distance in px before the button appears.' },
+  { name: 'visibleFrom', type: 'number', default: '400', description: 'Scroll distance in px before the button appears.' },
   { name: 'smooth', type: 'boolean', default: 'true', description: 'Use smooth scrolling when clicking the button.' },
+  { name: 'target', type: 'React.RefObject<HTMLElement>', description: 'Scroll container to attach to (defaults to window).' },
   { name: 'showProgress', type: 'boolean', default: 'false', description: 'Show a circular progress ring indicating scroll position.' },
-  { name: 'target', type: 'HTMLElement | null', description: 'Scroll container to attach to (defaults to window).' },
-  { name: 'position', type: "'bottom-right' | 'bottom-left'", default: "'bottom-right'", description: 'Corner placement of the button.' },
   { name: 'size', type: "'sm' | 'md' | 'lg'", default: "'md'", description: 'Size of the floating button.' },
-  { name: 'className', type: 'string', description: 'Additional CSS class for the root element.' },
+  { name: 'motion', type: '0 | 1 | 2 | 3', description: 'Animation intensity (0=none, 1=subtle, 2=expressive, 3=cinematic).' },
 ]
 
 const FILLER_PARAGRAPHS = Array.from({ length: 12 }, (_, i) =>

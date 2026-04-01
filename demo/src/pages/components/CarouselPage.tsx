@@ -204,14 +204,14 @@ const SLIDE_COLORS = [
 
 const propsData: PropDef[] = [
   { name: 'children', type: 'ReactNode', required: true, description: 'Slide elements rendered inside the carousel viewport.' },
+  { name: 'autoPlay', type: 'boolean', default: 'false', description: 'Automatically advance slides at a set interval.' },
+  { name: 'autoPlayInterval', type: 'number', default: '5000', description: 'Time in ms between auto-advance (when autoPlay is true).' },
   { name: 'showArrows', type: 'boolean', default: 'true', description: 'Show previous/next navigation arrows.' },
   { name: 'showDots', type: 'boolean', default: 'true', description: 'Show dot indicators below the slides.' },
-  { name: 'autoplay', type: 'boolean', default: 'false', description: 'Automatically advance slides at a set interval.' },
-  { name: 'autoplayInterval', type: 'number', default: '5000', description: 'Time in ms between auto-advance (when autoplay is true).' },
-  { name: 'loop', type: 'boolean', default: 'true', description: 'Whether the carousel wraps around at the ends.' },
-  { name: 'slidesToShow', type: 'number', default: '1', description: 'Number of slides visible at once.' },
-  { name: 'gap', type: 'string', default: "'1rem'", description: 'Gap between slides when showing multiple.' },
-  { name: 'className', type: 'string', description: 'Additional CSS class for the root element.' },
+  { name: 'loop', type: 'boolean', default: 'false', description: 'Whether the carousel wraps around at the ends.' },
+  { name: 'slidesPerView', type: 'number', default: '1', description: 'Number of slides visible at once.' },
+  { name: 'gap', type: 'number | string', default: '0', description: 'Gap between slides when showing multiple.' },
+  { name: 'motion', type: '0 | 1 | 2 | 3', description: 'Animation intensity (0=none, 1=subtle, 2=expressive, 3=cinematic).' },
 ]
 
 // ─── Component ───────────────────────────────────────────────────────────────
@@ -269,7 +269,7 @@ export default function CarouselPage() {
           Slides advance automatically every 3 seconds. Autoplay pauses on hover and focus.
         </p>
         <div className="carousel-page__preview carousel-page__preview--full">
-          <Carousel autoplay autoplayInterval={3000}>
+          <Carousel autoPlay autoPlayInterval={3000}>
             {SLIDE_COLORS.map((color, i) => (
               <div key={i} className="carousel-page__slide" style={{ background: color }}>
                 Slide {i + 1}
@@ -286,7 +286,7 @@ export default function CarouselPage() {
           Show multiple slides at once with a gap between them. Useful for card-based content.
         </p>
         <div className="carousel-page__preview carousel-page__preview--full">
-          <Carousel slidesToShow={3} gap="1rem" showDots={false}>
+          <Carousel slidesPerView={3} gap="1rem" showDots={false}>
             {SLIDE_COLORS.map((color, i) => (
               <div key={i} className="carousel-page__slide" style={{ background: color, minBlockSize: '140px', fontSize: '1.125rem' }}>
                 Card {i + 1}

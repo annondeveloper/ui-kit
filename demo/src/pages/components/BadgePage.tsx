@@ -1639,7 +1639,7 @@ export default function BadgePage() {
           and colored border. Creates a lighter visual weight while maintaining the same color semantics.
         </p>
         <div className="badge-page__preview" style={{ gap: '0.5rem', flexWrap: 'wrap' }}>
-          {(['primary', 'secondary', 'success', 'warning', 'danger', 'info'] as const).map(v => (
+          {(['primary', 'default', 'success', 'warning', 'danger', 'info'] as const).map(v => (
             <BadgeComponent key={v} variant={v} outline>
               {v.charAt(0).toUpperCase() + v.slice(1)}
             </BadgeComponent>

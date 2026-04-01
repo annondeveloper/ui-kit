@@ -669,15 +669,16 @@ const accordionPropsData: PropDef[] = [
   { name: 'defaultOpen', type: 'string[]', default: '[]', description: 'Array of item IDs that should be expanded on initial render.' },
   { name: 'onOpenChange', type: '(openIds: string[]) => void', description: 'Callback fired when the set of open items changes.' },
   { name: 'motion', type: '0 | 1 | 2 | 3', description: 'Animation intensity override. Cascades from OS > prop > CSS --motion > UIProvider.' },
-  { name: 'className', type: 'string', description: 'Additional CSS class name merged with the component class.' },
-  { name: 'ref', type: 'Ref<HTMLDivElement>', description: 'Forwarded ref to the root <div> element.' },
+  { name: 'variant', type: "'default' | 'bordered' | 'separated'", default: "'default'", description: 'Visual style variant of the accordion.' },
+  { name: 'size', type: "'sm' | 'md' | 'lg'", default: "'md'", description: 'Component size.' },
 ]
 
 const accordionItemPropsData: PropDef[] = [
   { name: 'id', type: 'string', required: true, description: 'Unique identifier for the item, used in defaultOpen and onOpenChange.' },
   { name: 'trigger', type: 'ReactNode', required: true, description: 'Content rendered as the clickable summary header.' },
   { name: 'content', type: 'ReactNode', required: true, description: 'Content revealed when the item is expanded.' },
-  { name: 'disabled', type: 'boolean', default: 'false', description: 'Prevents the item from being toggled. Shown with reduced opacity.' },
+  { name: 'disabled', type: 'boolean', description: 'Prevents the item from being toggled. Shown with reduced opacity.' },
+  { name: 'icon', type: 'ReactNode', description: 'Leading icon element.' },
 ]
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────

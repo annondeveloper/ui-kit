@@ -203,19 +203,19 @@ const pageStyles = css`
 const IMPORT_STR = "import { Timeline } from '@ui/components/timeline'"
 
 const DEPLOY_ITEMS = [
-  { title: 'Code pushed', description: 'Pushed 3 commits to main', status: 'completed' as const, timestamp: '10:30 AM' },
-  { title: 'Tests passed', description: 'All 247 tests passed', status: 'completed' as const, timestamp: '10:32 AM' },
-  { title: 'Building', description: 'Docker image building...', status: 'active' as const, timestamp: '10:34 AM' },
-  { title: 'Deploy to staging', description: 'Waiting for build', status: 'pending' as const },
-  { title: 'Deploy to production', description: 'Requires manual approval', status: 'pending' as const },
+  { id: 'push', title: 'Code pushed', description: 'Pushed 3 commits to main', status: 'completed' as const, timestamp: '10:30 AM' },
+  { id: 'test', title: 'Tests passed', description: 'All 247 tests passed', status: 'completed' as const, timestamp: '10:32 AM' },
+  { id: 'build', title: 'Building', description: 'Docker image building...', status: 'active' as const, timestamp: '10:34 AM' },
+  { id: 'staging', title: 'Deploy to staging', description: 'Waiting for build', status: 'pending' as const },
+  { id: 'prod', title: 'Deploy to production', description: 'Requires manual approval', status: 'pending' as const },
 ]
 
 const INCIDENT_ITEMS = [
-  { title: 'Incident detected', description: 'CPU usage exceeded 95%', status: 'error' as const, timestamp: '14:02' },
-  { title: 'Alert triggered', description: 'PagerDuty notification sent', status: 'warning' as const, timestamp: '14:03' },
-  { title: 'Investigation started', description: 'On-call engineer assigned', status: 'completed' as const, timestamp: '14:05' },
-  { title: 'Root cause identified', description: 'Memory leak in worker pool', status: 'completed' as const, timestamp: '14:22' },
-  { title: 'Fix deployed', description: 'Hotfix merged and deployed', status: 'completed' as const, timestamp: '14:45' },
+  { id: 'detect', title: 'Incident detected', description: 'CPU usage exceeded 95%', status: 'error' as const, timestamp: '14:02' },
+  { id: 'alert', title: 'Alert triggered', description: 'PagerDuty notification sent', status: 'active' as const, timestamp: '14:03' },
+  { id: 'investigate', title: 'Investigation started', description: 'On-call engineer assigned', status: 'completed' as const, timestamp: '14:05' },
+  { id: 'rootcause', title: 'Root cause identified', description: 'Memory leak in worker pool', status: 'completed' as const, timestamp: '14:22' },
+  { id: 'fix', title: 'Fix deployed', description: 'Hotfix merged and deployed', status: 'completed' as const, timestamp: '14:45' },
 ]
 
 const propsData: PropDef[] = [
@@ -306,7 +306,7 @@ export default function TimelinePage() {
           {(['solid', 'dashed', 'dotted'] as const).map(style => (
             <div key={style}>
               <p style={{ fontSize: 'var(--text-xs)', color: 'var(--text-tertiary)', marginBlockEnd: '0.75rem', fontFamily: 'monospace' }}>{style}</p>
-              <Timeline items={DEPLOY_ITEMS.slice(0, 3)} lineStyle={style} variant="compact" size="sm" />
+              <Timeline items={DEPLOY_ITEMS.slice(0, 3)} connectorStyle={style} variant="compact" size="sm" />
             </div>
           ))}
         </div>

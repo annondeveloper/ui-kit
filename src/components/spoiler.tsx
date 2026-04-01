@@ -12,6 +12,8 @@ export interface SpoilerProps extends HTMLAttributes<HTMLDivElement> {
   hideLabel?: string
   initialState?: 'hidden' | 'visible'
   transitionDuration?: number
+  /** Show gradient fade at bottom when collapsed (default: true) */
+  gradient?: boolean
   children: ReactNode
   motion?: 0 | 1 | 2 | 3
 }
@@ -49,6 +51,11 @@ const spoilerStyles = css`
 
       :scope[data-state="hidden"] .ui-spoiler__content {
         position: relative;
+      }
+
+      /* Disable gradient fade when gradient=false */
+      :scope[data-gradient="false"][data-state="hidden"] .ui-spoiler__content::after {
+        display: none;
       }
 
       /* Toggle button */
@@ -145,6 +152,7 @@ export const Spoiler = forwardRef<HTMLDivElement, SpoilerProps>(
       hideLabel = 'Show less',
       initialState = 'hidden',
       transitionDuration = 350,
+      gradient = true,
       children,
       motion: motionProp,
       className,
@@ -198,6 +206,7 @@ export const Spoiler = forwardRef<HTMLDivElement, SpoilerProps>(
         ref={ref}
         className={cn('ui-spoiler', className)}
         data-state={expanded ? 'visible' : 'hidden'}
+        data-gradient={gradient ? undefined : 'false'}
         data-motion={motionLevel}
         style={mergedStyle}
         {...rest}

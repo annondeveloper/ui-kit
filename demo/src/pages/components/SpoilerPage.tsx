@@ -193,13 +193,13 @@ const LONG_TEXT = `Aurora Fluid is a design language that draws inspiration from
 const SHORT_TEXT = `This section contains a brief overview of the component architecture. Click "Show more" to reveal additional details about implementation patterns and best practices.`
 
 const propsData: PropDef[] = [
-  { name: 'children', type: 'ReactNode', required: true, description: 'Content to display, which may be clipped at maxHeight.' },
-  { name: 'maxHeight', type: 'number', default: '120', description: 'Maximum height in pixels before content is clipped.' },
+  { name: 'maxHeight', type: 'number', required: true, description: 'Maximum height in pixels before content is clipped.' },
   { name: 'showLabel', type: 'string', default: "'Show more'", description: 'Label for the expand button.' },
   { name: 'hideLabel', type: 'string', default: "'Show less'", description: 'Label for the collapse button.' },
-  { name: 'animated', type: 'boolean', default: 'true', description: 'Whether the expand/collapse transition is animated.' },
-  { name: 'gradient', type: 'boolean', default: 'true', description: 'Show a fade gradient at the bottom when content is clipped.' },
-  { name: 'className', type: 'string', description: 'Additional CSS class for the root element.' },
+  { name: 'initialState', type: "'hidden' | 'visible'", default: "'hidden'", description: 'Initial visibility state of the content.' },
+  { name: 'transitionDuration', type: 'number', default: '350', description: 'Duration of the expand/collapse transition in milliseconds.' },
+  { name: 'children', type: 'ReactNode', required: true, description: 'Content to display, which may be clipped at maxHeight.' },
+  { name: 'motion', type: '0 | 1 | 2 | 3', description: 'Animation intensity (0=none, 1=subtle, 2=expressive, 3=cinematic).' },
 ]
 
 // ─── Component ───────────────────────────────────────────────────────────────
@@ -275,7 +275,7 @@ export default function SpoilerPage() {
           Disable the fade gradient for a hard clip at the max height boundary.
         </p>
         <div className="spoiler-page__preview">
-          <Spoiler maxHeight={80} gradient={false}>
+          <Spoiler maxHeight={80}>
             <p className="spoiler-page__sample-text">{LONG_TEXT}</p>
           </Spoiler>
         </div>

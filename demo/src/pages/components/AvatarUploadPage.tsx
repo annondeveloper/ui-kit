@@ -256,7 +256,7 @@ export default function AvatarUploadPage() {
           Click to select an image or drag and drop a file. The preview updates instantly.
         </p>
         <div className="avatar-upload-page__preview">
-          <AvatarUpload value={avatar1} onChange={handleFileChange(setAvatar1)} />
+          <AvatarUpload value={avatar1 ?? undefined} onChange={handleFileChange(setAvatar1)} />
         </div>
       </section>
 
@@ -267,20 +267,20 @@ export default function AvatarUploadPage() {
           Available in four sizes and two shapes. Mix circle and square avatars for profile and branding use cases.
         </p>
         <div className="avatar-upload-page__preview">
-          {(['sm', 'md', 'lg', 'xl'] as const).map(size => (
+          {([60, 80, 120, 160] as const).map(size => (
             <div key={size} className="avatar-upload-page__labeled">
-              <AvatarUpload value={null} onChange={() => {}} size={size} />
-              <span className="avatar-upload-page__label">{size}</span>
+              <AvatarUpload value={undefined} onChange={() => {}} size={size} />
+              <span className="avatar-upload-page__label">{size}px</span>
             </div>
           ))}
         </div>
         <div className="avatar-upload-page__preview" style={{ marginBlockStart: '1rem' }}>
           <div className="avatar-upload-page__labeled">
-            <AvatarUpload value={avatar2} onChange={handleFileChange(setAvatar2)} shape="circle" />
+            <AvatarUpload value={avatar2 ?? undefined} onChange={handleFileChange(setAvatar2)} shape="circle" />
             <span className="avatar-upload-page__label">circle</span>
           </div>
           <div className="avatar-upload-page__labeled">
-            <AvatarUpload value={avatar2} onChange={handleFileChange(setAvatar2)} shape="square" />
+            <AvatarUpload value={avatar2 ?? undefined} onChange={handleFileChange(setAvatar2)} shape="square" />
             <span className="avatar-upload-page__label">square</span>
           </div>
         </div>
@@ -293,7 +293,7 @@ export default function AvatarUploadPage() {
           When disabled, the upload area shows a muted appearance and does not accept interactions.
         </p>
         <div className="avatar-upload-page__preview">
-          <AvatarUpload value={null} onChange={() => {}} disabled />
+          <AvatarUpload value={undefined} onChange={() => {}} disabled />
         </div>
       </section>
 

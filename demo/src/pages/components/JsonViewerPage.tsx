@@ -304,10 +304,10 @@ export default function JsonViewerPage() {
           to reveal the copy button.
         </p>
         <div className="json-viewer-page__controls">
-          <Button size="sm" variant={expandDepth === 0 ? 'primary' : 'outline'} onClick={() => setExpandDepth(0)}>Collapsed</Button>
-          <Button size="sm" variant={expandDepth === 1 ? 'primary' : 'outline'} onClick={() => setExpandDepth(1)}>Depth 1</Button>
-          <Button size="sm" variant={expandDepth === 3 ? 'primary' : 'outline'} onClick={() => setExpandDepth(3)}>Depth 3</Button>
-          <Button size="sm" variant={sorted ? 'primary' : 'outline'} onClick={() => setSorted(!sorted)}>
+          <Button size="sm" variant={expandDepth === 0 ? 'primary' : 'secondary'} onClick={() => setExpandDepth(0)}>Collapsed</Button>
+          <Button size="sm" variant={expandDepth === 1 ? 'primary' : 'secondary'} onClick={() => setExpandDepth(1)}>Depth 1</Button>
+          <Button size="sm" variant={expandDepth === 3 ? 'primary' : 'secondary'} onClick={() => setExpandDepth(3)}>Depth 3</Button>
+          <Button size="sm" variant={sorted ? 'primary' : 'secondary'} onClick={() => setSorted(!sorted)}>
             {sorted ? 'Sorted' : 'Unsorted'}
           </Button>
         </div>
