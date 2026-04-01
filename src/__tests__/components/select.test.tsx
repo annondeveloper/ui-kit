@@ -569,6 +569,24 @@ describe('Select', () => {
     })
   })
 
+  // ─── Motion prop ─────────────────────────────────────────────────────
+
+  describe('motion prop', () => {
+    it('sets data-motion attribute when motion prop is provided', () => {
+      const { container } = render(
+        <Select name="test" options={[{ value: 'a', label: 'A' }]} motion={2} />
+      )
+      expect(container.querySelector('.ui-select')).toHaveAttribute('data-motion', '2')
+    })
+
+    it('sets data-motion="0" when motion={0}', () => {
+      const { container } = render(
+        <Select name="test" options={[{ value: 'a', label: 'A' }]} motion={0} />
+      )
+      expect(container.querySelector('.ui-select')).toHaveAttribute('data-motion', '0')
+    })
+  })
+
   // ─── Display name ─────────────────────────────────────────────────────
 
   describe('display name', () => {

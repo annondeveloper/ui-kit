@@ -262,6 +262,24 @@ describe('Alert', () => {
     })
   })
 
+  // ─── Size prop ──────────────────────────────────────────────────
+
+  describe('size prop', () => {
+    it('renders all 5 sizes with correct data-size attribute', () => {
+      const sizes = ['xs', 'sm', 'md', 'lg', 'xl'] as const
+      sizes.forEach((size) => {
+        const { container, unmount } = render(<Alert variant="info" size={size}>Content</Alert>)
+        expect(container.querySelector('.ui-alert')).toHaveAttribute('data-size', size)
+        unmount()
+      })
+    })
+
+    it('defaults to size="md" when size is not specified', () => {
+      const { container } = render(<Alert variant="info">Content</Alert>)
+      expect(container.querySelector('.ui-alert')).toHaveAttribute('data-size', 'md')
+    })
+  })
+
   // ─── Style injection ──────────────────────────────────────────────
 
   describe('style injection', () => {

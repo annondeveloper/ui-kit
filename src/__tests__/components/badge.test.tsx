@@ -68,6 +68,21 @@ describe('Badge', () => {
       expect(screen.getByText('Small')).toHaveAttribute('data-size', 'sm')
     })
 
+    it('renders with size="xs"', () => {
+      render(<Badge size="xs">XSmall</Badge>)
+      expect(screen.getByText('XSmall')).toHaveAttribute('data-size', 'xs')
+    })
+
+    it('renders with size="lg"', () => {
+      render(<Badge size="lg">Large</Badge>)
+      expect(screen.getByText('Large')).toHaveAttribute('data-size', 'lg')
+    })
+
+    it('renders with size="xl"', () => {
+      render(<Badge size="xl">XLarge</Badge>)
+      expect(screen.getByText('XLarge')).toHaveAttribute('data-size', 'xl')
+    })
+
     it('renders dot indicator when dot prop is true', () => {
       const { container } = render(<Badge dot>Status</Badge>)
       const dot = container.querySelector('.ui-badge__dot')

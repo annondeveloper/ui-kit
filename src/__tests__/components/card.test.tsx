@@ -1,5 +1,5 @@
 import { describe, it, expect, afterEach } from 'vitest'
-import { render, screen, cleanup } from '@testing-library/react'
+import { render, screen, cleanup, fireEvent } from '@testing-library/react'
 import { createRef } from 'react'
 import { axe, toHaveNoViolations } from 'jest-axe'
 import { Card } from '../../components/card'
@@ -282,6 +282,88 @@ describe('Card', () => {
       const { container } = render(<Card classNames={undefined}>Content</Card>)
       const card = container.querySelector('.ui-card')!
       expect(card.className).toContain('ui-card')
+    })
+  })
+
+  // ─── Header ──────────────────────────────────────────────────────
+
+  describe('header', () => {
+    it('renders header ReactNode content', () => {
+      render(<Card header={<span>Card Title</span>}>Body</Card>)
+      expect(screen.getByText('Card Title')).toBeInTheDocument()
+    })
+
+    it('renders .ui-card__header element when header is provided', () => {
+      const { container } = render(<Card header="My Header">Body</Card>)
+      expect(container.querySelector('.ui-card__header')).toBeInTheDocument()
+    })
+
+    it('does not render .ui-card__header when header is not provided', () => {
+      const { container } = render(<Card>Body</Card>)
+      expect(container.querySelector('.ui-card__header')).not.toBeInTheDocument()
+    })
+  })
+
+  // ─── Footer ─────────────────────────────────────────────────────
+
+  describe('footer', () => {
+    it('renders footer ReactNode content', () => {
+      render(<Card footer={<button>Save</button>}>Body</Card>)
+      expect(screen.getByRole('button', { name: 'Save' })).toBeInTheDocument()
+    })
+
+    it('renders .ui-card__footer element when footer is provided', () => {
+      const { container } = render(<Card footer="Footer Text">Body</Card>)
+      expect(container.querySelector('.ui-card__footer')).toBeInTheDocument()
+    })
+
+    it('does not render .ui-card__footer when footer is not provided', () => {
+      const { container } = render(<Card>Body</Card>)
+      expect(container.querySelector('.ui-card__footer')).not.toBeInTheDocument()
+    })
+  })
+
+  // ─── Expandable ─────────────────────────────────────────────────
+
+  describe('expandable', () => {
+    it('sets data-expandable attribute when expandable is true', () => {
+      const { container } = render(<Card expandable>Content</Card>)
+      expect(container.querySelector('.ui-card')).toHaveAttribute('data-expandable', 'true')
+    })
+
+    it('does not set data-expandable when expandable is false', () => {
+      const { container } = render(<Card>Content</Card>)
+      expect(container.querySelector('.ui-card')).not.toHaveAttribute('data-expandable')
+    })
+
+    it('content starts expanded by default (defaultExpanded=true)', () => {
+      const { container } = render(<Card expandable>Content</Card>)
+      const content = container.querySelector('.ui-card__content')
+      expect(content).toHaveAttribute('data-collapsed', 'false')
+    })
+
+    it('defaultExpanded=false starts content collapsed', () => {
+      const { container } = render(<Card expandable defaultExpanded={false}>Content</Card>)
+      const content = container.querySelector('.ui-card__content')
+      expect(content).toHaveAttribute('data-collapsed', 'true')
+    })
+  })
+
+  // ─── Href / Target / Rel ────────────────────────────────────────
+
+  describe('href / target / rel', () => {
+    it('passes target prop to anchor element', () => {
+      const { container } = render(
+        <Card as="a" href="https://example.com" target="_blank">Link</Card>
+      )
+      expect(container.querySelector('.ui-card')).toHaveAttribute('target', '_blank')
+    })
+
+    it('passes rel prop to anchor element', () => {
+      const { container } = render(
+        <Card as="a" href="https://example.com" rel="noopener noreferrer">Link</Card>
+      )
+      expect(container.querySelector('.ui-card')).toHaveAttribute('rel', 'noopener noreferrer')
     })
   })
 
