@@ -116,7 +116,7 @@ const chartStyles = css`
       }
 
       .ui-time-series-chart__tooltip-box {
-        position: absolute;
+        position: fixed;
         padding: 0.375rem 0.5rem;
         background: var(--bg-elevated, oklch(22% 0.02 270));
         border: 1px solid var(--border-subtle, oklch(100% 0 0 / 0.1));
@@ -125,9 +125,10 @@ const chartStyles = css`
         color: var(--text-primary, oklch(90% 0 0));
         pointer-events: none;
         white-space: nowrap;
-        z-index: 10;
-        transform: translate(-50%, -100%);
+        z-index: 1000;
+        transform: translate(-50%, calc(-100% - 8px));
         line-height: 1.4;
+        box-shadow: 0 4px 12px oklch(0% 0 0 / 0.3);
       }
 
       .ui-time-series-chart__tooltip-time {
@@ -337,6 +338,7 @@ function TimeSeriesChartInner({
   )
 
   // Tooltip: find nearest timestamp
+  const [tooltipPos, setTooltipPos] = useState<{ x: number; y: number } | null>(null)
   const handleMouseMove = useCallback(
     (e: React.MouseEvent<SVGRectElement>) => {
       if (!showTooltip || allTimestamps.length === 0) return
@@ -351,6 +353,7 @@ function TimeSeriesChartInner({
         if (dist < minDist) { minDist = dist; closest = i }
       }
       setHoveredIdx(closest)
+      setTooltipPos({ x: e.clientX, y: rect.top + PADDING.top })
     },
     [showTooltip, allTimestamps, xScale],
   )
@@ -462,21 +465,17 @@ function TimeSeriesChartInner({
           width={plotW}
           height={plotH}
           onMouseMove={handleMouseMove}
-          onMouseLeave={() => setHoveredIdx(null)}
+          onMouseLeave={() => { setHoveredIdx(null); setTooltipPos(null) }}
         />
       </svg>
 
       {/* Tooltip */}
-      {showTooltip && hoveredTimestamp !== null && (() => {
-        const xPos = xScale(hoveredTimestamp)
-        const flipRight = xPos > width * 0.7
-        return (
+      {showTooltip && hoveredTimestamp !== null && tooltipPos && (
         <div
           className="ui-time-series-chart__tooltip-box"
           style={{
-            left: flipRight ? undefined : `${xPos}px`,
-            right: flipRight ? `${width - xPos}px` : undefined,
-            top: `${PADDING.top - 4}px`,
+            left: `${tooltipPos.x}px`,
+            top: `${tooltipPos.y}px`,
           }}
         >
           <div className="ui-time-series-chart__tooltip-time">
@@ -493,8 +492,7 @@ function TimeSeriesChartInner({
             )
           })}
         </div>
-        )
-      })()}
+      )}
 
       {/* Legend */}
       {showLegend && series.length > 1 && (

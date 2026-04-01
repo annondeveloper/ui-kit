@@ -678,9 +678,9 @@ const animatedCounterProps: PropDef[] = [
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
-type FormatStyle = 'default' | 'currency' | 'percent' | 'compact' | 'bytes'
+type FormatStyle = 'default' | 'currency' | 'percent' | 'compact' | 'bytes' | 'duration' | 'temperature' | 'ordinal' | 'fileSize'
 
-const FORMAT_STYLES: FormatStyle[] = ['default', 'currency', 'percent', 'compact', 'bytes']
+const FORMAT_STYLES: FormatStyle[] = ['default', 'currency', 'percent', 'compact', 'bytes', 'duration', 'temperature', 'ordinal', 'fileSize']
 
 const IMPORT_STRINGS: Record<Tier, string> = {
   lite: "import { AnimatedCounter } from '@annondeveloper/ui-kit/lite'",
@@ -712,6 +712,29 @@ const FORMAT_FNS: Record<FormatStyle, ((v: number) => string) | undefined> = {
     let i = 0
     while (val >= 1024 && i < units.length - 1) { val /= 1024; i++ }
     return `${val.toFixed(i > 0 ? 1 : 0)} ${units[i]}`
+  },
+  duration: (v: number) => {
+    const s = Math.abs(Math.round(v))
+    const h = Math.floor(s / 3600)
+    const m = Math.floor((s % 3600) / 60)
+    const sec = s % 60
+    if (h > 0) return `${h}h ${m}m ${sec}s`
+    if (m > 0) return `${m}m ${sec}s`
+    return `${sec}s`
+  },
+  temperature: (v: number) => `${Math.round(v)}°C`,
+  ordinal: (v: number) => {
+    const n = Math.round(v)
+    const s = ['th', 'st', 'nd', 'rd']
+    const mod = n % 100
+    return `${n}${s[(mod - 20) % 10] || s[mod] || s[0]}`
+  },
+  fileSize: (v: number) => {
+    const units = ['B', 'KiB', 'MiB', 'GiB', 'TiB']
+    let val = Math.abs(Math.round(v))
+    let i = 0
+    while (val >= 1024 && i < units.length - 1) { val /= 1024; i++ }
+    return `${val.toFixed(i > 0 ? 2 : 0)} ${units[i]}`
   },
 }
 

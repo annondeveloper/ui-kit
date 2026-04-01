@@ -28,6 +28,11 @@ export type CopyBlockLanguage =
   | 'yaml'
   | 'markdown'
   | 'csv'
+  | 'java'
+  | 'csharp'
+  | 'php'
+  | 'swift'
+  | 'kotlin'
   | 'text'
 
 export interface CopyBlockProps extends HTMLAttributes<HTMLDivElement> {
@@ -332,6 +337,16 @@ function tokenizeLine(line: string, language: CopyBlockLanguage): Token[] {
       return [{ type: 'plain', value: line }]
     case 'csv':
       return [{ type: 'plain', value: line }]
+    case 'java':
+      return tokenizeGeneric(line, ['class','public','private','protected','static','void','int','String','boolean','return','if','else','for','while','new','import','package','extends','implements','interface','abstract','final','try','catch','throw','throws','super','this','true','false','null'], '//')
+    case 'csharp':
+      return tokenizeGeneric(line, ['class','public','private','protected','static','void','int','string','bool','return','if','else','for','while','foreach','new','using','namespace','var','async','await','abstract','interface','override','virtual','true','false','null'], '//')
+    case 'php':
+      return tokenizeGeneric(line, ['function','class','public','private','protected','static','return','if','else','elseif','for','foreach','while','echo','new','use','namespace','true','false','null','array','isset','empty'], '//')
+    case 'swift':
+      return tokenizeGeneric(line, ['func','let','var','class','struct','enum','protocol','if','else','for','while','return','import','guard','switch','case','default','true','false','nil','self','Self','throws','async','await'], '//')
+    case 'kotlin':
+      return tokenizeGeneric(line, ['fun','val','var','class','object','interface','if','else','for','while','when','return','import','package','true','false','null','this','super','override','data','sealed','companion'], '//')
     case 'text':
     default:
       return [{ type: 'plain', value: line }]

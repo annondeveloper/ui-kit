@@ -9,3 +9,5 @@ demo/.next/
 demo/out/
 .superpowers/
 .gstack/
+.playwright-mcp/
+*.png
