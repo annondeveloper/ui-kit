@@ -711,7 +711,7 @@ const pageStyles = css`
 // ─── Props Data ───────────────────────────────────────────────────────────────
 
 const alertProps: PropDef[] = [
-  { name: 'variant', type: "'info' | 'success' | 'warning' | 'error'", description: 'Semantic variant controlling color and default icon.' },
+  { name: 'variant', type: "'info' | 'success' | 'warning' | 'error'", required: true, description: 'Semantic variant controlling color and default icon.' },
   { name: 'title', type: 'ReactNode', description: 'Optional bold heading rendered above the body content.' },
   { name: 'icon', type: 'ReactNode', description: 'Custom icon override. Default icons are provided per variant.' },
   { name: 'dismissible', type: 'boolean', default: 'false', description: 'Shows a dismiss button in the top-right corner.' },
@@ -719,7 +719,7 @@ const alertProps: PropDef[] = [
   { name: 'action', type: '{ label: string; onClick: () => void }', description: 'Action link rendered below the body text.' },
   { name: 'size', type: "'xs' | 'sm' | 'md' | 'lg' | 'xl'", default: "'md'", description: 'Controls padding, font-size, and border width.' },
   { name: 'motion', type: '0 | 1 | 2 | 3', description: 'Animation intensity override. Cascades from OS > prop > CSS --motion > UIProvider.' },
-  { name: 'children', type: 'ReactNode', description: 'Alert body content.' },
+  { name: 'children', type: 'ReactNode', required: true, description: 'Alert body content.' },
   { name: 'className', type: 'string', description: 'Additional CSS class name merged with the component class.' },
   { name: 'ref', type: 'Ref<HTMLDivElement>', description: 'Forwarded ref to the underlying <div> element.' },
   { name: 'banner', type: 'boolean', default: 'false', description: 'Full-width banner mode with top border.' },
