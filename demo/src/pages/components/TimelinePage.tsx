@@ -7,6 +7,7 @@ import { Timeline } from '@ui/components/timeline'
 import { Card } from '@ui/components/card'
 import { Button } from '@ui/components/button'
 import { Icon } from '@ui/core/icons/icon'
+import { CopyBlock } from '@ui/domain/copy-block'
 import { PropsTable, type PropDef } from '../../components/PropsTable'
 
 // ─── Styles ──────────────────────────────────────────────────────────────────
@@ -294,6 +295,16 @@ export default function TimelinePage() {
             <Timeline items={INCIDENT_ITEMS} variant="compact" size="sm" />
           </div>
         </div>
+        <div style={{ marginBlockStart: '1rem' }}>
+          <CopyBlock
+            code={`// Alternate layout — items alternate left and right
+<Timeline items={DEPLOY_ITEMS} variant="alternate" />
+
+// Compact layout — reduced spacing for dense timelines
+<Timeline items={DEPLOY_ITEMS} variant="compact" size="sm" />`}
+            language="typescript"
+          />
+        </div>
       </section>
 
       {/* ── Line Styles ───────────────────────────── */}
@@ -309,6 +320,17 @@ export default function TimelinePage() {
               <Timeline items={DEPLOY_ITEMS.slice(0, 3)} connectorStyle={style} variant="compact" size="sm" />
             </div>
           ))}
+        </div>
+        <div style={{ marginBlockStart: '1rem' }}>
+          <CopyBlock
+            code={`{(['solid', 'dashed', 'dotted'] as const).map(style => (
+  <div key={style}>
+    <span>{style}</span>
+    <Timeline items={DEPLOY_ITEMS.slice(0, 3)} connectorStyle={style} />
+  </div>
+))}`}
+            language="typescript"
+          />
         </div>
       </section>
 

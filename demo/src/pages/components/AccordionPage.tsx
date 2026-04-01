@@ -1665,6 +1665,81 @@ export default function AccordionPage() {
         </div>
       </section>
 
+
+      {/* ── 4e. Feature: Single Mode ────────────────────── */}
+      <section className="accordion-page__section" id="single-mode">
+        <h2 className="accordion-page__section-title">
+          <a href="#single-mode">Single Mode</a>
+        </h2>
+        <p className="accordion-page__section-desc">
+          With <code>type="single"</code>, only one panel can be open at a time. Opening a new item
+          automatically collapses the previously expanded one. Ideal for FAQs and step-by-step guides.
+          {tier === 'lite' && (
+            <span style={{ display: 'block', marginBlockStart: '0.5rem', color: 'var(--text-tertiary)', fontStyle: 'italic' }}>
+              Note: Single mode requires the Standard tier. Lite tier uses native {'<details>'} which cannot enforce single mode.
+            </span>
+          )}
+        </p>
+        <div className="accordion-page__preview accordion-page__preview--col">
+          {tier === 'lite' ? (
+            <LiteAccordion items={FAQ_ITEMS.slice(0, 3)} defaultOpen={['what-is']} />
+          ) : (
+            <Accordion items={FAQ_ITEMS.slice(0, 3)} type="single" defaultOpen={['what-is']} />
+          )}
+        </div>
+        <div style={{ marginBlockStart: '1rem' }}>
+          <CopyBlock
+            code={`<Accordion type="single" items={ITEMS} />`}
+            language="typescript"
+          />
+        </div>
+      </section>
+
+      {/* ── 4f. Feature: Bordered & Separated Variants ──── */}
+      <section className="accordion-page__section" id="variants-style">
+        <h2 className="accordion-page__section-title">
+          <a href="#variants-style">Bordered &amp; Separated Variants</a>
+        </h2>
+        <p className="accordion-page__section-desc">
+          Three visual variants change the accordion's frame and spacing. <strong>Default</strong> uses a
+          clean flush list. <strong>Bordered</strong> wraps the whole group in a rounded border.
+          <strong>Separated</strong> renders each item as an independent card with a gap between items.
+        </p>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
+          <div>
+            <h3 style={{ fontSize: 'var(--text-sm)', fontWeight: 600, color: 'var(--text-primary)', marginBlockEnd: '0.75rem' }}>
+              Bordered
+            </h3>
+            <div className="accordion-page__preview accordion-page__preview--col">
+              <AccordionComponent
+                items={FAQ_ITEMS.slice(0, 3)}
+                {...(tier !== 'lite' ? { variant: 'bordered' as const } : {})}
+                defaultOpen={['what-is']}
+              />
+            </div>
+          </div>
+          <div>
+            <h3 style={{ fontSize: 'var(--text-sm)', fontWeight: 600, color: 'var(--text-primary)', marginBlockEnd: '0.75rem' }}>
+              Separated
+            </h3>
+            <div className="accordion-page__preview accordion-page__preview--col">
+              <AccordionComponent
+                items={FAQ_ITEMS.slice(0, 3)}
+                {...(tier !== 'lite' ? { variant: 'separated' as const } : {})}
+                defaultOpen={['what-is']}
+              />
+            </div>
+          </div>
+        </div>
+        <div style={{ marginBlockStart: '1rem' }}>
+          <CopyBlock
+            code={`<Accordion variant="bordered" items={ITEMS} />
+<Accordion variant="separated" items={ITEMS} />`}
+            language="typescript"
+          />
+        </div>
+      </section>
+
       {/* ── 5. Weight Tiers ────────────────────────────── */}
       <section className="accordion-page__section" id="tiers">
         <h2 className="accordion-page__section-title">
