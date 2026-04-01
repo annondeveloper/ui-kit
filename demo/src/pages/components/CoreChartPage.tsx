@@ -868,6 +868,7 @@ function PlaygroundSection({ tier: tierProp }: { tier: Tier }) {
   const { tier: contextTier } = useTier()
   const tier = tierProp ?? contextTier
   const [coreCount, setCoreCount] = useState(16)
+  const [randomSeed, setRandomSeed] = useState(0)
   const [columns, setColumns] = useState<number | undefined>(undefined)
   const [colorScale, setColorScale] = useState<ColorScale>('green-red')
   const [size, setSize] = useState<Size>('md')
@@ -875,7 +876,7 @@ function PlaygroundSection({ tier: tierProp }: { tier: Tier }) {
   const [motion, setMotion] = useState<0 | 1 | 2 | 3>(3)
   const [copyStatus, setCopyStatus] = useState('')
 
-  const cores = useMemo(() => generateCores(coreCount), [coreCount])
+  const cores = useMemo(() => generateCores(coreCount), [coreCount, randomSeed])
 
   const ChartComponent = tier === 'lite' ? LiteCoreChart : tier === 'premium' ? PremiumCoreChart : CoreChart
 
@@ -995,7 +996,7 @@ function PlaygroundSection({ tier: tierProp }: { tier: Tier }) {
             <Toggle label="Show Labels" checked={showLabels} onChange={setShowLabels} />
           </div>
 
-          <Button size="xs" variant="ghost" onClick={() => setCoreCount(prev => prev)}>
+          <Button size="xs" variant="ghost" onClick={() => setRandomSeed(s => s + 1)}>
             <Icon name="refresh" size="sm" /> Randomize Data
           </Button>
         </div>

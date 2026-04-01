@@ -211,17 +211,23 @@ function SparklineInner({
       </svg>
 
       {/* Tooltip */}
-      {showTooltip && hoveredIndex !== null && points[hoveredIndex] && (
-        <div
-          className="ui-sparkline__tooltip"
-          style={{
-            left: `${(points[hoveredIndex].x / viewW) * 100}%`,
-            top: `${(points[hoveredIndex].y / viewH) * 100}%`,
-          }}
-        >
-          {data[hoveredIndex]}
-        </div>
-      )}
+      {showTooltip && hoveredIndex !== null && points[hoveredIndex] && (() => {
+        const xPct = (points[hoveredIndex].x / viewW) * 100
+        const yPct = (points[hoveredIndex].y / viewH) * 100
+        const nearTop = points[hoveredIndex].y < viewH * 0.3
+        return (
+          <div
+            className="ui-sparkline__tooltip"
+            style={{
+              left: `${Math.min(Math.max(xPct, 10), 90)}%`,
+              top: `${yPct}%`,
+              transform: nearTop ? 'translate(-50%, 8px)' : 'translate(-50%, calc(-100% - 8px))',
+            }}
+          >
+            {data[hoveredIndex]}
+          </div>
+        )
+      })()}
     </div>
   )
 }
