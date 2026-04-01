@@ -598,7 +598,12 @@ const uptimeProps: PropDef[] = [
   { name: 'slaTarget', type: 'number', description: 'SLA target as a decimal (e.g. 0.999 for 99.9%). Displayed when showSla is enabled.' },
   { name: 'showSla', type: 'boolean', default: 'false', description: 'Show the SLA summary line with current uptime percentage and target.' },
   { name: 'motion', type: '0 | 1 | 2 | 3', description: 'Animation intensity override. 0 disables hover scale transitions.' },
-  { name: 'className', type: 'string', description: 'Additional CSS class name merged with the component class.' },
+]
+
+const uptimeDayProps: PropDef[] = [
+  { name: 'date', type: 'string', required: true, description: 'Date string in YYYY-MM-DD format.' },
+  { name: 'status', type: "'up' | 'degraded' | 'down' | 'unknown'", required: true, description: 'Uptime status for the day controlling bar color.' },
+  { name: 'uptime', type: 'number', description: 'Optional uptime percentage as a decimal (0–1) shown in the tooltip.' },
 ]
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -1130,6 +1135,19 @@ export default function UptimeTrackerPage() {
         </p>
         <Card variant="default" padding="md">
           <PropsTable props={uptimeProps} />
+        </Card>
+      </section>
+
+      {/* ── 8b. UptimeDay Sub-type ─────────────────────── */}
+      <section className="uptime-tracker-page__section" id="uptime-day">
+        <h2 className="uptime-tracker-page__section-title">
+          <a href="#uptime-day">UptimeDay</a>
+        </h2>
+        <p className="uptime-tracker-page__section-desc">
+          Shape of each object in the <code>days</code> array.
+        </p>
+        <Card variant="default" padding="md">
+          <PropsTable props={uptimeDayProps} />
         </Card>
       </section>
 

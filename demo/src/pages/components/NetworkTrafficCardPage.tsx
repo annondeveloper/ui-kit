@@ -573,15 +573,20 @@ const pageStyles = css`
 // ─── Props Data ───────────────────────────────────────────────────────────────
 
 const ntcProps: PropDef[] = [
-  { name: 'title', type: 'ReactNode', description: 'Card header title. Usually the interface or device name.' },
+  { name: 'title', type: 'ReactNode', required: true, description: 'Card header title. Usually the interface or device name.' },
   { name: 'vendor', type: 'string', description: 'Optional vendor or manufacturer name shown below the title.' },
   { name: 'location', type: 'string', description: 'Optional location string shown next to vendor with a separator.' },
-  { name: 'traffic', type: 'TrafficData', description: 'Object with inbound and outbound bytes per second values.' },
+  { name: 'traffic', type: 'TrafficData', required: true, description: 'Object with inbound and outbound bytes per second values.' },
   { name: 'trend', type: 'number[]', description: 'Historical data points rendered as a sparkline below the traffic rates.' },
   { name: 'status', type: "'ok' | 'warning' | 'critical' | 'unknown'", description: 'Status indicator dot and left border accent color.' },
-  { name: 'compact', type: 'boolean', default: 'false', description: 'Compact mode with reduced padding and hidden sparkline.' },
+  { name: 'compact', type: 'boolean', description: 'Compact mode with reduced padding and hidden sparkline.' },
   { name: 'motion', type: '0 | 1 | 2 | 3', description: 'Animation intensity override. Controls entrance animation and arrow pulse.' },
-  { name: 'className', type: 'string', description: 'Additional CSS class name merged with the component class.' },
+]
+
+const trafficDataProps: PropDef[] = [
+  { name: 'inbound', type: 'number', required: true, description: 'Inbound traffic rate in bytes per second.' },
+  { name: 'outbound', type: 'number', required: true, description: 'Outbound traffic rate in bytes per second.' },
+  { name: 'timestamp', type: 'number', description: 'Optional Unix timestamp for the measurement.' },
 ]
 
 // ─── Sample Data ──────────────────────────────────────────────────────────────
@@ -1371,6 +1376,19 @@ formatBitRate(100)       // "800 bps"`}
         </p>
         <Card variant="default" padding="md">
           <PropsTable props={ntcProps} />
+        </Card>
+      </section>
+
+      {/* ── 10b. TrafficData Sub-type ──────────────────── */}
+      <section className="ntc-page__section" id="traffic-data">
+        <h2 className="ntc-page__section-title">
+          <a href="#traffic-data">TrafficData</a>
+        </h2>
+        <p className="ntc-page__section-desc">
+          Shape of the <code>traffic</code> prop object.
+        </p>
+        <Card variant="default" padding="md">
+          <PropsTable props={trafficDataProps} />
         </Card>
       </section>
 

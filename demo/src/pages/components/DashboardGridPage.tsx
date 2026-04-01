@@ -586,11 +586,10 @@ const pageStyles = css`
 
 const dashboardGridProps: PropDef[] = [
   { name: 'groups', type: 'DashboardGroup[]', description: 'Array of groups for grouped mode. Each group has a title, optional description/summary, and items.' },
-  { name: 'columns', type: "number | 'auto'", default: "'auto'", description: 'Fixed column count (1-6) or auto-fit. Auto uses minmax(280px, 1fr).' },
-  { name: 'gap', type: "'sm' | 'md' | 'lg'", default: "'md'", description: 'Spacing between grid items.' },
+  { name: 'columns', type: "number | 'auto'", description: 'Fixed column count or auto-fit. Auto uses minmax(280px, 1fr).' },
+  { name: 'gap', type: "'sm' | 'md' | 'lg'", description: 'Spacing between grid items.' },
   { name: 'children', type: 'ReactNode', description: 'Direct children for ungrouped mode. Rendered in a flat grid.' },
   { name: 'motion', type: '0 | 1 | 2 | 3', description: 'Animation intensity override for collapse/expand transitions.' },
-  { name: 'className', type: 'string', description: 'Additional CSS class name merged with the component class.' },
 ]
 
 const dashboardGroupProps: PropDef[] = [
@@ -599,7 +598,7 @@ const dashboardGroupProps: PropDef[] = [
   { name: 'description', type: 'string', description: 'Optional description shown below the header.' },
   { name: 'summary', type: 'ReactNode', description: 'Aggregated summary rendered inline with the title (e.g., total count).' },
   { name: 'items', type: 'ReactNode[]', required: true, description: 'Array of child cards/components to render in the group grid.' },
-  { name: 'collapsed', type: 'boolean', default: 'false', description: 'Initial collapsed state. Users can toggle via the header button.' },
+  { name: 'collapsed', type: 'boolean', description: 'Initial collapsed state. Users can toggle via the header button.' },
 ]
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────

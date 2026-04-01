@@ -560,12 +560,17 @@ const pageStyles = css`
 // ─── Props Data ───────────────────────────────────────────────────────────────
 
 const psgProps: PropDef[] = [
-  { name: 'ports', type: 'PortStatus[]', description: 'Array of port objects with port number, status, and optional label.' },
+  { name: 'ports', type: 'PortStatus[]', required: true, description: 'Array of port objects with port number, status, and optional label.' },
   { name: 'columns', type: 'number', default: '8', description: 'Number of columns in the grid layout.' },
   { name: 'size', type: "'sm' | 'md'", default: "'md'", description: 'Grid cell size controlling padding and font size.' },
   { name: 'onPortClick', type: '(port: number) => void', description: 'Callback when a port cell is clicked. Renders ports as buttons when set.' },
   { name: 'motion', type: '0 | 1 | 2 | 3', description: 'Animation intensity override. Controls hover scale transition.' },
-  { name: 'className', type: 'string', description: 'Additional CSS class name merged with the component class.' },
+]
+
+const portStatusProps: PropDef[] = [
+  { name: 'port', type: 'number', required: true, description: 'Port number to display.' },
+  { name: 'status', type: "'ok' | 'warning' | 'critical' | 'unknown'", required: true, description: 'Status controlling cell color and indicator.' },
+  { name: 'label', type: 'string', description: 'Optional label shown below the port number.' },
 ]
 
 // ─── Sample Data ──────────────────────────────────────────────────────────────
@@ -1326,6 +1331,19 @@ export default function PortStatusGridPage() {
         </p>
         <Card variant="default" padding="md">
           <PropsTable props={psgProps} />
+        </Card>
+      </section>
+
+      {/* ── 9b. PortStatus Sub-type ────────────────────── */}
+      <section className="psg-page__section" id="port-status">
+        <h2 className="psg-page__section-title">
+          <a href="#port-status">PortStatus</a>
+        </h2>
+        <p className="psg-page__section-desc">
+          Shape of each object in the <code>ports</code> array.
+        </p>
+        <Card variant="default" padding="md">
+          <PropsTable props={portStatusProps} />
         </Card>
       </section>
 

@@ -536,13 +536,19 @@ const pageStyles = css`
 // ─── Props Data ───────────────────────────────────────────────────────────────
 
 const rackDiagramProps: PropDef[] = [
-  { name: 'units', type: 'number', description: 'Total rack units (U) to display. Standard racks are 42U.' },
-  { name: 'devices', type: 'RackDevice[]', description: 'Array of devices to render. Each has startU, heightU, label, and optional status.' },
+  { name: 'units', type: 'number', required: true, description: 'Total rack units (U) to display. Standard racks are 42U.' },
+  { name: 'devices', type: 'RackDevice[]', required: true, description: 'Array of devices to render. Each has startU, heightU, label, and optional status.' },
   { name: 'showUnitNumbers', type: 'boolean', default: 'true', description: 'Show unit numbers on the left side of the rack.' },
   { name: 'orientation', type: "'front' | 'rear'", default: "'front'", description: 'Rack viewing orientation. Front shows high U at top.' },
   { name: 'size', type: "'sm' | 'md' | 'lg'", default: "'md'", description: 'Controls rack width and unit height.' },
   { name: 'motion', type: '0 | 1 | 2 | 3', description: 'Animation intensity override. Cascades from OS > prop > CSS --motion > UIProvider.' },
-  { name: 'className', type: 'string', description: 'Additional CSS class name merged with the component class.' },
+]
+
+const rackDeviceProps: PropDef[] = [
+  { name: 'startU', type: 'number', required: true, description: 'Starting rack unit position (1-based).' },
+  { name: 'heightU', type: 'number', required: true, description: 'Height of the device in rack units.' },
+  { name: 'label', type: 'string', required: true, description: 'Label text displayed on the device.' },
+  { name: 'status', type: 'RackDeviceStatus', description: 'Optional device status (ok, warning, critical, etc.).' },
 ]
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -1192,6 +1198,19 @@ export default function RackDiagramPage() {
         </p>
         <Card variant="default" padding="md">
           <PropsTable props={rackDiagramProps} />
+        </Card>
+      </section>
+
+      {/* ── 7b. RackDevice Sub-type ────────────────────── */}
+      <section className="rack-diagram-page__section" id="rack-device">
+        <h2 className="rack-diagram-page__section-title">
+          <a href="#rack-device">RackDevice</a>
+        </h2>
+        <p className="rack-diagram-page__section-desc">
+          Shape of each object in the <code>devices</code> array.
+        </p>
+        <Card variant="default" padding="md">
+          <PropsTable props={rackDeviceProps} />
         </Card>
       </section>
 

@@ -559,16 +559,32 @@ const pageStyles = css`
 // ─── Props Data ───────────────────────────────────────────────────────────────
 
 const geoMapProps: PropDef[] = [
-  { name: 'points', type: 'GeoPoint[]', description: 'Array of geographic points to render on the map. Each point has id, lat, lng, and optional label/value/status.' },
+  { name: 'points', type: 'GeoPoint[]', required: true, description: 'Array of geographic points to render on the map. Each point has id, lat, lng, and optional label/value/status.' },
   { name: 'connections', type: 'GeoConnection[]', description: 'Optional connections between points drawn as curved lines. Requires matching point IDs.' },
   { name: 'projection', type: "'mercator' | 'equirectangular'", default: "'equirectangular'", description: 'Map projection type. Equirectangular is the default simple projection.' },
-  { name: 'showLabels', type: 'boolean', default: 'false', description: 'Display text labels below each point on the map.' },
-  { name: 'interactive', type: 'boolean', default: 'false', description: 'Enable click and hover interactions on points.' },
+  { name: 'showLabels', type: 'boolean', description: 'Display text labels below each point on the map.' },
+  { name: 'interactive', type: 'boolean', description: 'Enable click and hover interactions on points.' },
   { name: 'onPointClick', type: '(point: GeoPoint) => void', description: 'Callback when an interactive point is clicked.' },
   { name: 'onPointHover', type: '(point: GeoPoint | null) => void', description: 'Callback when hovering over or leaving a point.' },
   { name: 'height', type: 'number | string', description: 'Override the map container height. Accepts px number or CSS string.' },
   { name: 'motion', type: '0 | 1 | 2 | 3', description: 'Animation intensity override. Controls pulse and dash animations.' },
-  { name: 'className', type: 'string', description: 'Additional CSS class name merged with the component class.' },
+]
+
+const geoPointProps: PropDef[] = [
+  { name: 'id', type: 'string', required: true, description: 'Unique identifier for the point, used by connections.' },
+  { name: 'lat', type: 'number', required: true, description: 'Latitude coordinate.' },
+  { name: 'lng', type: 'number', required: true, description: 'Longitude coordinate.' },
+  { name: 'label', type: 'string', description: 'Optional label shown when showLabels is enabled.' },
+  { name: 'value', type: 'number', description: 'Optional numeric value shown in the tooltip.' },
+  { name: 'status', type: "'ok' | 'warning' | 'critical' | 'unknown'", description: 'Optional status controlling point color.' },
+  { name: 'tooltip', type: 'ReactNode', description: 'Optional custom tooltip content.' },
+]
+
+const geoConnectionProps: PropDef[] = [
+  { name: 'from', type: 'string', required: true, description: 'ID of the source GeoPoint.' },
+  { name: 'to', type: 'string', required: true, description: 'ID of the target GeoPoint.' },
+  { name: 'value', type: 'number', description: 'Optional numeric value for the connection (e.g. bandwidth).' },
+  { name: 'status', type: "'ok' | 'warning' | 'critical'", description: 'Optional status controlling connection line color.' },
 ]
 
 // ─── Sample Data ──────────────────────────────────────────────────────────────
@@ -1346,6 +1362,32 @@ export default function GeoMapPage() {
         </p>
         <Card variant="default" padding="md">
           <PropsTable props={geoMapProps} />
+        </Card>
+      </section>
+
+      {/* ── 9b. GeoPoint Sub-type ──────────────────────── */}
+      <section className="geo-map-page__section" id="geo-point">
+        <h2 className="geo-map-page__section-title">
+          <a href="#geo-point">GeoPoint</a>
+        </h2>
+        <p className="geo-map-page__section-desc">
+          Shape of each object in the <code>points</code> array.
+        </p>
+        <Card variant="default" padding="md">
+          <PropsTable props={geoPointProps} />
+        </Card>
+      </section>
+
+      {/* ── 9c. GeoConnection Sub-type ─────────────────── */}
+      <section className="geo-map-page__section" id="geo-connection">
+        <h2 className="geo-map-page__section-title">
+          <a href="#geo-connection">GeoConnection</a>
+        </h2>
+        <p className="geo-map-page__section-desc">
+          Shape of each object in the <code>connections</code> array.
+        </p>
+        <Card variant="default" padding="md">
+          <PropsTable props={geoConnectionProps} />
         </Card>
       </section>
 

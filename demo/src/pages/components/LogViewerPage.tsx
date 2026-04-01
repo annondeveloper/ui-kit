@@ -532,15 +532,21 @@ const pageStyles = css`
 const logViewerProps: PropDef[] = [
   { name: 'lines', type: 'LogLine[]', required: true, description: 'Array of log line objects to display. Each has id, message, optional timestamp and level.' },
   { name: 'maxLines', type: 'number', description: 'Maximum number of lines to display. Shows the last N lines when exceeded.' },
-  { name: 'autoTail', type: 'boolean', default: 'false', description: 'Auto-scroll to the bottom when new lines are appended.' },
-  { name: 'showTimestamp', type: 'boolean', default: 'false', description: 'Show formatted timestamps for each line (standard tier only).' },
-  { name: 'showLevel', type: 'boolean', default: 'false', description: 'Show color-coded log level badges (standard tier only).' },
-  { name: 'search', type: 'string', description: 'Highlight matching text in log messages with a <mark> element (standard tier only).' },
-  { name: 'filterLevel', type: 'string[]', description: 'Filter visible lines by log level (standard tier only).' },
-  { name: 'wrap', type: 'boolean', default: 'false', description: 'Enable word wrapping for long log lines (standard tier only).' },
+  { name: 'autoTail', type: 'boolean', description: 'Auto-scroll to the bottom when new lines are appended.' },
+  { name: 'showTimestamp', type: 'boolean', description: 'Show formatted timestamps for each line.' },
+  { name: 'showLevel', type: 'boolean', description: 'Show color-coded log level badges.' },
+  { name: 'search', type: 'string', description: 'Highlight matching text in log messages.' },
+  { name: 'filterLevel', type: 'string[]', description: 'Filter visible lines by log level.' },
+  { name: 'wrap', type: 'boolean', description: 'Enable word wrapping for long log lines.' },
   { name: 'height', type: 'string', description: 'Fixed height for the scroll container. Enables virtual scrolling for 100+ lines.' },
-  { name: 'motion', type: '0 | 1 | 2 | 3', description: 'Animation intensity override (standard tier only).' },
-  { name: 'className', type: 'string', description: 'Additional CSS class name.' },
+  { name: 'motion', type: '0 | 1 | 2 | 3', description: 'Animation intensity override.' },
+]
+
+const logLineProps: PropDef[] = [
+  { name: 'id', type: 'string | number', required: true, description: 'Unique identifier for the log line.' },
+  { name: 'timestamp', type: 'number | Date', description: 'Optional timestamp for this log entry.' },
+  { name: 'level', type: "'debug' | 'info' | 'warn' | 'error'", description: 'Optional log level controlling badge color.' },
+  { name: 'message', type: 'string', required: true, description: 'Log message text to display.' },
 ]
 
 // ─── Sample Data ──────────────────────────────────────────────────────────────
@@ -1244,6 +1250,19 @@ export default function LogViewerPage() {
         </p>
         <Card variant="default" padding="md">
           <PropsTable props={logViewerProps} />
+        </Card>
+      </section>
+
+      {/* ── 9b. LogLine Sub-type ───────────────────────── */}
+      <section className="log-viewer-page__section" id="log-line">
+        <h2 className="log-viewer-page__section-title">
+          <a href="#log-line">LogLine</a>
+        </h2>
+        <p className="log-viewer-page__section-desc">
+          Shape of each object in the <code>lines</code> array.
+        </p>
+        <Card variant="default" padding="md">
+          <PropsTable props={logLineProps} />
         </Card>
       </section>
 

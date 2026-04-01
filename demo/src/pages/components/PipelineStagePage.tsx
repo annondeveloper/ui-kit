@@ -570,10 +570,16 @@ const pageStyles = css`
 
 const pipelineProps: PropDef[] = [
   { name: 'stages', type: 'Stage[]', required: true, description: 'Array of stage objects with id, label, status (pending/running/success/failed/skipped), and optional duration (seconds).' },
-  { name: 'orientation', type: "'horizontal' | 'vertical'", default: "'horizontal'", description: 'Layout direction. Horizontal for dashboard views, vertical for sidebar or detail panels.' },
+  { name: 'orientation', type: "'horizontal' | 'vertical'", description: 'Layout direction. Horizontal for dashboard views, vertical for sidebar or detail panels.' },
   { name: 'onStageClick', type: '(stageId: string) => void', description: 'Click handler for stage labels. When provided, labels become interactive buttons.' },
   { name: 'motion', type: '0 | 1 | 2 | 3', description: 'Animation intensity override. 0 disables the running stage pulse animation.' },
-  { name: 'className', type: 'string', description: 'Additional CSS class name merged with the component class.' },
+]
+
+const stageProps: PropDef[] = [
+  { name: 'id', type: 'string', required: true, description: 'Unique identifier for the stage.' },
+  { name: 'label', type: 'string', required: true, description: 'Display label shown below the stage indicator.' },
+  { name: 'status', type: "'pending' | 'running' | 'success' | 'failed' | 'skipped'", required: true, description: 'Stage status controlling icon and color.' },
+  { name: 'duration', type: 'number', description: 'Optional stage duration in seconds shown below the label.' },
 ]
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -1111,6 +1117,19 @@ export default function PipelineStagePage() {
         </p>
         <Card variant="default" padding="md">
           <PropsTable props={pipelineProps} />
+        </Card>
+      </section>
+
+      {/* ── 9b. Stage Sub-type ─────────────────────────── */}
+      <section className="pipeline-stage-page__section" id="stage">
+        <h2 className="pipeline-stage-page__section-title">
+          <a href="#stage">Stage</a>
+        </h2>
+        <p className="pipeline-stage-page__section-desc">
+          Shape of each object in the <code>stages</code> array.
+        </p>
+        <Card variant="default" padding="md">
+          <PropsTable props={stageProps} />
         </Card>
       </section>
 

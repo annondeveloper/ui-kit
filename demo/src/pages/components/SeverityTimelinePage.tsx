@@ -521,12 +521,19 @@ const pageStyles = css`
 // ─── Props Data ───────────────────────────────────────────────────────────────
 
 const stlProps: PropDef[] = [
-  { name: 'events', type: 'TimelineEvent[]', description: 'Array of timeline events with id, timestamp, severity, title, and optional description.' },
-  { name: 'orientation', type: "'vertical' | 'horizontal'", default: "'vertical'", description: 'Timeline layout direction. Vertical stacks events top-to-bottom, horizontal scrolls left-to-right.' },
-  { name: 'expandable', type: 'boolean', default: 'false', description: 'When true, event descriptions are collapsed by default with a toggle button.' },
+  { name: 'events', type: 'TimelineEvent[]', required: true, description: 'Array of timeline events with id, timestamp, severity, title, and optional description.' },
+  { name: 'orientation', type: "'vertical' | 'horizontal'", description: 'Timeline layout direction. Vertical stacks events top-to-bottom, horizontal scrolls left-to-right.' },
+  { name: 'expandable', type: 'boolean', description: 'When true, event descriptions are collapsed by default with a toggle button.' },
   { name: 'maxVisible', type: 'number', description: 'Limit the number of visible events with a "+N more" indicator.' },
   { name: 'motion', type: '0 | 1 | 2 | 3', description: 'Animation intensity override. Controls entrance and transition effects.' },
-  { name: 'className', type: 'string', description: 'Additional CSS class name merged with the component class.' },
+]
+
+const timelineEventProps: PropDef[] = [
+  { name: 'id', type: 'string', required: true, description: 'Unique identifier for the event.' },
+  { name: 'timestamp', type: 'number | Date', required: true, description: 'Event timestamp as a Unix ms number or Date object.' },
+  { name: 'severity', type: "'info' | 'warning' | 'critical' | 'ok'", required: true, description: 'Severity level controls dot color and icon.' },
+  { name: 'title', type: 'ReactNode', required: true, description: 'Primary event title text.' },
+  { name: 'description', type: 'ReactNode', description: 'Optional helper text shown below the title.' },
 ]
 
 // ─── Sample Data ──────────────────────────────────────────────────────────────
@@ -1308,6 +1315,19 @@ export default function SeverityTimelinePage() {
         </p>
         <Card variant="default" padding="md">
           <PropsTable props={stlProps} />
+        </Card>
+      </section>
+
+      {/* ── 9b. TimelineEvent Sub-type ─────────────────── */}
+      <section className="stl-page__section" id="timeline-event">
+        <h2 className="stl-page__section-title">
+          <a href="#timeline-event">TimelineEvent</a>
+        </h2>
+        <p className="stl-page__section-desc">
+          Shape of each object in the <code>events</code> array.
+        </p>
+        <Card variant="default" padding="md">
+          <PropsTable props={timelineEventProps} />
         </Card>
       </section>
 

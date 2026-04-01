@@ -569,14 +569,22 @@ const pageStyles = css`
 // ─── Props Data ───────────────────────────────────────────────────────────────
 
 const switchFaceplateProps: PropDef[] = [
-  { name: 'ports', type: 'SwitchPort[]', description: 'Array of port definitions. Each has id, status, optional label, speed, type, and VLAN.' },
+  { name: 'ports', type: 'SwitchPort[]', required: true, description: 'Array of port definitions. Each has id, status, optional label, speed, type, and VLAN.' },
   { name: 'rows', type: 'number', default: '2', description: 'Number of rows to arrange ports in. Ports alternate between rows.' },
   { name: 'label', type: 'string', description: 'Optional switch name/model shown as a header above the ports.' },
   { name: 'showLabels', type: 'boolean', default: 'false', description: 'Show port labels below the grid.' },
   { name: 'onPortClick', type: '(port: SwitchPort) => void', description: 'Click handler for ports. Renders ports as buttons when provided.' },
   { name: 'size', type: "'sm' | 'md' | 'lg'", default: "'md'", description: 'Controls port size and gap spacing.' },
   { name: 'motion', type: '0 | 1 | 2 | 3', description: 'Animation intensity override. Controls hover scale and LED blinking.' },
-  { name: 'className', type: 'string', description: 'Additional CSS class name merged with the component class.' },
+]
+
+const switchPortProps: PropDef[] = [
+  { name: 'id', type: 'number', required: true, description: 'Unique port identifier number.' },
+  { name: 'label', type: 'string', description: 'Optional label shown when showLabels is enabled.' },
+  { name: 'status', type: "'up' | 'down' | 'admin-down' | 'unused'", required: true, description: 'Port status controlling LED color and indicator.' },
+  { name: 'speed', type: 'string', description: 'Optional port speed string shown in the tooltip (e.g. "1 Gbps").' },
+  { name: 'type', type: "'ethernet' | 'sfp' | 'qsfp' | 'management'", description: 'Optional port type controlling the visual style.' },
+  { name: 'vlan', type: 'number', description: 'Optional VLAN ID shown in the tooltip.' },
 ]
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -1200,6 +1208,19 @@ export default function SwitchFaceplatePage() {
         </p>
         <Card variant="default" padding="md">
           <PropsTable props={switchFaceplateProps} />
+        </Card>
+      </section>
+
+      {/* ── 8b. SwitchPort Sub-type ────────────────────── */}
+      <section className="switch-faceplate-page__section" id="switch-port">
+        <h2 className="switch-faceplate-page__section-title">
+          <a href="#switch-port">SwitchPort</a>
+        </h2>
+        <p className="switch-faceplate-page__section-desc">
+          Shape of each object in the <code>ports</code> array.
+        </p>
+        <Card variant="default" padding="md">
+          <PropsTable props={switchPortProps} />
         </Card>
       </section>
 
