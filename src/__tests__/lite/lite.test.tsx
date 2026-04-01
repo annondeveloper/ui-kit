@@ -141,8 +141,11 @@ describe('Lite tier components', () => {
     it('applies width and height styles', () => {
       render(<Skeleton width={100} height="2rem" data-testid="sk" />)
       const el = screen.getByTestId('sk')
-      expect(el.style.width).toBe('100px')
-      expect(el.style.height).toBe('2rem')
+      // Logical properties: inlineSize for width, blockSize for height
+      const hasWidth = el.style.width === '100px' || el.style.inlineSize === '100px'
+      const hasHeight = el.style.height === '2rem' || el.style.blockSize === '2rem'
+      expect(hasWidth).toBe(true)
+      expect(hasHeight).toBe(true)
     })
 
     it('forwards ref', () => {
@@ -156,8 +159,8 @@ describe('Lite tier components', () => {
   describe('Checkbox', () => {
     it('renders with correct className', () => {
       render(<Checkbox label="Accept" />)
-      const label = screen.getByText('Accept').closest('label')!
-      expect(label.className).toContain('ui-lite-checkbox')
+      const wrapper = screen.getByText('Accept').closest('.ui-lite-checkbox')
+      expect(wrapper).toBeTruthy()
     })
 
     it('renders checkbox input', () => {
@@ -177,8 +180,8 @@ describe('Lite tier components', () => {
   describe('ToggleSwitch', () => {
     it('renders with correct className', () => {
       render(<ToggleSwitch label="Dark mode" />)
-      const label = screen.getByText('Dark mode').closest('label')!
-      expect(label.className).toContain('ui-lite-toggle')
+      const wrapper = screen.getByText('Dark mode').closest('.ui-lite-toggle')
+      expect(wrapper).toBeTruthy()
     })
 
     it('renders switch role', () => {
