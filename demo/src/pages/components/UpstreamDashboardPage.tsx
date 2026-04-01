@@ -47,20 +47,33 @@ const DATA_CONFIGS: Record<DataConfig, { links: UpstreamLink[]; label: string; d
 // ─── Props Data ──────────────────────────────────────────────────────────────
 
 const PROPS: PropDef[] = [
-  { name: 'links', type: 'UpstreamLink[]', required: true, description: 'Array of upstream link objects that drive the entire dashboard.' },
-  { name: 'title', type: 'ReactNode', default: '\u2014', description: 'Dashboard title rendered as an h2.' },
-  { name: 'mode', type: "'hero' | 'compact' | 'table'", default: "'hero'", description: 'Visualization mode. Hero shows aggregated metrics, compact shows dense grid, table shows tabular rows.' },
-  { name: 'showSummary', type: 'boolean', default: 'false', description: 'Show aggregated summary card with total inbound/outbound traffic at the top.' },
-  { name: 'groupBy', type: "'vendor' | 'location' | 'none'", default: "'none'", description: 'Group upstream links by vendor name or geographic location.' },
-  { name: 'lastUpdated', type: 'number | Date', default: '\u2014', description: 'Timestamp shown in the summary footer as relative time (e.g. "5s ago").' },
-  { name: 'motion', type: '0 | 1 | 2 | 3', default: '3', description: 'Motion level override. 0 disables all animation.' },
-  { name: 'showCapacity', type: 'boolean', default: 'true', description: 'Show committed capacity in hero footer and table columns.' },
-  { name: 'showBurstCapacity', type: 'boolean', default: 'false', description: 'Show burstable capacity when available.' },
-  { name: 'showUtilization', type: 'boolean', default: 'true', description: 'Show utilization percentage in hero footer and table.' },
-  { name: 'utilizationDisplay', type: "'bar' | 'meter' | 'ambient'", default: "'bar'", description: 'How to render utilization. Bar shows a thin progress bar, meter shows an SVG arc gauge, ambient shifts card background.' },
-  { name: 'onLinkClick', type: '(link: UpstreamLink) => void', default: '\u2014', description: 'Called when a link card or table row is clicked.' },
-  { name: 'onGroupClick', type: '(groupName: string, links: UpstreamLink[]) => void', default: '\u2014', description: 'Called when a group header is clicked.' },
-  { name: 'onSummaryClick', type: '() => void', default: '\u2014', description: 'Called when the hero card or summary area is clicked.' },
+  { name: 'links', type: 'UpstreamLink[]', required: true, description: 'Array of upstream links — drives the entire dashboard.' },
+  { name: 'title', type: 'ReactNode', description: 'Dashboard title.' },
+  { name: 'mode', type: "'hero' | 'compact' | 'table'", description: 'Visualization mode.' },
+  { name: 'showSummary', type: 'boolean', description: 'Show aggregated summary at top.' },
+  { name: 'groupBy', type: "'vendor' | 'location' | 'none'", description: 'Group links.' },
+  { name: 'lastUpdated', type: 'number | Date', description: 'Last updated timestamp.' },
+  { name: 'motion', type: '0 | 1 | 2 | 3', description: 'Motion level.' },
+  { name: 'showCapacity', type: 'boolean', description: 'Show capacity info.' },
+  { name: 'showBurstCapacity', type: 'boolean', description: 'Show burstable capacity.' },
+  { name: 'showUtilization', type: 'boolean', description: 'Show utilization percentage.' },
+  { name: 'utilizationDisplay', type: "'bar' | 'meter' | 'ambient'", description: "How to display utilization: 'bar' (default), 'meter' (arc gauge), 'ambient' (bg color shift)." },
+  { name: 'onLinkClick', type: '(link: UpstreamLink) => void', description: 'Called when a link card is clicked.' },
+  { name: 'onGroupClick', type: '(groupName: string, links: UpstreamLink[]) => void', description: 'Called when a group header is clicked.' },
+  { name: 'onSummaryClick', type: '() => void', description: 'Called when the summary/hero area is clicked.' },
+  { name: 'compact', type: 'boolean', description: "@deprecated Use mode='compact' instead." },
+]
+
+const UPSTREAM_LINK_PROPS: PropDef[] = [
+  { name: 'id', type: 'string', required: true, description: 'Unique identifier for the link.' },
+  { name: 'vendor', type: 'string', required: true, description: 'Vendor name.' },
+  { name: 'location', type: 'string', required: true, description: 'Geographic location.' },
+  { name: 'inbound', type: 'number', required: true, description: 'Inbound traffic in bytes per second.' },
+  { name: 'outbound', type: 'number', required: true, description: 'Outbound traffic in bytes per second.' },
+  { name: 'status', type: "'ok' | 'warning' | 'critical' | 'unknown'", required: true, description: 'Operational status.' },
+  { name: 'capacity', type: 'number', description: 'Committed capacity in bytes per second.' },
+  { name: 'burstCapacity', type: 'number', description: 'Burstable maximum capacity in bytes per second.' },
+  { name: 'trend', type: 'number[]', description: 'Historical data points for sparkline.' },
 ]
 
 // ─── Constants ──────────────────────────────────────────────────────────────
@@ -1498,6 +1511,12 @@ export default function UpstreamDashboardPage() {
         </p>
         <Card variant="default" padding="md">
           <PropsTable props={PROPS} />
+        </Card>
+        <h3 className="ud-page__section-subtitle" style={{ marginBlockStart: '1.5rem', marginBlockEnd: '0.5rem', fontWeight: 600, fontSize: 'var(--text-base)' }}>
+          UpstreamLink sub-type
+        </h3>
+        <Card variant="default" padding="md">
+          <PropsTable props={UPSTREAM_LINK_PROPS} />
         </Card>
       </section>
 

@@ -541,15 +541,17 @@ const pageStyles = css`
 // ─── Props Data ───────────────────────────────────────────────────────────────
 
 const propDefs: PropDef[] = [
-  { name: 'name', type: 'string', description: 'Entity display name (required).' },
-  { name: 'type', type: 'string', description: 'Entity type label (e.g., "Virtual Machine", "Database").' },
-  { name: 'status', type: "'ok' | 'warning' | 'critical' | 'unknown' | 'maintenance'", default: "'unknown'", description: 'Operational status with color-coded indicator.' },
-  { name: 'metrics', type: '{ label: string; value: string }[]', description: 'Key metrics displayed in a row beneath the header.' },
-  { name: 'tags', type: 'string[]', description: 'Categorization tags rendered as pills.' },
-  { name: 'actions', type: '{ label: string; icon?: ReactNode; onClick: () => void }[]', description: 'Action buttons in the card footer.' },
-  { name: 'compact', type: 'boolean', default: 'false', description: 'Compact mode with reduced padding.' },
-  { name: 'size', type: "'sm' | 'md' | 'lg'", default: "'md'", description: 'Controls card dimensions and typography.' },
-  { name: 'motion', type: '0 | 1 | 2 | 3', description: 'Animation intensity override.' },
+  { name: 'name', type: 'string', required: true, description: 'Form field name.' },
+  { name: 'type', type: 'string', description: 'Type variant.' },
+  { name: 'status', type: "'ok' | 'warning' | 'critical' | 'unknown' | 'maintenance'", description: 'Status.' },
+  { name: 'icon', type: 'ReactNode', description: 'Leading icon element.' },
+  { name: 'metrics', type: '{ label: string; value: string }[]', description: 'Metrics.' },
+  { name: 'tags', type: 'string[]', description: 'Tags.' },
+  { name: 'href', type: 'string', description: 'Link URL.' },
+  { name: 'actions', type: '{ label: string; icon?: ReactNode; onClick: () => void }[]', description: 'Actions.' },
+  { name: 'compact', type: 'boolean', description: 'Compact toggle.' },
+  { name: 'size', type: "'sm' | 'md' | 'lg'", default: "'md'", description: 'Component size.' },
+  { name: 'motion', type: '0 | 1 | 2 | 3', description: 'Animation intensity (0=none, 1=subtle, 2=expressive, 3=cinematic).' },
 ]
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────

@@ -487,11 +487,18 @@ const pageStyles = css`
 // ─── Props Data ───────────────────────────────────────────────────────────────
 
 const propDefs: PropDef[] = [
-  { name: 'services', type: 'ServiceItem[]', description: 'Array of service objects with name, status, optional version and icon.' },
-  { name: 'maxVisible', type: 'number', description: 'Maximum number of badges to show before overflow count.' },
-  { name: 'size', type: "'sm' | 'md'", default: "'md'", description: 'Badge size variant.' },
-  { name: 'onServiceClick', type: '(service: ServiceItem) => void', description: 'Click handler for individual service badges.' },
-  { name: 'motion', type: '0 | 1 | 2 | 3', description: 'Animation intensity override.' },
+  { name: 'services', type: 'ServiceItem[]', required: true, description: 'Services.' },
+  { name: 'maxVisible', type: 'number', description: 'Max visible.' },
+  { name: 'size', type: "'sm' | 'md'", default: "'md'", description: 'Component size.' },
+  { name: 'onServiceClick', type: '(service: ServiceItem) => void', description: 'On service click.' },
+  { name: 'motion', type: '0 | 1 | 2 | 3', description: 'Animation intensity (0=none, 1=subtle, 2=expressive, 3=cinematic).' },
+]
+
+const serviceItemDefs: PropDef[] = [
+  { name: 'name', type: 'string', required: true, description: 'Form field name.' },
+  { name: 'status', type: "'running' | 'stopped' | 'error' | 'unknown'", required: true, description: 'Status.' },
+  { name: 'version', type: 'string', description: 'Version.' },
+  { name: 'icon', type: 'ReactNode', description: 'Leading icon element.' },
 ]
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -820,6 +827,10 @@ export default function ServiceStripPage() {
       <section className="service-strip-page__section" id="props">
         <h2 className="service-strip-page__section-title"><a href="#props">Props</a></h2>
         <PropsTable props={propDefs} />
+        <h3 style={{ marginBlockStart: '1.5rem', marginBlockEnd: '0.5rem', fontWeight: 600, fontSize: 'var(--text-base)', color: 'var(--text-primary)' }}>
+          ServiceItem sub-type
+        </h3>
+        <PropsTable props={serviceItemDefs} />
       </section>
 
       {/* Accessibility */}

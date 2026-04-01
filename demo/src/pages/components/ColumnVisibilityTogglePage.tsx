@@ -622,12 +622,10 @@ const pageStyles = css`
 // ─── Props Data ───────────────────────────────────────────────────────────────
 
 const columnVisibilityProps: PropDef[] = [
-  { name: 'columns', type: '{ id: string; label: string; visible: boolean }[]', required: true, description: 'Array of column definitions with visibility state.' },
-  { name: 'onChange', type: '(columnId: string, visible: boolean) => void', description: 'Callback fired when a column visibility is toggled.' },
-  { name: 'onReset', type: '() => void', description: 'Callback for the reset button. When provided, a "Reset to default" button appears in the dropdown.' },
-  { name: 'motion', type: '0 | 1 | 2 | 3', description: 'Animation intensity for dropdown open/close. Cascades from OS > prop > CSS --motion > UIProvider.' },
-  { name: 'className', type: 'string', description: 'Additional CSS class name merged with the component class.' },
-  { name: 'ref', type: 'Ref<HTMLDivElement>', description: 'Forwarded ref to the root div element.' },
+  { name: 'columns', type: '{ id: string; label: string; visible: boolean }[]', required: true, description: 'Columns toggle.' },
+  { name: 'onChange', type: '(columnId: string, visible: boolean) => void', description: 'Callback on value change.' },
+  { name: 'onReset', type: '() => void', description: 'On reset.' },
+  { name: 'motion', type: '0 | 1 | 2 | 3', description: 'Animation intensity (0=none, 1=subtle, 2=expressive, 3=cinematic).' },
 ]
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────

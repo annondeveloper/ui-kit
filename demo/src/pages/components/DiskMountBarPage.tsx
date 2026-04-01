@@ -425,12 +425,20 @@ const pageStyles = css`
 // ─── Props Data ───────────────────────────────────────────────────────────────
 
 const propDefs: PropDef[] = [
-  { name: 'mounts', type: 'MountInfo[]', description: 'Array of mount points with bytes and utilization.' },
-  { name: 'maxVisible', type: 'number', description: 'Max mounts shown before collapse.' },
-  { name: 'showFree', type: 'boolean', default: 'false', description: 'Show free space value alongside used.' },
-  { name: 'formatBytes', type: '(bytes: number) => string', description: 'Custom byte formatting function.' },
-  { name: 'size', type: "'sm' | 'md' | 'lg'", default: "'md'", description: 'Controls bar height and typography.' },
-  { name: 'motion', type: '0 | 1 | 2 | 3', description: 'Animation intensity override.' },
+  { name: 'mounts', type: 'MountInfo[]', required: true, description: 'Mounts.' },
+  { name: 'maxVisible', type: 'number', default: '3', description: 'Max visible.' },
+  { name: 'showFree', type: 'boolean', default: 'false', description: 'Show free toggle.' },
+  { name: 'formatBytes', type: '(bytes: number) => string', description: 'Format bytes.' },
+  { name: 'size', type: "'sm' | 'md' | 'lg'", default: "'md'", description: 'Component size.' },
+  { name: 'motion', type: '0 | 1 | 2 | 3', description: 'Animation intensity (0=none, 1=subtle, 2=expressive, 3=cinematic).' },
+]
+
+const mountInfoDefs: PropDef[] = [
+  { name: 'mount', type: 'string', required: true, description: 'Mount point path.' },
+  { name: 'totalBytes', type: 'number', required: true, description: 'Total bytes.' },
+  { name: 'usedBytes', type: 'number', required: true, description: 'Used bytes.' },
+  { name: 'freeBytes', type: 'number', required: true, description: 'Free bytes.' },
+  { name: 'utilPct', type: 'number', required: true, description: 'Utilization percentage.' },
 ]
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -753,6 +761,10 @@ export default function DiskMountBarPage() {
       <section className="disk-mount-bar-page__section" id="props">
         <h2 className="disk-mount-bar-page__section-title"><a href="#props">Props</a></h2>
         <PropsTable props={propDefs} />
+        <h3 style={{ marginBlockStart: '1.5rem', marginBlockEnd: '0.5rem', fontWeight: 600, fontSize: 'var(--text-base)', color: 'var(--text-primary)' }}>
+          MountInfo sub-type
+        </h3>
+        <PropsTable props={mountInfoDefs} />
       </section>
 
       {/* Threshold Colors */}

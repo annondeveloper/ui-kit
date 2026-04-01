@@ -675,13 +675,11 @@ const pageStyles = css`
 // ─── Props Data ───────────────────────────────────────────────────────────────
 
 const densitySelectorProps: PropDef[] = [
-  { name: 'value', type: "'compact' | 'comfortable' | 'spacious'", description: 'Controlled density value. When set, component becomes controlled.' },
-  { name: 'defaultValue', type: "'compact' | 'comfortable' | 'spacious'", default: "'comfortable'", description: 'Initial density value for uncontrolled usage.' },
-  { name: 'onChange', type: '(value: DensityValue) => void', description: 'Callback fired when the selected density changes.' },
-  { name: 'size', type: "'sm' | 'md'", default: "'md'", description: 'Controls the overall size of the selector. sm hides text labels.' },
-  { name: 'motion', type: '0 | 1 | 2 | 3', description: 'Animation intensity for the sliding indicator pill. Cascades from OS > prop > CSS --motion > UIProvider.' },
-  { name: 'className', type: 'string', description: 'Additional CSS class name merged with the component class.' },
-  { name: 'ref', type: 'Ref<HTMLDivElement>', description: 'Forwarded ref to the root div element.' },
+  { name: 'value', type: 'DensityValue', description: 'Controlled value.' },
+  { name: 'defaultValue', type: 'DensityValue', default: "'comfortable'", description: 'Initial uncontrolled value.' },
+  { name: 'onChange', type: '(value: DensityValue) => void', description: 'Callback on value change.' },
+  { name: 'size', type: "'sm' | 'md'", default: "'md'", description: 'Component size.' },
+  { name: 'motion', type: '0 | 1 | 2 | 3', description: 'Animation intensity (0=none, 1=subtle, 2=expressive, 3=cinematic).' },
 ]
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────

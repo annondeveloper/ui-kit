@@ -443,13 +443,21 @@ const pageStyles = css`
 // ─── Props Data ───────────────────────────────────────────────────────────────
 
 const propDefs: PropDef[] = [
-  { name: 'steps', type: 'TestStep[]', description: 'Array of test steps with id, label, status, optional message and duration.' },
-  { name: 'title', type: 'string', description: 'Panel header title.' },
-  { name: 'onRetry', type: '() => void', description: 'Retry callback. Shows retry button when provided.' },
-  { name: 'onCancel', type: '() => void', description: 'Cancel callback. Shows cancel button when running.' },
-  { name: 'running', type: 'boolean', default: 'false', description: 'Whether the test is currently executing.' },
-  { name: 'size', type: "'sm' | 'md' | 'lg'", default: "'md'", description: 'Controls panel dimensions and typography.' },
-  { name: 'motion', type: '0 | 1 | 2 | 3', description: 'Animation intensity override.' },
+  { name: 'steps', type: 'TestStep[]', required: true, description: 'Steps.' },
+  { name: 'title', type: 'string', description: 'Title text.' },
+  { name: 'onRetry', type: '() => void', description: 'On retry.' },
+  { name: 'onCancel', type: '() => void', description: 'On cancel.' },
+  { name: 'running', type: 'boolean', description: 'Running toggle.' },
+  { name: 'size', type: "'sm' | 'md' | 'lg'", description: 'Component size.' },
+  { name: 'motion', type: '0 | 1 | 2 | 3', description: 'Animation intensity (0=none, 1=subtle, 2=expressive, 3=cinematic).' },
+]
+
+const testStepDefs: PropDef[] = [
+  { name: 'id', type: 'string', required: true, description: 'Unique identifier.' },
+  { name: 'label', type: 'string', required: true, description: 'Label text above input.' },
+  { name: 'status', type: "'pending' | 'running' | 'passed' | 'failed' | 'skipped'", required: true, description: 'Status.' },
+  { name: 'message', type: 'string', description: 'Message.' },
+  { name: 'duration', type: 'number', description: 'Duration.' },
 ]
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -820,6 +828,10 @@ export default function ConnectionTestPanelPage() {
       <section className="connection-test-panel-page__section" id="props">
         <h2 className="connection-test-panel-page__section-title"><a href="#props">Props</a></h2>
         <PropsTable props={propDefs} />
+        <h3 style={{ marginBlockStart: '1.5rem', marginBlockEnd: '0.5rem', fontWeight: 600, fontSize: 'var(--text-base)', color: 'var(--text-primary)' }}>
+          TestStep sub-type
+        </h3>
+        <PropsTable props={testStepDefs} />
       </section>
 
       {/* Accessibility */}

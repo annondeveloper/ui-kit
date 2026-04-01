@@ -431,11 +431,19 @@ const pageStyles = css`
 // ─── Props Data ───────────────────────────────────────────────────────────────
 
 const propDefs: PropDef[] = [
-  { name: 'items', type: 'PropertyItem[]', description: 'Array of key-value items to display. Each has label, value, optional copyable, mono, href.' },
-  { name: 'columns', type: '1 | 2', default: '1', description: 'Number of columns for the property list layout.' },
-  { name: 'size', type: "'sm' | 'md' | 'lg'", default: "'md'", description: 'Controls padding and font size.' },
-  { name: 'striped', type: 'boolean', default: 'false', description: 'Alternate row backgrounds for better readability.' },
-  { name: 'motion', type: '0 | 1 | 2 | 3', description: 'Animation intensity override.' },
+  { name: 'items', type: 'PropertyItem[]', required: true, description: 'Array of items to render.' },
+  { name: 'columns', type: '1 | 2', description: 'Columns.' },
+  { name: 'size', type: "'sm' | 'md' | 'lg'", description: 'Component size.' },
+  { name: 'striped', type: 'boolean', description: 'Striped toggle.' },
+  { name: 'motion', type: '0 | 1 | 2 | 3', description: 'Animation intensity (0=none, 1=subtle, 2=expressive, 3=cinematic).' },
+]
+
+const propertyItemDefs: PropDef[] = [
+  { name: 'label', type: 'string', required: true, description: 'Label text above input.' },
+  { name: 'value', type: 'ReactNode', required: true, description: 'Controlled value.' },
+  { name: 'copyable', type: 'boolean', description: 'Copyable toggle.' },
+  { name: 'mono', type: 'boolean', description: 'Mono toggle.' },
+  { name: 'href', type: 'string', description: 'Link URL.' },
 ]
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -841,6 +849,10 @@ export default function PropertyListPage() {
           <a href="#props">Props</a>
         </h2>
         <PropsTable props={propDefs} />
+        <h3 style={{ marginBlockStart: '1.5rem', marginBlockEnd: '0.5rem', fontWeight: 600, fontSize: 'var(--text-base)', color: 'var(--text-primary)' }}>
+          PropertyItem sub-type
+        </h3>
+        <PropsTable props={propertyItemDefs} />
       </section>
 
       {/* Accessibility */}
