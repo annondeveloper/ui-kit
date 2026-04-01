@@ -1,9 +1,23 @@
-import { forwardRef } from 'react'
-import { StatusBadge as StandardStatusBadge, type StatusBadgeProps } from '../components/status-badge'
+import { forwardRef, type HTMLAttributes } from 'react'
 
-export type LiteStatusBadgeProps = Omit<StatusBadgeProps, 'motion'>
+export interface LiteStatusBadgeProps extends HTMLAttributes<HTMLSpanElement> {
+  status: 'ok' | 'warning' | 'critical' | 'info' | 'unknown' | 'maintenance'
+  label?: string
+  size?: 'sm' | 'md' | 'lg'
+}
 
 export const StatusBadge = forwardRef<HTMLSpanElement, LiteStatusBadgeProps>(
-  (props, ref) => <StandardStatusBadge ref={ref} motion={0} {...props} />
+  ({ status, label, size = 'md', className, ...rest }, ref) => (
+    <span
+      ref={ref}
+      className={`ui-lite-status-badge${className ? ` ${className}` : ''}`}
+      data-status={status}
+      data-size={size}
+      {...rest}
+    >
+      <span className="ui-lite-status-badge__dot" />
+      {label && <span>{label}</span>}
+    </span>
+  )
 )
 StatusBadge.displayName = 'StatusBadge'

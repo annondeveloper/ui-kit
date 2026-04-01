@@ -1,9 +1,19 @@
-import { forwardRef } from 'react'
-import { Button as StandardButton, type ButtonProps } from '../components/button'
+import { forwardRef, type ButtonHTMLAttributes } from 'react'
 
-export type LiteButtonProps = Omit<ButtonProps, 'motion'>
+export interface LiteButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
+  variant?: 'primary' | 'secondary' | 'ghost' | 'danger' | 'link'
+  size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl'
+}
 
 export const Button = forwardRef<HTMLButtonElement, LiteButtonProps>(
-  (props, ref) => <StandardButton ref={ref} motion={0} {...props} />
+  ({ variant = 'primary', size = 'md', className, ...rest }, ref) => (
+    <button
+      ref={ref}
+      className={`ui-lite-button${className ? ` ${className}` : ''}`}
+      data-variant={variant}
+      data-size={size}
+      {...rest}
+    />
+  )
 )
 Button.displayName = 'Button'

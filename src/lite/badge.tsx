@@ -1,9 +1,19 @@
-import { forwardRef } from 'react'
-import { Badge as StandardBadge, type BadgeProps } from '../components/badge'
+import { forwardRef, type HTMLAttributes } from 'react'
 
-export type LiteBadgeProps = Omit<BadgeProps, 'motion'>
+export interface LiteBadgeProps extends HTMLAttributes<HTMLSpanElement> {
+  variant?: 'default' | 'primary' | 'success' | 'warning' | 'danger' | 'info'
+  size?: 'xs' | 'sm' | 'md'
+}
 
 export const Badge = forwardRef<HTMLSpanElement, LiteBadgeProps>(
-  (props, ref) => <StandardBadge ref={ref} motion={0} {...props} />
+  ({ variant = 'default', size = 'sm', className, ...rest }, ref) => (
+    <span
+      ref={ref}
+      className={`ui-lite-badge${className ? ` ${className}` : ''}`}
+      data-variant={variant}
+      data-size={size}
+      {...rest}
+    />
+  )
 )
 Badge.displayName = 'Badge'

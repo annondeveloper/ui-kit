@@ -1,9 +1,22 @@
-import { forwardRef } from 'react'
-import { SuccessCheckmark as StandardSuccessCheckmark, type SuccessCheckmarkProps } from '../components/success-checkmark'
+import { forwardRef, type HTMLAttributes } from 'react'
 
-export type LiteSuccessCheckmarkProps = Omit<SuccessCheckmarkProps, 'motion'>
+export interface LiteSuccessCheckmarkProps extends HTMLAttributes<HTMLSpanElement> {
+  size?: 'sm' | 'md' | 'lg'
+}
 
-export const SuccessCheckmark = forwardRef<HTMLDivElement, LiteSuccessCheckmarkProps>(
-  (props, ref) => <StandardSuccessCheckmark ref={ref} motion={0} {...props} />
+/** Lite success checkmark — static checkmark, no animation */
+export const SuccessCheckmark = forwardRef<HTMLSpanElement, LiteSuccessCheckmarkProps>(
+  ({ size = 'md', className, ...rest }, ref) => (
+    <span
+      ref={ref}
+      className={`ui-lite-success-checkmark${className ? ` ${className}` : ''}`}
+      data-size={size}
+      role="img"
+      aria-label="Success"
+      {...rest}
+    >
+      &#x2713;
+    </span>
+  )
 )
 SuccessCheckmark.displayName = 'SuccessCheckmark'

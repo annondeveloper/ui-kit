@@ -1,9 +1,14 @@
-import { forwardRef } from 'react'
-import { Divider as StandardDivider, type DividerProps } from '../components/divider'
+import { forwardRef, type HTMLAttributes } from 'react'
 
-export type LiteDividerProps = DividerProps
+export interface LiteDividerProps extends HTMLAttributes<HTMLHRElement> {}
 
 export const Divider = forwardRef<HTMLHRElement, LiteDividerProps>(
-  (props, ref) => <StandardDivider ref={ref} {...props} />
+  ({ className, ...rest }, ref) => (
+    <hr
+      ref={ref}
+      className={`ui-lite-divider${className ? ` ${className}` : ''}`}
+      {...rest}
+    />
+  )
 )
 Divider.displayName = 'Divider'

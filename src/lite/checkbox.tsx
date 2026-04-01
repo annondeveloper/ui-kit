@@ -1,9 +1,15 @@
-import { forwardRef } from 'react'
-import { Checkbox as StandardCheckbox, type CheckboxProps } from '../components/checkbox'
+import { forwardRef, type InputHTMLAttributes, type ReactNode } from 'react'
 
-export type LiteCheckboxProps = Omit<CheckboxProps, 'motion'>
+export interface LiteCheckboxProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 'type'> {
+  label?: ReactNode
+}
 
 export const Checkbox = forwardRef<HTMLInputElement, LiteCheckboxProps>(
-  (props, ref) => <StandardCheckbox ref={ref} motion={0} {...props} />
+  ({ label, className, ...rest }, ref) => (
+    <label className={`ui-lite-checkbox${className ? ` ${className}` : ''}`}>
+      <input ref={ref} type="checkbox" {...rest} />
+      {label != null && <span>{label}</span>}
+    </label>
+  )
 )
 Checkbox.displayName = 'Checkbox'

@@ -1,9 +1,21 @@
-import { forwardRef } from 'react'
-import { Skeleton as StandardSkeleton, type SkeletonProps } from '../components/skeleton'
+import { forwardRef, type HTMLAttributes } from 'react'
 
-export type LiteSkeletonProps = Omit<SkeletonProps, 'motion'>
+export interface LiteSkeletonProps extends HTMLAttributes<HTMLDivElement> {
+  variant?: 'text' | 'circular' | 'rectangular' | 'rounded'
+  width?: string | number
+  height?: string | number
+}
 
 export const Skeleton = forwardRef<HTMLDivElement, LiteSkeletonProps>(
-  (props, ref) => <StandardSkeleton ref={ref} motion={0} {...props} />
+  ({ variant = 'rectangular', width, height, className, style, ...rest }, ref) => (
+    <div
+      ref={ref}
+      className={`ui-lite-skeleton${className ? ` ${className}` : ''}`}
+      data-variant={variant}
+      aria-hidden="true"
+      style={{ width, height, ...style }}
+      {...rest}
+    />
+  )
 )
 Skeleton.displayName = 'Skeleton'

@@ -1,11 +1,27 @@
-import { forwardRef } from 'react'
-import { Accordion as StandardAccordion, type AccordionProps, type AccordionItem } from '../components/accordion'
+import { forwardRef, type HTMLAttributes, type ReactNode } from 'react'
 
-export type LiteAccordionItem = AccordionItem
+export interface LiteAccordionItem {
+  id: string
+  trigger: ReactNode
+  content: ReactNode
+  disabled?: boolean
+}
 
-export type LiteAccordionProps = Omit<AccordionProps, 'motion'>
+export interface LiteAccordionProps extends HTMLAttributes<HTMLDivElement> {
+  items: LiteAccordionItem[]
+  defaultOpen?: string[]
+}
 
 export const Accordion = forwardRef<HTMLDivElement, LiteAccordionProps>(
-  (props, ref) => <StandardAccordion ref={ref} motion={0} {...props} />
+  ({ items, defaultOpen = [], className, ...rest }, ref) => (
+    <div ref={ref} className={`ui-lite-accordion${className ? ` ${className}` : ''}`} {...rest}>
+      {items.map(item => (
+        <details key={item.id} open={defaultOpen.includes(item.id)} className="ui-lite-accordion__item">
+          <summary className="ui-lite-accordion__trigger">{item.trigger}</summary>
+          <div className="ui-lite-accordion__content">{item.content}</div>
+        </details>
+      ))}
+    </div>
+  )
 )
 Accordion.displayName = 'Accordion'
