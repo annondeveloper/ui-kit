@@ -225,7 +225,7 @@ export default function DocsPage() {
       <div className="docs-hero">
         <div className="docs-hero-row">
           <h1 className="docs-hero-title">Documentation</h1>
-          <Badge variant="info" size="sm">v2.7</Badge>
+          <Badge variant="info" size="sm">v2.7.0</Badge>
         </div>
         <p className="docs-hero-desc">
           Guides, API references, and tutorials for every feature in the UI Kit.

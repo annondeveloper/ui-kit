@@ -136,9 +136,12 @@ import { UIProvider } from '@annondeveloper/ui-kit'
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
+| `children` | `ReactNode` | — | **Required.** App content to render inside the provider |
+| `theme` | `ThemeTokens` | — | Optional custom theme token overrides |
 | `motion` | `0 \| 1 \| 2 \| 3` | `3` | Animation intensity |
 | `mode` | `'dark' \| 'light'` | `'dark'` | Color scheme |
 | `density` | `'compact' \| 'default' \| 'spacious'` | `'default'` | UI spacing density |
+| `onModeChange` | `(mode: 'dark' \| 'light') => void` | — | Callback when color mode changes |
 
 ### Motion Levels
 
