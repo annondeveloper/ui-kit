@@ -229,12 +229,12 @@ function ThresholdGaugeInner({
           />
         )}
 
-        {/* Value text centered */}
+        {/* Value text centered below arc */}
         {showValue && (
           <text
             className="ui-threshold-gauge__value-text"
             x={cx}
-            y={cy}
+            y={cy - strokeWidth * 0.5}
           >
             {value}
           </text>

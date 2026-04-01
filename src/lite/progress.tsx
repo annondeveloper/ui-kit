@@ -15,6 +15,13 @@ export const Progress = forwardRef<HTMLDivElement, LiteProgressProps>(
     const clampedValue = isIndeterminate ? undefined : Math.min(Math.max(0, value), max)
     const percent = isIndeterminate ? undefined : Math.round((clampedValue! / max) * 100)
 
+    const variantColors: Record<string, string> = {
+      default: 'var(--brand, oklch(65% 0.2 270))',
+      success: 'var(--status-ok, oklch(72% 0.19 155))',
+      warning: 'var(--status-warning, oklch(78% 0.17 85))',
+      danger: 'var(--status-critical, oklch(62% 0.22 25))',
+    }
+
     return (
       <div
         ref={ref}
@@ -29,7 +36,13 @@ export const Progress = forwardRef<HTMLDivElement, LiteProgressProps>(
         {...(isIndeterminate ? { 'data-indeterminate': '' } : {})}
         {...rest}
       >
-        <div className="ui-lite-progress__fill" style={!isIndeterminate ? { width: `${percent}%` } : undefined} />
+        <div
+          className="ui-lite-progress__fill"
+          style={!isIndeterminate ? {
+            width: `${percent}%`,
+            background: variantColors[variant] || variantColors.default,
+          } : undefined}
+        />
         {showValue && !isIndeterminate && (
           <span className="ui-lite-progress__value">{percent}%</span>
         )}
