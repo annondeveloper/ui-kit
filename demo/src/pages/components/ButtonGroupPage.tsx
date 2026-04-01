@@ -196,12 +196,12 @@ const pageStyles = css`
 const IMPORT_STR = "import { ButtonGroup } from '@ui/components/button-group'"
 
 const propsData: PropDef[] = [
-  { name: 'orientation', type: "'horizontal' | 'vertical'", default: "'horizontal'", description: 'Direction of the button group layout.' },
-  { name: 'attached', type: 'boolean', default: 'false', description: 'Merge borders between buttons for a seamless look.' },
-  { name: 'size', type: "'xs' | 'sm' | 'md' | 'lg'", default: "'md'", description: 'Size applied to all child buttons.' },
-  { name: 'variant', type: "'solid' | 'outline' | 'ghost'", default: "'outline'", description: 'Variant applied to all child buttons.' },
-  { name: 'disabled', type: 'boolean', default: 'false', description: 'Disable all buttons in the group.' },
-  { name: 'className', type: 'string', description: 'Additional CSS class for the root element.' },
+  { name: 'orientation', type: "'horizontal' | 'vertical'", default: "'horizontal'", description: 'Layout direction of grouped buttons.' },
+  { name: 'size', type: "'xs' | 'sm' | 'md' | 'lg' | 'xl'", default: "'md'", description: 'Size propagated to child buttons via CSS custom properties.' },
+  { name: 'variant', type: "'primary' | 'secondary' | 'ghost'", default: "'primary'", description: 'Variant propagated to child buttons via CSS custom properties.' },
+  { name: 'attached', type: 'boolean', default: 'false', description: 'Buttons visually connected (no gap, shared border-radius).' },
+  { name: 'motion', type: '0 | 1 | 2 | 3', description: 'Motion intensity level.' },
+  { name: 'children', type: 'ReactNode', required: true, description: 'Child content.' },
 ]
 
 // ─── Component ───────────────────────────────────────────────────────────────

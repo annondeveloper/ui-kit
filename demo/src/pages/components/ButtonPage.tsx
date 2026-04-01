@@ -839,24 +839,22 @@ const pageStyles = css`
 // ─── Props Data ───────────────────────────────────────────────────────────────
 
 const buttonProps: PropDef[] = [
-  { name: 'variant', type: "'primary' | 'secondary' | 'ghost' | 'danger' | 'link'", default: "'primary'", description: 'Visual style variant controlling colors and emphasis.' },
-  { name: 'size', type: "'xs' | 'sm' | 'md' | 'lg' | 'xl'", default: "'md'", description: 'Controls padding, font-size, and min-height.' },
-  { name: 'loading', type: 'boolean', default: 'false', description: 'Shows a spinner overlay and prevents interaction. Announces via aria-busy.' },
-  { name: 'icon', type: 'ReactNode', description: 'Leading icon element rendered before children.' },
-  { name: 'iconEnd', type: 'ReactNode', description: 'Trailing icon element rendered after children.' },
-  { name: 'disabled', type: 'boolean', default: 'false', description: 'Disables the button with reduced opacity and pointer-events: none.' },
-  { name: 'motion', type: '0 | 1 | 2 | 3', description: 'Animation intensity override. Cascades from OS > prop > CSS --motion > UIProvider.' },
-  { name: 'type', type: "'button' | 'submit' | 'reset'", default: "'button'", description: 'HTML button type. Defaults to "button" to prevent accidental form submission.' },
-  { name: 'onClick', type: '(e: MouseEvent) => void', description: 'Click handler. Debounced internally at 150ms to prevent double-clicks.' },
-  { name: 'className', type: 'string', description: 'Additional CSS class name merged with the component class.' },
-  { name: 'children', type: 'ReactNode', description: 'Button label content.' },
-  { name: 'ref', type: 'Ref<HTMLButtonElement>', description: 'Forwarded ref to the underlying <button> element.' },
-  { name: 'haptics', type: "boolean | 'light' | 'medium' | 'heavy' | 'selection' | 'success' | 'error'", description: 'Enable haptic vibration feedback on click. true uses light pattern.' },
-  { name: 'shortcuts', type: '{ activate?: string }', description: "Custom keyboard shortcut to activate this button. Example: 'ctrl+s'" },
-  { name: 'loadingText', type: 'string', description: 'Custom text shown during loading instead of hiding content.' },
-  { name: 'fullWidth', type: 'boolean', default: 'false', description: 'Makes button stretch to fill container width.' },
-  { name: 'iconOnly', type: 'boolean', default: 'false', description: 'Compact square button for icon-only usage.' },
-  { name: 'classNames', type: "Partial<Record<'root' | 'icon' | 'iconEnd', string>>", description: 'Custom classes for inner parts.' },
+  { name: 'variant', type: "'primary' | 'secondary' | 'ghost' | 'danger' | 'link'", default: "'primary'", description: 'Visual style variant.' },
+  { name: 'size', type: "'xs' | 'sm' | 'md' | 'lg' | 'xl'", default: "'md'", description: 'Component size.' },
+  { name: 'loading', type: 'boolean', default: 'false', description: 'Shows loading spinner.' },
+  { name: 'loadingText', type: 'string', description: 'Custom text to display during loading state instead of hiding content.' },
+  { name: 'icon', type: 'ReactNode', description: 'Leading icon element.' },
+  { name: 'iconEnd', type: 'ReactNode', description: 'Trailing icon element.' },
+  { name: 'fullWidth', type: 'boolean', description: 'Makes the button fill the full width of its container.' },
+  { name: 'iconOnly', type: 'boolean', description: 'Compact square button for icon-only usage (no text, adjusts sizing).' },
+  { name: 'motion', type: '0 | 1 | 2 | 3', description: 'Animation intensity (0=none, 1=subtle, 2=expressive, 3=cinematic).' },
+  { name: 'haptics', type: 'boolean | HapticType', description: "Enable haptic feedback on click. true uses 'light', or pass a specific pattern." },
+  { name: 'shortcuts', type: 'ButtonShortcuts', description: 'Custom keyboard shortcuts for this button.' },
+  { name: 'classNames', type: "Partial<Record<'root' | 'icon' | 'iconEnd', string>>", description: 'Custom class names for internal parts.' },
+]
+
+const buttonShortcutsProps: PropDef[] = [
+  { name: 'activate', type: 'string', description: 'Keyboard shortcut string to activate this button.' },
 ]
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -1969,6 +1967,10 @@ export default function ButtonPage() {
         </p>
         <Card variant="default" padding="md">
           <PropsTable props={buttonProps} />
+        </Card>
+        <h3 className="button-page__section-title" style={{ fontSize: 'var(--text-base)', marginBlockStart: '1rem' }}>ButtonShortcuts</h3>
+        <Card variant="default" padding="md">
+          <PropsTable props={buttonShortcutsProps} />
         </Card>
       </section>
 

@@ -701,15 +701,10 @@ const pageStyles = css`
 // ─── Props Data ───────────────────────────────────────────────────────────────
 
 const shimmerButtonProps: PropDef[] = [
-  { name: 'shimmerColor', type: 'string', description: 'Custom OKLCH or CSS color for the rotating shimmer border effect. Defaults to brand purple.' },
-  { name: 'size', type: "'sm' | 'md' | 'lg'", default: "'md'", description: 'Controls padding, font-size, and min-height of the button.' },
-  { name: 'motion', type: '0 | 1 | 2 | 3', description: 'Animation intensity override. 0 shows static shimmer glow. Cascades from OS > prop > CSS --motion > UIProvider.' },
-  { name: 'disabled', type: 'boolean', default: 'false', description: 'Disables the button with reduced opacity and pointer-events: none.' },
-  { name: 'children', type: 'ReactNode', description: 'Button label content.' },
-  { name: 'className', type: 'string', description: 'Additional CSS class name merged with the component class.' },
-  { name: 'style', type: 'CSSProperties', description: 'Inline styles applied to the root button element.' },
-  { name: 'onClick', type: '(e: MouseEvent) => void', description: 'Click handler on the underlying button element.' },
-  { name: 'type', type: "'button' | 'submit' | 'reset'", description: 'HTML button type attribute.' },
+  { name: 'shimmerColor', type: 'string', description: 'Shimmer color.' },
+  { name: 'children', type: 'ReactNode', required: true, description: 'Child content.' },
+  { name: 'size', type: "'sm' | 'md' | 'lg'", default: "'md'", description: 'Component size.' },
+  { name: 'motion', type: '0 | 1 | 2 | 3', description: 'Animation intensity (0=none, 1=subtle, 2=expressive, 3=cinematic).' },
 ]
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────

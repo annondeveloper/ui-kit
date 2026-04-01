@@ -214,15 +214,14 @@ const pageStyles = css`
 // ─── Props Data ──────────────────────────────────────────────────────────────
 
 const PROPS: PropDef[] = [
-  { name: 'variant', type: "'filled' | 'light' | 'outline' | 'subtle' | 'transparent'", default: "'filled'", description: 'Visual style variant.' },
-  { name: 'color', type: "'default' | 'primary' | 'success' | 'warning' | 'danger'", default: "'default'", description: 'Color scheme.' },
-  { name: 'size', type: "'xs' | 'sm' | 'md' | 'lg' | 'xl'", default: "'md'", description: 'Icon button size. Controls dimensions and icon scale.' },
-  { name: 'radius', type: "'sm' | 'md' | 'lg' | 'full'", default: "'md'", description: 'Border radius.' },
-  { name: 'loading', type: 'boolean', default: 'false', description: 'Shows a spinner and disables interaction.' },
-  { name: 'disabled', type: 'boolean', default: 'false', description: 'Disables the button.' },
-  { name: 'aria-label', type: 'string', required: true, description: 'Required accessible label since the button has no visible text.' },
-  { name: 'children', type: 'ReactNode', required: true, description: 'Icon element to render inside the button.' },
-  { name: 'motion', type: '0 | 1 | 2 | 3', description: 'Motion intensity level.' },
+  { name: 'variant', type: "'filled' | 'light' | 'outline' | 'subtle' | 'transparent'", default: "'subtle'", description: 'Visual style variant.' },
+  { name: 'color', type: "'default' | 'primary' | 'success' | 'warning' | 'danger'", default: "'default'", description: 'Color variant or custom color.' },
+  { name: 'size', type: "'xs' | 'sm' | 'md' | 'lg' | 'xl'", default: "'md'", description: 'Component size.' },
+  { name: 'radius', type: "'sm' | 'md' | 'lg' | 'full'", default: "'md'", description: 'Border radius override.' },
+  { name: 'loading', type: 'boolean', default: 'false', description: 'Shows loading spinner.' },
+  { name: 'disabled', type: 'boolean', description: 'Disables interaction.' },
+  { name: 'children', type: 'ReactNode', required: true, description: 'Child content.' },
+  { name: 'motion', type: '0 | 1 | 2 | 3', description: 'Animation intensity (0=none, 1=subtle, 2=expressive, 3=cinematic).' },
 ]
 
 const IMPORT = "import { ActionIcon } from '@ui/components/action-icon'"

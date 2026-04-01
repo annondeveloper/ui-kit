@@ -229,11 +229,11 @@ const pageStyles = css`
 // ─── Props Data ──────────────────────────────────────────────────────────────
 
 const PROPS: PropDef[] = [
-  { name: 'value', type: 'string', required: true, description: 'The text value to copy to the clipboard.' },
-  { name: 'timeout', type: 'number', default: '1000', description: 'Duration in ms to show the "copied" state before resetting.' },
-  { name: 'children', type: '(payload: { copied: boolean; copy: () => void }) => ReactNode', required: true, description: 'Render function receiving copied state and copy action.' },
-  { name: 'size', type: "'xs' | 'sm' | 'md' | 'lg'", default: "'sm'", description: 'Size of the button wrapper.' },
-  { name: 'motion', type: '0 | 1 | 2 | 3', description: 'Motion intensity level.' },
+  { name: 'value', type: 'string', required: true, description: 'Controlled value.' },
+  { name: 'timeout', type: 'number', description: 'Duration in ms to show the copied state before resetting.' },
+  { name: 'children', type: '(payload: { copied: boolean; copy: () => void }) => ReactNode', required: true, description: 'Render prop receiving copied state and copy trigger.' },
+  { name: 'size', type: "'xs' | 'sm' | 'md' | 'lg'", description: 'Component size.' },
+  { name: 'motion', type: '0 | 1 | 2 | 3', description: 'Animation intensity (0=none, 1=subtle, 2=expressive, 3=cinematic).' },
 ]
 
 const IMPORT = "import { CopyButton } from '@ui/components/copy-button'"
