@@ -590,12 +590,8 @@ const pageStyles = css`
 // ─── Props Data ───────────────────────────────────────────────────────────────
 
 const viewTransitionLinkProps: PropDef[] = [
-  { name: 'href', type: 'string', description: 'The URL to navigate to. Falls through to native anchor navigation when View Transitions API is unavailable.' },
-  { name: 'transitionName', type: 'string', description: 'CSS view-transition-name applied via inline style. Used to create named transitions between pages.' },
-  { name: 'children', type: 'ReactNode', required: true, description: 'The link content (text, icons, or any elements).' },
-  { name: 'onClick', type: '(e: MouseEvent) => void', description: 'Click handler called before the view transition starts. Call e.preventDefault() to cancel navigation.' },
-  { name: 'className', type: 'string', description: 'Additional CSS class name for the anchor element.' },
-  { name: 'style', type: 'CSSProperties', description: 'Inline styles merged with the transition name style.' },
+  { name: 'transitionName', type: 'string', description: 'Transition name for the View Transitions API.' },
+  { name: 'children', type: 'ReactNode', required: true, description: 'Child content.' },
 ]
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────

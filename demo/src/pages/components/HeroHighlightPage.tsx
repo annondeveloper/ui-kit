@@ -654,9 +654,8 @@ const pageStyles = css`
 // ─── Props Data ───────────────────────────────────────────────────────────────
 
 const heroHighlightProps: PropDef[] = [
-  { name: 'children', type: 'ReactNode', description: 'Content rendered inside the hero highlight container.' },
-  { name: 'motion', type: '0 | 1 | 2 | 3', description: 'Animation intensity override for the container. Cascades from OS > prop > CSS --motion > UIProvider.' },
-  { name: 'className', type: 'string', description: 'Additional CSS class name merged with the component class.' },
+  { name: 'children', type: 'ReactNode', required: true, description: 'Child content.' },
+  { name: 'motion', type: '0 | 1 | 2 | 3', description: 'Animation intensity (0=none, 1=subtle, 2=expressive, 3=cinematic).' },
 ]
 
 const highlightProps: PropDef[] = [

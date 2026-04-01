@@ -678,14 +678,10 @@ const pageStyles = css`
 
 const card3DProps: PropDef[] = [
   { name: 'perspective', type: 'number', default: '1000', description: 'CSS perspective value in pixels. Lower values create more dramatic 3D rotation.' },
-  { name: 'maxTilt', type: 'number', default: '10', description: 'Maximum tilt angle in degrees. Higher values create more dramatic rotation on hover.' },
+  { name: 'maxTilt', type: 'number', default: '10', description: 'Maximum tilt angle in degrees.' },
   { name: 'glare', type: 'boolean', default: 'true', description: 'Show a directional glare overlay that follows cursor position.' },
-  { name: 'motion', type: '0 | 1 | 2 | 3', description: 'Animation intensity override. 0 disables tilt and glare. Cascades from OS > prop > CSS --motion > UIProvider.' },
-  { name: 'children', type: 'ReactNode', description: 'Content rendered inside the card with preserve-3d transform style.' },
-  { name: 'className', type: 'string', description: 'Additional CSS class name merged with the component class.' },
-  { name: 'style', type: 'CSSProperties', description: 'Inline styles applied to the root element.' },
-  { name: 'onMouseMove', type: '(e: MouseEvent) => void', description: 'Mouse move handler. Called alongside internal tilt tracking.' },
-  { name: 'onMouseLeave', type: '(e: MouseEvent) => void', description: 'Mouse leave handler. Called alongside tilt reset to 0.' },
+  { name: 'children', type: 'ReactNode', description: 'Content rendered inside the card.' },
+  { name: 'motion', type: '0 | 1 | 2 | 3', description: 'Animation intensity (0=none, 1=subtle, 2=expressive, 3=cinematic).' },
 ]
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────

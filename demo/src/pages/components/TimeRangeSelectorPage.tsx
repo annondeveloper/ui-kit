@@ -528,12 +528,17 @@ const pageStyles = css`
 // ─── Props Data ───────────────────────────────────────────────────────────────
 
 const timeRangeProps: PropDef[] = [
-  { name: 'presets', type: 'TimeRangePreset[]', description: 'Array of preset time ranges. Each preset has label, value, and range [start, end] in ms.' },
-  { name: 'value', type: '[number, number]', description: 'Controlled value as a tuple of [startMs, endMs] timestamps.' },
-  { name: 'onChange', type: '(range: [number, number]) => void', description: 'Callback fired when the selected range changes.' },
-  { name: 'showCustom', type: 'boolean', default: 'false', description: 'Show custom datetime-local inputs for manual range entry.' },
-  { name: 'motion', type: '0 | 1 | 2 | 3', description: 'Animation intensity override. Cascades from OS > prop > CSS --motion > UIProvider.' },
-  { name: 'className', type: 'string', description: 'Additional CSS class name for the root element.' },
+  { name: 'presets', type: 'TimeRangePreset[]', description: 'Array of preset time ranges.' },
+  { name: 'value', type: '[number, number]', description: 'Controlled value.' },
+  { name: 'onChange', type: '(range: [number, number]) => void', description: 'Callback on value change.' },
+  { name: 'showCustom', type: 'boolean', description: 'Show custom date/time inputs for manual range entry.' },
+  { name: 'motion', type: '0 | 1 | 2 | 3', description: 'Animation intensity (0=none, 1=subtle, 2=expressive, 3=cinematic).' },
+]
+
+const timeRangePresetProps: PropDef[] = [
+  { name: 'label', type: 'string', required: true, description: 'Label text for the preset button.' },
+  { name: 'value', type: 'string', required: true, description: 'Unique value identifier for the preset.' },
+  { name: 'range', type: '[number, number]', required: true, description: 'Start and end timestamps in milliseconds.' },
 ]
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -1169,7 +1174,20 @@ export default function TimeRangeSelectorPage() {
         </Card>
       </section>
 
-      {/* ── 9. Accessibility ──────────────────────────── */}
+      {/* ── 9. TimeRangePreset Sub-Type ───────────────── */}
+      <section className="time-range-selector-page__section" id="preset-type">
+        <h2 className="time-range-selector-page__section-title">
+          <a href="#preset-type">TimeRangePreset</a>
+        </h2>
+        <p className="time-range-selector-page__section-desc">
+          Shape of each object in the <code>presets</code> array.
+        </p>
+        <Card variant="default" padding="md">
+          <PropsTable props={timeRangePresetProps} />
+        </Card>
+      </section>
+
+      {/* ── 10. Accessibility ──────────────────────────── */}
       <section className="time-range-selector-page__section" id="accessibility">
         <h2 className="time-range-selector-page__section-title">
           <a href="#accessibility">Accessibility</a>

@@ -669,14 +669,13 @@ const pageStyles = css`
 // ─── Props Data ───────────────────────────────────────────────────────────────
 
 const responsiveCardProps: PropDef[] = [
-  { name: 'title', type: 'ReactNode', description: 'Card title displayed as an h3 heading. Required.' },
-  { name: 'description', type: 'ReactNode', description: 'Optional description text displayed below the title.' },
-  { name: 'image', type: 'ReactNode', description: 'Optional image or media element displayed in the card image slot.' },
-  { name: 'actions', type: 'ReactNode', description: 'Optional actions area rendered at the bottom of the card (buttons, links).' },
-  { name: 'badge', type: 'ReactNode', description: 'Optional badge element positioned absolutely at the top-right corner.' },
-  { name: 'variant', type: "'default' | 'horizontal' | 'compact'", default: "'default'", description: 'Layout variant. Default auto-switches based on container width. Horizontal forces side-by-side. Compact reduces padding.' },
-  { name: 'motion', type: '0 | 1 | 2 | 3', description: 'Animation intensity. Controls hover lift effect. 0 disables all transitions.' },
-  { name: 'className', type: 'string', description: 'Additional CSS class name merged with the component class.' },
+  { name: 'image', type: 'ReactNode', description: 'Image or media element displayed in the card image slot.' },
+  { name: 'title', type: 'ReactNode', required: true, description: 'Title text.' },
+  { name: 'description', type: 'ReactNode', description: 'Helper text below the title.' },
+  { name: 'actions', type: 'ReactNode', description: 'Actions area rendered at the bottom of the card (buttons, links).' },
+  { name: 'badge', type: 'ReactNode', description: 'Badge/count shown next to label.' },
+  { name: 'variant', type: "'default' | 'horizontal' | 'compact'", description: 'Visual style variant.' },
+  { name: 'motion', type: '0 | 1 | 2 | 3', description: 'Animation intensity (0=none, 1=subtle, 2=expressive, 3=cinematic).' },
 ]
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────

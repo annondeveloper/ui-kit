@@ -676,11 +676,9 @@ const pageStyles = css`
 // ─── Props Data ───────────────────────────────────────────────────────────────
 
 const tracingBeamProps: PropDef[] = [
-  { name: 'color', type: 'string', description: 'Beam color override. Accepts any CSS color. Defaults to brand purple (oklch(75% 0.15 270)).' },
-  { name: 'children', type: 'ReactNode', description: 'Content rendered beside the tracing beam track.' },
-  { name: 'motion', type: '0 | 1 | 2 | 3', description: 'Animation intensity override. 0 shows the full beam statically without scroll tracking.' },
-  { name: 'className', type: 'string', description: 'Additional CSS class name merged with the component class.' },
-  { name: 'style', type: 'CSSProperties', description: 'Inline styles applied to the root element.' },
+  { name: 'color', type: 'string', description: 'Color variant or custom color.' },
+  { name: 'children', type: 'ReactNode', required: true, description: 'Child content.' },
+  { name: 'motion', type: '0 | 1 | 2 | 3', description: 'Animation intensity (0=none, 1=subtle, 2=expressive, 3=cinematic).' },
 ]
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────

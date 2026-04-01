@@ -679,11 +679,7 @@ const csvExportProps: PropDef[] = [
   { name: 'columns', type: '{ key: string; label: string }[]', description: 'Column configuration for export. Defines key mapping and header labels. Defaults to all keys from first row.' },
   { name: 'onExport', type: '() => void', description: 'Callback fired after successful CSV export/download.' },
   { name: 'size', type: "'xs' | 'sm' | 'md' | 'lg' | 'xl'", default: "'md'", description: 'Controls padding, font-size, and min-height of the export button.' },
-  { name: 'motion', type: '0 | 1 | 2 | 3', description: 'Animation intensity for press and success feedback. Cascades from OS > prop > CSS --motion > UIProvider.' },
-  { name: 'disabled', type: 'boolean', default: 'false', description: 'Disables the export button with reduced opacity and pointer-events: none.' },
-  { name: 'children', type: 'ReactNode', description: "Button label content. Defaults to 'Export CSV' with success state showing 'Exported!'." },
-  { name: 'className', type: 'string', description: 'Additional CSS class name merged with the component class.' },
-  { name: 'ref', type: 'Ref<HTMLButtonElement>', description: 'Forwarded ref to the underlying <button> element.' },
+  { name: 'motion', type: '0 | 1 | 2 | 3', description: 'Animation intensity (0=none, 1=subtle, 2=expressive, 3=cinematic).' },
 ]
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
