@@ -4,9 +4,12 @@ import { useEffect } from 'react'
 import { css } from '@ui/core/styles/css-tag'
 import { useStyles } from '@ui/core/styles/use-styles'
 import { ScrollReveal } from '@ui/domain/scroll-reveal'
+import { ScrollReveal as LiteScrollReveal } from '@ui/lite/scroll-reveal'
+import { ScrollReveal as PremiumScrollReveal } from '@ui/premium/scroll-reveal'
 import { Card } from '@ui/components/card'
 import { CopyBlock } from '@ui/domain/copy-block'
 import { PropsTable, type PropDef } from '../../components/PropsTable'
+import { useTier } from '../../App'
 
 // ─── Props ───────────────────────────────────────────────────────────────────
 
@@ -218,6 +221,71 @@ const pageStyles = css`
         font-size: var(--text-sm, 0.875rem);
         font-style: italic;
       }
+
+      /* ── Tiers ───────────────────────────────── */
+
+      .scroll-reveal-page__tiers {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 1rem;
+      }
+
+      .scroll-reveal-page__tier-card {
+        background: var(--bg-surface);
+        border: 1px solid var(--border-subtle);
+        border-radius: var(--radius-md);
+        padding: 1.5rem;
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+        min-width: 0;
+        overflow: hidden;
+      }
+
+      .scroll-reveal-page__tier-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+
+      .scroll-reveal-page__tier-name {
+        font-size: var(--text-sm, 0.875rem);
+        font-weight: 700;
+        color: var(--text-primary);
+      }
+
+      .scroll-reveal-page__tier-size {
+        font-size: var(--text-xs, 0.75rem);
+        color: var(--text-tertiary);
+        font-family: 'SF Mono', 'Fira Code', 'JetBrains Mono', monospace;
+      }
+
+      .scroll-reveal-page__tier-desc {
+        font-size: var(--text-xs, 0.75rem);
+        color: var(--text-secondary);
+        line-height: 1.5;
+      }
+
+      .scroll-reveal-page__tier-import {
+        font-family: 'SF Mono', 'Fira Code', 'JetBrains Mono', monospace;
+        font-size: 0.625rem;
+        color: oklch(from var(--brand) calc(l + 0.1) c h);
+        background: var(--border-subtle);
+        padding: 0.375rem 0.5rem;
+        border-radius: var(--radius-sm);
+        overflow-wrap: break-word;
+        word-break: break-all;
+        line-height: 1.4;
+      }
+
+      .scroll-reveal-page__tier-preview {
+        padding-block-start: 0.5rem;
+        overflow: hidden;
+      }
+
+      @container (max-width: 640px) {
+        .scroll-reveal-page__tiers { grid-template-columns: 1fr; }
+      }
     }
   }
 `
@@ -230,6 +298,9 @@ const ANIMATIONS = ['fade-up', 'fade-down', 'fade-left', 'fade-right', 'scale'] 
 
 export default function ScrollRevealPage() {
   useStyles('scroll-reveal-page', pageStyles)
+
+  const { tier } = useTier()
+  const ActiveScrollReveal = tier === 'lite' ? LiteScrollReveal : tier === 'premium' ? PremiumScrollReveal : ScrollReveal
 
   useEffect(() => {
     const sections = document.querySelectorAll('.scroll-reveal-page__section')
@@ -279,7 +350,7 @@ export default function ScrollRevealPage() {
         <div className="scroll-reveal-page__preview">
           <div className="scroll-reveal-page__hint">Scroll within the page to trigger reveals below</div>
           {ANIMATIONS.map((anim, i) => (
-            <ScrollReveal key={anim} animation={anim} delay={i * 100} once>
+            <ActiveScrollReveal key={anim} animation={anim} delay={i * 100} once>
               <div className="scroll-reveal-page__card">
                 <p className="scroll-reveal-page__card-title">{anim}</p>
                 <p className="scroll-reveal-page__card-desc">
@@ -290,7 +361,7 @@ export default function ScrollRevealPage() {
                   {anim === 'scale' && 'Fades in while scaling from 90% to 100%.'}
                 </p>
               </div>
-            </ScrollReveal>
+            </ActiveScrollReveal>
           ))}
         </div>
       </section>
@@ -303,7 +374,7 @@ export default function ScrollRevealPage() {
           Each child receives an incremental delay.
         </p>
         <div className="scroll-reveal-page__preview">
-          <ScrollReveal animation="fade-up" stagger={80} once>
+          <ActiveScrollReveal animation="fade-up" stagger={80} once>
             <div className="scroll-reveal-page__grid">
               {Array.from({ length: 6 }, (_, i) => (
                 <div key={i} className="scroll-reveal-page__card">
@@ -312,7 +383,7 @@ export default function ScrollRevealPage() {
                 </div>
               ))}
             </div>
-          </ScrollReveal>
+          </ActiveScrollReveal>
         </div>
       </section>
 
@@ -324,7 +395,7 @@ export default function ScrollRevealPage() {
           most of it is visible. Useful for important above-the-fold content.
         </p>
         <div className="scroll-reveal-page__preview">
-          <ScrollReveal animation="scale" delay={300} threshold={0.5} once>
+          <ActiveScrollReveal animation="scale" delay={300} threshold={0.5} once>
             <div className="scroll-reveal-page__card" style={{ padding: '2.5rem' }}>
               <p className="scroll-reveal-page__card-title">Delayed Scale Reveal</p>
               <p className="scroll-reveal-page__card-desc">
@@ -332,7 +403,89 @@ export default function ScrollRevealPage() {
                 the animation triggers, then waits an additional 300ms.
               </p>
             </div>
-          </ScrollReveal>
+          </ActiveScrollReveal>
+        </div>
+      </section>
+
+      {/* ── Tiers ─────────────────────────────────────── */}
+      <section className="scroll-reveal-page__section" id="tiers">
+        <h2 className="scroll-reveal-page__section-title"><a href="#tiers">Weight Tiers</a></h2>
+        <p className="scroll-reveal-page__section-desc">
+          Three tiers let you choose between static rendering, intersection-observer animations,
+          and spring-physics reveals. Lite always shows content without animation — ideal for SSR
+          and reduced-motion contexts; Standard adds IntersectionObserver-driven reveal animations
+          with 5 directions, stagger, delay, and threshold control; Premium wraps Standard with
+          spring overshoot on entry, aurora shimmer on revealed elements, and full motion-level support.
+        </p>
+        <div className="scroll-reveal-page__tiers">
+          {/* Lite */}
+          <div className="scroll-reveal-page__tier-card">
+            <div className="scroll-reveal-page__tier-header">
+              <span className="scroll-reveal-page__tier-name">Lite</span>
+              <span className="scroll-reveal-page__tier-size">~0.1 KB</span>
+            </div>
+            <p className="scroll-reveal-page__tier-desc">
+              Renders children immediately with no animation or IntersectionObserver. A simple div
+              wrapper — perfect for SSR, prefers-reduced-motion contexts, or when animation is unwanted.
+            </p>
+            <div className="scroll-reveal-page__tier-import">
+              import {'{'} ScrollReveal {'}'} from '@annondeveloper/ui-kit/lite'
+            </div>
+            <div className="scroll-reveal-page__tier-preview">
+              <LiteScrollReveal>
+                <div className="scroll-reveal-page__card">
+                  <p className="scroll-reveal-page__card-title">Always visible</p>
+                  <p className="scroll-reveal-page__card-desc">No animation — content shows immediately.</p>
+                </div>
+              </LiteScrollReveal>
+            </div>
+          </div>
+
+          {/* Standard */}
+          <div className="scroll-reveal-page__tier-card">
+            <div className="scroll-reveal-page__tier-header">
+              <span className="scroll-reveal-page__tier-name">Standard</span>
+              <span className="scroll-reveal-page__tier-size">~1.8 KB</span>
+            </div>
+            <p className="scroll-reveal-page__tier-desc">
+              IntersectionObserver-driven reveals with 5 animation directions (fade-up/down/left/right/scale),
+              stagger for child elements, configurable delay, threshold, and once behaviour.
+            </p>
+            <div className="scroll-reveal-page__tier-import">
+              import {'{'} ScrollReveal {'}'} from '@annondeveloper/ui-kit'
+            </div>
+            <div className="scroll-reveal-page__tier-preview">
+              <ScrollReveal animation="fade-up" once>
+                <div className="scroll-reveal-page__card">
+                  <p className="scroll-reveal-page__card-title">fade-up</p>
+                  <p className="scroll-reveal-page__card-desc">IntersectionObserver reveal.</p>
+                </div>
+              </ScrollReveal>
+            </div>
+          </div>
+
+          {/* Premium */}
+          <div className="scroll-reveal-page__tier-card">
+            <div className="scroll-reveal-page__tier-header">
+              <span className="scroll-reveal-page__tier-name">Premium</span>
+              <span className="scroll-reveal-page__tier-size">~2.3 KB</span>
+            </div>
+            <p className="scroll-reveal-page__tier-desc">
+              Wraps Standard with spring overshoot on entry (motion level 3), aurora shimmer on
+              revealed elements, enhanced stagger with spring easing, and motion-level-aware degradation.
+            </p>
+            <div className="scroll-reveal-page__tier-import">
+              import {'{'} ScrollReveal {'}'} from '@annondeveloper/ui-kit/premium'
+            </div>
+            <div className="scroll-reveal-page__tier-preview">
+              <PremiumScrollReveal animation="scale" once>
+                <div className="scroll-reveal-page__card">
+                  <p className="scroll-reveal-page__card-title">Spring scale</p>
+                  <p className="scroll-reveal-page__card-desc">Spring overshoot on entry.</p>
+                </div>
+              </PremiumScrollReveal>
+            </div>
+          </div>
         </div>
       </section>
 

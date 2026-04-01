@@ -10,6 +10,7 @@ import { Button } from '@ui/components/button'
 import { Card } from '@ui/components/card'
 import { Icon } from '@ui/core/icons/icon'
 import { PropsTable, type PropDef } from '../../components/PropsTable'
+import { useTier } from '../../App'
 
 // ─── Styles ──────────────────────────────────────────────────────────────────
 
@@ -317,6 +318,9 @@ const SAMPLE_TEXT =
 export default function HighlightPage() {
   useStyles('highlight-page', pageStyles)
 
+  const { tier } = useTier()
+  const ActiveHighlight = tier === 'lite' ? LiteHighlight : tier === 'premium' ? PremiumHighlight : Highlight
+
   const [copied, setCopied] = useState(false)
   const [search, setSearch] = useState('React')
 
@@ -362,7 +366,7 @@ export default function HighlightPage() {
             aria-label="Search text to highlight"
           />
           <div className={`${PAGE}__sample-text`}>
-            <Highlight highlight={search}>{SAMPLE_TEXT}</Highlight>
+            <ActiveHighlight highlight={search}>{SAMPLE_TEXT}</ActiveHighlight>
           </div>
         </div>
       </section>
@@ -378,21 +382,21 @@ export default function HighlightPage() {
           <div className={`${PAGE}__labeled-item`}>
             <span className={`${PAGE}__item-label`}>multiple terms: ["React", "components", "UIs"]</span>
             <div className={`${PAGE}__sample-text`}>
-              <Highlight highlight={['React', 'components', 'UIs']}>{SAMPLE_TEXT}</Highlight>
+              <ActiveHighlight highlight={['React', 'components', 'UIs']}>{SAMPLE_TEXT}</ActiveHighlight>
             </div>
           </div>
 
           <div className={`${PAGE}__labeled-item`}>
             <span className={`${PAGE}__item-label`}>custom color (oklch green)</span>
             <div className={`${PAGE}__sample-text`}>
-              <Highlight highlight="JavaScript" color="oklch(75% 0.15 145 / 0.3)">{SAMPLE_TEXT}</Highlight>
+              <ActiveHighlight highlight="JavaScript" color="oklch(75% 0.15 145 / 0.3)">{SAMPLE_TEXT}</ActiveHighlight>
             </div>
           </div>
 
           <div className={`${PAGE}__labeled-item`}>
             <span className={`${PAGE}__item-label`}>case-sensitive: "react" (no match) vs "React" (match)</span>
             <div className={`${PAGE}__sample-text`}>
-              <Highlight highlight="react" caseSensitive>{SAMPLE_TEXT}</Highlight>
+              <ActiveHighlight highlight="react" caseSensitive>{SAMPLE_TEXT}</ActiveHighlight>
             </div>
           </div>
         </div>

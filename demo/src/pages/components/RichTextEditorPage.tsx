@@ -4,8 +4,11 @@ import { useState, useEffect } from 'react'
 import { css } from '@ui/core/styles/css-tag'
 import { useStyles } from '@ui/core/styles/use-styles'
 import { RichTextEditor } from '@ui/domain/rich-text-editor'
+import { RichTextEditor as LiteRichTextEditor } from '@ui/lite/rich-text-editor'
+import { RichTextEditor as PremiumRichTextEditor } from '@ui/premium/rich-text-editor'
 import { CopyBlock } from '@ui/domain/copy-block'
 import { PropsTable, type PropDef } from '../../components/PropsTable'
+import { useTier } from '../../App'
 
 // ─── Props ───────────────────────────────────────────────────────────────────
 
@@ -200,6 +203,71 @@ const pageStyles = css`
         margin-block-start: 1rem;
         margin-block-end: 0.25rem;
       }
+
+      /* ── Tiers ───────────────────────────────── */
+
+      .rte-page__tiers {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 1rem;
+      }
+
+      .rte-page__tier-card {
+        background: var(--bg-surface);
+        border: 1px solid var(--border-subtle);
+        border-radius: var(--radius-md);
+        padding: 1.5rem;
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+        min-width: 0;
+        overflow: hidden;
+      }
+
+      .rte-page__tier-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+
+      .rte-page__tier-name {
+        font-size: var(--text-sm, 0.875rem);
+        font-weight: 700;
+        color: var(--text-primary);
+      }
+
+      .rte-page__tier-size {
+        font-size: var(--text-xs, 0.75rem);
+        color: var(--text-tertiary);
+        font-family: 'SF Mono', 'Fira Code', 'JetBrains Mono', monospace;
+      }
+
+      .rte-page__tier-desc {
+        font-size: var(--text-xs, 0.75rem);
+        color: var(--text-secondary);
+        line-height: 1.5;
+      }
+
+      .rte-page__tier-import {
+        font-family: 'SF Mono', 'Fira Code', 'JetBrains Mono', monospace;
+        font-size: 0.625rem;
+        color: oklch(from var(--brand) calc(l + 0.1) c h);
+        background: var(--border-subtle);
+        padding: 0.375rem 0.5rem;
+        border-radius: var(--radius-sm);
+        overflow-wrap: break-word;
+        word-break: break-all;
+        line-height: 1.4;
+      }
+
+      .rte-page__tier-preview {
+        padding-block-start: 0.5rem;
+        overflow: hidden;
+      }
+
+      @container (max-width: 640px) {
+        .rte-page__tiers { grid-template-columns: 1fr; }
+      }
     }
   }
 `
@@ -210,6 +278,9 @@ const IMPORT_STR = "import { RichTextEditor } from '@ui/domain/rich-text-editor'
 
 export default function RichTextEditorPage() {
   useStyles('rte-page', pageStyles)
+
+  const { tier } = useTier()
+  const ActiveRTE = tier === 'lite' ? LiteRichTextEditor : tier === 'premium' ? PremiumRichTextEditor : RichTextEditor
 
   const [html, setHtml] = useState('<p>Try <strong>bold</strong>, <em>italic</em>, and <a href="#">links</a>.</p>')
 
@@ -259,7 +330,7 @@ export default function RichTextEditorPage() {
           <code>Ctrl+I</code> for italic, and <code>Ctrl+K</code> for links.
         </p>
         <div className="rte-page__preview">
-          <RichTextEditor
+          <ActiveRTE
             value={html}
             onChange={setHtml}
             label="Post content"
@@ -279,7 +350,7 @@ export default function RichTextEditorPage() {
           and link -- perfect for comment fields or inline editing.
         </p>
         <div className="rte-page__preview">
-          <RichTextEditor
+          <ActiveRTE
             defaultValue="<p>A simpler editing experience.</p>"
             toolbar={['bold', 'italic', 'link']}
             size="sm"
@@ -297,24 +368,104 @@ export default function RichTextEditorPage() {
           visual feedback and ARIA attributes.
         </p>
         <div className="rte-page__preview" style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-          <RichTextEditor
+          <ActiveRTE
             defaultValue="<p>This field has a validation error.</p>"
             label="With error"
             error="Content must be at least 50 characters."
             minHeight="80px"
           />
-          <RichTextEditor
+          <ActiveRTE
             defaultValue="<p>This editor is disabled.</p>"
             label="Disabled"
             disabled
             minHeight="80px"
           />
-          <RichTextEditor
+          <ActiveRTE
             defaultValue="<p>This content is <strong>read-only</strong>. You can select and copy but not edit.</p>"
             label="Read-only"
             readOnly
             minHeight="80px"
           />
+        </div>
+      </section>
+
+      {/* ── Tiers ─────────────────────────────────────── */}
+      <section className="rte-page__section" id="tiers">
+        <h2 className="rte-page__section-title"><a href="#tiers">Weight Tiers</a></h2>
+        <p className="rte-page__section-desc">
+          Three tiers let you choose the right balance of bundle size and features.
+          Lite provides a basic contentEditable with bold, italic, and underline buttons only;
+          Standard adds a full configurable toolbar with 11 actions, keyboard shortcuts, HTML
+          sanitization, error and disabled states, and 4 motion levels; Premium wraps Standard
+          with aurora glow on focus, spring-scale toolbar button interactions, and motion-level-aware
+          degradation.
+        </p>
+        <div className="rte-page__tiers">
+          {/* Lite */}
+          <div className="rte-page__tier-card">
+            <div className="rte-page__tier-header">
+              <span className="rte-page__tier-name">Lite</span>
+              <span className="rte-page__tier-size">~0.8 KB</span>
+            </div>
+            <p className="rte-page__tier-desc">
+              Basic contentEditable with bold, italic, and underline toolbar buttons. Supports
+              controlled/uncontrolled value, label, placeholder, disabled, readOnly, and minHeight.
+              No error state, no keyboard shortcuts, no motion.
+            </p>
+            <div className="rte-page__tier-import">
+              import {'{'} RichTextEditor {'}'} from '@annondeveloper/ui-kit/lite'
+            </div>
+            <div className="rte-page__tier-preview">
+              <LiteRichTextEditor
+                defaultValue="<p>Lite editor — bold, italic, underline only.</p>"
+                minHeight="80px"
+              />
+            </div>
+          </div>
+
+          {/* Standard */}
+          <div className="rte-page__tier-card">
+            <div className="rte-page__tier-header">
+              <span className="rte-page__tier-name">Standard</span>
+              <span className="rte-page__tier-size">~4.8 KB</span>
+            </div>
+            <p className="rte-page__tier-desc">
+              Full configurable toolbar with 11 actions, keyboard shortcuts (Ctrl+B/I/K), HTML
+              sanitization, error display, disabled/readOnly states, size variants, and 4 motion levels.
+            </p>
+            <div className="rte-page__tier-import">
+              import {'{'} RichTextEditor {'}'} from '@annondeveloper/ui-kit'
+            </div>
+            <div className="rte-page__tier-preview">
+              <RichTextEditor
+                defaultValue="<p>Standard editor with full toolbar.</p>"
+                toolbar={['bold', 'italic', 'underline', 'link']}
+                minHeight="80px"
+              />
+            </div>
+          </div>
+
+          {/* Premium */}
+          <div className="rte-page__tier-card">
+            <div className="rte-page__tier-header">
+              <span className="rte-page__tier-name">Premium</span>
+              <span className="rte-page__tier-size">~5.2 KB</span>
+            </div>
+            <p className="rte-page__tier-desc">
+              Wraps Standard with aurora glow on focus, spring-scale animation on toolbar buttons,
+              and motion-level-aware degradation. Full props compatibility with Standard.
+            </p>
+            <div className="rte-page__tier-import">
+              import {'{'} RichTextEditor {'}'} from '@annondeveloper/ui-kit/premium'
+            </div>
+            <div className="rte-page__tier-preview">
+              <PremiumRichTextEditor
+                defaultValue="<p>Premium editor with aurora focus glow.</p>"
+                toolbar={['bold', 'italic', 'underline', 'link']}
+                minHeight="80px"
+              />
+            </div>
+          </div>
         </div>
       </section>
 

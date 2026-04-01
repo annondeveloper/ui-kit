@@ -9,6 +9,7 @@ import { CodeEditor as PremiumCodeEditor } from '@ui/premium/code-editor'
 import { Button } from '@ui/components/button'
 import { CopyBlock } from '@ui/domain/copy-block'
 import { PropsTable, type PropDef } from '../../components/PropsTable'
+import { useTier } from '../../App'
 
 // ─── Sample Code ─────────────────────────────────────────────────────────────
 
@@ -326,6 +327,9 @@ type Lang = 'typescript' | 'json' | 'python'
 export default function CodeEditorPage() {
   useStyles('code-editor-page', pageStyles)
 
+  const { tier } = useTier()
+  const ActiveCodeEditor = tier === 'lite' ? LiteCodeEditor : tier === 'premium' ? PremiumCodeEditor : CodeEditor
+
   const [lang, setLang] = useState<Lang>('typescript')
   const [code, setCode] = useState(TS_SAMPLE)
 
@@ -389,7 +393,7 @@ export default function CodeEditorPage() {
           ))}
         </div>
         <div className="code-editor-page__preview">
-          <CodeEditor
+          <ActiveCodeEditor
             value={code}
             onChange={setCode}
             language={lang}
@@ -409,7 +413,7 @@ export default function CodeEditorPage() {
           to default and input is disabled while keeping selection and copy functionality.
         </p>
         <div className="code-editor-page__preview">
-          <CodeEditor
+          <ActiveCodeEditor
             value={JSON_SAMPLE}
             language="json"
             readOnly
@@ -426,7 +430,7 @@ export default function CodeEditorPage() {
           set a placeholder for empty editors.
         </p>
         <div className="code-editor-page__preview">
-          <CodeEditor
+          <ActiveCodeEditor
             defaultValue=""
             language="typescript"
             placeholder="Start typing your code here..."

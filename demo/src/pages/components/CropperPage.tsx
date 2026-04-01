@@ -4,9 +4,12 @@ import { useState, useEffect } from 'react'
 import { css } from '@ui/core/styles/css-tag'
 import { useStyles } from '@ui/core/styles/use-styles'
 import { Cropper, type CropResult } from '@ui/domain/cropper'
+import { Cropper as LiteCropper } from '@ui/lite/cropper'
+import { Cropper as PremiumCropper } from '@ui/premium/cropper'
 import { Button } from '@ui/components/button'
 import { CopyBlock } from '@ui/domain/copy-block'
 import { PropsTable, type PropDef } from '../../components/PropsTable'
+import { useTier } from '../../App'
 
 // ─── Props ───────────────────────────────────────────────────────────────────
 
@@ -210,6 +213,71 @@ const pageStyles = css`
         flex-wrap: wrap;
         margin-block-end: 1rem;
       }
+
+      /* ── Tiers ───────────────────────────────── */
+
+      .cropper-page__tiers {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 1rem;
+      }
+
+      .cropper-page__tier-card {
+        background: var(--bg-surface);
+        border: 1px solid var(--border-subtle);
+        border-radius: var(--radius-md);
+        padding: 1.5rem;
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+        min-width: 0;
+        overflow: hidden;
+      }
+
+      .cropper-page__tier-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+
+      .cropper-page__tier-name {
+        font-size: var(--text-sm, 0.875rem);
+        font-weight: 700;
+        color: var(--text-primary);
+      }
+
+      .cropper-page__tier-size {
+        font-size: var(--text-xs, 0.75rem);
+        color: var(--text-tertiary);
+        font-family: 'SF Mono', 'Fira Code', 'JetBrains Mono', monospace;
+      }
+
+      .cropper-page__tier-desc {
+        font-size: var(--text-xs, 0.75rem);
+        color: var(--text-secondary);
+        line-height: 1.5;
+      }
+
+      .cropper-page__tier-import {
+        font-family: 'SF Mono', 'Fira Code', 'JetBrains Mono', monospace;
+        font-size: 0.625rem;
+        color: oklch(from var(--brand) calc(l + 0.1) c h);
+        background: var(--border-subtle);
+        padding: 0.375rem 0.5rem;
+        border-radius: var(--radius-sm);
+        overflow-wrap: break-word;
+        word-break: break-all;
+        line-height: 1.4;
+      }
+
+      .cropper-page__tier-preview {
+        padding-block-start: 0.5rem;
+        overflow: hidden;
+      }
+
+      @container (max-width: 640px) {
+        .cropper-page__tiers { grid-template-columns: 1fr; }
+      }
     }
   }
 `
@@ -232,6 +300,9 @@ const SAMPLE_IMAGE = 'data:image/svg+xml,' + encodeURIComponent(
 
 export default function CropperPage() {
   useStyles('cropper-page', pageStyles)
+
+  const { tier } = useTier()
+  const ActiveCropper = tier === 'lite' ? LiteCropper : tier === 'premium' ? PremiumCropper : Cropper
 
   const [cropResult, setCropResult] = useState<CropResult | null>(null)
   const [aspectRatio, setAspectRatio] = useState<number | undefined>(undefined)
@@ -302,7 +373,7 @@ export default function CropperPage() {
           ))}
         </div>
         <div className="cropper-page__preview">
-          <Cropper
+          <ActiveCropper
             src={SAMPLE_IMAGE}
             aspectRatio={aspectRatio}
             onCrop={setCropResult}
@@ -349,7 +420,7 @@ export default function CropperPage() {
           Combined with a 1:1 aspect ratio for consistent output.
         </p>
         <div className="cropper-page__preview">
-          <Cropper
+          <ActiveCropper
             src={SAMPLE_IMAGE}
             aspectRatio={1}
             rounded
@@ -357,6 +428,74 @@ export default function CropperPage() {
             showRotate={false}
             showGrid={false}
           />
+        </div>
+      </section>
+
+      {/* ── Tiers ─────────────────────────────────────── */}
+      <section className="cropper-page__section" id="tiers">
+        <h2 className="cropper-page__section-title"><a href="#tiers">Weight Tiers</a></h2>
+        <p className="cropper-page__section-desc">
+          Three tiers balance interactivity and bundle size. Lite renders a static image display
+          with optional aspect ratio and rounded clipping — no drag, no sliders, no state;
+          Standard provides the full interactive cropper with drag handles, zoom and rotation sliders,
+          rule-of-thirds grid, and onCrop callbacks; Premium wraps Standard with spring-physics handle
+          animations, aurora glow on the crop overlay, and motion-level-aware degradation.
+        </p>
+        <div className="cropper-page__tiers">
+          {/* Lite */}
+          <div className="cropper-page__tier-card">
+            <div className="cropper-page__tier-header">
+              <span className="cropper-page__tier-name">Lite</span>
+              <span className="cropper-page__tier-size">~0.3 KB</span>
+            </div>
+            <p className="cropper-page__tier-desc">
+              Static image display with optional aspect ratio constraint and rounded clip. Supports
+              src, aspectRatio, and rounded only. No interactivity, no sliders, no onCrop callback.
+            </p>
+            <div className="cropper-page__tier-import">
+              import {'{'} Cropper {'}'} from '@annondeveloper/ui-kit/lite'
+            </div>
+            <div className="cropper-page__tier-preview">
+              <LiteCropper src={SAMPLE_IMAGE} aspectRatio={16 / 9} />
+            </div>
+          </div>
+
+          {/* Standard */}
+          <div className="cropper-page__tier-card">
+            <div className="cropper-page__tier-header">
+              <span className="cropper-page__tier-name">Standard</span>
+              <span className="cropper-page__tier-size">~5.4 KB</span>
+            </div>
+            <p className="cropper-page__tier-desc">
+              Full interactive cropper with drag-to-select, resize handles, zoom and rotation sliders,
+              optional rule-of-thirds grid, aspect ratio locking, and onCrop callback.
+            </p>
+            <div className="cropper-page__tier-import">
+              import {'{'} Cropper {'}'} from '@annondeveloper/ui-kit'
+            </div>
+            <div className="cropper-page__tier-preview">
+              <Cropper src={SAMPLE_IMAGE} aspectRatio={16 / 9} showGrid showZoom />
+            </div>
+          </div>
+
+          {/* Premium */}
+          <div className="cropper-page__tier-card">
+            <div className="cropper-page__tier-header">
+              <span className="cropper-page__tier-name">Premium</span>
+              <span className="cropper-page__tier-size">~5.8 KB</span>
+            </div>
+            <p className="cropper-page__tier-desc">
+              Wraps Standard with spring-physics resize handle animations, aurora glow on the
+              crop overlay boundary, smooth spring transitions on zoom and rotation, and
+              motion-level-aware degradation.
+            </p>
+            <div className="cropper-page__tier-import">
+              import {'{'} Cropper {'}'} from '@annondeveloper/ui-kit/premium'
+            </div>
+            <div className="cropper-page__tier-preview">
+              <PremiumCropper src={SAMPLE_IMAGE} aspectRatio={16 / 9} showGrid showZoom />
+            </div>
+          </div>
         </div>
       </section>
 

@@ -9,6 +9,7 @@ import { JsonViewer as PremiumJsonViewer } from '@ui/premium/json-viewer'
 import { Button } from '@ui/components/button'
 import { CopyBlock } from '@ui/domain/copy-block'
 import { PropsTable, type PropDef } from '../../components/PropsTable'
+import { useTier } from '../../App'
 
 // ─── Sample Data ─────────────────────────────────────────────────────────────
 
@@ -311,6 +312,9 @@ const IMPORT_STR = "import { JsonViewer } from '@ui/domain/json-viewer'"
 export default function JsonViewerPage() {
   useStyles('json-viewer-page', pageStyles)
 
+  const { tier } = useTier()
+  const ActiveJsonViewer = tier === 'lite' ? LiteJsonViewer : tier === 'premium' ? PremiumJsonViewer : JsonViewer
+
   const [expandDepth, setExpandDepth] = useState(1)
   const [sorted, setSorted] = useState(false)
 
@@ -361,7 +365,7 @@ export default function JsonViewerPage() {
           with syntax highlighting and type annotations.
         </p>
         <div className="json-viewer-page__preview">
-          <JsonViewer data={SIMPLE_DATA} rootName="package" initialExpandDepth={2} />
+          <ActiveJsonViewer data={SIMPLE_DATA} rootName="package" initialExpandDepth={2} />
         </div>
       </section>
 
@@ -381,7 +385,7 @@ export default function JsonViewerPage() {
           </Button>
         </div>
         <div className="json-viewer-page__preview">
-          <JsonViewer
+          <ActiveJsonViewer
             data={NESTED_DATA}
             rootName="config"
             initialExpandDepth={expandDepth}
@@ -400,7 +404,7 @@ export default function JsonViewerPage() {
           instead of throwing a stack overflow.
         </p>
         <div className="json-viewer-page__preview">
-          <JsonViewer data={makeCircularData()} rootName="circular" initialExpandDepth={3} />
+          <ActiveJsonViewer data={makeCircularData()} rootName="circular" initialExpandDepth={3} />
         </div>
       </section>
 

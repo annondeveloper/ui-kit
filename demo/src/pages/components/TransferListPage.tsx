@@ -10,6 +10,7 @@ import { Button } from '@ui/components/button'
 import { Card } from '@ui/components/card'
 import { Icon } from '@ui/core/icons/icon'
 import { PropsTable, type PropDef } from '../../components/PropsTable'
+import { useTier } from '../../App'
 
 // ─── Styles ──────────────────────────────────────────────────────────────────
 
@@ -314,6 +315,9 @@ const IMPORT = "import { TransferList } from '@ui/components/transfer-list'"
 export default function TransferListPage() {
   useStyles('transfer-list-page', pageStyles)
 
+  const { tier } = useTier()
+  const ActiveTransferList = tier === 'lite' ? LiteTransferList : tier === 'premium' ? PremiumTransferList : TransferList
+
   const [copied, setCopied] = useState(false)
   const [basic, setBasic] = useState<[TransferListItem[], TransferListItem[]]>([
     TEAM_MEMBERS.slice(0, 4),
@@ -357,7 +361,7 @@ export default function TransferListPage() {
           manages checkbox selection internally and calls onChange with the updated tuple.
         </p>
         <div className={`${PAGE}__preview`}>
-          <TransferList
+          <ActiveTransferList
             value={basic}
             onChange={setBasic}
             titles={['Team Pool', 'Project Team']}
@@ -378,7 +382,7 @@ export default function TransferListPage() {
           Enable showTransferAll for bulk-move buttons.
         </p>
         <div className={`${PAGE}__preview`}>
-          <TransferList
+          <ActiveTransferList
             value={grouped}
             onChange={setGrouped}
             titles={['Available Frameworks', 'Selected Stack']}
