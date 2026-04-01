@@ -4,6 +4,8 @@ import { useState } from 'react'
 import { css } from '@ui/core/styles/css-tag'
 import { useStyles } from '@ui/core/styles/use-styles'
 import { Highlight } from '@ui/components/highlight'
+import { Highlight as LiteHighlight } from '@ui/lite/highlight'
+import { Highlight as PremiumHighlight } from '@ui/premium/highlight'
 import { Button } from '@ui/components/button'
 import { Card } from '@ui/components/card'
 import { Icon } from '@ui/core/icons/icon'
@@ -224,6 +226,73 @@ const pageStyles = css`
         color: var(--text-tertiary);
         font-weight: 500;
       }
+
+      /* ── Tiers ───────────────────────────────── */
+
+      .${PAGE}__tiers {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 1rem;
+      }
+
+      .${PAGE}__tier-card {
+        background: var(--bg-surface);
+        border: 1px solid var(--border-subtle);
+        border-radius: var(--radius-md);
+        padding: 1.5rem;
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+        min-width: 0;
+        overflow: hidden;
+      }
+
+      .${PAGE}__tier-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+
+      .${PAGE}__tier-name {
+        font-size: var(--text-sm, 0.875rem);
+        font-weight: 700;
+        color: var(--text-primary);
+      }
+
+      .${PAGE}__tier-size {
+        font-size: var(--text-xs, 0.75rem);
+        color: var(--text-tertiary);
+        font-family: 'SF Mono', 'Fira Code', 'JetBrains Mono', monospace;
+      }
+
+      .${PAGE}__tier-desc {
+        font-size: var(--text-xs, 0.75rem);
+        color: var(--text-secondary);
+        line-height: 1.5;
+      }
+
+      .${PAGE}__tier-import {
+        font-family: 'SF Mono', 'Fira Code', 'JetBrains Mono', monospace;
+        font-size: 0.625rem;
+        color: oklch(from var(--brand) calc(l + 0.1) c h);
+        background: var(--border-subtle);
+        padding: 0.375rem 0.5rem;
+        border-radius: var(--radius-sm);
+        overflow-wrap: break-word;
+        word-break: break-all;
+        line-height: 1.4;
+      }
+
+      .${PAGE}__tier-preview {
+        padding-block-start: 0.5rem;
+        font-size: var(--text-sm, 0.875rem);
+        line-height: 1.7;
+        color: var(--text-primary);
+      }
+
+      @container ${PAGE} (max-width: 640px) {
+        .${PAGE}__tiers { grid-template-columns: 1fr; }
+      }
     }
   }
 `
@@ -329,7 +398,72 @@ export default function HighlightPage() {
         </div>
       </section>
 
-      {/* ── 3. Props API ─────────────────────────────────── */}
+      {/* ── 3. Weight Tiers ──────────────────────────────── */}
+      <section className={`${PAGE}__section`} id="tiers">
+        <h2 className={`${PAGE}__section-title`}><a href="#tiers">Weight Tiers</a></h2>
+        <p className={`${PAGE}__section-desc`}>
+          Highlight is a pure rendering utility with no motion, so all three tiers share
+          the same implementation. The Lite and Premium packages re-export the Standard component
+          unchanged, making Highlight a zero-overhead addition at any tier.
+        </p>
+        <div className={`${PAGE}__tiers`}>
+          {/* Lite */}
+          <div className={`${PAGE}__tier-card`}>
+            <div className={`${PAGE}__tier-header`}>
+              <span className={`${PAGE}__tier-name`}>Lite</span>
+              <span className={`${PAGE}__tier-size`}>~0.3 KB</span>
+            </div>
+            <p className={`${PAGE}__tier-desc`}>
+              Re-exports the Standard component directly. Identical output, no extra overhead.
+              Use when only the Lite bundle is imported.
+            </p>
+            <div className={`${PAGE}__tier-import`}>
+              import {'{'} Highlight {'}'} from '@annondeveloper/ui-kit/lite'
+            </div>
+            <div className={`${PAGE}__tier-preview`}>
+              <LiteHighlight highlight="Lite">Lite re-export — same as Standard.</LiteHighlight>
+            </div>
+          </div>
+
+          {/* Standard */}
+          <div className={`${PAGE}__tier-card`}>
+            <div className={`${PAGE}__tier-header`}>
+              <span className={`${PAGE}__tier-name`}>Standard</span>
+              <span className={`${PAGE}__tier-size`}>~0.3 KB</span>
+            </div>
+            <p className={`${PAGE}__tier-desc`}>
+              Core implementation. Splits text on matching substrings, wraps each in a{' '}
+              <code>{'<mark>'}</code> with configurable color and className. Supports arrays of terms.
+            </p>
+            <div className={`${PAGE}__tier-import`}>
+              import {'{'} Highlight {'}'} from '@annondeveloper/ui-kit'
+            </div>
+            <div className={`${PAGE}__tier-preview`}>
+              <Highlight highlight="Standard">Standard highlight component.</Highlight>
+            </div>
+          </div>
+
+          {/* Premium */}
+          <div className={`${PAGE}__tier-card`}>
+            <div className={`${PAGE}__tier-header`}>
+              <span className={`${PAGE}__tier-name`}>Premium</span>
+              <span className={`${PAGE}__tier-size`}>~0.3 KB</span>
+            </div>
+            <p className={`${PAGE}__tier-desc`}>
+              Re-exports the Standard component unchanged. Highlight has no motion props,
+              so Premium adds no additional layer.
+            </p>
+            <div className={`${PAGE}__tier-import`}>
+              import {'{'} Highlight {'}'} from '@annondeveloper/ui-kit/premium'
+            </div>
+            <div className={`${PAGE}__tier-preview`}>
+              <PremiumHighlight highlight="Premium">Premium re-export — same as Standard.</PremiumHighlight>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ── 4. Props API ─────────────────────────────────── */}
       <section className={`${PAGE}__section`} id="props">
         <h2 className={`${PAGE}__section-title`}><a href="#props">Props API</a></h2>
         <p className={`${PAGE}__section-desc`}>All available props for Highlight.</p>

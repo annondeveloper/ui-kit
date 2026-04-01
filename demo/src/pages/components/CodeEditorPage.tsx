@@ -4,6 +4,8 @@ import { useState, useEffect } from 'react'
 import { css } from '@ui/core/styles/css-tag'
 import { useStyles } from '@ui/core/styles/use-styles'
 import { CodeEditor } from '@ui/domain/code-editor'
+import { CodeEditor as LiteCodeEditor } from '@ui/lite/code-editor'
+import { CodeEditor as PremiumCodeEditor } from '@ui/premium/code-editor'
 import { Button } from '@ui/components/button'
 import { CopyBlock } from '@ui/domain/copy-block'
 import { PropsTable, type PropDef } from '../../components/PropsTable'
@@ -246,6 +248,71 @@ const pageStyles = css`
         margin-block-start: 0.75rem;
         text-align: end;
       }
+
+      /* ── Tiers ───────────────────────────────── */
+
+      .code-editor-page__tiers {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 1rem;
+      }
+
+      .code-editor-page__tier-card {
+        background: var(--bg-surface);
+        border: 1px solid var(--border-subtle);
+        border-radius: var(--radius-md);
+        padding: 1.5rem;
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+        min-width: 0;
+        overflow: hidden;
+      }
+
+      .code-editor-page__tier-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+
+      .code-editor-page__tier-name {
+        font-size: var(--text-sm, 0.875rem);
+        font-weight: 700;
+        color: var(--text-primary);
+      }
+
+      .code-editor-page__tier-size {
+        font-size: var(--text-xs, 0.75rem);
+        color: var(--text-tertiary);
+        font-family: 'SF Mono', 'Fira Code', 'JetBrains Mono', monospace;
+      }
+
+      .code-editor-page__tier-desc {
+        font-size: var(--text-xs, 0.75rem);
+        color: var(--text-secondary);
+        line-height: 1.5;
+      }
+
+      .code-editor-page__tier-import {
+        font-family: 'SF Mono', 'Fira Code', 'JetBrains Mono', monospace;
+        font-size: 0.625rem;
+        color: oklch(from var(--brand) calc(l + 0.1) c h);
+        background: var(--border-subtle);
+        padding: 0.375rem 0.5rem;
+        border-radius: var(--radius-sm);
+        overflow-wrap: break-word;
+        word-break: break-all;
+        line-height: 1.4;
+      }
+
+      .code-editor-page__tier-preview {
+        padding-block-start: 0.5rem;
+        overflow: hidden;
+      }
+
+      @container (max-width: 640px) {
+        .code-editor-page__tiers { grid-template-columns: 1fr; }
+      }
     }
   }
 `
@@ -367,6 +434,73 @@ export default function CodeEditorPage() {
             wordWrap
             minHeight="120px"
           />
+        </div>
+      </section>
+
+      {/* ── Tiers ─────────────────────────────────────── */}
+      <section className="code-editor-page__section" id="tiers">
+        <h2 className="code-editor-page__section-title"><a href="#tiers">Weight Tiers</a></h2>
+        <p className="code-editor-page__section-desc">
+          Choose the right balance of features and bundle size. Lite is a plain textarea with
+          optional line numbers but no syntax highlighting; Standard adds full tokenized
+          highlighting for 8 languages, active-line tracking, word wrap, and tab-size control;
+          Premium wraps Standard with aurora focus glow, spring-animated active line numbers,
+          and keyword shimmer.
+        </p>
+        <div className="code-editor-page__tiers">
+          {/* Lite */}
+          <div className="code-editor-page__tier-card">
+            <div className="code-editor-page__tier-header">
+              <span className="code-editor-page__tier-name">Lite</span>
+              <span className="code-editor-page__tier-size">~0.5 KB</span>
+            </div>
+            <p className="code-editor-page__tier-desc">
+              Plain textarea with optional line-number gutter. Controlled and uncontrolled modes.
+              No syntax highlighting, no active line, no maxHeight or wordWrap props.
+            </p>
+            <div className="code-editor-page__tier-import">
+              import {'{'} CodeEditor {'}'} from '@annondeveloper/ui-kit/lite'
+            </div>
+            <div className="code-editor-page__tier-preview">
+              <LiteCodeEditor defaultValue={'const x = 1\nconst y = 2'} showLineNumbers minHeight="80px" />
+            </div>
+          </div>
+
+          {/* Standard */}
+          <div className="code-editor-page__tier-card">
+            <div className="code-editor-page__tier-header">
+              <span className="code-editor-page__tier-name">Standard</span>
+              <span className="code-editor-page__tier-size">~4.1 KB</span>
+            </div>
+            <p className="code-editor-page__tier-desc">
+              Tokenized syntax highlighting for TypeScript, JavaScript, JSON, Python, CSS, HTML,
+              Bash, and SQL. Active line, word wrap, configurable tab size, and placeholder text.
+            </p>
+            <div className="code-editor-page__tier-import">
+              import {'{'} CodeEditor {'}'} from '@annondeveloper/ui-kit'
+            </div>
+            <div className="code-editor-page__tier-preview">
+              <CodeEditor defaultValue={'const x = 1\nconst y = 2'} language="typescript" showLineNumbers highlightActiveLine maxHeight="100px" />
+            </div>
+          </div>
+
+          {/* Premium */}
+          <div className="code-editor-page__tier-card">
+            <div className="code-editor-page__tier-header">
+              <span className="code-editor-page__tier-name">Premium</span>
+              <span className="code-editor-page__tier-size">~4.5 KB</span>
+            </div>
+            <p className="code-editor-page__tier-desc">
+              Wraps Standard with aurora glow on focus, spring-scale animation on active line numbers,
+              keyword text-shadow shimmer, and motion-level-aware degradation.
+            </p>
+            <div className="code-editor-page__tier-import">
+              import {'{'} CodeEditor {'}'} from '@annondeveloper/ui-kit/premium'
+            </div>
+            <div className="code-editor-page__tier-preview">
+              <PremiumCodeEditor defaultValue={'const x = 1\nconst y = 2'} language="typescript" showLineNumbers highlightActiveLine maxHeight="100px" />
+            </div>
+          </div>
         </div>
       </section>
 

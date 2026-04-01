@@ -4,6 +4,8 @@ import { useState } from 'react'
 import { css } from '@ui/core/styles/css-tag'
 import { useStyles } from '@ui/core/styles/use-styles'
 import { TransferList, type TransferListItem } from '@ui/components/transfer-list'
+import { TransferList as LiteTransferList } from '@ui/lite/transfer-list'
+import { TransferList as PremiumTransferList } from '@ui/premium/transfer-list'
 import { Button } from '@ui/components/button'
 import { Card } from '@ui/components/card'
 import { Icon } from '@ui/core/icons/icon'
@@ -195,6 +197,71 @@ const pageStyles = css`
         background: oklch(0% 0 0 / 0.15);
         border-radius: var(--radius-sm);
       }
+
+      /* ── Tiers ───────────────────────────────── */
+
+      .${PAGE}__tiers {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 1rem;
+      }
+
+      .${PAGE}__tier-card {
+        background: var(--bg-surface);
+        border: 1px solid var(--border-subtle);
+        border-radius: var(--radius-md);
+        padding: 1.5rem;
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+        min-width: 0;
+        overflow: hidden;
+      }
+
+      .${PAGE}__tier-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+
+      .${PAGE}__tier-name {
+        font-size: var(--text-sm, 0.875rem);
+        font-weight: 700;
+        color: var(--text-primary);
+      }
+
+      .${PAGE}__tier-size {
+        font-size: var(--text-xs, 0.75rem);
+        color: var(--text-tertiary);
+        font-family: 'SF Mono', 'Fira Code', 'JetBrains Mono', monospace;
+      }
+
+      .${PAGE}__tier-desc {
+        font-size: var(--text-xs, 0.75rem);
+        color: var(--text-secondary);
+        line-height: 1.5;
+      }
+
+      .${PAGE}__tier-import {
+        font-family: 'SF Mono', 'Fira Code', 'JetBrains Mono', monospace;
+        font-size: 0.625rem;
+        color: oklch(from var(--brand) calc(l + 0.1) c h);
+        background: var(--border-subtle);
+        padding: 0.375rem 0.5rem;
+        border-radius: var(--radius-sm);
+        overflow-wrap: break-word;
+        word-break: break-all;
+        line-height: 1.4;
+      }
+
+      .${PAGE}__tier-preview {
+        padding-block-start: 0.5rem;
+        overflow: hidden;
+      }
+
+      @container ${PAGE} (max-width: 640px) {
+        .${PAGE}__tiers { grid-template-columns: 1fr; }
+      }
     }
   }
 `
@@ -322,7 +389,97 @@ export default function TransferListPage() {
         </div>
       </section>
 
-      {/* ── 3. TransferListItem Props ────────────────────── */}
+      {/* ── 3. Weight Tiers ──────────────────────────────── */}
+      <section className={`${PAGE}__section`} id="tiers">
+        <h2 className={`${PAGE}__section-title`}><a href="#tiers">Weight Tiers</a></h2>
+        <p className={`${PAGE}__section-desc`}>
+          Three tiers balance animation richness against bundle size. Lite locks motion to 0
+          for zero runtime animation overhead; Standard includes all features with configurable
+          motion levels; Premium wraps Standard with spring-physics item transfer animation,
+          aurora glow on focused control buttons, and a hover-lift effect on list items.
+        </p>
+        <div className={`${PAGE}__tiers`}>
+          {/* Lite */}
+          <div className={`${PAGE}__tier-card`}>
+            <div className={`${PAGE}__tier-header`}>
+              <span className={`${PAGE}__tier-name`}>Lite</span>
+              <span className={`${PAGE}__tier-size`}>~1.2 KB</span>
+            </div>
+            <p className={`${PAGE}__tier-desc`}>
+              Wraps Standard with motion locked to 0. No animations, no spring physics.
+              Full transfer functionality: search, groups, transfer-all, and keyboard support.
+            </p>
+            <div className={`${PAGE}__tier-import`}>
+              import {'{'} TransferList {'}'} from '@annondeveloper/ui-kit/lite'
+            </div>
+            <div className={`${PAGE}__tier-preview`}>
+              <LiteTransferList
+                value={[
+                  [{ value: 'a', label: 'Alpha' }, { value: 'b', label: 'Beta' }],
+                  [{ value: 'c', label: 'Gamma' }],
+                ]}
+                onChange={() => {}}
+                titles={['Available', 'Selected']}
+                listHeight={160}
+              />
+            </div>
+          </div>
+
+          {/* Standard */}
+          <div className={`${PAGE}__tier-card`}>
+            <div className={`${PAGE}__tier-header`}>
+              <span className={`${PAGE}__tier-name`}>Standard</span>
+              <span className={`${PAGE}__tier-size`}>~2.8 KB</span>
+            </div>
+            <p className={`${PAGE}__tier-desc`}>
+              Full-featured dual-panel list with search, grouping, transfer-all buttons,
+              keyboard-driven selection, configurable sizes, and 4 motion levels.
+            </p>
+            <div className={`${PAGE}__tier-import`}>
+              import {'{'} TransferList {'}'} from '@annondeveloper/ui-kit'
+            </div>
+            <div className={`${PAGE}__tier-preview`}>
+              <TransferList
+                value={[
+                  [{ value: 'a', label: 'Alpha' }, { value: 'b', label: 'Beta' }],
+                  [{ value: 'c', label: 'Gamma' }],
+                ]}
+                onChange={() => {}}
+                titles={['Available', 'Selected']}
+                listHeight={160}
+              />
+            </div>
+          </div>
+
+          {/* Premium */}
+          <div className={`${PAGE}__tier-card`}>
+            <div className={`${PAGE}__tier-header`}>
+              <span className={`${PAGE}__tier-name`}>Premium</span>
+              <span className={`${PAGE}__tier-size`}>~3.2 KB</span>
+            </div>
+            <p className={`${PAGE}__tier-desc`}>
+              Wraps Standard with spring-physics item transfer animation, aurora glow on
+              focused control buttons, hover-lift on list items, and spring-scale on button hover.
+            </p>
+            <div className={`${PAGE}__tier-import`}>
+              import {'{'} TransferList {'}'} from '@annondeveloper/ui-kit/premium'
+            </div>
+            <div className={`${PAGE}__tier-preview`}>
+              <PremiumTransferList
+                value={[
+                  [{ value: 'a', label: 'Alpha' }, { value: 'b', label: 'Beta' }],
+                  [{ value: 'c', label: 'Gamma' }],
+                ]}
+                onChange={() => {}}
+                titles={['Available', 'Selected']}
+                listHeight={160}
+              />
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ── 5. TransferListItem Props ────────────────────── */}
       <section className={`${PAGE}__section`} id="item-props">
         <h2 className={`${PAGE}__section-title`}><a href="#item-props">TransferListItem Interface</a></h2>
         <p className={`${PAGE}__section-desc`}>Shape of each item in the transfer list arrays.</p>
@@ -331,7 +488,7 @@ export default function TransferListPage() {
         </Card>
       </section>
 
-      {/* ── 4. Props API ─────────────────────────────────── */}
+      {/* ── 6. Props API ─────────────────────────────────── */}
       <section className={`${PAGE}__section`} id="props">
         <h2 className={`${PAGE}__section-title`}><a href="#props">Props API</a></h2>
         <p className={`${PAGE}__section-desc`}>All available props for TransferList.</p>

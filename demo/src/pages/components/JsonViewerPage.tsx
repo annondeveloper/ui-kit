@@ -4,6 +4,8 @@ import { useState, useRef, useEffect } from 'react'
 import { css } from '@ui/core/styles/css-tag'
 import { useStyles } from '@ui/core/styles/use-styles'
 import { JsonViewer } from '@ui/domain/json-viewer'
+import { JsonViewer as LiteJsonViewer } from '@ui/lite/json-viewer'
+import { JsonViewer as PremiumJsonViewer } from '@ui/premium/json-viewer'
 import { Button } from '@ui/components/button'
 import { CopyBlock } from '@ui/domain/copy-block'
 import { PropsTable, type PropDef } from '../../components/PropsTable'
@@ -231,6 +233,73 @@ const pageStyles = css`
         gap: 0.5rem;
         margin-block-end: 1rem;
       }
+
+      /* ── Tiers ───────────────────────────────── */
+
+      .json-viewer-page__tiers {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 1rem;
+      }
+
+      .json-viewer-page__tier-card {
+        background: var(--bg-surface);
+        border: 1px solid var(--border-subtle);
+        border-radius: var(--radius-md);
+        padding: 1.5rem;
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+        min-width: 0;
+        overflow: hidden;
+      }
+
+      .json-viewer-page__tier-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+
+      .json-viewer-page__tier-name {
+        font-size: var(--text-sm, 0.875rem);
+        font-weight: 700;
+        color: var(--text-primary);
+      }
+
+      .json-viewer-page__tier-size {
+        font-size: var(--text-xs, 0.75rem);
+        color: var(--text-tertiary);
+        font-family: 'SF Mono', 'Fira Code', 'JetBrains Mono', monospace;
+      }
+
+      .json-viewer-page__tier-desc {
+        font-size: var(--text-xs, 0.75rem);
+        color: var(--text-secondary);
+        line-height: 1.5;
+      }
+
+      .json-viewer-page__tier-import {
+        font-family: 'SF Mono', 'Fira Code', 'JetBrains Mono', monospace;
+        font-size: 0.625rem;
+        color: oklch(from var(--brand) calc(l + 0.1) c h);
+        background: var(--border-subtle);
+        padding: 0.375rem 0.5rem;
+        border-radius: var(--radius-sm);
+        overflow-wrap: break-word;
+        word-break: break-all;
+        line-height: 1.4;
+      }
+
+      .json-viewer-page__tier-preview {
+        padding-block-start: 0.5rem;
+        overflow: hidden;
+        max-block-size: 200px;
+        overflow-y: auto;
+      }
+
+      @container (max-width: 640px) {
+        .json-viewer-page__tiers { grid-template-columns: 1fr; }
+      }
     }
   }
 `
@@ -332,6 +401,72 @@ export default function JsonViewerPage() {
         </p>
         <div className="json-viewer-page__preview">
           <JsonViewer data={makeCircularData()} rootName="circular" initialExpandDepth={3} />
+        </div>
+      </section>
+
+      {/* ── Tiers ────────────────────────────────────── */}
+      <section className="json-viewer-page__section" id="tiers">
+        <h2 className="json-viewer-page__section-title"><a href="#tiers">Weight Tiers</a></h2>
+        <p className="json-viewer-page__section-desc">
+          Three tiers let you choose the right balance of bundle size and features.
+          Lite renders a static pre-formatted text tree; Standard adds interactive
+          expand/collapse, syntax coloring, clipboard, and circular reference detection;
+          Premium wraps Standard with aurora glow, spring-animated chevrons, and row hover effects.
+        </p>
+        <div className="json-viewer-page__tiers">
+          {/* Lite */}
+          <div className="json-viewer-page__tier-card">
+            <div className="json-viewer-page__tier-header">
+              <span className="json-viewer-page__tier-name">Lite</span>
+              <span className="json-viewer-page__tier-size">~0.4 KB</span>
+            </div>
+            <p className="json-viewer-page__tier-desc">
+              Static pre-formatted output. No interactivity, no motion — just serializes
+              data as indented text. Supports data, initialExpandDepth, collapsed, and rootName only.
+            </p>
+            <div className="json-viewer-page__tier-import">
+              import {'{'} JsonViewer {'}'} from '@annondeveloper/ui-kit/lite'
+            </div>
+            <div className="json-viewer-page__tier-preview">
+              <LiteJsonViewer data={{ name: 'Lite', tags: ['fast', 'tiny'] }} rootName="pkg" initialExpandDepth={2} />
+            </div>
+          </div>
+
+          {/* Standard */}
+          <div className="json-viewer-page__tier-card">
+            <div className="json-viewer-page__tier-header">
+              <span className="json-viewer-page__tier-name">Standard</span>
+              <span className="json-viewer-page__tier-size">~3.2 KB</span>
+            </div>
+            <p className="json-viewer-page__tier-desc">
+              Interactive tree with expand/collapse per node, syntax highlighting, copy-to-clipboard,
+              type annotations, object size badges, key sorting, and safe circular reference handling.
+            </p>
+            <div className="json-viewer-page__tier-import">
+              import {'{'} JsonViewer {'}'} from '@annondeveloper/ui-kit'
+            </div>
+            <div className="json-viewer-page__tier-preview">
+              <JsonViewer data={{ name: 'Standard', tags: ['interactive', 'full'] }} rootName="pkg" initialExpandDepth={2} enableClipboard displayDataTypes />
+            </div>
+          </div>
+
+          {/* Premium */}
+          <div className="json-viewer-page__tier-card">
+            <div className="json-viewer-page__tier-header">
+              <span className="json-viewer-page__tier-name">Premium</span>
+              <span className="json-viewer-page__tier-size">~3.6 KB</span>
+            </div>
+            <p className="json-viewer-page__tier-desc">
+              Wraps Standard with aurora glow on hover, spring-animated chevron rotation,
+              row hover background, and copy-pulse animation. Motion-level-aware.
+            </p>
+            <div className="json-viewer-page__tier-import">
+              import {'{'} JsonViewer {'}'} from '@annondeveloper/ui-kit/premium'
+            </div>
+            <div className="json-viewer-page__tier-preview">
+              <PremiumJsonViewer data={{ name: 'Premium', tags: ['aurora', 'spring'] }} rootName="pkg" initialExpandDepth={2} enableClipboard />
+            </div>
+          </div>
         </div>
       </section>
 
