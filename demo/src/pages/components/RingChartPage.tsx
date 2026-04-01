@@ -1056,10 +1056,11 @@ export default function RingChartPage() {
           <div className="ring-chart-page__labeled-row">
             {[0, 25, 50, 75, 100].map(v => (
               <div key={v} className="ring-chart-page__labeled-item">
+                {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
                 <ChartComponent
                   value={v}
                   showValue
-                  {...(tier === 'lite' ? { size: 64 } : { size: 'md' as const })}
+                  size={'md' as any}
                 />
                 <span className="ring-chart-page__item-label">{v}%</span>
               </div>
@@ -1081,13 +1082,11 @@ export default function RingChartPage() {
           <div className="ring-chart-page__labeled-row">
             {SIZES.map(s => (
               <div key={s} className="ring-chart-page__labeled-item">
+                {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
                 <ChartComponent
                   value={72}
                   showValue
-                  {...(tier === 'lite'
-                    ? { size: s === 'sm' ? 48 : s === 'lg' ? 96 : 64 }
-                    : { size: s }
-                  )}
+                  size={s as any}
                 />
                 <span className="ring-chart-page__item-label">{s}</span>
               </div>
@@ -1109,11 +1108,12 @@ export default function RingChartPage() {
           <div className="ring-chart-page__labeled-row">
             {COLOR_OPTIONS.map(c => (
               <div key={c.label} className="ring-chart-page__labeled-item">
+                {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
                 <ChartComponent
                   value={65}
                   color={c.value}
                   showValue
-                  {...(tier === 'lite' ? { size: 64 } : { size: 'md' as const })}
+                  size={'md' as any}
                 />
                 <span className="ring-chart-page__item-label">{c.label}</span>
               </div>
@@ -1134,11 +1134,12 @@ export default function RingChartPage() {
           <div className="ring-chart-page__labeled-row">
             {[2, 4, 8, 12].map(t => (
               <div key={t} className="ring-chart-page__labeled-item">
+                {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
                 <ChartComponent
                   value={60}
                   thickness={t}
                   showValue
-                  {...(tier === 'lite' ? { size: 64 } : { size: 'md' as const })}
+                  size={'md' as any}
                 />
                 <span className="ring-chart-page__item-label">{t}px</span>
               </div>
@@ -1159,25 +1160,28 @@ export default function RingChartPage() {
         <div className="ring-chart-page__preview">
           <div className="ring-chart-page__labeled-row">
             <div className="ring-chart-page__labeled-item">
+              {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
               <ChartComponent
                 value={85}
                 showValue
-                {...(tier === 'lite' ? { size: 96 } : { size: 'lg' as const })}
+                size={'lg' as any}
               />
               <span className="ring-chart-page__item-label">showValue</span>
             </div>
             <div className="ring-chart-page__labeled-item">
+              {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
               <ChartComponent
                 value={85}
                 label="CPU"
-                {...(tier === 'lite' ? { size: 96 } : { size: 'lg' as const })}
+                size={'lg' as any}
               />
               <span className="ring-chart-page__item-label">custom label</span>
             </div>
             <div className="ring-chart-page__labeled-item">
+              {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
               <ChartComponent
                 value={85}
-                {...(tier === 'lite' ? { size: 96 } : { size: 'lg' as const })}
+                size={'lg' as any}
               />
               <span className="ring-chart-page__item-label">no label</span>
             </div>
