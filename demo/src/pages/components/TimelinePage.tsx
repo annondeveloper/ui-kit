@@ -219,12 +219,21 @@ const INCIDENT_ITEMS = [
 ]
 
 const propsData: PropDef[] = [
-  { name: 'items', type: 'TimelineItem[]', required: true, description: 'Array of timeline items with title, description, status, and optional timestamp.' },
+  { name: 'items', type: 'TimelineItem[]', required: true, description: 'Array of timeline items to render.' },
   { name: 'variant', type: "'default' | 'alternate' | 'compact'", default: "'default'", description: 'Layout variant. Alternate places items on alternating sides.' },
   { name: 'size', type: "'sm' | 'md' | 'lg'", default: "'md'", description: 'Controls the size of icons and spacing.' },
-  { name: 'lineStyle', type: "'solid' | 'dashed' | 'dotted'", default: "'solid'", description: 'Style of the connecting line between items.' },
-  { name: 'animated', type: 'boolean', default: 'true', description: 'Whether items animate in on scroll.' },
+  { name: 'connectorStyle', type: "'solid' | 'dashed' | 'dotted'", default: "'solid'", description: 'Style of the connecting line between items.' },
+  { name: 'motion', type: '0 | 1 | 2 | 3', description: 'Animation intensity override. Cascades from OS > prop > CSS --motion > UIProvider.' },
   { name: 'className', type: 'string', description: 'Additional CSS class for the root element.' },
+]
+
+const timelineItemProps: PropDef[] = [
+  { name: 'id', type: 'string', required: true, description: 'Unique identifier for the timeline item.' },
+  { name: 'title', type: 'ReactNode', required: true, description: 'Title text for the timeline item.' },
+  { name: 'description', type: 'ReactNode', description: 'Optional helper text or detail below the title.' },
+  { name: 'icon', type: 'ReactNode', description: 'Optional leading icon element rendered in the dot.' },
+  { name: 'timestamp', type: 'string', description: 'Optional timestamp string displayed alongside the item.' },
+  { name: 'status', type: "'completed' | 'active' | 'pending' | 'error'", description: 'Visual status of the item.' },
 ]
 
 // ─── Component ───────────────────────────────────────────────────────────────
@@ -311,6 +320,11 @@ export default function TimelinePage() {
         </p>
         <Card variant="default" padding="md">
           <PropsTable props={propsData} />
+        </Card>
+        <h3 className="timeline-page__section-title" style={{ marginBlockStart: '1.5rem' }}>TimelineItem</h3>
+        <p className="timeline-page__section-desc">Shape of each item in the <code>items</code> array.</p>
+        <Card variant="default" padding="md">
+          <PropsTable props={timelineItemProps} />
         </Card>
       </section>
     </div>

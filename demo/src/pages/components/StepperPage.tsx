@@ -204,13 +204,22 @@ const STEPS = [
 ]
 
 const propsData: PropDef[] = [
-  { name: 'steps', type: 'StepItem[]', required: true, description: 'Array of steps with label and optional description.' },
-  { name: 'activeStep', type: 'number', default: '0', description: 'Zero-based index of the current active step.' },
-  { name: 'variant', type: "'numbered' | 'dots' | 'progress'", default: "'numbered'", description: 'Visual style of the step indicators.' },
+  { name: 'steps', type: 'StepperStep[]', required: true, description: 'Array of step definitions to render.' },
+  { name: 'activeStep', type: 'number', required: true, description: 'Zero-based index of the current active step.' },
   { name: 'orientation', type: "'horizontal' | 'vertical'", default: "'horizontal'", description: 'Layout direction of the stepper.' },
+  { name: 'variant', type: "'default' | 'dots' | 'progress'", default: "'default'", description: 'Visual style of the step indicators.' },
   { name: 'size', type: "'sm' | 'md' | 'lg'", default: "'md'", description: 'Controls icon and text size.' },
-  { name: 'onStepClick', type: '(index: number) => void', description: 'Callback when a step is clicked. Enables clickable steps.' },
+  { name: 'onStepClick', type: '(step: number) => void', description: 'Callback when a step is clicked. Enables clickable steps.' },
+  { name: 'motion', type: '0 | 1 | 2 | 3', description: 'Animation intensity override. Cascades from OS > prop > CSS --motion > UIProvider.' },
   { name: 'className', type: 'string', description: 'Additional CSS class for the root element.' },
+]
+
+const stepperStepProps: PropDef[] = [
+  { name: 'id', type: 'string', required: true, description: 'Unique identifier for the step.' },
+  { name: 'label', type: 'ReactNode', required: true, description: 'Label text displayed for the step.' },
+  { name: 'description', type: 'string', description: 'Optional helper text below the label.' },
+  { name: 'icon', type: 'ReactNode', description: 'Optional icon element rendered in the step indicator.' },
+  { name: 'optional', type: 'boolean', description: 'Marks the step as optional.' },
 ]
 
 // ─── Component ───────────────────────────────────────────────────────────────
@@ -300,6 +309,11 @@ export default function StepperPage() {
         </p>
         <Card variant="default" padding="md">
           <PropsTable props={propsData} />
+        </Card>
+        <h3 className="stepper-page__section-title" style={{ marginBlockStart: '1.5rem' }}>StepperStep</h3>
+        <p className="stepper-page__section-desc">Shape of each item in the <code>steps</code> array.</p>
+        <Card variant="default" padding="md">
+          <PropsTable props={stepperStepProps} />
         </Card>
       </section>
     </div>

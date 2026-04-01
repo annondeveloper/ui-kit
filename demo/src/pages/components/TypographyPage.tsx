@@ -691,7 +691,7 @@ const pageStyles = css`
 // ─── Props Data ───────────────────────────────────────────────────────────────
 
 const typographyProps: PropDef[] = [
-  { name: 'variant', type: "'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6' | 'body' | 'body-sm' | 'caption' | 'code' | 'overline'", default: "'body'", description: 'Semantic variant controlling element type, font-size, weight, and line-height.' },
+  { name: 'variant', type: "'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6' | 'body' | 'body-sm' | 'caption' | 'code' | 'overline'", description: 'Semantic variant controlling element type, font-size, weight, and line-height.' },
   { name: 'color', type: "'primary' | 'secondary' | 'tertiary' | 'brand' | 'success' | 'warning' | 'danger'", description: 'Text color mapped to theme tokens. Falls back to variant default color.' },
   { name: 'weight', type: '300 | 400 | 500 | 600 | 700 | 800', description: 'Override font-weight. By default determined by the variant.' },
   { name: 'align', type: "'start' | 'center' | 'end'", description: 'Text alignment using logical properties.' },
