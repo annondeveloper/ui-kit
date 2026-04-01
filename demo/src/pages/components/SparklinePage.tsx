@@ -601,14 +601,13 @@ const pageStyles = css`
 
 const sparklineProps: PropDef[] = [
   { name: 'data', type: 'number[]', required: true, description: 'Array of numeric values to render as the sparkline.' },
-  { name: 'width', type: "number | string", default: "'100%'", description: 'Width of the sparkline container. Number is px, string allows any CSS unit.' },
-  { name: 'height', type: 'number', default: '32', description: 'Height of the SVG in pixels.' },
-  { name: 'color', type: 'string', default: "'oklch(65% 0.2 270)'", description: 'Stroke color. Accepts any CSS color value.' },
-  { name: 'gradient', type: 'boolean', default: 'true', description: 'Show a gradient fill beneath the line (standard tier only).' },
-  { name: 'showTooltip', type: 'boolean', default: 'false', description: 'Show value tooltip on hover (standard tier only).' },
-  { name: 'animate', type: 'boolean', default: 'true', description: 'Animate the sparkline drawing (standard tier only).' },
+  { name: 'width', type: 'number | string', description: 'Width of the sparkline container. Number is px, string allows any CSS unit.' },
+  { name: 'height', type: 'number', description: 'Height of the SVG in pixels.' },
+  { name: 'color', type: 'string', description: 'Stroke color. Accepts any CSS color value.' },
+  { name: 'gradient', type: 'boolean', description: 'Show a gradient fill beneath the line (standard tier only).' },
+  { name: 'showTooltip', type: 'boolean', description: 'Show value tooltip on hover (standard tier only).' },
+  { name: 'animate', type: 'boolean', description: 'Animate the sparkline drawing (standard tier only).' },
   { name: 'motion', type: '0 | 1 | 2 | 3', description: 'Animation intensity override. Cascades from OS > prop > CSS --motion > UIProvider.' },
-  { name: 'className', type: 'string', description: 'Additional CSS class name merged with the component class.' },
 ]
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────

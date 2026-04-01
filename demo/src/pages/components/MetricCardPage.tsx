@@ -652,22 +652,22 @@ interface PropDef {
   name: string
   type: string
   default?: string
+  required?: boolean
   description: string
 }
 
 const metricCardProps: PropDef[] = [
-  { name: 'title', type: 'ReactNode', description: 'Label displayed above the metric value. Typically a short string describing the metric.' },
-  { name: 'value', type: 'ReactNode', description: 'The primary numeric or text display. Rendered large and prominent.' },
+  { name: 'title', type: 'ReactNode', required: true, description: 'Label displayed above the metric value. Typically a short string describing the metric.' },
+  { name: 'value', type: 'ReactNode', required: true, description: 'The primary numeric or text display. Rendered large and prominent.' },
   { name: 'change', type: '{ value: number; period?: string }', description: 'Percentage change indicator. Shows + prefix for positive values and optional comparison period.' },
   { name: 'trend', type: "'up' | 'down' | 'flat'", description: 'Directional arrow indicator. Colors: up = green, down = red, flat = neutral.' },
   { name: 'status', type: "'ok' | 'warning' | 'critical'", description: 'Status accent: colored left border, ambient glow, and pulsing status dot.' },
   { name: 'icon', type: 'ReactNode', description: 'Custom icon rendered in the header row next to the title.' },
   { name: 'sparkline', type: 'number[]', description: 'Array of numeric data points. Rendered as a mini SVG sparkline chart below the value.' },
-  { name: 'loading', type: 'boolean', default: 'false', description: 'Shows a skeleton pulse animation and hides the value.' },
+  { name: 'loading', type: 'boolean', description: 'Shows a skeleton pulse animation and hides the value.' },
   { name: 'error', type: 'ReactNode', description: 'Error state content. Replaces value and hides change/sparkline when set.' },
   { name: 'empty', type: 'ReactNode', description: 'Empty state content shown when value is falsy and error is not set.' },
   { name: 'motion', type: '0 | 1 | 2 | 3', description: 'Animation intensity. 0=none, 1=subtle transitions, 2=fade-up entrance, 3=full physics.' },
-  { name: 'className', type: 'string', description: 'Additional CSS class name merged with the component class.' },
 ]
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────

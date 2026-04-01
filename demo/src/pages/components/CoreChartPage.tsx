@@ -578,13 +578,17 @@ const pageStyles = css`
 // ─── Props Data ───────────────────────────────────────────────────────────────
 
 const coreChartProps: PropDef[] = [
-  { name: 'cores', type: 'CoreChartCore[]', description: 'Array of core objects with id (number) and usage (0-100 percent).' },
+  { name: 'cores', type: 'CoreChartCore[]', required: true, description: 'Array of core objects with id (number) and usage (0-100 percent).' },
   { name: 'columns', type: 'number', description: 'Number of grid columns. Defaults to Math.ceil(Math.sqrt(cores.length)).' },
-  { name: 'size', type: "'sm' | 'md' | 'lg'", default: "'md'", description: 'Cell size: sm (16px), md (24px), lg (32px).' },
-  { name: 'showLabels', type: 'boolean', default: 'false', description: 'Display core ID label centered in each cell.' },
-  { name: 'colorScale', type: "'green-red' | 'blue-red' | 'brand'", default: "'green-red'", description: 'Color gradient scale for usage visualization.' },
+  { name: 'size', type: "'sm' | 'md' | 'lg'", description: 'Cell size: sm (16px), md (24px), lg (32px).' },
+  { name: 'showLabels', type: 'boolean', description: 'Display core ID label centered in each cell.' },
+  { name: 'colorScale', type: "'green-red' | 'blue-red' | 'brand'", description: 'Color gradient scale for usage visualization.' },
   { name: 'motion', type: '0 | 1 | 2 | 3', description: 'Animation intensity override.' },
-  { name: 'className', type: 'string', description: 'Additional CSS class name.' },
+]
+
+const coreChartCoreProps: PropDef[] = [
+  { name: 'id', type: 'number', required: true, description: 'Unique identifier for the core.' },
+  { name: 'usage', type: 'number', required: true, description: 'CPU usage percentage (0–100).' },
 ]
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -1282,6 +1286,13 @@ export default function CoreChartPage() {
         </p>
         <Card variant="default" padding="md">
           <PropsTable props={coreChartProps} />
+        </Card>
+        <h3 className="core-chart-page__section-title" style={{ marginBlockStart: 'var(--space-lg, 1.5rem)', fontSize: 'var(--text-base, 1rem)' }}>
+          CoreChartCore
+        </h3>
+        <p className="core-chart-page__section-desc">Sub-type for each element in the <code>cores</code> array.</p>
+        <Card variant="default" padding="md">
+          <PropsTable props={coreChartCoreProps} />
         </Card>
       </section>
 

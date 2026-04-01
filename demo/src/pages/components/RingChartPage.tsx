@@ -592,16 +592,15 @@ const pageStyles = css`
 // ─── Props Data ───────────────────────────────────────────────────────────────
 
 const ringChartProps: PropDef[] = [
-  { name: 'value', type: 'number', description: 'Current value (clamped between 0 and max).' },
-  { name: 'max', type: 'number', default: '100', description: 'Maximum value for the ring.' },
-  { name: 'size', type: "'sm' | 'md' | 'lg'", default: "'md'", description: 'Ring size: sm (48px), md (64px), lg (96px).' },
+  { name: 'value', type: 'number', required: true, description: 'Current value (clamped between 0 and max).' },
+  { name: 'max', type: 'number', description: 'Maximum value for the ring.' },
+  { name: 'size', type: "'sm' | 'md' | 'lg'", description: 'Ring size: sm (48px), md (64px), lg (96px).' },
   { name: 'thickness', type: 'number', description: 'Stroke width in pixels. Defaults per size: sm=4, md=6, lg=8.' },
-  { name: 'color', type: 'string', default: "'oklch(65% 0.2 270)'", description: 'Fill stroke color. Accepts any CSS color value.' },
+  { name: 'color', type: 'string', description: 'Fill stroke color. Accepts any CSS color value.' },
   { name: 'label', type: 'ReactNode', description: 'Custom center label. Overrides the default percentage display.' },
-  { name: 'showValue', type: 'boolean', default: 'false', description: 'Show the percentage value in the center of the ring.' },
-  { name: 'animated', type: 'boolean', default: 'true', description: 'Enable stroke transition animation.' },
+  { name: 'showValue', type: 'boolean', description: 'Show the percentage value in the center of the ring.' },
+  { name: 'animated', type: 'boolean', description: 'Enable stroke transition animation.' },
   { name: 'motion', type: '0 | 1 | 2 | 3', description: 'Animation intensity override.' },
-  { name: 'className', type: 'string', description: 'Additional CSS class name.' },
 ]
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────

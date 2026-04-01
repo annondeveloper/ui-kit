@@ -579,7 +579,12 @@ const barProps: PropDef[] = [
   { name: 'showLabels', type: 'boolean', default: 'false', description: 'Show a legend row below the bar with colored dots and segment labels.' },
   { name: 'size', type: "'sm' | 'md' | 'lg'", default: "'md'", description: 'Controls bar track height (6/8/12px).' },
   { name: 'motion', type: '0 | 1 | 2 | 3', description: 'Animation intensity override. 0 disables segment width transitions.' },
-  { name: 'className', type: 'string', description: 'Additional CSS class name merged with the component class.' },
+]
+
+const utilizationSegmentProps: PropDef[] = [
+  { name: 'value', type: 'number', required: true, description: 'Numeric value for the segment.' },
+  { name: 'color', type: 'string', description: 'Optional custom color for the segment.' },
+  { name: 'label', type: 'string', description: 'Optional display label for the segment.' },
 ]
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -1106,6 +1111,13 @@ export default function UtilizationBarPage() {
         </p>
         <Card variant="default" padding="md">
           <PropsTable props={barProps} />
+        </Card>
+        <h3 className="utilization-bar-page__section-title" style={{ marginBlockStart: 'var(--space-lg, 1.5rem)', fontSize: 'var(--text-base, 1rem)' }}>
+          UtilizationSegment
+        </h3>
+        <p className="utilization-bar-page__section-desc">Sub-type for each element in the <code>segments</code> array.</p>
+        <Card variant="default" padding="md">
+          <PropsTable props={utilizationSegmentProps} />
         </Card>
       </section>
 

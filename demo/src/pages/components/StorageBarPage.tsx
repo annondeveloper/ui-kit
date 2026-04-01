@@ -639,13 +639,18 @@ const pageStyles = css`
 // ─── Props Data ───────────────────────────────────────────────────────────────
 
 const storageBarProps: PropDef[] = [
-  { name: 'segments', type: 'StorageBarSegment[]', description: 'Array of segments with label (string), value (number), and optional color (string).' },
-  { name: 'total', type: 'number', description: 'Total capacity in the same unit as segment values.' },
+  { name: 'segments', type: 'StorageBarSegment[]', required: true, description: 'Array of segments with label (string), value (number), and optional color (string).' },
+  { name: 'total', type: 'number', required: true, description: 'Total capacity in the same unit as segment values.' },
   { name: 'showLabels', type: 'boolean', default: 'false', description: 'Display segment labels inside the bar (hidden at sm size).' },
   { name: 'showLegend', type: 'boolean', default: 'false', description: 'Show a color-coded legend below the bar with segment names and values.' },
   { name: 'size', type: "'sm' | 'md' | 'lg'", default: "'md'", description: 'Bar height: sm (8px), md (16px), lg (24px).' },
   { name: 'motion', type: '0 | 1 | 2 | 3', description: 'Animation intensity override.' },
-  { name: 'className', type: 'string', description: 'Additional CSS class name.' },
+]
+
+const storageBarSegmentProps: PropDef[] = [
+  { name: 'label', type: 'string', required: true, description: 'Display label for the segment.' },
+  { name: 'value', type: 'number', required: true, description: 'Numeric value for the segment.' },
+  { name: 'color', type: 'string', description: 'Optional custom color for the segment.' },
 ]
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -1366,6 +1371,13 @@ export default function StorageBarPage() {
         </p>
         <Card variant="default" padding="md">
           <PropsTable props={storageBarProps} />
+        </Card>
+        <h3 className="storage-bar-page__section-title" style={{ marginBlockStart: 'var(--space-lg, 1.5rem)', fontSize: 'var(--text-base, 1rem)' }}>
+          StorageBarSegment
+        </h3>
+        <p className="storage-bar-page__section-desc">Sub-type for each element in the <code>segments</code> array.</p>
+        <Card variant="default" padding="md">
+          <PropsTable props={storageBarSegmentProps} />
         </Card>
       </section>
 

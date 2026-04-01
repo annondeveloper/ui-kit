@@ -573,19 +573,30 @@ const pageStyles = css`
 // ─── Props Data ───────────────────────────────────────────────────────────────
 
 const chartProps: PropDef[] = [
-  { name: 'series', type: 'TimeSeriesSeries[]', description: 'Array of data series. Each has id, label, data points (timestamp + value), and optional color.' },
-  { name: 'height', type: 'number', default: '200', description: 'Chart height in pixels.' },
-  { name: 'showXAxis', type: 'boolean', default: 'true', description: 'Show time labels along the x-axis.' },
-  { name: 'showYAxis', type: 'boolean', default: 'true', description: 'Show value labels along the y-axis.' },
-  { name: 'showGrid', type: 'boolean', default: 'true', description: 'Show horizontal grid lines.' },
-  { name: 'showTooltip', type: 'boolean', default: 'true', description: 'Show crosshair and tooltip on hover.' },
-  { name: 'showLegend', type: 'boolean', default: 'true', description: 'Show legend below the chart when multiple series exist.' },
+  { name: 'series', type: 'TimeSeriesSeries[]', required: true, description: 'Array of data series. Each has id, label, data points (timestamp + value), and optional color.' },
+  { name: 'height', type: 'number', description: 'Chart height in pixels.' },
+  { name: 'showXAxis', type: 'boolean', description: 'Show time labels along the x-axis.' },
+  { name: 'showYAxis', type: 'boolean', description: 'Show value labels along the y-axis.' },
+  { name: 'showGrid', type: 'boolean', description: 'Show horizontal grid lines.' },
+  { name: 'showTooltip', type: 'boolean', description: 'Show crosshair and tooltip on hover.' },
+  { name: 'showLegend', type: 'boolean', description: 'Show legend below the chart when multiple series exist.' },
   { name: 'yMin', type: 'number', description: 'Override minimum y-axis value. Auto-calculated if not set.' },
   { name: 'yMax', type: 'number', description: 'Override maximum y-axis value. Auto-calculated if not set.' },
   { name: 'formatValue', type: '(v: number) => string', description: 'Custom value formatter for y-axis labels and tooltips.' },
   { name: 'formatTime', type: '(t: number) => string', description: 'Custom time formatter for x-axis labels.' },
   { name: 'motion', type: '0 | 1 | 2 | 3', description: 'Animation intensity override. Controls line draw animation speed.' },
-  { name: 'className', type: 'string', description: 'Additional CSS class name merged with the component class.' },
+]
+
+const timeSeriesDataProps: PropDef[] = [
+  { name: 'timestamp', type: 'number', required: true, description: 'Unix timestamp (ms) for the data point.' },
+  { name: 'value', type: 'number', required: true, description: 'Numeric value at this timestamp.' },
+]
+
+const timeSeriesSeriesProps: PropDef[] = [
+  { name: 'id', type: 'string', required: true, description: 'Unique identifier for the series.' },
+  { name: 'label', type: 'string', required: true, description: 'Display label for the series (shown in legend and tooltip).' },
+  { name: 'data', type: 'TimeSeriesData[]', required: true, description: 'Array of data points for this series.' },
+  { name: 'color', type: 'string', description: 'Optional custom color for this series line.' },
 ]
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -1159,6 +1170,20 @@ export default function TimeSeriesChartPage() {
         </p>
         <Card variant="default" padding="md">
           <PropsTable props={chartProps} />
+        </Card>
+        <h3 className="time-series-chart-page__section-title" style={{ marginBlockStart: 'var(--space-lg, 1.5rem)', fontSize: 'var(--text-base, 1rem)' }}>
+          TimeSeriesData
+        </h3>
+        <p className="time-series-chart-page__section-desc">Sub-type for each data point within a series.</p>
+        <Card variant="default" padding="md">
+          <PropsTable props={timeSeriesDataProps} />
+        </Card>
+        <h3 className="time-series-chart-page__section-title" style={{ marginBlockStart: 'var(--space-lg, 1.5rem)', fontSize: 'var(--text-base, 1rem)' }}>
+          TimeSeriesSeries
+        </h3>
+        <p className="time-series-chart-page__section-desc">Sub-type for each element in the <code>series</code> array.</p>
+        <Card variant="default" padding="md">
+          <PropsTable props={timeSeriesSeriesProps} />
         </Card>
       </section>
 

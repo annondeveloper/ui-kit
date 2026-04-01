@@ -560,7 +560,6 @@ const gaugeProps: PropDef[] = [
   { name: 'showValue', type: 'boolean', default: 'false', description: 'Show the numeric value centered inside the gauge arc.' },
   { name: 'size', type: "'sm' | 'md' | 'lg'", default: "'md'", description: 'Controls the gauge diameter (80/120/160px) and stroke width.' },
   { name: 'motion', type: '0 | 1 | 2 | 3', description: 'Animation intensity override. 0 disables all transitions.' },
-  { name: 'className', type: 'string', description: 'Additional CSS class name merged with the component class.' },
 ]
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
