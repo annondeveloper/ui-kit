@@ -1,4 +1,4 @@
-import { forwardRef, useRef, useCallback, type HTMLAttributes } from 'react'
+import { forwardRef, useCallback, useEffect, useRef, type HTMLAttributes } from 'react'
 
 export interface LiteOtpInputProps extends Omit<HTMLAttributes<HTMLDivElement>, 'onChange'> {
   length?: number
@@ -6,11 +6,20 @@ export interface LiteOtpInputProps extends Omit<HTMLAttributes<HTMLDivElement>, 
   onChange?: (value: string) => void
   onComplete?: (value: string) => void
   error?: string
+  disabled?: boolean
+  size?: 'sm' | 'md' | 'lg'
+  /** 'number' sets inputMode numeric; 'text' allows any character */
+  type?: 'number' | 'text'
+  autoFocus?: boolean
 }
 
 export const OtpInput = forwardRef<HTMLDivElement, LiteOtpInputProps>(
-  ({ length = 6, value = '', onChange, onComplete, error, className, ...rest }, ref) => {
+  ({ length = 6, value = '', onChange, onComplete, error, disabled, size, type = 'number', autoFocus, className, ...rest }, ref) => {
     const inputsRef = useRef<(HTMLInputElement | null)[]>([])
+
+    useEffect(() => {
+      if (autoFocus) inputsRef.current[0]?.focus()
+    }, [autoFocus])
 
     const handleInput = useCallback((index: number, char: string) => {
       const chars = value.split('')
@@ -22,15 +31,22 @@ export const OtpInput = forwardRef<HTMLDivElement, LiteOtpInputProps>(
     }, [value, length, onChange, onComplete])
 
     return (
-      <div ref={ref} className={`ui-lite-otp-input${className ? ` ${className}` : ''}`} aria-invalid={!!error} {...rest}>
+      <div
+        ref={ref}
+        className={`ui-lite-otp-input${className ? ` ${className}` : ''}`}
+        aria-invalid={!!error}
+        data-size={size}
+        {...rest}
+      >
         {Array.from({ length }, (_, i) => (
           <input
             key={i}
             ref={el => { inputsRef.current[i] = el }}
             type="text"
-            inputMode="numeric"
+            inputMode={type === 'number' ? 'numeric' : 'text'}
             maxLength={1}
             value={value[i] ?? ''}
+            disabled={disabled}
             aria-label={`Digit ${i + 1}`}
             onChange={e => handleInput(i, e.target.value)}
             onKeyDown={e => { if (e.key === 'Backspace' && !value[i] && i > 0) inputsRef.current[i - 1]?.focus() }}
