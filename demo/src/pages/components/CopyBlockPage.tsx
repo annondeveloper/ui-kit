@@ -649,7 +649,7 @@ const SAMPLE_HTML = `<!DOCTYPE html>
 </body>
 </html>`
 
-type Language = 'typescript' | 'css' | 'json' | 'bash' | 'html'
+type Language = 'typescript' | 'css' | 'json' | 'bash' | 'html' | 'python' | 'rust' | 'go' | 'sql' | 'yaml' | 'java' | 'swift'
 
 const LANG_SAMPLES: Record<Language, { code: string; label: string }> = {
   typescript: { code: SAMPLE_TS, label: 'TypeScript / JSX' },
@@ -657,6 +657,13 @@ const LANG_SAMPLES: Record<Language, { code: string; label: string }> = {
   json: { code: SAMPLE_JSON, label: 'JSON' },
   bash: { code: SAMPLE_BASH, label: 'Bash' },
   html: { code: SAMPLE_HTML, label: 'HTML' },
+  python: { code: 'def fibonacci(n: int) -> int:\n    """Calculate nth Fibonacci number."""\n    if n <= 1:\n        return n\n    return fibonacci(n - 1) + fibonacci(n - 2)\n\n# Generate first 10 numbers\nresult = [fibonacci(i) for i in range(10)]\nprint(f"Fibonacci: {result}")', label: 'Python' },
+  rust: { code: 'fn main() {\n    let mut numbers = vec![3, 1, 4, 1, 5, 9];\n    numbers.sort();\n    \n    for n in &numbers {\n        println!("Value: {}", n);\n    }\n}', label: 'Rust' },
+  go: { code: 'package main\n\nimport "fmt"\n\nfunc main() {\n    nums := []int{3, 1, 4, 1, 5}\n    for i, v := range nums {\n        fmt.Printf("Index %d: %d\\n", i, v)\n    }\n}', label: 'Go' },
+  sql: { code: 'SELECT u.name, COUNT(o.id) AS total_orders\nFROM users u\nLEFT JOIN orders o ON u.id = o.user_id\nWHERE u.created_at >= \'2024-01-01\'\nGROUP BY u.name\nHAVING COUNT(o.id) > 5\nORDER BY total_orders DESC\nLIMIT 10;', label: 'SQL' },
+  yaml: { code: 'name: ui-kit\nversion: 2.7.0\ndependencies:\n  react: "^19.0.0"\nscripts:\n  build: tsup\n  test: vitest\n  # Run type checking\n  typecheck: tsc --noEmit', label: 'YAML' },
+  java: { code: 'public class Calculator {\n    public static int factorial(int n) {\n        if (n <= 1) return 1;\n        return n * factorial(n - 1);\n    }\n\n    public static void main(String[] args) {\n        System.out.println(factorial(5));\n    }\n}', label: 'Java' },
+  swift: { code: 'struct User {\n    let name: String\n    var age: Int\n    \n    func greet() -> String {\n        return "Hello, \\(name)!"\n    }\n}\n\nlet user = User(name: "Alice", age: 30)\nprint(user.greet())', label: 'Swift' },
 }
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -947,7 +954,7 @@ function PlaygroundSection({ tier }: { tier: Tier }) {
         <div className="copy-block-page__playground-controls">
           <OptionGroup
             label="Language"
-            options={['typescript', 'css', 'json', 'bash', 'html'] as const}
+            options={['typescript', 'css', 'json', 'bash', 'html', 'python', 'rust', 'go', 'sql', 'yaml', 'java', 'swift'] as const}
             value={language}
             onChange={setLanguage}
           />
@@ -1034,7 +1041,7 @@ export default function CopyBlockPage() {
         <h1 className="copy-block-page__title">CopyBlock</h1>
         <p className="copy-block-page__desc">
           Code display component with syntax highlighting, line numbers, line highlighting,
-          one-click copy to clipboard, and a scrollable body. Supports 7 languages with built-in tokenizers.
+          one-click copy to clipboard, and a scrollable body. Supports 20 languages with built-in tokenizers.
         </p>
         <div className="copy-block-page__import-row">
           <code className="copy-block-page__import-code">{IMPORT_STRINGS[tier]}</code>
@@ -1219,7 +1226,7 @@ export default function CopyBlockPage() {
               <span className="copy-block-page__tier-size">~3.5 KB</span>
             </div>
             <p className="copy-block-page__tier-desc">
-              Full-featured with syntax highlighting tokenizers for 7 languages,
+              Full-featured with syntax highlighting tokenizers for 20 languages,
               line highlighting, title header, language badge, and max-height scroll.
             </p>
             <div className="copy-block-page__tier-import">
