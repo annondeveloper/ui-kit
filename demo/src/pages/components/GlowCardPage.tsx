@@ -669,13 +669,8 @@ const pageStyles = css`
 
 const glowCardProps: PropDef[] = [
   { name: 'glowColor', type: 'string', description: 'Custom OKLCH or CSS color for the glow effect. Defaults to brand purple.' },
+  { name: 'children', type: 'ReactNode', required: true, description: 'Content rendered inside the card.' },
   { name: 'motion', type: '0 | 1 | 2 | 3', description: 'Animation intensity override. 0 disables glow entirely. Cascades from OS > prop > CSS --motion > UIProvider.' },
-  { name: 'children', type: 'ReactNode', description: 'Content rendered inside the card.' },
-  { name: 'className', type: 'string', description: 'Additional CSS class name merged with the component class.' },
-  { name: 'style', type: 'CSSProperties', description: 'Inline styles applied to the root element.' },
-  { name: 'onMouseMove', type: '(e: MouseEvent) => void', description: 'Mouse move handler. Called alongside internal glow tracking.' },
-  { name: 'onMouseEnter', type: '(e: MouseEvent) => void', description: 'Mouse enter handler. Called alongside internal hover state.' },
-  { name: 'onMouseLeave', type: '(e: MouseEvent) => void', description: 'Mouse leave handler. Called alongside internal hover state reset.' },
 ]
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────

@@ -607,11 +607,10 @@ const pageStyles = css`
 // ─── Props Data ───────────────────────────────────────────────────────────────
 
 const numberTickerProps: PropDef[] = [
-  { name: 'value', type: 'number', description: 'The numeric value to display. Formatted with Intl.NumberFormat (locale-aware commas/periods).' },
+  { name: 'value', type: 'number', required: true, description: 'The numeric value to display. Formatted with Intl.NumberFormat (locale-aware commas/periods).' },
   { name: 'direction', type: "'up' | 'down'", default: "'up'", description: 'Direction digits roll when changing. "up" rolls from bottom, "down" from top.' },
   { name: 'delay', type: 'number', default: '0', description: 'Delay in milliseconds before the initial animation starts.' },
   { name: 'motion', type: '0 | 1 | 2 | 3', description: 'Animation intensity override. 0 = instant display, 1-3 = animated digit columns.' },
-  { name: 'className', type: 'string', description: 'Additional CSS class name merged with the component class.' },
 ]
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────

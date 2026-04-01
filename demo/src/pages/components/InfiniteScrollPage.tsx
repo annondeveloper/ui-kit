@@ -441,7 +441,6 @@ const infiniteScrollProps: PropDef[] = [
   { name: 'pullToRefresh', type: 'boolean', default: 'false', description: 'Enable pull-to-refresh indicator at the top (mobile).' },
   { name: 'onRefresh', type: '() => void | Promise<void>', description: 'Callback for pull-to-refresh. Required when pullToRefresh is true.' },
   { name: 'children', type: 'ReactNode', required: true, description: 'Scrollable content to render inside the container.' },
-  { name: 'className', type: 'string', description: 'Additional CSS class name merged with the component class.' },
 ]
 
 // ─── Demo Item Generator ─────────────────────────────────────────────────────

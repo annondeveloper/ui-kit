@@ -578,13 +578,11 @@ const pageStyles = css`
 // ─── Props Data ───────────────────────────────────────────────────────────────
 
 const wavyProps: PropDef[] = [
-  { name: 'waveCount', type: 'number', default: '5', description: 'Number of layered sine waves rendered as SVG paths.' },
-  { name: 'speed', type: 'number', default: '10', description: 'Base animation speed in seconds. Each wave varies slightly around this value.' },
+  { name: 'waveCount', type: 'number', description: 'Number of layered sine waves rendered as SVG paths.' },
+  { name: 'speed', type: 'number', description: 'Base animation speed in seconds. Each wave varies slightly around this value.' },
   { name: 'color', type: 'string', description: 'Base color for all waves using OKLCH or any CSS color. Default is a violet hue.' },
   { name: 'children', type: 'ReactNode', description: 'Content rendered above the waves in a z-indexed content layer.' },
   { name: 'motion', type: '0 | 1 | 2 | 3', description: 'Animation intensity override. At 0 waves are static. Cascades from OS > prop > CSS --motion > UIProvider.' },
-  { name: 'className', type: 'string', description: 'Additional CSS class name merged with the component class.' },
-  { name: 'style', type: 'CSSProperties', description: 'Inline style object applied to the root container element.' },
 ]
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────

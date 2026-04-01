@@ -660,12 +660,8 @@ const pageStyles = css`
 // ─── Props Data ───────────────────────────────────────────────────────────────
 
 const evervaultCardProps: PropDef[] = [
-  { name: 'children', type: 'ReactNode', description: 'Content rendered inside the card, above the matrix effect layer.' },
+  { name: 'children', type: 'ReactNode', required: true, description: 'Content rendered inside the card, above the matrix effect layer.' },
   { name: 'motion', type: '0 | 1 | 2 | 3', description: 'Animation intensity override. 0 disables the matrix entirely. Cascades from OS > prop > CSS --motion > UIProvider.' },
-  { name: 'className', type: 'string', description: 'Additional CSS class name merged with the component class.' },
-  { name: 'onMouseMove', type: '(e: MouseEvent) => void', description: 'Native mouse move handler, called before the internal tracking logic.' },
-  { name: 'onMouseEnter', type: '(e: MouseEvent) => void', description: 'Native mouse enter handler, called before hover state is set.' },
-  { name: 'onMouseLeave', type: '(e: MouseEvent) => void', description: 'Native mouse leave handler, called before hover state is cleared.' },
 ]
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────

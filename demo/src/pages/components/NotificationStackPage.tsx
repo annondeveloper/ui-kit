@@ -585,7 +585,18 @@ const notificationStackProps: PropDef[] = [
   { name: 'maxVisible', type: 'number', default: '10', description: 'Maximum number of notifications to display.' },
   { name: 'emptyMessage', type: 'string', default: "'No notifications'", description: 'Message shown when the notification list is empty.' },
   { name: 'motion', type: '0 | 1 | 2 | 3', description: 'Animation intensity override. Controls staggered entry animation.' },
-  { name: 'className', type: 'string', description: 'Additional CSS class name for the root element.' },
+]
+
+const notificationSubTypeProps: PropDef[] = [
+  { name: 'id', type: 'string', required: true, description: 'Unique identifier for the notification.' },
+  { name: 'title', type: 'string', required: true, description: 'Title text displayed in the notification.' },
+  { name: 'description', type: 'string', description: 'Helper text displayed below the title.' },
+  { name: 'timestamp', type: 'number | Date', required: true, description: 'Timestamp shown as formatted time.' },
+  { name: 'variant', type: "'default' | 'success' | 'warning' | 'error' | 'info'", description: 'Visual style variant.' },
+  { name: 'icon', type: 'ReactNode', description: 'Leading icon element.' },
+  { name: 'read', type: 'boolean', description: 'Whether the notification has been read.' },
+  { name: 'group', type: 'string', description: 'Group identifier for grouping notifications.' },
+  { name: 'action', type: '{ label: string; onClick: () => void }', description: 'Optional action button rendered in the notification.' },
 ]
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -1327,7 +1338,20 @@ export default function NotificationStackPage() {
         </div>
       </section>
 
-      {/* ── 8. Props API ───────────────────────────────── */}
+      {/* ── 8. Notification Interface ──────────────────── */}
+      <section className="notification-stack-page__section" id="notification-type">
+        <h2 className="notification-stack-page__section-title">
+          <a href="#notification-type">Notification Interface</a>
+        </h2>
+        <p className="notification-stack-page__section-desc">
+          Each item in the notifications array follows this interface.
+        </p>
+        <Card variant="default" padding="md">
+          <PropsTable props={notificationSubTypeProps} />
+        </Card>
+      </section>
+
+      {/* ── 9. Props API ───────────────────────────────── */}
       <section className="notification-stack-page__section" id="props">
         <h2 className="notification-stack-page__section-title">
           <a href="#props">Props API</a>

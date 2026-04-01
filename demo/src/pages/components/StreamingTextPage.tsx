@@ -620,13 +620,12 @@ const pageStyles = css`
 // ─── Props Data ───────────────────────────────────────────────────────────────
 
 const streamingTextProps: PropDef[] = [
-  { name: 'text', type: 'string', description: 'The text content to display. Supports markdown-style code blocks with triple backticks.' },
-  { name: 'streaming', type: 'boolean', default: 'false', description: 'When true, shows a blinking cursor and sets aria-busy. Triggers onComplete and cursor fade when toggled off.' },
+  { name: 'text', type: 'string', required: true, description: 'The text content to display. Supports markdown-style code blocks with triple backticks.' },
+  { name: 'streaming', type: 'boolean', description: 'When true, shows a blinking cursor and sets aria-busy. Triggers onComplete and cursor fade when toggled off.' },
   { name: 'showCursor', type: 'boolean', description: 'Override cursor visibility. Defaults to matching the streaming prop value.' },
   { name: 'speed', type: 'number', description: 'Characters revealed per animation frame for typewriter effect. Omit for instant display.' },
   { name: 'onComplete', type: '() => void', description: 'Called when streaming transitions from true to false.' },
   { name: 'motion', type: '0 | 1 | 2 | 3', description: 'Animation intensity. 0 = no cursor blink, 1-3 = animated cursor.' },
-  { name: 'className', type: 'string', description: 'Additional CSS class name merged with the component class.' },
 ]
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────

@@ -688,10 +688,9 @@ const pageStyles = css`
 // ─── Props Data ───────────────────────────────────────────────────────────────
 
 const flipWordsProps: PropDef[] = [
-  { name: 'words', type: 'string[]', description: 'Array of words to cycle through with the flip animation.' },
+  { name: 'words', type: 'string[]', required: true, description: 'Array of words to cycle through with the flip animation.' },
   { name: 'interval', type: 'number', default: '3000', description: 'Time in milliseconds between word transitions.' },
   { name: 'motion', type: '0 | 1 | 2 | 3', description: 'Animation intensity override. 0 = static (shows first word), 3 = full 3D flip.' },
-  { name: 'className', type: 'string', description: 'Additional CSS class name merged with the component class.' },
 ]
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────

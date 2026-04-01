@@ -564,8 +564,6 @@ const meteorProps: PropDef[] = [
   { name: 'count', type: 'number', default: '20', description: 'Number of meteor streaks to render. Higher counts create denser showers.' },
   { name: 'children', type: 'ReactNode', description: 'Content rendered above the meteors in a z-indexed content layer.' },
   { name: 'motion', type: '0 | 1 | 2 | 3', description: 'Animation intensity override. At 0 meteors are hidden. Cascades from OS > prop > CSS --motion > UIProvider.' },
-  { name: 'className', type: 'string', description: 'Additional CSS class name merged with the component class.' },
-  { name: 'style', type: 'CSSProperties', description: 'Inline style object applied to the root container.' },
 ]
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────

@@ -691,11 +691,8 @@ const pageStyles = css`
 const rippleProps: PropDef[] = [
   { name: 'color', type: 'string', description: 'Ripple color override. Accepts any CSS color value. Defaults to semi-transparent white.' },
   { name: 'duration', type: 'number', default: '600', description: 'Ripple animation duration in milliseconds.' },
-  { name: 'children', type: 'ReactNode', description: 'Content wrapped by the ripple container. Click anywhere to trigger.' },
+  { name: 'children', type: 'ReactNode', required: true, description: 'Content wrapped by the ripple container. Click anywhere to trigger.' },
   { name: 'motion', type: '0 | 1 | 2 | 3', description: 'Animation intensity override. 0 disables ripple entirely.' },
-  { name: 'onClick', type: '(e: MouseEvent) => void', description: 'Click handler. Called before the ripple animation begins.' },
-  { name: 'className', type: 'string', description: 'Additional CSS class name merged with the component class.' },
-  { name: 'style', type: 'CSSProperties', description: 'Inline styles applied to the root element.' },
 ]
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────

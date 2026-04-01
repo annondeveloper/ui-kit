@@ -669,13 +669,8 @@ const pageStyles = css`
 
 const spotlightCardProps: PropDef[] = [
   { name: 'spotlightColor', type: 'string', description: 'Custom OKLCH or CSS color for the spotlight radial gradient. Defaults to brand purple at 15% opacity.' },
+  { name: 'children', type: 'ReactNode', required: true, description: 'Content rendered inside the card above the spotlight layer.' },
   { name: 'motion', type: '0 | 1 | 2 | 3', description: 'Animation intensity override. 0 disables the spotlight. Cascades from OS > prop > CSS --motion > UIProvider.' },
-  { name: 'children', type: 'ReactNode', description: 'Content rendered inside the card above the spotlight layer.' },
-  { name: 'className', type: 'string', description: 'Additional CSS class name merged with the component class.' },
-  { name: 'style', type: 'CSSProperties', description: 'Inline styles applied to the root element.' },
-  { name: 'onMouseMove', type: '(e: MouseEvent) => void', description: 'Mouse move handler. Called alongside internal spotlight position tracking.' },
-  { name: 'onMouseEnter', type: '(e: MouseEvent) => void', description: 'Mouse enter handler. Called alongside internal hover state.' },
-  { name: 'onMouseLeave', type: '(e: MouseEvent) => void', description: 'Mouse leave handler. Called alongside internal hover state reset.' },
 ]
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────

@@ -577,10 +577,8 @@ const borderBeamProps: PropDef[] = [
   { name: 'duration', type: 'number', default: '5', description: 'Beam rotation speed in seconds per full revolution around the border.' },
   { name: 'color', type: 'string', description: 'Beam color using OKLCH or any CSS color. Overrides the default violet beam.' },
   { name: 'size', type: 'number', default: '80', description: 'Beam arc size in pixels. Larger values create a wider visible beam segment.' },
-  { name: 'children', type: 'ReactNode', description: 'Content rendered inside the bordered container above the beam animation.' },
+  { name: 'children', type: 'ReactNode', required: true, description: 'Content rendered inside the bordered container above the beam animation.' },
   { name: 'motion', type: '0 | 1 | 2 | 3', description: 'Animation intensity override. At 0 beam becomes a static border highlight. Cascades from OS > prop > CSS --motion > UIProvider.' },
-  { name: 'className', type: 'string', description: 'Additional CSS class name merged with the component class.' },
-  { name: 'style', type: 'CSSProperties', description: 'Inline style object applied to the root container element.' },
 ]
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────

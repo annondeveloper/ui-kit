@@ -620,10 +620,9 @@ const pageStyles = css`
 
 const typingIndicatorProps: PropDef[] = [
   { name: 'avatar', type: 'ReactNode', description: 'Optional avatar element displayed before the bouncing dots.' },
-  { name: 'label', type: 'string', default: "'Someone is typing...'", description: 'Visually hidden label announced to screen readers via role="status".' },
-  { name: 'size', type: "'sm' | 'md'", default: "'md'", description: 'Controls dot size and spacing. sm = 4px dots, md = 6px dots.' },
+  { name: 'label', type: 'string', description: 'Visually hidden label announced to screen readers via role="status".' },
+  { name: 'size', type: "'sm' | 'md'", description: 'Controls dot size and spacing. sm = 4px dots, md = 6px dots.' },
   { name: 'motion', type: '0 | 1 | 2 | 3', description: 'Animation intensity. 0 = static, 1 = simple bounce, 2-3 = spring physics with overshoot.' },
-  { name: 'className', type: 'string', description: 'Additional CSS class name merged with the component class.' },
 ]
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────

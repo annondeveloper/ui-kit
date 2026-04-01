@@ -688,11 +688,10 @@ const pageStyles = css`
 // ─── Props Data ───────────────────────────────────────────────────────────────
 
 const textRevealProps: PropDef[] = [
-  { name: 'text', type: 'string', description: 'The text to reveal character-by-character.' },
+  { name: 'text', type: 'string', required: true, description: 'The text to reveal character-by-character.' },
   { name: 'trigger', type: "'mount' | 'inView'", default: "'mount'", description: 'When to start the reveal animation. Mount starts immediately, inView waits for scroll.' },
   { name: 'speed', type: 'number', default: '30', description: 'Characters revealed per second. Higher values create faster reveals.' },
   { name: 'motion', type: '0 | 1 | 2 | 3', description: 'Animation intensity override. 0 = instant reveal, 3 = full character animation.' },
-  { name: 'className', type: 'string', description: 'Additional CSS class name merged with the component class.' },
 ]
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────

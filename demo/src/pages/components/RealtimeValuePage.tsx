@@ -561,10 +561,9 @@ const realtimeValueProps: PropDef[] = [
   { name: 'value', type: 'number', required: true, description: 'The current numeric value to display.' },
   { name: 'previousValue', type: 'number', description: 'The previous value, used to calculate and display delta.' },
   { name: 'format', type: '(value: number) => string', description: 'Custom formatting function. Defaults to Intl.NumberFormat with 2 decimal places.' },
-  { name: 'showDelta', type: 'boolean', default: 'false', description: 'Show the change amount (+/-) next to the value.' },
-  { name: 'flashOnChange', type: 'boolean', default: 'true', description: 'Flash green/red background when value changes up/down.' },
+  { name: 'showDelta', type: 'boolean', description: 'Show the change amount (+/-) next to the value.' },
+  { name: 'flashOnChange', type: 'boolean', description: 'Flash green/red background when value changes up/down.' },
   { name: 'motion', type: '0 | 1 | 2 | 3', description: 'Animation intensity override. At 0, flash animations are disabled.' },
-  { name: 'className', type: 'string', description: 'Additional CSS class name for the root span element.' },
 ]
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────

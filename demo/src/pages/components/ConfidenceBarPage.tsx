@@ -664,13 +664,12 @@ const pageStyles = css`
 // ─── Props Data ───────────────────────────────────────────────────────────────
 
 const confidenceBarPropsData: PropDef[] = [
-  { name: 'value', type: 'number', description: 'Confidence value between 0 and 1. Determines fill width and color level.' },
+  { name: 'value', type: 'number', required: true, description: 'Confidence value between 0 and 1. Determines fill width and color level.' },
   { name: 'label', type: 'ReactNode', description: 'Optional label displayed above the bar on the left side.' },
-  { name: 'showValue', type: 'boolean', default: 'true', description: 'Whether to display the percentage value above the bar on the right side.' },
-  { name: 'thresholds', type: '{ low: number; medium: number }', default: '{ low: 0.3, medium: 0.7 }', description: 'Threshold values for color transitions. Below low = red, below medium = yellow, above medium = green.' },
-  { name: 'size', type: "'sm' | 'md' | 'lg'", default: "'md'", description: 'Track height: sm = 4px, md = 8px, lg = 12px.' },
+  { name: 'showValue', type: 'boolean', description: 'Whether to display the percentage value above the bar on the right side.' },
+  { name: 'thresholds', type: '{ low: number; medium: number }', description: 'Threshold values for color transitions. Below low = red, below medium = yellow, above medium = green.' },
+  { name: 'size', type: "'sm' | 'md' | 'lg'", description: 'Track height: sm = 4px, md = 8px, lg = 12px.' },
   { name: 'motion', type: '0 | 1 | 2 | 3', description: 'Animation intensity. 0 = no transition, 1 = subtle ease, 2-3 = spring bounce.' },
-  { name: 'className', type: 'string', description: 'Additional CSS class name merged with the component class.' },
 ]
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────

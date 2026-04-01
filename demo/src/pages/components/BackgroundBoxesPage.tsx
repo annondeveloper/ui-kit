@@ -668,8 +668,6 @@ const backgroundBoxesProps: PropDef[] = [
   { name: 'cols', type: 'number', default: '15', description: 'Number of columns in the grid.' },
   { name: 'children', type: 'ReactNode', description: 'Content rendered above the animated grid.' },
   { name: 'motion', type: '0 | 1 | 2 | 3', description: 'Animation intensity override. 0 disables animation entirely.' },
-  { name: 'className', type: 'string', description: 'Additional CSS class name merged with the component class.' },
-  { name: 'style', type: 'CSSProperties', description: 'Inline styles applied to the root element.' },
 ]
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────

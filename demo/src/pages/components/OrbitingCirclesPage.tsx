@@ -662,13 +662,11 @@ const pageStyles = css`
 // ─── Props Data ───────────────────────────────────────────────────────────────
 
 const orbitingCirclesProps: PropDef[] = [
-  { name: 'radius', type: 'number', default: '100', description: 'Orbit radius in pixels. Controls the distance of items from center.' },
-  { name: 'duration', type: 'number', default: '15', description: 'Full orbit duration in seconds.' },
-  { name: 'reverse', type: 'boolean', default: 'false', description: 'Reverses the orbit direction (counter-clockwise).' },
-  { name: 'children', type: 'ReactNode[]', description: 'Array of elements to distribute evenly around the orbit. Each child becomes an orbiting item.' },
+  { name: 'radius', type: 'number', description: 'Orbit radius in pixels. Controls the distance of items from center.' },
+  { name: 'duration', type: 'number', description: 'Full orbit duration in seconds.' },
+  { name: 'reverse', type: 'boolean', description: 'Reverses the orbit direction (counter-clockwise).' },
+  { name: 'children', type: 'ReactNode[]', required: true, description: 'Array of elements to distribute evenly around the orbit. Each child becomes an orbiting item.' },
   { name: 'motion', type: '0 | 1 | 2 | 3', description: 'Animation intensity override. 0 places items statically on the circle.' },
-  { name: 'className', type: 'string', description: 'Additional CSS class name merged with the component class.' },
-  { name: 'style', type: 'CSSProperties', description: 'Inline styles applied to the root element.' },
 ]
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────

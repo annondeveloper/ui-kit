@@ -582,16 +582,15 @@ const pageStyles = css`
 
 const liveFeedProps: PropDef[] = [
   { name: 'items', type: 'FeedItem[]', required: true, description: 'Array of feed items to display. New items animate in.' },
-  { name: 'maxItems', type: 'number', default: '50', description: 'Maximum items to display. Oldest items are truncated.' },
-  { name: 'autoScroll', type: 'boolean', default: 'true', description: 'Automatically scroll to bottom when new items arrive.' },
+  { name: 'maxItems', type: 'number', description: 'Maximum items to display. Oldest items are truncated.' },
+  { name: 'autoScroll', type: 'boolean', description: 'Automatically scroll to bottom when new items arrive.' },
   { name: 'paused', type: 'boolean', description: 'Pause auto-scrolling. Shows a paused badge in the header.' },
   { name: 'onPause', type: '() => void', description: 'Callback when the feed is paused.' },
   { name: 'onResume', type: '() => void', description: 'Callback when the feed is resumed.' },
   { name: 'connectionStatus', type: "'connected' | 'reconnecting' | 'offline'", description: 'Connection indicator shown in the header with colored status dot.' },
   { name: 'height', type: 'string', description: 'Fixed height for the scrollable area (e.g., "400px").' },
-  { name: 'emptyMessage', type: 'ReactNode', default: "'No events'", description: 'Content shown when items array is empty.' },
+  { name: 'emptyMessage', type: 'ReactNode', description: 'Content shown when items array is empty.' },
   { name: 'motion', type: '0 | 1 | 2 | 3', description: 'Animation intensity override. Controls flash animation and scroll behavior.' },
-  { name: 'className', type: 'string', description: 'Additional CSS class name merged with the component class.' },
 ]
 
 const feedItemProps: PropDef[] = [

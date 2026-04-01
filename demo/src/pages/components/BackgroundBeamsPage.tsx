@@ -634,8 +634,6 @@ const bgBeamsProps: PropDef[] = [
   { name: 'color', type: 'string', description: 'Custom beam color using OKLCH or any CSS color. Overrides the default violet beam gradient.' },
   { name: 'children', type: 'ReactNode', description: 'Content rendered above the beams in a z-indexed content layer.' },
   { name: 'motion', type: '0 | 1 | 2 | 3', description: 'Animation intensity override. At 0 beams are hidden. Cascades from OS > prop > CSS --motion > UIProvider.' },
-  { name: 'className', type: 'string', description: 'Additional CSS class name merged with the component class.' },
-  { name: 'style', type: 'CSSProperties', description: 'Inline style object applied to the root container element.' },
 ]
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────

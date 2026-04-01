@@ -688,13 +688,11 @@ const pageStyles = css`
 // ─── Props Data ───────────────────────────────────────────────────────────────
 
 const encryptedTextProps: PropDef[] = [
-  { name: 'text', type: 'string', description: 'The text to display with a scramble-to-reveal animation.' },
+  { name: 'text', type: 'string', required: true, description: 'The text to display with a scramble-to-reveal animation.' },
   { name: 'trigger', type: "'mount' | 'hover' | 'inView'", default: "'mount'", description: 'When to start the decryption animation.' },
   { name: 'speed', type: 'number', default: '2', description: 'Character resolve speed multiplier. Higher values resolve characters faster.' },
-  { name: 'scrambleChars', type: 'string', default: "'A-Z a-z 0-9 !@#$%'", description: 'Character set used for scramble glyphs.' },
+  { name: 'scrambleChars', type: 'string', default: 'DEFAULT_SCRAMBLE', description: 'Character set used for scramble glyphs.' },
   { name: 'motion', type: '0 | 1 | 2 | 3', description: 'Animation intensity override. 0 = instant reveal, 3 = full scramble animation.' },
-  { name: 'className', type: 'string', description: 'Additional CSS class name merged with the component class.' },
-  { name: 'onMouseEnter', type: '(e: MouseEvent) => void', description: 'Mouse enter handler. Used internally for hover trigger.' },
 ]
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
