@@ -658,6 +658,12 @@ const radioGroupPropsData: PropDef[] = [
   { name: 'ref', type: 'Ref<HTMLFieldSetElement>', description: 'Forwarded ref to the underlying <fieldset> element.' },
 ]
 
+const radioOptionPropsData: PropDef[] = [
+  { name: 'value', type: 'string', required: true, description: 'The value submitted with the form when this option is selected.' },
+  { name: 'label', type: 'ReactNode', required: true, description: 'Label text displayed next to the radio button.' },
+  { name: 'disabled', type: 'boolean', description: 'Disables interaction for this individual option.' },
+]
+
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
 type Size = 'xs' | 'sm' | 'md' | 'lg' | 'xl'
@@ -1477,6 +1483,15 @@ export default function RadioGroupPage() {
         </p>
         <Card variant="default" padding="md">
           <PropsTable props={radioGroupPropsData} />
+        </Card>
+        <h3 className="radio-group-page__section-title" style={{ marginBlockStart: '1.5rem' }}>
+          RadioOption
+        </h3>
+        <p className="radio-group-page__section-desc">
+          Shape of each object in the <code>options</code> array.
+        </p>
+        <Card variant="default" padding="md">
+          <PropsTable props={radioOptionPropsData} />
         </Card>
       </section>
 
