@@ -35,7 +35,8 @@ const metricCardStyles = css`
     @scope (.ui-metric-card) {
       :scope {
         position: relative;
-        min-inline-size: 280px;
+        min-inline-size: 0;
+        max-inline-size: 100%;
         display: flex;
         flex-direction: column;
         gap: var(--space-xs, 0.25rem);
@@ -164,6 +165,9 @@ const metricCardStyles = css`
         color: var(--text-secondary, oklch(70% 0 0));
         text-wrap: balance;
         line-height: 1.4;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
       }
 
       /* Value */
@@ -174,6 +178,9 @@ const metricCardStyles = css`
         color: var(--text-primary, oklch(90% 0 0));
         line-height: 1.2;
         font-variant-numeric: tabular-nums;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
       }
 
       /* Change / trend row */

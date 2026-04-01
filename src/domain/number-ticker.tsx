@@ -28,17 +28,23 @@ const numberTickerStyles = css`
     @scope (.ui-number-ticker) {
       :scope {
         display: inline-flex;
-        min-inline-size: 60px;
         align-items: baseline;
         font-variant-numeric: tabular-nums;
-        overflow: hidden;
+        line-height: 1;
       }
 
       .ui-number-ticker--digit-slot {
         display: inline-block;
         block-size: 1em;
         overflow: hidden;
-        line-height: 1;
+        position: relative;
+        vertical-align: bottom;
+      }
+
+      @supports (block-size: 1lh) {
+        .ui-number-ticker--digit-slot {
+          block-size: 1lh;
+        }
       }
 
       .ui-number-ticker--digit-column {
@@ -52,7 +58,12 @@ const numberTickerStyles = css`
         align-items: center;
         justify-content: center;
         block-size: 1em;
-        line-height: 1;
+      }
+
+      @supports (block-size: 1lh) {
+        .ui-number-ticker--digit {
+          block-size: 1lh;
+        }
       }
 
       /* Static characters (comma, period, sign) */
@@ -149,16 +160,16 @@ export function NumberTicker({
           )
         }
 
-        const offset = direction === 'up'
-          ? -digitIndex * 100
-          : -(9 - digitIndex) * 100
+        const translateEm = direction === 'up'
+          ? -digitIndex
+          : -(9 - digitIndex)
 
         return (
           <span key={`digit-${i}`} className="ui-number-ticker--digit-slot" aria-hidden="true">
             <span
               className="ui-number-ticker--digit-column"
               style={{
-                transform: `translateY(${offset / 10}em)`,
+                transform: `translateY(${translateEm}em)`,
               }}
             >
               {(direction === 'up' ? DIGITS : [...DIGITS].reverse()).map((d) => (

@@ -467,11 +467,15 @@ function TimeSeriesChartInner({
       </svg>
 
       {/* Tooltip */}
-      {showTooltip && hoveredTimestamp !== null && (
+      {showTooltip && hoveredTimestamp !== null && (() => {
+        const xPos = xScale(hoveredTimestamp)
+        const flipRight = xPos > width * 0.7
+        return (
         <div
           className="ui-time-series-chart__tooltip-box"
           style={{
-            left: `${xScale(hoveredTimestamp)}px`,
+            left: flipRight ? undefined : `${xPos}px`,
+            right: flipRight ? `${width - xPos}px` : undefined,
             top: `${PADDING.top - 4}px`,
           }}
         >
@@ -489,7 +493,8 @@ function TimeSeriesChartInner({
             )
           })}
         </div>
-      )}
+        )
+      })()}
 
       {/* Legend */}
       {showLegend && series.length > 1 && (

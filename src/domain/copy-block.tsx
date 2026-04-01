@@ -20,6 +20,14 @@ export type CopyBlockLanguage =
   | 'json'
   | 'bash'
   | 'html'
+  | 'python'
+  | 'rust'
+  | 'go'
+  | 'sql'
+  | 'xml'
+  | 'yaml'
+  | 'markdown'
+  | 'csv'
   | 'text'
 
 export interface CopyBlockProps extends HTMLAttributes<HTMLDivElement> {
@@ -308,10 +316,63 @@ function tokenizeLine(line: string, language: CopyBlockLanguage): Token[] {
       return tokenizeCSS(line)
     case 'bash':
       return tokenizeBash(line)
+    case 'python':
+      return tokenizeGeneric(line, ['def','class','if','elif','else','for','while','return','import','from','as','with','try','except','raise','yield','lambda','pass','break','continue','in','not','and','or','is','True','False','None','self','async','await'], '#')
+    case 'rust':
+      return tokenizeGeneric(line, ['fn','let','mut','pub','struct','enum','impl','trait','use','mod','match','if','else','for','while','loop','return','self','Self','true','false','type','where','const','static','ref','move','async','await','unsafe','crate','super','dyn'], '//')
+    case 'go':
+      return tokenizeGeneric(line, ['func','package','import','var','const','type','struct','interface','if','else','for','range','return','go','defer','chan','select','switch','case','default','break','continue','nil','true','false','error','string','int','bool'], '//')
+    case 'sql':
+      return tokenizeGeneric(line, ['SELECT','FROM','WHERE','JOIN','LEFT','RIGHT','INNER','ON','INSERT','INTO','VALUES','UPDATE','SET','DELETE','CREATE','TABLE','ALTER','DROP','INDEX','AND','OR','NOT','IN','IS','NULL','ORDER','BY','GROUP','HAVING','LIMIT','AS','DISTINCT','COUNT','SUM','AVG','MIN','MAX','UNION','BEGIN','COMMIT','ROLLBACK','PRIMARY','KEY','FOREIGN','REFERENCES'], '--', true)
+    case 'xml':
+      return tokenizeGeneric(line, [], '<!--', false)
+    case 'yaml':
+      return tokenizeGeneric(line, ['true','false','null','yes','no'], '#')
+    case 'markdown':
+      return [{ type: 'plain', value: line }]
+    case 'csv':
+      return [{ type: 'plain', value: line }]
     case 'text':
     default:
       return [{ type: 'plain', value: line }]
   }
+}
+
+/** Simple keyword-based tokenizer for many languages */
+function tokenizeGeneric(line: string, keywords: string[], commentPrefix: string, caseInsensitive = false): Token[] {
+  const tokens: Token[] = []
+  // Check for line comment
+  const commentIdx = line.indexOf(commentPrefix)
+  const codePart = commentIdx >= 0 ? line.slice(0, commentIdx) : line
+  const commentPart = commentIdx >= 0 ? line.slice(commentIdx) : ''
+
+  // Tokenize code part
+  const parts = codePart.split(/("(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*'|`[^`]*`)/)
+  for (const part of parts) {
+    if ((part.startsWith('"') || part.startsWith("'") || part.startsWith('`')) && part.length >= 2) {
+      tokens.push({ type: 'string', value: part })
+    } else {
+      // Split by word boundaries and tokenize
+      const words = part.split(/\b/)
+      for (const word of words) {
+        const check = caseInsensitive ? word.toUpperCase() : word
+        const kwList = caseInsensitive ? keywords.map(k => k.toUpperCase()) : keywords
+        if (kwList.includes(check)) {
+          tokens.push({ type: 'keyword', value: word })
+        } else if (/^\d+(\.\d+)?$/.test(word)) {
+          tokens.push({ type: 'number', value: word })
+        } else if (word.length > 0) {
+          tokens.push({ type: 'plain', value: word })
+        }
+      }
+    }
+  }
+
+  if (commentPart) {
+    tokens.push({ type: 'comment', value: commentPart })
+  }
+
+  return tokens
 }
 
 // ─── Styles ─────────────────────────────────────────────────────────────────
