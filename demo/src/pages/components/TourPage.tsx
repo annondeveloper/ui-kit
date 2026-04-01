@@ -14,7 +14,7 @@ const STEP_PROPS: PropDef[] = [
   { name: 'target', type: 'string', required: true, description: 'CSS selector for the element to spotlight.' },
   { name: 'title', type: 'string', required: true, description: 'Heading text displayed in the tooltip.' },
   { name: 'description', type: 'ReactNode', required: true, description: 'Body content of the tooltip card.' },
-  { name: 'placement', type: "'top' | 'bottom' | 'left' | 'right'", default: "'bottom'", description: 'Preferred tooltip position relative to the target.' },
+  { name: 'placement', type: "'top' | 'bottom' | 'left' | 'right'", description: 'Preferred tooltip position relative to the target.' },
   { name: 'onShow', type: '() => void', description: 'Called when this step becomes active.' },
 ]
 

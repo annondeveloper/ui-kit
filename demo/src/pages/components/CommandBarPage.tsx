@@ -632,7 +632,6 @@ const commandBarProps: PropDef[] = [
   { name: 'emptyMessage', type: 'string', default: "'No results found'", description: 'Message shown when no items match the query.' },
   { name: 'shortcut', type: 'string[]', description: 'Custom keyboard shortcut keys (e.g., ["Meta", "k"]). Defaults to Cmd/Ctrl+K.' },
   { name: 'motion', type: '0 | 1 | 2 | 3', description: 'Animation intensity override. Cascades from OS > prop > CSS --motion > UIProvider.' },
-  { name: 'className', type: 'string', description: 'Additional CSS class name merged with the component class.' },
 ]
 
 const commandItemProps: PropDef[] = [
