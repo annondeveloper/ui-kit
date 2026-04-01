@@ -10,7 +10,7 @@ export interface LiteTabsProps extends Omit<HTMLAttributes<HTMLDivElement>, 'onC
   tabs: LiteTab[]
   activeTab?: string
   onChange?: (tabId: string) => void
-  variant?: 'underline' | 'pills'
+  variant?: 'underline' | 'pills' | 'enclosed'
 }
 
 export const Tabs = forwardRef<HTMLDivElement, LiteTabsProps>(

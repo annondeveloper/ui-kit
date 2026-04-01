@@ -1,8 +1,8 @@
 import { forwardRef, type HTMLAttributes } from 'react'
 
 export interface LiteCardProps extends HTMLAttributes<HTMLDivElement> {
-  variant?: 'default' | 'elevated'
-  padding?: 'sm' | 'md' | 'lg'
+  variant?: 'default' | 'elevated' | 'outlined' | 'ghost' | 'glass' | 'gradient'
+  padding?: 'none' | 'sm' | 'md' | 'lg'
 }
 
 export const Card = forwardRef<HTMLDivElement, LiteCardProps>(

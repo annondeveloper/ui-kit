@@ -6,6 +6,8 @@ export interface LiteDiskMountBarProps extends HTMLAttributes<HTMLDivElement> {
   mounts: LiteMountInfo[]
   maxVisible?: number
   showFree?: boolean
+  size?: 'sm' | 'md' | 'lg'
+  formatBytes?: (bytes: number) => string
 }
 
 function fmtB(b: number): string {

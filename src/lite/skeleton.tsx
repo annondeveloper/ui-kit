@@ -1,7 +1,7 @@
 import { forwardRef, type HTMLAttributes } from 'react'
 
 export interface LiteSkeletonProps extends HTMLAttributes<HTMLDivElement> {
-  variant?: 'rectangular' | 'text' | 'circular'
+  variant?: 'text' | 'circular' | 'rectangular' | 'rounded'
   width?: string | number
   height?: string | number
 }
