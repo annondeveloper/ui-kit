@@ -3,20 +3,55 @@ import { forwardRef, type HTMLAttributes, type ReactNode } from 'react'
 export interface LiteSidebarProps extends HTMLAttributes<HTMLElement> {
   collapsed?: boolean
   width?: number | string
+  /** Width when collapsed — applied as CSS var `--sidebar-collapsed-width` */
+  collapsedWidth?: number | string
+  /** Called when the collapsed state changes */
+  onCollapse?: (collapsed: boolean) => void
+  /** Side the sidebar is positioned on (data-position, default 'left') */
+  position?: 'left' | 'right'
 }
 
 export const Sidebar = forwardRef<HTMLElement, LiteSidebarProps>(
-  ({ collapsed, width = 240, className, style, children, ...rest }, ref) => (
-    <aside
-      ref={ref}
-      className={`ui-lite-sidebar${className ? ` ${className}` : ''}`}
-      data-collapsed={collapsed ? '' : undefined}
-      style={{ ...style, '--sidebar-width': typeof width === 'number' ? `${width}px` : width } as React.CSSProperties}
-      {...rest}
-    >
-      {children}
-    </aside>
-  )
+  (
+    {
+      collapsed,
+      width = 240,
+      collapsedWidth,
+      onCollapse,
+      position = 'left',
+      className,
+      style,
+      children,
+      ...rest
+    },
+    ref,
+  ) => {
+    const cssVars: Record<string, string> = {
+      '--sidebar-width': typeof width === 'number' ? `${width}px` : width,
+    }
+    if (collapsedWidth !== undefined) {
+      cssVars['--sidebar-collapsed-width'] =
+        typeof collapsedWidth === 'number' ? `${collapsedWidth}px` : collapsedWidth
+    }
+
+    return (
+      <aside
+        ref={ref}
+        className={`ui-lite-sidebar${className ? ` ${className}` : ''}`}
+        data-collapsed={collapsed ? '' : undefined}
+        data-position={position}
+        style={{ ...style, ...cssVars } as React.CSSProperties}
+        onClick={
+          onCollapse
+            ? () => onCollapse(!collapsed)
+            : undefined
+        }
+        {...rest}
+      >
+        {children}
+      </aside>
+    )
+  },
 )
 Sidebar.displayName = 'Sidebar'
 
@@ -42,6 +77,6 @@ export const SidebarItem = forwardRef<HTMLElement, LiteSidebarItemProps>(
         <span className="ui-lite-sidebar__label">{label}</span>
       </Tag>
     )
-  }
+  },
 )
 SidebarItem.displayName = 'SidebarItem'

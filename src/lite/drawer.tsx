@@ -4,11 +4,15 @@ export interface LiteDrawerProps extends Omit<HTMLAttributes<HTMLDialogElement>,
   open: boolean
   onClose: () => void
   side?: 'left' | 'right' | 'top' | 'bottom'
+  /** Render a backdrop overlay (default true) */
+  overlay?: boolean
+  /** Size of the drawer panel (data-size) */
+  size?: 'sm' | 'md' | 'lg'
   children: ReactNode
 }
 
 export const Drawer = forwardRef<HTMLDialogElement, LiteDrawerProps>(
-  ({ open, onClose, side = 'right', className, children, ...rest }, ref) => {
+  ({ open, onClose, side = 'right', overlay = true, size = 'md', className, children, ...rest }, ref) => {
     const internalRef = useRef<HTMLDialogElement>(null)
     const dialogRef = (ref as React.RefObject<HTMLDialogElement>) ?? internalRef
 
@@ -24,12 +28,16 @@ export const Drawer = forwardRef<HTMLDialogElement, LiteDrawerProps>(
         ref={dialogRef}
         className={`ui-lite-sheet${className ? ` ${className}` : ''}`}
         data-side={side}
+        data-size={size}
         onClose={onClose}
         {...rest}
       >
+        {overlay && (
+          <div className="ui-lite-sheet__overlay" aria-hidden="true" onClick={onClose} />
+        )}
         <div className="ui-lite-sheet__body">{children}</div>
       </dialog>
     )
-  }
+  },
 )
 Drawer.displayName = 'Drawer'

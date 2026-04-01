@@ -1,4 +1,4 @@
-import { forwardRef, type SelectHTMLAttributes, type ReactNode } from 'react'
+import { forwardRef, type ChangeEvent, type SelectHTMLAttributes, type ReactNode } from 'react'
 
 export interface LiteSelectOption {
   value: string
@@ -7,16 +7,50 @@ export interface LiteSelectOption {
   group?: string
 }
 
-export interface LiteSelectProps extends Omit<SelectHTMLAttributes<HTMLSelectElement>, 'size'> {
+export interface LiteSelectProps extends Omit<SelectHTMLAttributes<HTMLSelectElement>, 'size' | 'onChange'> {
   label?: ReactNode
   options: LiteSelectOption[]
   error?: string
   size?: 'sm' | 'md' | 'lg'
   placeholder?: string
+  /** Controlled value */
+  value?: string | string[]
+  /** Uncontrolled default value */
+  defaultValue?: string | string[]
+  disabled?: boolean
+  /** Allow multiple selections — wired to native select */
+  multiple?: boolean
+  /** Called with the selected value string (or comma-joined for multiple) */
+  onChange?: (value: string) => void
+  /** Interface only — not possible with native select */
+  clearable?: boolean
+  /** Interface only — not possible with native select */
+  searchable?: boolean
 }
 
 export const Select = forwardRef<HTMLSelectElement, LiteSelectProps>(
-  ({ label, options, error, size = 'md', placeholder, className, id, name, ...rest }, ref) => {
+  (
+    {
+      label,
+      options,
+      error,
+      size = 'md',
+      placeholder,
+      className,
+      id,
+      name,
+      value,
+      defaultValue,
+      disabled,
+      multiple,
+      onChange,
+      // destructure interface-only props so they don't land on <select>
+      clearable: _clearable,
+      searchable: _searchable,
+      ...rest
+    },
+    ref,
+  ) => {
     const selectId = id ?? (name ? `lite-select-${name}` : undefined)
     const groups = new Map<string, LiteSelectOption[]>()
     const ungrouped: LiteSelectOption[] = []
@@ -29,10 +63,32 @@ export const Select = forwardRef<HTMLSelectElement, LiteSelectProps>(
         ungrouped.push(opt)
       }
     }
+
+    function handleChange(e: ChangeEvent<HTMLSelectElement>) {
+      if (!onChange) return
+      if (multiple) {
+        const selected = Array.from(e.target.selectedOptions).map(o => o.value)
+        onChange(selected.join(','))
+      } else {
+        onChange(e.target.value)
+      }
+    }
+
     return (
       <div className={`ui-lite-select${className ? ` ${className}` : ''}`} data-size={size}>
         {label && <label htmlFor={selectId}>{label}</label>}
-        <select ref={ref} id={selectId} name={name} aria-invalid={!!error} {...rest}>
+        <select
+          ref={ref}
+          id={selectId}
+          name={name}
+          aria-invalid={!!error}
+          value={value}
+          defaultValue={defaultValue}
+          disabled={disabled}
+          multiple={multiple}
+          onChange={handleChange}
+          {...rest}
+        >
           {placeholder && <option value="" disabled>{placeholder}</option>}
           {ungrouped.map(o => (
             <option key={o.value} value={o.value} disabled={o.disabled}>{o.label}</option>
@@ -48,6 +104,6 @@ export const Select = forwardRef<HTMLSelectElement, LiteSelectProps>(
         {error && <span className="ui-lite-select__error">{error}</span>}
       </div>
     )
-  }
+  },
 )
 Select.displayName = 'Select'
