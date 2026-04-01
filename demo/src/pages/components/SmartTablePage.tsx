@@ -551,20 +551,11 @@ const COLUMNS = [
 // ─── Props Data ───────────────────────────────────────────────────────────────
 
 const smartTableProps: PropDef[] = [
-  { name: 'data', type: 'T[]', required: true, description: 'Array of row objects to display in the table.' },
-  { name: 'columns', type: 'ColumnDef<T>[]', required: true, description: 'Column definitions controlling header, accessor, sorting, and rendering.' },
-  { name: 'searchable', type: 'boolean', default: 'false', description: 'Enable the search bar above the table.' },
+  { name: 'searchable', type: 'boolean', default: '{searchable || filterable}', description: 'Enable search bar (maps to DataTable\'s searchable).' },
   { name: 'searchPlaceholder', type: 'string', description: 'Placeholder text for the search input.' },
-  { name: 'filterable', type: 'boolean', default: 'false', description: 'Alias for searchable. Enables the search bar.' },
-  { name: 'paginated', type: 'boolean', default: 'false', description: 'Enable pagination controls below the table.' },
-  { name: 'pageSize', type: 'number', default: '10', description: 'Number of rows per page when paginated.' },
-  { name: 'sortable', type: 'boolean', default: 'true', description: 'Enable column sorting via header clicks.' },
-  { name: 'columnToggle', type: 'boolean', default: 'false', description: 'Show a dropdown to toggle column visibility.' },
-  { name: 'selectable', type: 'boolean', default: 'false', description: 'Enable row selection with checkboxes.' },
-  { name: 'stickyHeader', type: 'boolean', default: 'false', description: 'Keep the header row fixed while scrolling.' },
-  { name: 'loading', type: 'boolean', default: 'false', description: 'Show a loading overlay on the table.' },
-  { name: 'className', type: 'string', description: 'Additional CSS class name for the root element.' },
-  { name: 'ref', type: 'Ref<HTMLDivElement>', description: 'Forwarded ref to the root container.' },
+  { name: 'filterable', type: 'boolean', default: 'false', description: 'Enable filtering (alias for searchable).' },
+  { name: 'paginated', type: 'boolean', default: '{paginated}', description: 'Enable pagination (maps to DataTable\'s paginated).' },
+  { name: 'columnToggle', type: 'boolean', description: 'Enable column toggle dropdown.' },
 ]
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────

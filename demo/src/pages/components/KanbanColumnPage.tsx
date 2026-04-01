@@ -560,13 +560,21 @@ const kanbanColumnProps: PropDef[] = [
   { name: 'title', type: 'ReactNode', required: true, description: 'Column header title text or element.' },
   { name: 'cards', type: 'KanbanCard[]', required: true, description: 'Array of card objects to render in the column.' },
   { name: 'columnId', type: 'string', required: true, description: 'Unique identifier for this column used in card move callbacks.' },
-  { name: 'onCardClick', type: '(cardId: string) => void', description: 'Handler called when a card is clicked or activated via keyboard.' },
   { name: 'onCardMove', type: '(cardId: string, targetColumnId: string, targetIndex: number) => void', description: 'Handler called when a card is moved to another column.' },
+  { name: 'onCardClick', type: '(cardId: string) => void', description: 'Handler called when a card is clicked.' },
   { name: 'wipLimit', type: 'number', description: 'Work-in-progress limit. Shows warning styling when card count reaches this limit.' },
   { name: 'collapsed', type: 'boolean', default: 'false', description: 'Whether the column is collapsed to a narrow vertical strip.' },
-  { name: 'onCollapse', type: '(collapsed: boolean) => void', description: 'Handler for collapse toggle. Renders collapse button when defined.' },
-  { name: 'motion', type: '0 | 1 | 2 | 3', description: 'Animation intensity override. Cascades from OS > prop > CSS --motion > UIProvider.' },
-  { name: 'className', type: 'string', description: 'Additional CSS class name merged with the component class.' },
+  { name: 'onCollapse', type: '(collapsed: boolean) => void', description: 'Handler for collapse toggle.' },
+  { name: 'motion', type: '0 | 1 | 2 | 3', description: 'Animation intensity (0=none, 1=subtle, 2=expressive, 3=cinematic).' },
+]
+
+const kanbanCardProps: PropDef[] = [
+  { name: 'id', type: 'string', required: true, description: 'Unique identifier for the card.' },
+  { name: 'title', type: 'ReactNode', required: true, description: 'Title text or element for the card.' },
+  { name: 'description', type: 'ReactNode', description: 'Optional helper text displayed below the title.' },
+  { name: 'tags', type: 'string[]', description: 'Array of tag labels displayed on the card.' },
+  { name: 'assignee', type: 'ReactNode', description: 'Assignee content (avatar or name) displayed on the card.' },
+  { name: "priority", type: "'low' | 'medium' | 'high' | 'critical'", description: 'Priority level for the card.' },
 ]
 
 // ─── Sample Data ──────────────────────────────────────────────────────────────
@@ -1335,6 +1343,19 @@ export default function KanbanColumnPage() {
         </p>
         <Card variant="default" padding="md">
           <PropsTable props={kanbanColumnProps} />
+        </Card>
+      </section>
+
+      {/* ── 9b. KanbanCard Definition ──────────────────── */}
+      <section className="kanban-column-page__section" id="kanban-card">
+        <h2 className="kanban-column-page__section-title">
+          <a href="#kanban-card">KanbanCard Definition</a>
+        </h2>
+        <p className="kanban-column-page__section-desc">
+          Each card in the cards array accepts these properties.
+        </p>
+        <Card variant="default" padding="md">
+          <PropsTable props={kanbanCardProps} />
         </Card>
       </section>
 

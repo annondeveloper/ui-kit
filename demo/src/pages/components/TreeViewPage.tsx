@@ -504,11 +504,11 @@ const treeViewProps: PropDef[] = [
   { name: 'nodes', type: 'TreeNode[]', required: true, description: 'Hierarchical data structure. Each node has id, label, optional children, icon, disabled, data.' },
   { name: 'selected', type: 'string | string[]', description: 'Currently selected node ID(s). Supports single or multi-select.' },
   { name: 'onSelect', type: '(nodeId: string) => void', description: 'Callback when a node is selected via click or keyboard.' },
-  { name: 'expanded', type: 'string[]', default: '[]', description: 'Array of expanded node IDs. Controls which branches are open.' },
+  { name: 'expanded', type: 'string[]', description: 'Array of expanded node IDs. Controls which branches are open.' },
   { name: 'onExpand', type: '(nodeId: string, expanded: boolean) => void', description: 'Callback when a node is expanded or collapsed.' },
-  { name: 'multiSelect', type: 'boolean', default: 'false', description: 'Enable multi-selection mode with aria-multiselectable.' },
-  { name: 'lazy', type: '(nodeId: string) => Promise<TreeNode[]>', description: 'Lazy loading function for on-demand child nodes. Shows spinner while loading.' },
-  { name: 'showGuides', type: 'boolean', default: 'true', description: 'Show vertical indent guide lines for visual hierarchy.' },
+  { name: 'multiSelect', type: 'boolean', description: 'Enable multi-selection mode with aria-multiselectable.' },
+  { name: 'lazy', type: '(nodeId: string) => Promise<TreeNode[]>', description: 'Lazy-load content on demand for a node.' },
+  { name: 'showGuides', type: 'boolean', description: 'Show vertical indent guide lines for visual hierarchy.' },
   { name: 'motion', type: '0 | 1 | 2 | 3', description: 'Animation intensity for expand/collapse transitions.' },
 ]
 

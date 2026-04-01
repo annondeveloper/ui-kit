@@ -507,8 +507,7 @@ const sortableListProps: PropDef[] = [
   { name: 'handle', type: 'boolean', default: 'true', description: 'Show a drag handle grip icon on each item.' },
   { name: 'disabled', type: 'boolean', default: 'false', description: 'Disable all reordering interactions.' },
   { name: 'orientation', type: "'vertical' | 'horizontal'", default: "'vertical'", description: 'Layout direction. Vertical stacks items top-to-bottom.' },
-  { name: 'motion', type: '0 | 1 | 2 | 3', description: 'Animation intensity for grab/drop transitions.' },
-  { name: 'aria-label', type: 'string', default: "'Sortable list'", description: 'Accessible label for the listbox container.' },
+  { name: 'motion', type: '0 | 1 | 2 | 3', description: 'Animation intensity (0=none, 1=subtle, 2=expressive, 3=cinematic).' },
 ]
 
 const sortableItemProps: PropDef[] = [
