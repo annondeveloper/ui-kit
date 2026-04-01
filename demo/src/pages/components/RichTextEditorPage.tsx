@@ -13,16 +13,16 @@ const PROPS: PropDef[] = [
   { name: 'value', type: 'string', description: 'Controlled HTML content string.' },
   { name: 'defaultValue', type: 'string', description: 'Initial HTML content for uncontrolled mode.' },
   { name: 'onChange', type: '(html: string) => void', description: 'Called on every content change with sanitized HTML.' },
-  { name: 'placeholder', type: 'string', description: 'Placeholder text shown when the editor is empty.' },
+  { name: 'placeholder', type: 'string', default: "'Start typing...'", description: 'Placeholder text shown when the editor is empty.' },
   { name: 'label', type: 'string', description: 'Accessible label rendered above the editor.' },
   { name: 'error', type: 'string', description: 'Error message displayed below the editor.' },
   { name: 'disabled', type: 'boolean', default: 'false', description: 'Disable all editing and toolbar interactions.' },
   { name: 'readOnly', type: 'boolean', default: 'false', description: 'Allow reading and selection but prevent edits.' },
-  { name: 'minHeight', type: 'string | number', description: 'Minimum block size of the editable area.' },
+  { name: 'minHeight', type: 'string | number', default: '120', description: 'Minimum block size of the editable area.' },
   { name: 'maxHeight', type: 'string | number', description: 'Maximum block size before the content scrolls.' },
-  { name: 'toolbar', type: 'ToolbarAction[]', default: 'all actions', description: 'Array of toolbar actions to display. Options: bold, italic, underline, strikethrough, heading, bulletList, orderedList, blockquote, code, link, clearFormatting.' },
+  { name: 'toolbar', type: 'ToolbarAction[]', default: 'DEFAULT_TOOLBAR', description: 'Array of toolbar actions to display.' },
   { name: 'size', type: "'sm' | 'md' | 'lg'", default: "'md'", description: 'Controls font-size and padding of the editor.' },
-  { name: 'motion', type: '0 | 1 | 2 | 3', description: 'Animation intensity for toolbar hover and focus effects.' },
+  { name: 'motion', type: '0 | 1 | 2 | 3', description: 'Animation intensity (0=none, 1=subtle, 2=expressive, 3=cinematic).' },
 ]
 
 // ─── Page Styles ─────────────────────────────────────────────────────────────

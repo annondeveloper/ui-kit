@@ -513,13 +513,12 @@ const diffViewerProps: PropDef[] = [
   { name: 'newValue', type: 'string', required: true, description: 'The modified text to compare.' },
   { name: 'oldTitle', type: 'string', description: 'Label displayed above the old (left) pane.' },
   { name: 'newTitle', type: 'string', description: 'Label displayed above the new (right) pane.' },
-  { name: 'mode', type: "'side-by-side' | 'unified'", default: "'unified'", description: 'Display mode — unified shows interleaved changes, side-by-side shows two columns.' },
-  { name: 'showLineNumbers', type: 'boolean', default: 'true', description: 'Show old/new line numbers in the gutter.' },
-  { name: 'foldUnchanged', type: 'boolean', default: 'true', description: 'Collapse large unchanged regions into expandable folds.' },
-  { name: 'foldThreshold', type: 'number', default: '3', description: 'Minimum unchanged lines before folding kicks in.' },
-  { name: 'language', type: 'string', description: 'Language hint for syntax highlighting (future use).' },
-  { name: 'motion', type: '0 | 1 | 2 | 3', description: 'Animation intensity override.' },
-  { name: 'className', type: 'string', description: 'Additional CSS class name merged with the component class.' },
+  { name: 'mode', type: "'side-by-side' | 'unified'", description: 'Display mode — unified shows interleaved changes, side-by-side shows two columns.' },
+  { name: 'showLineNumbers', type: 'boolean', description: 'Show old/new line numbers in the gutter.' },
+  { name: 'foldUnchanged', type: 'boolean', description: 'Collapse large unchanged regions into expandable folds.' },
+  { name: 'foldThreshold', type: 'number', description: 'Minimum unchanged lines before folding kicks in.' },
+  { name: 'language', type: 'string', description: 'Language hint for syntax highlighting.' },
+  { name: 'motion', type: '0 | 1 | 2 | 3', description: 'Animation intensity (0=none, 1=subtle, 2=expressive, 3=cinematic).' },
 ]
 
 // ─── Sample Data ──────────────────────────────────────────────────────────────

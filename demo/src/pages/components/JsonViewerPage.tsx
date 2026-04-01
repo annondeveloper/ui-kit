@@ -51,17 +51,17 @@ function makeCircularData() {
 
 const PROPS: PropDef[] = [
   { name: 'data', type: 'unknown', required: true, description: 'The JSON data to display. Supports objects, arrays, primitives, null, and handles circular references.' },
-  { name: 'initialExpandDepth', type: 'number', default: '1', description: 'Number of levels to expand by default on initial render.' },
-  { name: 'collapsed', type: 'boolean', default: 'false', description: 'When true, all nodes start collapsed regardless of initialExpandDepth.' },
-  { name: 'rootName', type: 'string', default: '"root"', description: 'Label shown for the root node.' },
-  { name: 'enableClipboard', type: 'boolean', default: 'true', description: 'Show copy-to-clipboard button on hover for each value.' },
-  { name: 'displayDataTypes', type: 'boolean', default: 'true', description: 'Show type annotations next to values (string, number, etc.).' },
-  { name: 'displayObjectSize', type: 'boolean', default: 'true', description: 'Show item count badge next to objects and arrays.' },
-  { name: 'theme', type: "'dark' | 'light' | 'auto'", default: '"auto"', description: 'Color scheme for syntax highlighting.' },
-  { name: 'indentWidth', type: 'number', default: '2', description: 'Number of spaces per indentation level.' },
-  { name: 'sortKeys', type: 'boolean', default: 'false', description: 'Alphabetically sort object keys.' },
+  { name: 'initialExpandDepth', type: 'number', description: 'Number of levels to expand by default on initial render.' },
+  { name: 'collapsed', type: 'boolean', description: 'When true, all nodes start collapsed regardless of initialExpandDepth.' },
+  { name: 'rootName', type: 'string', description: 'Label shown for the root node.' },
+  { name: 'enableClipboard', type: 'boolean', description: 'Show copy-to-clipboard button on hover for each value.' },
+  { name: 'displayDataTypes', type: 'boolean', description: 'Show type annotations next to values (string, number, etc.).' },
+  { name: 'displayObjectSize', type: 'boolean', description: 'Show item count badge next to objects and arrays.' },
+  { name: 'theme', type: "'dark' | 'light' | 'auto'", description: 'Color scheme for syntax highlighting.' },
+  { name: 'indentWidth', type: 'number', description: 'Number of spaces per indentation level.' },
+  { name: 'sortKeys', type: 'boolean', description: 'Alphabetically sort object keys.' },
   { name: 'maxStringLength', type: 'number', description: 'Truncate long strings to this character count with an ellipsis.' },
-  { name: 'motion', type: '0 | 1 | 2 | 3', description: 'Animation intensity for expand/collapse transitions.' },
+  { name: 'motion', type: '0 | 1 | 2 | 3', description: 'Animation intensity (0=none, 1=subtle, 2=expressive, 3=cinematic).' },
 ]
 
 // ─── Page Styles ─────────────────────────────────────────────────────────────

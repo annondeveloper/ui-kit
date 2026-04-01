@@ -546,13 +546,12 @@ const pageStyles = css`
 
 const copyBlockProps: PropDef[] = [
   { name: 'code', type: 'string', required: true, description: 'The source code string to display and copy.' },
-  { name: 'language', type: "'javascript' | 'typescript' | 'css' | 'json' | 'bash' | 'html' | 'text'", default: "'text'", description: 'Language for syntax highlighting tokenizer.' },
-  { name: 'showLineNumbers', type: 'boolean', default: 'true', description: 'Show line numbers in the left gutter.' },
+  { name: 'language', type: 'CopyBlockLanguage', description: 'Language for syntax highlighting tokenizer.' },
+  { name: 'showLineNumbers', type: 'boolean', description: 'Show line numbers in the left gutter.' },
   { name: 'highlight', type: 'number[]', description: 'Array of 1-based line numbers to highlight with brand color background.' },
-  { name: 'maxHeight', type: 'string', description: 'Maximum height for the scrollable code area (e.g., "300px").' },
-  { name: 'title', type: 'string', description: 'Optional header bar with title text and language badge.' },
-  { name: 'motion', type: '0 | 1 | 2 | 3', description: 'Animation intensity override.' },
-  { name: 'className', type: 'string', description: 'Additional CSS class name.' },
+  { name: 'maxHeight', type: 'string', description: 'Maximum height for the scrollable code area.' },
+  { name: 'title', type: 'string', description: 'Title text shown in the header bar.' },
+  { name: 'motion', type: '0 | 1 | 2 | 3', description: 'Animation intensity (0=none, 1=subtle, 2=expressive, 3=cinematic).' },
 ]
 
 // ─── Sample Code Strings ──────────────────────────────────────────────────────
