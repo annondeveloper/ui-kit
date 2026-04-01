@@ -415,8 +415,8 @@ const pageStyles = css`
 // ─── Props Data ───────────────────────────────────────────────────────────────
 
 const inlineEditProps: PropDef[] = [
-  { name: 'value', type: 'string', description: 'Current text value (controlled).' },
-  { name: 'onChange', type: '(value: string) => void', description: 'Callback when value changes on save.' },
+  { name: 'value', type: 'string', required: true, description: 'Current text value (controlled).' },
+  { name: 'onChange', type: '(value: string) => void', required: true, description: 'Callback when value changes on save.' },
   { name: 'placeholder', type: 'string', description: 'Placeholder shown when value is empty.' },
   { name: 'disabled', type: 'boolean', default: 'false', description: 'Prevents entering edit mode.' },
   { name: 'size', type: "'sm' | 'md' | 'lg'", default: "'md'", description: 'Controls font size and input height.' },
@@ -425,8 +425,6 @@ const inlineEditProps: PropDef[] = [
   { name: 'onSave', type: '(value: string) => void', description: 'Called when edit is confirmed (Enter or blur).' },
   { name: 'onCancel', type: '() => void', description: 'Called when edit is cancelled (Escape).' },
   { name: 'motion', type: '0 | 1 | 2 | 3', description: 'Animation intensity for edit mode entry.' },
-  { name: 'className', type: 'string', description: 'Additional CSS class merged with component class.' },
-  { name: 'ref', type: 'Ref<HTMLDivElement>', description: 'Forwarded ref to the root container.' },
 ]
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────

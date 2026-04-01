@@ -479,8 +479,6 @@ const otpInputProps: PropDef[] = [
   { name: 'autoFocus', type: 'boolean', default: 'false', description: 'Auto-focus the first digit on mount.' },
   { name: 'size', type: "'xs' | 'sm' | 'md' | 'lg' | 'xl'", default: "'md'", description: 'Controls digit cell dimensions and font size.' },
   { name: 'motion', type: '0 | 1 | 2 | 3', description: 'Animation intensity override. Controls error shake.' },
-  { name: 'className', type: 'string', description: 'Additional CSS class merged with component class.' },
-  { name: 'ref', type: 'Ref<HTMLDivElement>', description: 'Forwarded ref to the root container.' },
 ]
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────

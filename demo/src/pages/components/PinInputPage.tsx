@@ -197,7 +197,7 @@ const pinProps: PropDef[] = [
   { name: 'value', type: 'string', description: 'Controlled pin value.' },
   { name: 'onChange', type: '(value: string) => void', description: 'Called on each digit change.' },
   { name: 'onComplete', type: '(value: string) => void', description: 'Called when all digits are filled.' },
-  { name: 'mask', type: 'boolean', default: 'false', description: 'Mask entered digits with dots for security.' },
+  { name: 'mask', type: 'boolean', default: 'true', description: 'Mask entered digits with dots for security.' },
   { name: 'type', type: "'number' | 'alphanumeric'", default: "'number'", description: 'Restrict input to numbers or allow letters too.' },
   { name: 'placeholder', type: 'string', default: "'○'", description: 'Placeholder character for empty digits.' },
   { name: 'size', type: "'xs' | 'sm' | 'md' | 'lg' | 'xl'", default: "'md'", description: 'Input cell size scale.' },

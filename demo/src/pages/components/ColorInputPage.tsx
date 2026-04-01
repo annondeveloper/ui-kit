@@ -458,19 +458,17 @@ const pageStyles = css`
 // ─── Props Data ───────────────────────────────────────────────────────────────
 
 const colorInputProps: PropDef[] = [
-  { name: 'name', type: 'string', description: 'Form field name for the hex input.' },
+  { name: 'name', type: 'string', required: true, description: 'Form field name for the hex input.' },
   { name: 'value', type: 'string', description: 'Controlled hex color value (e.g. "#ff0000").' },
-  { name: 'defaultValue', type: 'string', default: "'#000000'", description: 'Initial color for uncontrolled mode.' },
+  { name: 'defaultValue', type: 'string', description: 'Initial color for uncontrolled mode.' },
   { name: 'onChange', type: '(color: string) => void', description: 'Callback when color changes.' },
   { name: 'label', type: 'ReactNode', description: 'Label rendered above the input.' },
   { name: 'error', type: 'string', description: 'Error message with animated entry.' },
-  { name: 'disabled', type: 'boolean', default: 'false', description: 'Disables the entire color input.' },
-  { name: 'size', type: "'sm' | 'md' | 'lg'", default: "'md'", description: 'Controls trigger and input dimensions.' },
+  { name: 'disabled', type: 'boolean', description: 'Disables the entire color input.' },
+  { name: 'size', type: "'sm' | 'md' | 'lg'", description: 'Controls trigger and input dimensions.' },
   { name: 'swatches', type: 'string[]', description: 'Array of preset hex colors shown in the popover.' },
-  { name: 'showInput', type: 'boolean', default: 'true', description: 'Show the hex text input alongside the swatch trigger.' },
+  { name: 'showInput', type: 'boolean', description: 'Show the hex text input alongside the swatch trigger.' },
   { name: 'motion', type: '0 | 1 | 2 | 3', description: 'Animation intensity for popover entry and error animation.' },
-  { name: 'className', type: 'string', description: 'Additional CSS class merged with component class.' },
-  { name: 'ref', type: 'Ref<HTMLDivElement>', description: 'Forwarded ref to the root container.' },
 ]
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────

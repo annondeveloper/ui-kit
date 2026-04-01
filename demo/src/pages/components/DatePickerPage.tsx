@@ -690,13 +690,11 @@ const datePickerProps: PropDef[] = [
   { name: 'placeholder', type: 'string', description: 'Placeholder text shown when no date is selected.' },
   { name: 'label', type: 'ReactNode', description: 'Label rendered above the input field.' },
   { name: 'error', type: 'string', description: 'Error message. When set, adds red border and shows error text.' },
-  { name: 'disabled', type: 'boolean', default: 'false', description: 'Disables the entire date picker.' },
-  { name: 'size', type: "'sm' | 'md' | 'lg'", default: "'md'", description: 'Controls input height and font size.' },
-  { name: 'showWeekNumbers', type: 'boolean', default: 'false', description: 'Show ISO week numbers in calendar.' },
-  { name: 'firstDayOfWeek', type: '0 | 1', default: '1', description: 'First day of week: 0 = Sunday, 1 = Monday.' },
+  { name: 'disabled', type: 'boolean', description: 'Disables the entire date picker.' },
+  { name: 'size', type: "'sm' | 'md' | 'lg'", description: 'Controls input height and font size.' },
+  { name: 'showWeekNumbers', type: 'boolean', description: 'Show ISO week numbers in calendar.' },
+  { name: 'firstDayOfWeek', type: '0 | 1', description: 'First day of week: 0 = Sunday, 1 = Monday.' },
   { name: 'motion', type: '0 | 1 | 2 | 3', description: 'Animation intensity override for calendar entry.' },
-  { name: 'className', type: 'string', description: 'Additional CSS class merged with component class.' },
-  { name: 'ref', type: 'Ref<HTMLDivElement>', description: 'Forwarded ref to the root container.' },
 ]
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────

@@ -422,8 +422,8 @@ const pageStyles = css`
 // ─── Props Data ───────────────────────────────────────────────────────────────
 
 const tagInputPropDefs: PropDef[] = [
-  { name: 'tags', type: 'string[]', description: 'Controlled array of tag strings.' },
-  { name: 'onChange', type: '(tags: string[]) => void', description: 'Called when tags array changes (add or remove).' },
+  { name: 'tags', type: 'string[]', required: true, description: 'Controlled array of tag strings.' },
+  { name: 'onChange', type: '(tags: string[]) => void', required: true, description: 'Called when tags array changes (add or remove).' },
   { name: 'placeholder', type: 'string', description: 'Placeholder shown in the input when empty.' },
   { name: 'maxTags', type: 'number', description: 'Maximum number of tags allowed. Input stops accepting when reached.' },
   { name: 'allowDuplicates', type: 'boolean', default: 'false', description: 'Allow duplicate tag values.' },
@@ -432,9 +432,6 @@ const tagInputPropDefs: PropDef[] = [
   { name: 'error', type: 'string', description: 'Error message with role="alert" for screen readers.' },
   { name: 'disabled', type: 'boolean', default: 'false', description: 'Disables the input and all tag removal buttons.' },
   { name: 'motion', type: '0 | 1 | 2 | 3', description: 'Animation intensity for tag entry animation.' },
-  { name: 'aria-label', type: 'string', description: 'Accessible label for the input element.' },
-  { name: 'className', type: 'string', description: 'Additional CSS class merged with the component root.' },
-  { name: 'ref', type: 'Ref<HTMLDivElement>', description: 'Forwarded ref to the root div element.' },
 ]
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────

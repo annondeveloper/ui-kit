@@ -643,7 +643,7 @@ const pageStyles = css`
 const fileUploadProps: PropDef[] = [
   { name: 'name', type: 'string', required: true, description: 'The name attribute for the hidden file input.' },
   { name: 'accept', type: 'string', description: 'Comma-separated list of accepted file types (e.g., "image/*,.pdf").' },
-  { name: 'multiple', type: 'boolean', default: 'false', description: 'When true, allows selecting multiple files at once.' },
+  { name: 'multiple', type: 'boolean', description: 'When true, allows selecting multiple files at once.' },
   { name: 'maxSize', type: 'number', description: 'Maximum file size in bytes. Files exceeding this trigger onError.' },
   { name: 'maxFiles', type: 'number', description: 'Maximum number of files allowed when multiple is true.' },
   { name: 'onChange', type: '(files: File[]) => void', description: 'Callback fired with the selected files after validation.' },
@@ -651,10 +651,9 @@ const fileUploadProps: PropDef[] = [
   { name: 'label', type: 'ReactNode', description: 'Label text displayed above the dropzone.' },
   { name: 'description', type: 'string', description: 'Custom description text inside the dropzone area.' },
   { name: 'error', type: 'string', description: 'External error message displayed below the dropzone.' },
-  { name: 'disabled', type: 'boolean', default: 'false', description: 'Disables the entire file upload component.' },
-  { name: 'showPreview', type: 'boolean', default: 'true', description: 'When true, shows image thumbnails and file icons for selected files.' },
+  { name: 'disabled', type: 'boolean', description: 'Disables the entire file upload component.' },
+  { name: 'showPreview', type: 'boolean', description: 'When true, shows image thumbnails and file icons for selected files.' },
   { name: 'motion', type: '0 | 1 | 2 | 3', description: 'Animation intensity override. Cascades from OS > prop > CSS --motion > UIProvider.' },
-  { name: 'className', type: 'string', description: 'Additional CSS class name for the root wrapper.' },
 ]
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
