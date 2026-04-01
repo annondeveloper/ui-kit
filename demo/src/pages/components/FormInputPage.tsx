@@ -660,20 +660,21 @@ const pageStyles = css`
 // ─── Props Data ───────────────────────────────────────────────────────────────
 
 const formInputPropDefs: PropDef[] = [
-  { name: 'name', type: 'string', description: 'Field name for form context integration and native form submission.' },
-  { name: 'label', type: 'ReactNode', description: 'Label text rendered above the input with proper htmlFor binding.' },
-  { name: 'description', type: 'string', description: 'Helper text rendered below the input for additional guidance.' },
-  { name: 'error', type: 'string', description: 'Error message displayed below the input with role="alert" for screen readers.' },
-  { name: 'size', type: "'xs' | 'sm' | 'md' | 'lg' | 'xl'", default: "'md'", description: 'Controls padding, font-size, and minimum block-size.' },
-  { name: 'variant', type: "'default' | 'filled'", default: "'default'", description: 'Visual style: default has a border, filled has a solid background.' },
-  { name: 'icon', type: 'ReactNode', description: 'Leading icon rendered inside the input field.' },
-  { name: 'iconEnd', type: 'ReactNode', description: 'Trailing icon rendered at the end of the input field.' },
-  { name: 'motion', type: '0 | 1 | 2 | 3', description: 'Animation intensity override for error animations.' },
-  { name: 'disabled', type: 'boolean', default: 'false', description: 'Disables the input with reduced opacity.' },
-  { name: 'type', type: 'string', default: "'text'", description: 'HTML input type: text, email, password, number, tel, url, etc.' },
-  { name: 'placeholder', type: 'string', description: 'Placeholder text shown when the input is empty.' },
-  { name: 'className', type: 'string', description: 'Additional CSS class merged with the component root.' },
-  { name: 'ref', type: 'Ref<HTMLInputElement>', description: 'Forwarded ref to the underlying <input> element.' },
+  { name: 'name', type: 'string', required: true, description: 'Form field name.' },
+  { name: 'label', type: 'ReactNode', description: 'Label text above input.' },
+  { name: 'description', type: 'string', description: 'Helper text below input.' },
+  { name: 'error', type: 'string', description: 'Error message below input.' },
+  { name: 'size', type: "'xs' | 'sm' | 'md' | 'lg' | 'xl'", default: "'md'", description: 'Component size.' },
+  { name: 'variant', type: "'default' | 'filled'", default: "'default'", description: 'Visual style variant.' },
+  { name: 'icon', type: 'ReactNode', description: 'Leading icon element.' },
+  { name: 'iconEnd', type: 'ReactNode', description: 'Trailing icon element.' },
+  { name: 'motion', type: '0 | 1 | 2 | 3', description: 'Animation intensity (0=none, 1=subtle, 2=expressive, 3=cinematic).' },
+  { name: 'maxLength', type: 'number', description: 'Maximum character length.' },
+  { name: 'showCount', type: 'boolean', description: 'Show count toggle.' },
+  { name: 'clearable', type: 'boolean', description: 'Shows clear button when has value.' },
+  { name: 'onClear', type: '() => void', description: 'Called when clear button is clicked.' },
+  { name: 'required', type: 'boolean', description: 'Marks as required.' },
+  { name: 'classNames', type: "Partial<Record<'root' | 'label' | 'field' | 'icon' | 'iconEnd' | 'description' | 'error', string>>", description: 'Custom class names for internal parts.' },
 ]
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────

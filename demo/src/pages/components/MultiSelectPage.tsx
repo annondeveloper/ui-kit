@@ -213,20 +213,27 @@ const GROUPED_OPTIONS = [
 // ─── Props ──────────────────────────────────────────────────────────────────
 
 const msProps: PropDef[] = [
-  { name: 'options', type: 'MultiSelectOption[]', required: true, description: 'Array of options with value, label, optional group and disabled.' },
-  { name: 'value', type: 'string[]', description: 'Controlled selected values.' },
-  { name: 'defaultValue', type: 'string[]', description: 'Uncontrolled initial selection.' },
-  { name: 'onChange', type: '(values: string[]) => void', description: 'Called when selection changes.' },
-  { name: 'placeholder', type: 'string', description: 'Placeholder text when no items selected.' },
-  { name: 'searchable', type: 'boolean', default: 'false', description: 'Enable type-to-search filtering in the dropdown.' },
-  { name: 'clearable', type: 'boolean', default: 'false', description: 'Show a clear-all button when items are selected.' },
-  { name: 'disabled', type: 'boolean', default: 'false', description: 'Disables the entire select.' },
+  { name: 'options', type: 'MultiSelectOption[]', required: true, description: 'Options to render in the dropdown.' },
+  { name: 'value', type: 'string[]', description: 'Controlled value.' },
+  { name: 'defaultValue', type: 'string[]', description: 'Initial uncontrolled value.' },
+  { name: 'onChange', type: '(values: string[]) => void', description: 'Callback on value change.' },
+  { name: 'placeholder', type: 'string', default: "'Select...'", description: 'Placeholder text when empty.' },
+  { name: 'searchable', type: 'boolean', default: 'true', description: 'Enables search/filter.' },
+  { name: 'clearable', type: 'boolean', default: 'false', description: 'Shows clear button when has value.' },
+  { name: 'disabled', type: 'boolean', description: 'Disables interaction.' },
   { name: 'maxSelected', type: 'number', description: 'Maximum number of items that can be selected.' },
-  { name: 'size', type: "'sm' | 'md' | 'lg'", default: "'md'", description: 'Control size.' },
-  { name: 'error', type: 'string', description: 'Error message below the select.' },
-  { name: 'label', type: 'string', description: 'Label above the select.' },
-  { name: 'motion', type: '0 | 1 | 2 | 3', description: 'Animation intensity override.' },
+  { name: 'size', type: "'sm' | 'md' | 'lg'", default: "'md'", description: 'Component size.' },
+  { name: 'error', type: 'string', description: 'Error message below input.' },
+  { name: 'label', type: 'string', description: 'Label text above input.' },
   { name: 'name', type: 'string', description: 'Form field name.' },
+  { name: 'motion', type: '0 | 1 | 2 | 3', description: 'Animation intensity (0=none, 1=subtle, 2=expressive, 3=cinematic).' },
+]
+
+const msOptionProps: PropDef[] = [
+  { name: 'value', type: 'string', required: true, description: 'Controlled value.' },
+  { name: 'label', type: 'string', required: true, description: 'Label text for the option.' },
+  { name: 'disabled', type: 'boolean', description: 'Disables interaction.' },
+  { name: 'group', type: 'string', description: 'Group name for categorizing options.' },
 ]
 
 // ─── Helpers ────────────────────────────────────────────────────────────────
@@ -325,6 +332,16 @@ export default function MultiSelectPage() {
         </p>
         <Card variant="default" padding="md">
           <PropsTable props={msProps} />
+        </Card>
+
+        <h3 className="ms-page__section-title" style={{ marginBlockStart: '1.5rem' }}>
+          MultiSelectOption Interface
+        </h3>
+        <p className="ms-page__section-desc">
+          Shape of each option object passed to the <code>options</code> prop.
+        </p>
+        <Card variant="default" padding="md">
+          <PropsTable props={msOptionProps} />
         </Card>
       </section>
     </div>

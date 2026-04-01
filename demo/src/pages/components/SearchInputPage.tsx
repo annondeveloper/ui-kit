@@ -423,20 +423,16 @@ const pageStyles = css`
 // ─── Props Data ───────────────────────────────────────────────────────────────
 
 const searchInputPropDefs: PropDef[] = [
-  { name: 'value', type: 'string', description: 'Controlled search value.' },
-  { name: 'defaultValue', type: 'string', description: 'Initial value for uncontrolled mode.' },
-  { name: 'onChange', type: '(value: string) => void', description: 'Debounced callback when the value changes.' },
+  { name: 'value', type: 'string', description: 'Controlled value.' },
+  { name: 'defaultValue', type: 'string', description: 'Initial uncontrolled value.' },
+  { name: 'onChange', type: '(value: string) => void', description: 'Callback on value change.' },
   { name: 'onSearch', type: '(value: string) => void', description: 'Called on Enter key press with the current value.' },
   { name: 'onClear', type: '() => void', description: 'Called when the clear button is clicked.' },
-  { name: 'debounce', type: 'number', default: '300', description: 'Debounce delay in ms for the onChange callback.' },
-  { name: 'loading', type: 'boolean', default: 'false', description: 'Shows a spinning loader icon instead of the search icon.' },
-  { name: 'size', type: "'xs' | 'sm' | 'md' | 'lg' | 'xl'", default: "'md'", description: 'Controls input height, padding, and font-size.' },
-  { name: 'clearable', type: 'boolean', default: 'true', description: 'Show a clear button when the input has a value.' },
-  { name: 'motion', type: '0 | 1 | 2 | 3', description: 'Animation intensity for the spinner rotation.' },
-  { name: 'disabled', type: 'boolean', default: 'false', description: 'Disables the input and hides the clear button.' },
-  { name: 'placeholder', type: 'string', description: 'Placeholder text shown when the input is empty.' },
-  { name: 'className', type: 'string', description: 'Additional CSS class merged with the component root.' },
-  { name: 'ref', type: 'Ref<HTMLInputElement>', description: 'Forwarded ref to the underlying <input> element.' },
+  { name: 'debounce', type: 'number', description: 'Debounce delay in ms for the onChange callback.' },
+  { name: 'loading', type: 'boolean', default: 'false', description: 'Shows loading spinner.' },
+  { name: 'size', type: "'xs' | 'sm' | 'md' | 'lg' | 'xl'", default: "'md'", description: 'Component size.' },
+  { name: 'clearable', type: 'boolean', default: 'true', description: 'Shows clear button when has value.' },
+  { name: 'motion', type: '0 | 1 | 2 | 3', description: 'Animation intensity (0=none, 1=subtle, 2=expressive, 3=cinematic).' },
 ]
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────

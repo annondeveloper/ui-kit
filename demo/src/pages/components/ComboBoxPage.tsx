@@ -528,22 +528,31 @@ const pageStyles = css`
 // ─── Props Data ───────────────────────────────────────────────────────────────
 
 const comboboxPropDefs: PropDef[] = [
-  { name: 'name', type: 'string', description: 'Field name for form context integration and hidden input submission.' },
-  { name: 'options', type: 'ComboboxOption[]', description: 'Array of options with value, label, optional icon, group, and description.' },
-  { name: 'value', type: 'string', description: 'Controlled selected value.' },
-  { name: 'defaultValue', type: 'string', description: 'Initial value for uncontrolled mode.' },
-  { name: 'onChange', type: '(value: string) => void', description: 'Called when a selection is made.' },
+  { name: 'name', type: 'string', required: true, description: 'Form field name.' },
+  { name: 'options', type: 'ComboboxOption[]', required: true, description: 'Options to render in the dropdown.' },
+  { name: 'value', type: 'string', description: 'Controlled value.' },
+  { name: 'defaultValue', type: 'string', description: 'Initial uncontrolled value.' },
+  { name: 'onChange', type: '(value: string) => void', description: 'Callback on value change.' },
   { name: 'onSearch', type: '(query: string) => void', description: 'Called on input change for external/async filtering.' },
-  { name: 'placeholder', type: 'string', default: "'Search...'", description: 'Placeholder text in the search input.' },
-  { name: 'label', type: 'ReactNode', description: 'Label text rendered above the combobox.' },
-  { name: 'error', type: 'string', description: 'Error message with role="alert" for screen readers.' },
-  { name: 'disabled', type: 'boolean', default: 'false', description: 'Disables all interaction.' },
-  { name: 'size', type: "'sm' | 'md' | 'lg'", default: "'md'", description: 'Controls input size, padding, and font-size.' },
-  { name: 'allowCreate', type: 'boolean', default: 'false', description: 'Allow creating new options by typing.' },
+  { name: 'placeholder', type: 'string', default: "'Search...'", description: 'Placeholder text when empty.' },
+  { name: 'label', type: 'ReactNode', description: 'Label text above input.' },
+  { name: 'error', type: 'string', description: 'Error message below input.' },
+  { name: 'disabled', type: 'boolean', description: 'Disables interaction.' },
+  { name: 'size', type: "'sm' | 'md' | 'lg'", default: "'md'", description: 'Component size.' },
+  { name: 'allowCreate', type: 'boolean', description: 'Allow create toggle.' },
   { name: 'onCreate', type: '(value: string) => void', description: 'Called when user creates a new option.' },
-  { name: 'loading', type: 'boolean', default: 'false', description: 'Shows a loading spinner inside the dropdown.' },
-  { name: 'emptyMessage', type: 'string', default: "'No results found'", description: 'Message when no options match the search.' },
-  { name: 'motion', type: '0 | 1 | 2 | 3', description: 'Animation intensity for dropdown and error animations.' },
+  { name: 'loading', type: 'boolean', default: 'false', description: 'Shows loading spinner.' },
+  { name: 'emptyMessage', type: 'string', default: "'No results found'", description: 'Message displayed when no options match.' },
+  { name: 'motion', type: '0 | 1 | 2 | 3', description: 'Animation intensity (0=none, 1=subtle, 2=expressive, 3=cinematic).' },
+]
+
+const comboboxOptionProps: PropDef[] = [
+  { name: 'value', type: 'string', required: true, description: 'Controlled value.' },
+  { name: 'label', type: 'string', required: true, description: 'Label text for the option.' },
+  { name: 'disabled', type: 'boolean', description: 'Disables interaction.' },
+  { name: 'icon', type: 'ReactNode', description: 'Leading icon element.' },
+  { name: 'group', type: 'string', description: 'Group name for categorizing options.' },
+  { name: 'description', type: 'string', description: 'Helper text below the option label.' },
 ]
 
 // ─── Sample Data ─────────────────────────────────────────────────────────────
@@ -1296,6 +1305,16 @@ export default function ComboBoxPage() {
         </p>
         <Card variant="default" padding="md">
           <PropsTable props={comboboxPropDefs} />
+        </Card>
+
+        <h3 className="combobox-page__section-title" style={{ marginBlockStart: '1.5rem' }}>
+          ComboboxOption Interface
+        </h3>
+        <p className="combobox-page__section-desc">
+          Shape of each option object passed to the <code>options</code> prop.
+        </p>
+        <Card variant="default" padding="md">
+          <PropsTable props={comboboxOptionProps} />
         </Card>
       </section>
 

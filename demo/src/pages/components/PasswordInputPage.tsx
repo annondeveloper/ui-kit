@@ -189,20 +189,21 @@ const pageStyles = css`
 // ─── Props ──────────────────────────────────────────────────────────────────
 
 const pwProps: PropDef[] = [
-  { name: 'value', type: 'string', description: 'Controlled input value.' },
-  { name: 'onChange', type: '(e: ChangeEvent<HTMLInputElement>) => void', description: 'Standard input change handler.' },
-  { name: 'label', type: 'string', description: 'Label above the input.' },
-  { name: 'description', type: 'string', description: 'Help text below the label.' },
-  { name: 'error', type: 'string', description: 'Error message below the input.' },
+  { name: 'value', type: 'string', description: 'Controlled value.' },
+  { name: 'onChange', type: '(e: React.ChangeEvent<HTMLInputElement>) => void', description: 'Callback on value change.' },
+  { name: 'label', type: 'string', description: 'Label text above input.' },
+  { name: 'description', type: 'string', description: 'Helper text below input.' },
+  { name: 'error', type: 'string', description: 'Error message below input.' },
   { name: 'placeholder', type: 'string', description: 'Placeholder text when empty.' },
-  { name: 'size', type: "'xs' | 'sm' | 'md' | 'lg' | 'xl'", default: "'md'", description: 'Input size scale.' },
-  { name: 'disabled', type: 'boolean', default: 'false', description: 'Disables the input.' },
-  { name: 'required', type: 'boolean', default: 'false', description: 'Marks field as required.' },
-  { name: 'visibilityToggle', type: 'boolean', default: 'true', description: 'Show the eye icon to toggle password visibility.' },
-  { name: 'showStrengthMeter', type: 'boolean', default: 'false', description: 'Display a password strength progress bar.' },
-  { name: 'strengthLabels', type: 'string[]', default: "['', 'Weak', 'Fair', 'Good', 'Strong']", description: 'Labels for each strength level (0-4).' },
+  { name: 'name', type: 'string', description: 'Form field name.' },
+  { name: 'size', type: "'xs' | 'sm' | 'md' | 'lg' | 'xl'", default: "'md'", description: 'Component size.' },
+  { name: 'disabled', type: 'boolean', description: 'Disables interaction.' },
+  { name: 'required', type: 'boolean', description: 'Marks as required.' },
+  { name: 'showStrengthMeter', type: 'boolean', description: 'Show strength meter toggle.' },
+  { name: 'strengthLabels', type: 'string[]', default: 'DEFAULT_STRENGTH_LABELS', description: 'Labels for each strength level.' },
+  { name: 'visibilityToggle', type: 'boolean', default: 'true', description: 'Visibility toggle — shows eye icon to reveal/hide password.' },
   { name: 'onStrengthChange', type: '(strength: number) => void', description: 'Called when calculated strength changes.' },
-  { name: 'motion', type: '0 | 1 | 2 | 3', description: 'Animation intensity override.' },
+  { name: 'motion', type: '0 | 1 | 2 | 3', description: 'Animation intensity (0=none, 1=subtle, 2=expressive, 3=cinematic).' },
 ]
 
 // ─── Helpers ────────────────────────────────────────────────────────────────

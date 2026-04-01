@@ -189,23 +189,24 @@ const pageStyles = css`
 // ─── Props ──────────────────────────────────────────────────────────────────
 
 const taProps: PropDef[] = [
-  { name: 'value', type: 'string', description: 'Controlled textarea value.' },
-  { name: 'defaultValue', type: 'string', description: 'Uncontrolled initial value.' },
-  { name: 'onChange', type: '(e: ChangeEvent<HTMLTextAreaElement>) => void', description: 'Standard textarea change handler.' },
-  { name: 'label', type: 'string', description: 'Label above the textarea.' },
-  { name: 'description', type: 'string', description: 'Help text below the label.' },
-  { name: 'error', type: 'string', description: 'Error message below the textarea.' },
+  { name: 'value', type: 'string', description: 'Controlled value.' },
+  { name: 'defaultValue', type: 'string', description: 'Initial uncontrolled value.' },
+  { name: 'onChange', type: '(e: React.ChangeEvent<HTMLTextAreaElement>) => void', description: 'Callback on value change.' },
+  { name: 'label', type: 'string', description: 'Label text above input.' },
+  { name: 'description', type: 'string', description: 'Helper text below input.' },
+  { name: 'error', type: 'string', description: 'Error message below input.' },
   { name: 'placeholder', type: 'string', description: 'Placeholder text when empty.' },
-  { name: 'size', type: "'xs' | 'sm' | 'md' | 'lg' | 'xl'", default: "'md'", description: 'Textarea size scale.' },
-  { name: 'disabled', type: 'boolean', default: 'false', description: 'Disables the textarea.' },
-  { name: 'required', type: 'boolean', default: 'false', description: 'Marks field as required.' },
-  { name: 'autoResize', type: 'boolean', default: 'false', description: 'Automatically grow height to fit content.' },
+  { name: 'name', type: 'string', description: 'Form field name.' },
+  { name: 'size', type: "'xs' | 'sm' | 'md' | 'lg' | 'xl'", default: "'md'", description: 'Component size.' },
+  { name: 'disabled', type: 'boolean', description: 'Disables interaction.' },
+  { name: 'required', type: 'boolean', description: 'Marks as required.' },
+  { name: 'autoResize', type: 'boolean', description: 'Auto resize toggle.' },
   { name: 'minRows', type: 'number', default: '3', description: 'Minimum number of visible rows.' },
   { name: 'maxRows', type: 'number', description: 'Maximum rows before scrolling when autoResize is enabled.' },
-  { name: 'maxLength', type: 'number', description: 'Maximum character count.' },
-  { name: 'showCount', type: 'boolean', default: 'false', description: 'Display character count (requires maxLength).' },
+  { name: 'maxLength', type: 'number', description: 'Maximum character length.' },
+  { name: 'showCount', type: 'boolean', description: 'Show count toggle.' },
   { name: 'resize', type: "'none' | 'vertical' | 'horizontal' | 'both'", default: "'vertical'", description: 'CSS resize behavior.' },
-  { name: 'motion', type: '0 | 1 | 2 | 3', description: 'Animation intensity override.' },
+  { name: 'motion', type: '0 | 1 | 2 | 3', description: 'Animation intensity (0=none, 1=subtle, 2=expressive, 3=cinematic).' },
 ]
 
 // ─── Helpers ────────────────────────────────────────────────────────────────

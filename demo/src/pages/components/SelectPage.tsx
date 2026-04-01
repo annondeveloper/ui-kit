@@ -871,30 +871,28 @@ const GROUPED_LITE_OPTIONS = GROUPED_OPTIONS.map(({ value, label, disabled, grou
 // ─── Props Data ───────────────────────────────────────────────────────────────
 
 const selectProps: PropDef[] = [
-  { name: 'name', type: 'string', required: true, description: 'Field name for form submission. Also used for hidden input elements.' },
-  { name: 'options', type: 'SelectOption[]', required: true, description: 'Array of option objects to render in the dropdown.' },
-  { name: 'value', type: 'string | string[]', description: 'Controlled value. Pass string[] when multiple is true.' },
-  { name: 'defaultValue', type: 'string | string[]', description: 'Initial value for uncontrolled usage.' },
-  { name: 'onChange', type: '(value: string | string[]) => void', description: 'Called when selection changes. Returns string[] when multiple is true.' },
-  { name: 'placeholder', type: 'string', default: "'Select...'", description: 'Placeholder text when no value is selected.' },
-  { name: 'label', type: 'ReactNode', description: 'Label rendered above the trigger. Linked via aria-labelledby.' },
-  { name: 'error', type: 'string', description: 'Error message displayed below the trigger. Adds invalid styling.' },
-  { name: 'disabled', type: 'boolean', default: 'false', description: 'Disables the select with reduced opacity and pointer-events: none.' },
-  { name: 'size', type: "'xs' | 'sm' | 'md' | 'lg' | 'xl'", default: "'md'", description: 'Controls trigger height, padding, and font-size.' },
-  { name: 'searchable', type: 'boolean', default: 'false', description: 'Adds a search input to filter options in the dropdown.' },
-  { name: 'clearable', type: 'boolean', default: 'false', description: 'Shows a clear button when a value is selected.' },
-  { name: 'multiple', type: 'boolean', default: 'false', description: 'Allow selecting multiple options. Renders tags in trigger.' },
-  { name: 'motion', type: '0 | 1 | 2 | 3', description: 'Animation intensity override. Cascades from OS > prop > CSS --motion > UIProvider.' },
-  { name: 'className', type: 'string', description: 'Additional CSS class name merged with the component class.' },
-  { name: 'ref', type: 'Ref<HTMLDivElement>', description: 'Forwarded ref to the root wrapper element.' },
+  { name: 'name', type: 'string', required: true, description: 'Form field name.' },
+  { name: 'options', type: 'SelectOption[]', required: true, description: 'Options to render in the dropdown.' },
+  { name: 'value', type: 'string | string[]', description: 'Controlled value.' },
+  { name: 'defaultValue', type: 'string | string[]', description: 'Initial uncontrolled value.' },
+  { name: 'onChange', type: '(value: string | string[]) => void', description: 'Callback on value change.' },
+  { name: 'placeholder', type: 'string', default: "'Select...'", description: 'Placeholder text when empty.' },
+  { name: 'label', type: 'ReactNode', description: 'Label text above input.' },
+  { name: 'error', type: 'string', description: 'Error message below input.' },
+  { name: 'disabled', type: 'boolean', description: 'Disables interaction.' },
+  { name: 'size', type: "'xs' | 'sm' | 'md' | 'lg' | 'xl'", default: "'md'", description: 'Component size.' },
+  { name: 'searchable', type: 'boolean', description: 'Enables search/filter.' },
+  { name: 'clearable', type: 'boolean', description: 'Shows clear button when has value.' },
+  { name: 'multiple', type: 'boolean', description: 'Multiple toggle.' },
+  { name: 'motion', type: '0 | 1 | 2 | 3', description: 'Animation intensity (0=none, 1=subtle, 2=expressive, 3=cinematic).' },
 ]
 
 const selectOptionProps: PropDef[] = [
-  { name: 'value', type: 'string', required: true, description: 'Unique value identifier for the option.' },
-  { name: 'label', type: 'string', required: true, description: 'Display text for the option.' },
-  { name: 'disabled', type: 'boolean', description: 'Prevents selection of this option. Shown with reduced opacity.' },
-  { name: 'icon', type: 'ReactNode', description: 'Icon element rendered before the label (Standard tier only).' },
-  { name: 'group', type: 'string', description: 'Group name for categorizing options in the dropdown.' },
+  { name: 'value', type: 'string', required: true, description: 'Controlled value.' },
+  { name: 'label', type: 'string', required: true, description: 'Label text above input.' },
+  { name: 'disabled', type: 'boolean', description: 'Disables interaction.' },
+  { name: 'icon', type: 'ReactNode', description: 'Leading icon element.' },
+  { name: 'group', type: 'string', description: 'Group name for categorizing options.' },
 ]
 
 const liteSelectProps: PropDef[] = [
