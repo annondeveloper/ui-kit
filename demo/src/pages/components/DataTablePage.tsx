@@ -1240,6 +1240,7 @@ function PlaygroundSection({ tier, brandColor }: { tier: Tier; brandColor: strin
   const [filterable, setFilterable] = useState(false)
   const [editable, setEditable] = useState(false)
   const [groupBy, setGroupBy] = useState<string>('none')
+  const [aggMode, setAggMode] = useState<'none' | 'avg' | 'sum' | 'count' | 'min' | 'max'>('none')
 
   // Layout features
   const [paginated, setPaginated] = useState(true)
@@ -1337,7 +1338,12 @@ function PlaygroundSection({ tier, brandColor }: { tier: Tier; brandColor: strin
     tableProps.onCellEdit = handleCellEdit
   }
   if (autoSize) tableProps.autoSizeColumns = true
-  if (groupBy !== 'none') tableProps.groupBy = groupBy
+  if (groupBy !== 'none') {
+    tableProps.groupBy = groupBy
+    if (aggMode !== 'none') {
+      tableProps.aggregations = { cpu: aggMode, memory: aggMode, disk: aggMode }
+    }
+  }
 
   return (
     <section className="datatable-page__section" id="playground">
@@ -1365,6 +1371,14 @@ function PlaygroundSection({ tier, brandColor }: { tier: Tier; brandColor: strin
                 value={groupBy as 'none'}
                 onChange={setGroupBy}
               />
+              {groupBy !== 'none' && (
+                <OptionGroup
+                  label="Aggregation"
+                  options={['none', 'avg', 'sum', 'count', 'min', 'max'] as const}
+                  value={aggMode}
+                  onChange={setAggMode}
+                />
+              )}
             </div>
           </div>
 
