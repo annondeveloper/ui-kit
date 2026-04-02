@@ -66,14 +66,15 @@ const gridStyles = css`
       :scope {
         container-type: inline-size;
         display: grid;
-        grid-template-columns: repeat(var(--nig-cols, auto-fit), minmax(var(--nig-min-col, 200px), 1fr));
+        inline-size: 100%;
+        grid-template-columns: repeat(auto-fit, minmax(var(--nig-min-col, 200px), 1fr));
         gap: var(--nig-gap, 0.75rem);
         font-family: var(--font-mono, ui-monospace, monospace);
       }
 
       /* Column override when explicit columns set */
       :scope[data-columns] {
-        grid-template-columns: repeat(var(--nig-cols), minmax(0, 1fr));
+        grid-template-columns: repeat(var(--nig-cols), minmax(120px, 1fr));
       }
 
       /* Size variants */

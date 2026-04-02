@@ -115,13 +115,15 @@ export function forceDirectedLayout(
         const dx = cx - n.x
         const dy = cy - n.y
         const dist2 = dx * dx + dy * dy
-        if (dist2 < 1) return false // too close, drill down
+        if (dist2 < 0.01) return false // too close, drill down
 
         // Barnes-Hut: if quadrant is far enough, approximate
         const theta = 0.9
         if (size * size / dist2 < theta * theta) {
           const dist = Math.sqrt(dist2)
-          const force = (repulsion * mass * alpha) / dist2
+          // Cap force to prevent explosion at very close distances
+          const cappedDist2 = Math.max(dist2, 100)
+          const force = (repulsion * mass * alpha) / cappedDist2
           if (n.fx == null) vx[i] -= (dx / dist) * force
           if (n.fy == null) vy[i] -= (dy / dist) * force
           return true // skip children
@@ -156,7 +158,8 @@ export function forceDirectedLayout(
       if (n.fy == null) vy[i] += (centerY - n.y) * gravity * alpha
     }
 
-    // Apply velocities with damping
+    // Apply velocities with damping and clamping
+    const maxVelocity = Math.max(width, height) * 0.1
     for (let i = 0; i < positioned.length; i++) {
       const n = positioned[i]
       if (n.fx != null) {
@@ -164,6 +167,9 @@ export function forceDirectedLayout(
         vx[i] = 0
       } else {
         vx[i] *= damping
+        // Clamp velocity to prevent explosion
+        if (vx[i] > maxVelocity) vx[i] = maxVelocity
+        if (vx[i] < -maxVelocity) vx[i] = -maxVelocity
         n.x += vx[i]
       }
       if (n.fy != null) {
@@ -171,8 +177,14 @@ export function forceDirectedLayout(
         vy[i] = 0
       } else {
         vy[i] *= damping
+        if (vy[i] > maxVelocity) vy[i] = maxVelocity
+        if (vy[i] < -maxVelocity) vy[i] = -maxVelocity
         n.y += vy[i]
       }
+      // Keep nodes within bounds (with padding)
+      const pad = 20
+      n.x = Math.max(pad, Math.min(width - pad, n.x))
+      n.y = Math.max(pad, Math.min(height - pad, n.y))
     }
   }
 
@@ -350,13 +362,18 @@ export function dagreLayout(
   for (let l = 0; l <= maxLayer; l++) {
     const group = layerGroups[l]
     const count = group.length
-    const totalWidth = count * nodeSep
+    // Account for node dimensions in spacing
+    const avgNodeSize = horizontal
+      ? positioned.reduce((sum, n) => sum + (n.height || 40), 0) / positioned.length
+      : positioned.reduce((sum, n) => sum + (n.width || 60), 0) / positioned.length
+    const effectiveSep = nodeSep + avgNodeSize
+    const totalWidth = count * effectiveSep
     const startOffset = (secondarySize - totalWidth) / 2
 
     for (let i = 0; i < group.length; i++) {
       const idx = idxMap.get(group[i])!
       const primaryPos = layerStart + l * layerSpacing * layerSign
-      const secondaryPos = startOffset + (i + 0.5) * nodeSep
+      const secondaryPos = startOffset + (i + 0.5) * effectiveSep
 
       if (horizontal) {
         positioned[idx].x = primaryPos
@@ -485,19 +502,44 @@ export function gridLayout(
 
 // ---- Main entry point ----
 
+/** Round all coordinates to 2 decimal places for clean SVG output */
+function roundResult(result: LayoutResult): LayoutResult {
+  return {
+    ...result,
+    nodes: result.nodes.map(n => ({
+      ...n,
+      x: Math.round(n.x * 100) / 100,
+      y: Math.round(n.y * 100) / 100,
+    })),
+    edges: result.edges.map(e => ({
+      ...e,
+      points: e.points.map(p => ({
+        x: Math.round(p.x * 100) / 100,
+        y: Math.round(p.y * 100) / 100,
+      })),
+    })),
+  }
+}
+
 export function computeLayout(
   nodes: GraphNode[],
   edges: GraphEdge[],
   options: LayoutOptions,
 ): LayoutResult {
+  let result: LayoutResult
   switch (options.type) {
     case 'force':
-      return forceDirectedLayout(nodes, edges, options)
+      result = forceDirectedLayout(nodes, edges, options)
+      break
     case 'dagre':
-      return dagreLayout(nodes, edges, options)
+      result = dagreLayout(nodes, edges, options)
+      break
     case 'circular':
-      return circularLayout(nodes, edges, options)
+      result = circularLayout(nodes, edges, options)
+      break
     case 'grid':
-      return gridLayout(nodes, edges, options)
+      result = gridLayout(nodes, edges, options)
+      break
   }
+  return roundResult(result)
 }

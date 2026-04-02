@@ -208,7 +208,7 @@ const dagStyles = css`
 
       .ui-pipeline-dag__edge-path {
         fill: none;
-        stroke: var(--border-default, oklch(100% 0 0 / 0.15));
+        stroke: var(--border-strong, oklch(70% 0 0 / 0.5));
         stroke-width: 1.5;
         stroke-linecap: round;
       }
@@ -364,7 +364,23 @@ function PipelineDAGInner({
     )
   }
 
-  const viewBox = `0 0 ${layout.width} ${layout.height}`
+  // Auto-fit viewBox to actual node positions with padding
+  const pad = 40
+  let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity
+  for (const n of layout.nodes) {
+    const nw = (n.width || NODE_WIDTH) / 2
+    const nh = (n.height || nodeH) / 2
+    if (n.x - nw < minX) minX = n.x - nw
+    if (n.y - nh < minY) minY = n.y - nh
+    if (n.x + nw > maxX) maxX = n.x + nw
+    if (n.y + nh > maxY) maxY = n.y + nh
+  }
+  if (!isFinite(minX)) { minX = 0; minY = 0; maxX = layout.width; maxY = layout.height }
+  const vbX = minX - pad
+  const vbY = minY - pad
+  const vbW = maxX - minX + pad * 2
+  const vbH = maxY - minY + pad * 2
+  const viewBox = `${vbX} ${vbY} ${vbW} ${vbH}`
 
   // Compute max throughput for edge scaling
   const maxThroughput = edges.reduce((max, e) => Math.max(max, e.throughput ?? 0), 1)
@@ -393,7 +409,7 @@ function PipelineDAGInner({
             markerHeight="6"
             orient="auto-start-reverse"
           >
-            <path d="M 0 0 L 10 5 L 0 10 Z" fill="var(--border-default, oklch(100% 0 0 / 0.2))" />
+            <path d="M 0 0 L 10 5 L 0 10 Z" fill="oklch(70% 0 0 / 0.5)" />
           </marker>
         </defs>
 
