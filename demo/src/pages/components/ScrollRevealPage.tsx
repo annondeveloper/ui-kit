@@ -240,7 +240,11 @@ const pageStyles = css`
         gap: 0.75rem;
         min-width: 0;
         overflow: hidden;
+        cursor: pointer;
+        transition: border-color 0.15s, box-shadow 0.15s;
       }
+      .scroll-reveal-page__tier-card:hover { border-color: var(--border-default); }
+      .scroll-reveal-page__tier-card--active { border-color: var(--brand); box-shadow: 0 0 0 1px var(--brand), var(--shadow-glow, 0 0 12px oklch(65% 0.2 270 / 0.15)); }
 
       .scroll-reveal-page__tier-header {
         display: flex;
@@ -299,7 +303,7 @@ const ANIMATIONS = ['fade-up', 'fade-down', 'fade-left', 'fade-right', 'scale'] 
 export default function ScrollRevealPage() {
   useStyles('scroll-reveal-page', pageStyles)
 
-  const { tier } = useTier()
+  const { tier, setTier } = useTier()
   const ActiveScrollReveal = tier === 'lite' ? LiteScrollReveal : tier === 'premium' ? PremiumScrollReveal : ScrollReveal
 
   useEffect(() => {
@@ -419,7 +423,7 @@ export default function ScrollRevealPage() {
         </p>
         <div className="scroll-reveal-page__tiers">
           {/* Lite */}
-          <div className="scroll-reveal-page__tier-card">
+          <div className={`scroll-reveal-page__tier-card${tier === 'lite' ? ' scroll-reveal-page__tier-card--active' : ''}`} onClick={() => setTier('lite')} role="button" tabIndex={0} onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setTier('lite') } }}>
             <div className="scroll-reveal-page__tier-header">
               <span className="scroll-reveal-page__tier-name">Lite</span>
               <span className="scroll-reveal-page__tier-size">~0.1 KB</span>
@@ -442,7 +446,7 @@ export default function ScrollRevealPage() {
           </div>
 
           {/* Standard */}
-          <div className="scroll-reveal-page__tier-card">
+          <div className={`scroll-reveal-page__tier-card${tier === 'standard' ? ' scroll-reveal-page__tier-card--active' : ''}`} onClick={() => setTier('standard')} role="button" tabIndex={0} onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setTier('standard') } }}>
             <div className="scroll-reveal-page__tier-header">
               <span className="scroll-reveal-page__tier-name">Standard</span>
               <span className="scroll-reveal-page__tier-size">~1.8 KB</span>
@@ -465,7 +469,7 @@ export default function ScrollRevealPage() {
           </div>
 
           {/* Premium */}
-          <div className="scroll-reveal-page__tier-card">
+          <div className={`scroll-reveal-page__tier-card${tier === 'premium' ? ' scroll-reveal-page__tier-card--active' : ''}`} onClick={() => setTier('premium')} role="button" tabIndex={0} onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setTier('premium') } }}>
             <div className="scroll-reveal-page__tier-header">
               <span className="scroll-reveal-page__tier-name">Premium</span>
               <span className="scroll-reveal-page__tier-size">~2.3 KB</span>

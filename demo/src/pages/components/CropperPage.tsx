@@ -232,7 +232,11 @@ const pageStyles = css`
         gap: 0.75rem;
         min-width: 0;
         overflow: hidden;
+        cursor: pointer;
+        transition: border-color 0.15s, box-shadow 0.15s;
       }
+      .cropper-page__tier-card:hover { border-color: var(--border-default); }
+      .cropper-page__tier-card--active { border-color: var(--brand); box-shadow: 0 0 0 1px var(--brand), var(--shadow-glow, 0 0 12px oklch(65% 0.2 270 / 0.15)); }
 
       .cropper-page__tier-header {
         display: flex;
@@ -301,7 +305,7 @@ const SAMPLE_IMAGE = 'data:image/svg+xml,' + encodeURIComponent(
 export default function CropperPage() {
   useStyles('cropper-page', pageStyles)
 
-  const { tier } = useTier()
+  const { tier, setTier } = useTier()
   const ActiveCropper = tier === 'lite' ? LiteCropper : tier === 'premium' ? PremiumCropper : Cropper
 
   const [cropResult, setCropResult] = useState<CropResult | null>(null)
@@ -443,7 +447,7 @@ export default function CropperPage() {
         </p>
         <div className="cropper-page__tiers">
           {/* Lite */}
-          <div className="cropper-page__tier-card">
+          <div className={`cropper-page__tier-card${tier === 'lite' ? ' cropper-page__tier-card--active' : ''}`} onClick={() => setTier('lite')} role="button" tabIndex={0} onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setTier('lite') } }}>
             <div className="cropper-page__tier-header">
               <span className="cropper-page__tier-name">Lite</span>
               <span className="cropper-page__tier-size">~0.3 KB</span>
@@ -461,7 +465,7 @@ export default function CropperPage() {
           </div>
 
           {/* Standard */}
-          <div className="cropper-page__tier-card">
+          <div className={`cropper-page__tier-card${tier === 'standard' ? ' cropper-page__tier-card--active' : ''}`} onClick={() => setTier('standard')} role="button" tabIndex={0} onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setTier('standard') } }}>
             <div className="cropper-page__tier-header">
               <span className="cropper-page__tier-name">Standard</span>
               <span className="cropper-page__tier-size">~5.4 KB</span>
@@ -479,7 +483,7 @@ export default function CropperPage() {
           </div>
 
           {/* Premium */}
-          <div className="cropper-page__tier-card">
+          <div className={`cropper-page__tier-card${tier === 'premium' ? ' cropper-page__tier-card--active' : ''}`} onClick={() => setTier('premium')} role="button" tabIndex={0} onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setTier('premium') } }}>
             <div className="cropper-page__tier-header">
               <span className="cropper-page__tier-name">Premium</span>
               <span className="cropper-page__tier-size">~5.8 KB</span>

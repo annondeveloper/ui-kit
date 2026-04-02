@@ -268,7 +268,11 @@ const pageStyles = css`
         gap: 0.75rem;
         min-width: 0;
         overflow: hidden;
+        cursor: pointer;
+        transition: border-color 0.15s, box-shadow 0.15s;
       }
+      .code-editor-page__tier-card:hover { border-color: var(--border-default); }
+      .code-editor-page__tier-card--active { border-color: var(--brand); box-shadow: 0 0 0 1px var(--brand), var(--shadow-glow, 0 0 12px oklch(65% 0.2 270 / 0.15)); }
 
       .code-editor-page__tier-header {
         display: flex;
@@ -327,7 +331,7 @@ type Lang = 'typescript' | 'json' | 'python'
 export default function CodeEditorPage() {
   useStyles('code-editor-page', pageStyles)
 
-  const { tier } = useTier()
+  const { tier, setTier } = useTier()
   const ActiveCodeEditor = tier === 'lite' ? LiteCodeEditor : tier === 'premium' ? PremiumCodeEditor : CodeEditor
 
   const [lang, setLang] = useState<Lang>('typescript')
@@ -453,7 +457,7 @@ export default function CodeEditorPage() {
         </p>
         <div className="code-editor-page__tiers">
           {/* Lite */}
-          <div className="code-editor-page__tier-card">
+          <div className={`code-editor-page__tier-card${tier === 'lite' ? ' code-editor-page__tier-card--active' : ''}`} onClick={() => setTier('lite')} role="button" tabIndex={0} onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setTier('lite') } }}>
             <div className="code-editor-page__tier-header">
               <span className="code-editor-page__tier-name">Lite</span>
               <span className="code-editor-page__tier-size">~0.5 KB</span>
@@ -471,7 +475,7 @@ export default function CodeEditorPage() {
           </div>
 
           {/* Standard */}
-          <div className="code-editor-page__tier-card">
+          <div className={`code-editor-page__tier-card${tier === 'standard' ? ' code-editor-page__tier-card--active' : ''}`} onClick={() => setTier('standard')} role="button" tabIndex={0} onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setTier('standard') } }}>
             <div className="code-editor-page__tier-header">
               <span className="code-editor-page__tier-name">Standard</span>
               <span className="code-editor-page__tier-size">~4.1 KB</span>
@@ -489,7 +493,7 @@ export default function CodeEditorPage() {
           </div>
 
           {/* Premium */}
-          <div className="code-editor-page__tier-card">
+          <div className={`code-editor-page__tier-card${tier === 'premium' ? ' code-editor-page__tier-card--active' : ''}`} onClick={() => setTier('premium')} role="button" tabIndex={0} onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setTier('premium') } }}>
             <div className="code-editor-page__tier-header">
               <span className="code-editor-page__tier-name">Premium</span>
               <span className="code-editor-page__tier-size">~4.5 KB</span>

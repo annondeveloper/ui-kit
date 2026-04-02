@@ -222,7 +222,11 @@ const pageStyles = css`
         gap: 0.75rem;
         min-width: 0;
         overflow: hidden;
+        cursor: pointer;
+        transition: border-color 0.15s, box-shadow 0.15s;
       }
+      .rte-page__tier-card:hover { border-color: var(--border-default); }
+      .rte-page__tier-card--active { border-color: var(--brand); box-shadow: 0 0 0 1px var(--brand), var(--shadow-glow, 0 0 12px oklch(65% 0.2 270 / 0.15)); }
 
       .rte-page__tier-header {
         display: flex;
@@ -279,7 +283,7 @@ const IMPORT_STR = "import { RichTextEditor } from '@ui/domain/rich-text-editor'
 export default function RichTextEditorPage() {
   useStyles('rte-page', pageStyles)
 
-  const { tier } = useTier()
+  const { tier, setTier } = useTier()
   const ActiveRTE = tier === 'lite' ? LiteRichTextEditor : tier === 'premium' ? PremiumRichTextEditor : RichTextEditor
 
   const [html, setHtml] = useState('<p>Try <strong>bold</strong>, <em>italic</em>, and <a href="#">links</a>.</p>')
@@ -402,7 +406,7 @@ export default function RichTextEditorPage() {
         </p>
         <div className="rte-page__tiers">
           {/* Lite */}
-          <div className="rte-page__tier-card">
+          <div className={`rte-page__tier-card${tier === 'lite' ? ' rte-page__tier-card--active' : ''}`} onClick={() => setTier('lite')} role="button" tabIndex={0} onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setTier('lite') } }}>
             <div className="rte-page__tier-header">
               <span className="rte-page__tier-name">Lite</span>
               <span className="rte-page__tier-size">~0.8 KB</span>
@@ -424,7 +428,7 @@ export default function RichTextEditorPage() {
           </div>
 
           {/* Standard */}
-          <div className="rte-page__tier-card">
+          <div className={`rte-page__tier-card${tier === 'standard' ? ' rte-page__tier-card--active' : ''}`} onClick={() => setTier('standard')} role="button" tabIndex={0} onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setTier('standard') } }}>
             <div className="rte-page__tier-header">
               <span className="rte-page__tier-name">Standard</span>
               <span className="rte-page__tier-size">~4.8 KB</span>
@@ -446,7 +450,7 @@ export default function RichTextEditorPage() {
           </div>
 
           {/* Premium */}
-          <div className="rte-page__tier-card">
+          <div className={`rte-page__tier-card${tier === 'premium' ? ' rte-page__tier-card--active' : ''}`} onClick={() => setTier('premium')} role="button" tabIndex={0} onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setTier('premium') } }}>
             <div className="rte-page__tier-header">
               <span className="rte-page__tier-name">Premium</span>
               <span className="rte-page__tier-size">~5.2 KB</span>

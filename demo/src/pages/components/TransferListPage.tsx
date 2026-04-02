@@ -217,7 +217,11 @@ const pageStyles = css`
         gap: 0.75rem;
         min-width: 0;
         overflow: hidden;
+        cursor: pointer;
+        transition: border-color 0.15s, box-shadow 0.15s;
       }
+      .${PAGE}__tier-card:hover { border-color: var(--border-default); }
+      .${PAGE}__tier-card--active { border-color: var(--brand); box-shadow: 0 0 0 1px var(--brand), var(--shadow-glow, 0 0 12px oklch(65% 0.2 270 / 0.15)); }
 
       .${PAGE}__tier-header {
         display: flex;
@@ -315,7 +319,7 @@ const IMPORT = "import { TransferList } from '@ui/components/transfer-list'"
 export default function TransferListPage() {
   useStyles('transfer-list-page', pageStyles)
 
-  const { tier } = useTier()
+  const { tier, setTier } = useTier()
   const ActiveTransferList = tier === 'lite' ? LiteTransferList : tier === 'premium' ? PremiumTransferList : TransferList
 
   const [copied, setCopied] = useState(false)
@@ -404,7 +408,7 @@ export default function TransferListPage() {
         </p>
         <div className={`${PAGE}__tiers`}>
           {/* Lite */}
-          <div className={`${PAGE}__tier-card`}>
+          <div className={`${PAGE}__tier-card${tier === 'lite' ? ` ${PAGE}__tier-card--active` : ''}`} onClick={() => setTier('lite')} role="button" tabIndex={0} onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setTier('lite') } }}>
             <div className={`${PAGE}__tier-header`}>
               <span className={`${PAGE}__tier-name`}>Lite</span>
               <span className={`${PAGE}__tier-size`}>~1.2 KB</span>
@@ -430,7 +434,7 @@ export default function TransferListPage() {
           </div>
 
           {/* Standard */}
-          <div className={`${PAGE}__tier-card`}>
+          <div className={`${PAGE}__tier-card${tier === 'standard' ? ` ${PAGE}__tier-card--active` : ''}`} onClick={() => setTier('standard')} role="button" tabIndex={0} onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setTier('standard') } }}>
             <div className={`${PAGE}__tier-header`}>
               <span className={`${PAGE}__tier-name`}>Standard</span>
               <span className={`${PAGE}__tier-size`}>~2.8 KB</span>
@@ -456,7 +460,7 @@ export default function TransferListPage() {
           </div>
 
           {/* Premium */}
-          <div className={`${PAGE}__tier-card`}>
+          <div className={`${PAGE}__tier-card${tier === 'premium' ? ` ${PAGE}__tier-card--active` : ''}`} onClick={() => setTier('premium')} role="button" tabIndex={0} onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setTier('premium') } }}>
             <div className={`${PAGE}__tier-header`}>
               <span className={`${PAGE}__tier-name`}>Premium</span>
               <span className={`${PAGE}__tier-size`}>~3.2 KB</span>
