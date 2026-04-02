@@ -517,6 +517,17 @@ const dashboardTemplateProps: PropDef[] = [
   { name: 'actions', type: 'ReactNode', description: 'Action buttons rendered in the header.' },
   { name: 'autoRefresh', type: 'number', description: 'Auto-refresh interval in milliseconds.' },
   { name: 'onRefresh', type: '() => void', description: 'Callback fired on each auto-refresh tick.' },
+  { name: 'headerHeight', type: 'number | string', description: 'Custom header height (number in px or CSS string).' },
+  { name: 'metricsScrollable', type: 'boolean', default: 'true', description: 'Enable horizontal scroll-snap for the metrics strip.' },
+  { name: 'sidebarWidth', type: 'number | string', default: '280px', description: 'Custom sidebar width (number in px or CSS string).' },
+  { name: 'variant', type: "'default' | 'compact' | 'fullscreen'", default: "'default'", description: 'Layout density variant. Compact reduces padding/fonts, fullscreen stretches to edges.' },
+  { name: 'showBreadcrumb', type: 'ReactNode', description: 'Breadcrumb content rendered above the title.' },
+  { name: 'showStatusBar', type: 'boolean', default: 'false', description: 'Show a status bar below the header.' },
+  { name: 'statusBarContent', type: 'ReactNode', description: 'Custom status bar content. Defaults to auto-generated text from status prop.' },
+  { name: 'onSectionToggle', type: '(sectionId: string, collapsed: boolean) => void', description: 'Callback when a collapsible section is toggled.' },
+  { name: 'stickyHeader', type: 'boolean', default: 'false', description: 'Make the header sticky on scroll.' },
+  { name: 'metricsLayout', type: "'row' | 'grid'", default: "'row'", description: 'Metrics layout: row (horizontal scroll) or grid (wrapping).' },
+  { name: 'onMetricClick', type: '(metric: DashboardMetric) => void', description: 'Makes metric cards clickable. Fires with the clicked metric.' },
   { name: 'motion', type: '0 | 1 | 2 | 3', description: 'Animation intensity override.' },
 ]
 
@@ -548,6 +559,8 @@ type Status = 'ok' | 'warning' | 'critical' | 'unknown' | 'maintenance'
 const COLUMN_OPTIONS = ['1', '2', '3'] as const
 const STATUS_OPTIONS: Status[] = ['ok', 'warning', 'critical', 'unknown', 'maintenance']
 const SIDEBAR_POS_OPTIONS = ['left', 'right'] as const
+const VARIANT_OPTIONS = ['default', 'compact', 'fullscreen'] as const
+const METRICS_LAYOUT_OPTIONS = ['row', 'grid'] as const
 const TIERS: { id: Tier; label: string }[] = [
   { id: 'lite', label: 'Lite' },
   { id: 'standard', label: 'Standard' },
@@ -639,6 +652,9 @@ function generateReactCode(
   sidebarPosition: string,
   sidebarCollapsible: boolean,
   status: Status,
+  variant: string = 'default',
+  stickyHeader: boolean = false,
+  metricsLayout: string = 'row',
 ): string {
   const importStr = IMPORT_STRINGS[tier]
   const props: string[] = [
@@ -649,6 +665,9 @@ function generateReactCode(
     '  sections={sections}',
   ]
   if (columns !== 2) props.push(`  columns={${columns}}`)
+  if (variant !== 'default') props.push(`  variant="${variant}"`)
+  if (stickyHeader) props.push('  stickyHeader')
+  if (metricsLayout !== 'row') props.push(`  metricsLayout="${metricsLayout}"`)
   if (sidebarPosition !== 'right') props.push(`  sidebarPosition="${sidebarPosition}"`)
   if (sidebarCollapsible) props.push('  sidebarCollapsible')
   props.push('  sidebar={<Sidebar />}')
@@ -716,6 +735,13 @@ function PlaygroundSection({ tier: tierProp }: { tier: Tier }) {
   const [autoRefreshEnabled, setAutoRefreshEnabled] = useState(false)
   const [refreshCount, setRefreshCount] = useState(0)
   const [copyStatus, setCopyStatus] = useState('')
+  const [variant, setVariant] = useState<'default' | 'compact' | 'fullscreen'>('default')
+  const [stickyHeader, setStickyHeader] = useState(false)
+  const [metricsLayout, setMetricsLayout] = useState<'row' | 'grid'>('row')
+  const [showStatusBar, setShowStatusBar] = useState(false)
+  const [showBreadcrumb, setShowBreadcrumb] = useState(false)
+  const [clickableMetrics, setClickableMetrics] = useState(false)
+  const [clickedMetric, setClickedMetric] = useState('')
 
   const Component = tier === 'lite'
     ? (props: any) => <LiteDashboardTemplate {...props} />
@@ -724,8 +750,8 @@ function PlaygroundSection({ tier: tierProp }: { tier: Tier }) {
     : DashboardTemplate
 
   const reactCode = useMemo(
-    () => generateReactCode(tier, columns, sidebarPosition, sidebarCollapsible, status),
-    [tier, columns, sidebarPosition, sidebarCollapsible, status],
+    () => generateReactCode(tier, columns, sidebarPosition, sidebarCollapsible, status, variant, stickyHeader, metricsLayout),
+    [tier, columns, sidebarPosition, sidebarCollapsible, status, variant, stickyHeader, metricsLayout],
   )
   const htmlCode = useMemo(() => generateHtmlCode(status), [status])
 
@@ -787,6 +813,12 @@ function PlaygroundSection({ tier: tierProp }: { tier: Tier }) {
     sidebarCollapsible,
     autoRefresh: autoRefreshEnabled ? 5000 : undefined,
     onRefresh: autoRefreshEnabled ? () => setRefreshCount(c => c + 1) : undefined,
+    variant,
+    stickyHeader,
+    metricsLayout,
+    showStatusBar,
+    showBreadcrumb: showBreadcrumb ? <span>Home / Monitoring / <strong>Dashboard</strong></span> : undefined,
+    onMetricClick: clickableMetrics ? (m: DashboardMetric) => setClickedMetric(m.title) : undefined,
   })
 
   return (
@@ -834,6 +866,12 @@ function PlaygroundSection({ tier: tierProp }: { tier: Tier }) {
 
         <div className="dashboard-template-page__playground-controls">
           <OptionGroup
+            label="Variant"
+            options={VARIANT_OPTIONS}
+            value={variant}
+            onChange={v => setVariant(v as 'default' | 'compact' | 'fullscreen')}
+          />
+          <OptionGroup
             label="Columns"
             options={COLUMN_OPTIONS}
             value={String(columns) as typeof COLUMN_OPTIONS[number]}
@@ -851,17 +889,32 @@ function PlaygroundSection({ tier: tierProp }: { tier: Tier }) {
             value={status}
             onChange={v => setStatus(v as Status)}
           />
+          <OptionGroup
+            label="Metrics Layout"
+            options={METRICS_LAYOUT_OPTIONS}
+            value={metricsLayout}
+            onChange={v => setMetricsLayout(v as 'row' | 'grid')}
+          />
           <div className="dashboard-template-page__control-group">
             <span className="dashboard-template-page__control-label">Toggles</span>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.375rem' }}>
               <Toggle label="Show sidebar" checked={showSidebar} onChange={setShowSidebar} />
               <Toggle label="Collapsible sidebar" checked={sidebarCollapsible} onChange={setSidebarCollapsible} />
               <Toggle label="Auto-refresh (5s)" checked={autoRefreshEnabled} onChange={setAutoRefreshEnabled} />
+              <Toggle label="Sticky header" checked={stickyHeader} onChange={setStickyHeader} />
+              <Toggle label="Status bar" checked={showStatusBar} onChange={setShowStatusBar} />
+              <Toggle label="Breadcrumb" checked={showBreadcrumb} onChange={setShowBreadcrumb} />
+              <Toggle label="Clickable metrics" checked={clickableMetrics} onChange={v => { setClickableMetrics(v); setClickedMetric('') }} />
             </div>
           </div>
           {autoRefreshEnabled && (
             <div style={{ fontSize: '0.75rem', color: 'var(--text-tertiary)' }}>
               Refresh count: {refreshCount}
+            </div>
+          )}
+          {clickedMetric && (
+            <div style={{ fontSize: '0.75rem', color: 'var(--brand)' }}>
+              Clicked: {clickedMetric}
             </div>
           )}
         </div>

@@ -247,4 +247,144 @@ describe('VlanBusBar', () => {
       expect(VlanBusBar.displayName).toBe('VlanBusBar')
     })
   })
+
+  // ─── New props (v2.7) ─────────────────────────────────────────────
+
+  describe('highlightPorts / highlightVlans', () => {
+    it('renders connector dots for port-VLAN membership', () => {
+      const { container } = render(<VlanBusBar vlans={sampleVlans} totalPorts={12} />)
+      const connectors = container.querySelectorAll('.ui-vlan-bus-bar__connector')
+      // Management has 4 ports, Production 6, Development 4 => 14 connectors
+      expect(connectors.length).toBe(14)
+    })
+
+    it('applies highlighted class when highlightPorts is set', () => {
+      const { container } = render(
+        <VlanBusBar vlans={sampleVlans} totalPorts={12} highlightPorts={[1]} />
+      )
+      const highlighted = container.querySelectorAll('.ui-vlan-bus-bar__segment--highlighted')
+      // Port 1 is in Management and Production = 2 highlighted segments
+      expect(highlighted.length).toBe(2)
+    })
+
+    it('applies highlighted class when highlightVlans is set', () => {
+      const { container } = render(
+        <VlanBusBar vlans={sampleVlans} totalPorts={12} highlightVlans={[200]} />
+      )
+      const highlighted = container.querySelectorAll('.ui-vlan-bus-bar__segment--highlighted')
+      // VLAN 200 (Development) has ports 3,4,9,10 = 4 segments highlighted
+      expect(highlighted.length).toBe(4)
+    })
+
+    it('dims non-highlighted segments when highlight is active', () => {
+      const { container } = render(
+        <VlanBusBar vlans={sampleVlans} totalPorts={12} highlightVlans={[1]} />
+      )
+      const dimmed = container.querySelectorAll('.ui-vlan-bus-bar__segment--dimmed')
+      expect(dimmed.length).toBeGreaterThan(0)
+    })
+  })
+
+  describe('showTrunkIndicator', () => {
+    it('renders trunk/access indicators when enabled', () => {
+      const { container } = render(
+        <VlanBusBar vlans={sampleVlans} totalPorts={12} showTrunkIndicator />
+      )
+      const indicators = container.querySelectorAll('.ui-vlan-bus-bar__trunk-indicator')
+      expect(indicators.length).toBe(12)
+    })
+
+    it('marks trunk ports with T class', () => {
+      const { container } = render(
+        <VlanBusBar vlans={sampleVlans} totalPorts={12} showTrunkIndicator />
+      )
+      const trunkIndicators = container.querySelectorAll('.ui-vlan-bus-bar__trunk-indicator--trunk')
+      expect(trunkIndicators.length).toBeGreaterThan(0)
+    })
+  })
+
+  describe('compactMode', () => {
+    it('applies data-compact attribute', () => {
+      const { container } = render(
+        <VlanBusBar vlans={sampleVlans} totalPorts={12} compactMode />
+      )
+      expect(container.querySelector('[data-compact]')).toBeInTheDocument()
+    })
+
+    it('hides labels in compact mode', () => {
+      const { container } = render(
+        <VlanBusBar vlans={sampleVlans} totalPorts={12} compactMode showLabels />
+      )
+      expect(container.querySelectorAll('.ui-vlan-bus-bar__label').length).toBe(0)
+    })
+
+    it('uses sm size config in compact mode', () => {
+      const { container } = render(
+        <VlanBusBar vlans={sampleVlans} totalPorts={12} compactMode size="lg" />
+      )
+      // Should apply sm, not lg
+      expect(container.querySelector('[data-size="sm"]')).toBeInTheDocument()
+    })
+  })
+
+  describe('maxHeight', () => {
+    it('applies maxBlockSize style when maxHeight is set', () => {
+      const { container } = render(
+        <VlanBusBar vlans={sampleVlans} totalPorts={12} maxHeight={200} />
+      )
+      const el = container.querySelector('.ui-vlan-bus-bar') as HTMLElement
+      expect(el.style.maxBlockSize).toBe('200px')
+    })
+
+    it('applies string maxHeight', () => {
+      const { container } = render(
+        <VlanBusBar vlans={sampleVlans} totalPorts={12} maxHeight="50vh" />
+      )
+      const el = container.querySelector('.ui-vlan-bus-bar') as HTMLElement
+      expect(el.style.maxBlockSize).toBe('50vh')
+    })
+  })
+
+  describe('colorScheme', () => {
+    it('generates sequential colors with sequential scheme', () => {
+      const vlans: VlanEntry[] = [
+        { id: 1, ports: [1] },
+        { id: 2, ports: [2] },
+        { id: 3, ports: [3] },
+      ]
+      const { container } = render(
+        <VlanBusBar vlans={vlans} totalPorts={3} colorScheme="sequential" />
+      )
+      const segments = container.querySelectorAll('.ui-vlan-bus-bar__segment')
+      const fills = Array.from(segments).map(s => s.getAttribute('fill'))
+      // All should contain hue 250 (blue)
+      fills.forEach(f => expect(f).toContain('250'))
+    })
+  })
+
+  describe('callbacks', () => {
+    it('calls onPortHover on port enter/leave', () => {
+      const onPortHover = vi.fn()
+      const { container } = render(
+        <VlanBusBar vlans={sampleVlans} totalPorts={12} onPortHover={onPortHover} />
+      )
+      const tickAreas = container.querySelectorAll('.ui-vlan-bus-bar__port-tick-area')
+      fireEvent.mouseEnter(tickAreas[0])
+      expect(onPortHover).toHaveBeenCalledWith(1)
+      fireEvent.mouseLeave(tickAreas[0])
+      expect(onPortHover).toHaveBeenCalledWith(null)
+    })
+
+    it('calls onVlanHover on segment enter/leave', () => {
+      const onVlanHover = vi.fn()
+      const { container } = render(
+        <VlanBusBar vlans={sampleVlans} totalPorts={12} onVlanHover={onVlanHover} />
+      )
+      const segments = container.querySelectorAll('.ui-vlan-bus-bar__segment')
+      fireEvent.mouseEnter(segments[0])
+      expect(onVlanHover).toHaveBeenCalledWith(expect.objectContaining({ id: 1 }))
+      fireEvent.mouseLeave(segments[0])
+      expect(onVlanHover).toHaveBeenCalledWith(null)
+    })
+  })
 })

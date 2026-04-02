@@ -358,4 +358,151 @@ describe('DashboardTemplate', () => {
       expect(container.querySelector('[data-motion="0"]')).toBeInTheDocument()
     })
   })
+
+  // ─── New Props ────────────────────────────────────────────────────
+
+  describe('variant', () => {
+    it('sets compact variant data attribute', () => {
+      const { container } = render(<DashboardTemplate variant="compact" title="Test" />)
+      expect(container.querySelector('[data-variant="compact"]')).toBeInTheDocument()
+    })
+
+    it('sets fullscreen variant data attribute', () => {
+      const { container } = render(<DashboardTemplate variant="fullscreen" title="Test" />)
+      expect(container.querySelector('[data-variant="fullscreen"]')).toBeInTheDocument()
+    })
+
+    it('does not set data-variant for default', () => {
+      const { container } = render(<DashboardTemplate variant="default" title="Test" />)
+      expect(container.querySelector('[data-variant]')).not.toBeInTheDocument()
+    })
+  })
+
+  describe('sticky header', () => {
+    it('sets data-sticky-header when enabled', () => {
+      const { container } = render(<DashboardTemplate stickyHeader title="Test" />)
+      expect(container.querySelector('[data-sticky-header]')).toBeInTheDocument()
+    })
+
+    it('does not set data-sticky-header by default', () => {
+      const { container } = render(<DashboardTemplate title="Test" />)
+      expect(container.querySelector('[data-sticky-header]')).not.toBeInTheDocument()
+    })
+  })
+
+  describe('breadcrumb', () => {
+    it('renders breadcrumb when provided', () => {
+      render(<DashboardTemplate title="Test" showBreadcrumb={<span data-testid="bc">Home / Test</span>} />)
+      expect(screen.getByTestId('bc')).toBeInTheDocument()
+    })
+
+    it('does not render breadcrumb when not provided', () => {
+      const { container } = render(<DashboardTemplate title="Test" />)
+      expect(container.querySelector('.ui-dashboard-template__breadcrumb')).not.toBeInTheDocument()
+    })
+  })
+
+  describe('status bar', () => {
+    it('renders status bar when showStatusBar is true', () => {
+      const { container } = render(<DashboardTemplate title="Test" showStatusBar status="ok" />)
+      const bar = container.querySelector('.ui-dashboard-template__status-bar')
+      expect(bar).toBeInTheDocument()
+      expect(bar?.textContent).toContain('All systems operational')
+    })
+
+    it('renders custom status bar content', () => {
+      render(<DashboardTemplate title="Test" showStatusBar statusBarContent={<span>Custom status</span>} />)
+      expect(screen.getByText('Custom status')).toBeInTheDocument()
+    })
+
+    it('does not render status bar by default', () => {
+      const { container } = render(<DashboardTemplate title="Test" />)
+      expect(container.querySelector('.ui-dashboard-template__status-bar')).not.toBeInTheDocument()
+    })
+  })
+
+  describe('metrics layout', () => {
+    it('sets data-layout="grid" on metrics strip', () => {
+      const { container } = render(<DashboardTemplate metrics={sampleMetrics} metricsLayout="grid" />)
+      expect(container.querySelector('.ui-dashboard-template__metrics[data-layout="grid"]')).toBeInTheDocument()
+    })
+
+    it('sets data-scrollable on metrics strip when scrollable', () => {
+      const { container } = render(<DashboardTemplate metrics={sampleMetrics} metricsScrollable metricsLayout="row" />)
+      expect(container.querySelector('.ui-dashboard-template__metrics[data-scrollable]')).toBeInTheDocument()
+    })
+
+    it('does not set data-scrollable when layout is grid', () => {
+      const { container } = render(<DashboardTemplate metrics={sampleMetrics} metricsScrollable metricsLayout="grid" />)
+      expect(container.querySelector('.ui-dashboard-template__metrics[data-scrollable]')).not.toBeInTheDocument()
+    })
+  })
+
+  describe('clickable metrics', () => {
+    it('makes metrics clickable when onMetricClick is provided', () => {
+      const onClick = vi.fn()
+      const { container } = render(<DashboardTemplate metrics={sampleMetrics} onMetricClick={onClick} />)
+      const clickableMetrics = container.querySelectorAll('.ui-dashboard-template__metric[data-clickable]')
+      expect(clickableMetrics.length).toBe(sampleMetrics.length)
+    })
+
+    it('fires onMetricClick on click', () => {
+      const onClick = vi.fn()
+      const { container } = render(<DashboardTemplate metrics={sampleMetrics} onMetricClick={onClick} />)
+      const firstMetric = container.querySelector('.ui-dashboard-template__metric[data-clickable]')
+      fireEvent.click(firstMetric!)
+      expect(onClick).toHaveBeenCalledTimes(1)
+      expect(onClick).toHaveBeenCalledWith(sampleMetrics[0])
+    })
+
+    it('fires onMetricClick on Enter key', () => {
+      const onClick = vi.fn()
+      const { container } = render(<DashboardTemplate metrics={sampleMetrics} onMetricClick={onClick} />)
+      const firstMetric = container.querySelector('.ui-dashboard-template__metric[data-clickable]')
+      fireEvent.keyDown(firstMetric!, { key: 'Enter' })
+      expect(onClick).toHaveBeenCalledTimes(1)
+    })
+
+    it('metrics have role="button" when clickable', () => {
+      const onClick = vi.fn()
+      const { container } = render(<DashboardTemplate metrics={sampleMetrics} onMetricClick={onClick} />)
+      const firstMetric = container.querySelector('.ui-dashboard-template__metric[data-clickable]')
+      expect(firstMetric?.getAttribute('role')).toBe('button')
+    })
+  })
+
+  describe('onSectionToggle', () => {
+    it('fires callback when section is toggled', () => {
+      const onToggle = vi.fn()
+      render(<DashboardTemplate sections={sampleSections} onSectionToggle={onToggle} />)
+      const toggle = screen.getByLabelText(/Collapse Active Alerts/)
+      fireEvent.click(toggle)
+      expect(onToggle).toHaveBeenCalledWith('alerts', true)
+    })
+
+    it('fires callback with false when section is expanded', () => {
+      const onToggle = vi.fn()
+      const sections: DashboardSection[] = [
+        { id: 'test', title: 'Test Section', content: <div>test</div>, collapsible: true, defaultCollapsed: true },
+      ]
+      render(<DashboardTemplate sections={sections} onSectionToggle={onToggle} />)
+      const toggle = screen.getByLabelText(/Expand Test Section/)
+      fireEvent.click(toggle)
+      expect(onToggle).toHaveBeenCalledWith('test', false)
+    })
+  })
+
+  describe('header height', () => {
+    it('applies custom header height as number', () => {
+      const { container } = render(<DashboardTemplate title="Test" headerHeight={80} />)
+      const header = container.querySelector('.ui-dashboard-template__header') as HTMLElement
+      expect(header?.style.minBlockSize).toBe('80px')
+    })
+
+    it('applies custom header height as string', () => {
+      const { container } = render(<DashboardTemplate title="Test" headerHeight="5rem" />)
+      const header = container.querySelector('.ui-dashboard-template__header') as HTMLElement
+      expect(header?.style.minBlockSize).toBe('5rem')
+    })
+  })
 })

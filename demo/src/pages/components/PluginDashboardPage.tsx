@@ -14,6 +14,7 @@ import {
   NGINX_DASHBOARD,
   ELASTICSEARCH_DASHBOARD,
   type PluginDashboardConfig,
+  type DashboardWidget,
 } from '@ui/domain/plugin-dashboard'
 import { PluginDashboard as LitePluginDashboard } from '@ui/lite/plugin-dashboard'
 import { PluginDashboard as PremiumPluginDashboard } from '@ui/premium/plugin-dashboard'
@@ -37,6 +38,17 @@ const samplePostgresData: Record<string, unknown> = {
   port: '5432',
   database: 'production',
   uptime: 864000000,
+  replication_status: 'streaming',
+  active_queries: [
+    { pid: 1234, query: 'SELECT * FROM users WHERE id = $1', duration: 120, state: 'active' },
+    { pid: 1235, query: 'UPDATE orders SET status = $1 WHERE created_at < $2', duration: 3400, state: 'active' },
+    { pid: 1236, query: 'INSERT INTO analytics (event, data) VALUES ($1, $2)', duration: 45, state: 'idle' },
+  ],
+  slow_queries_list: [
+    'SELECT * FROM orders JOIN products ON ... (2.3s)',
+    'UPDATE inventory SET count = count - 1 WHERE ... (1.8s)',
+    'DELETE FROM sessions WHERE expired_at < now() (1.2s)',
+  ],
 }
 
 const sampleMysqlData: Record<string, unknown> = {
@@ -597,6 +609,8 @@ const pluginDashboardConfigProps: PropDef[] = [
   { name: 'icon', type: 'ReactNode', description: 'Optional icon displayed next to the title.' },
   { name: 'metrics', type: 'PluginMetricDef[]', required: true, description: 'Array of metric definitions for the metric strip.' },
   { name: 'charts', type: 'PluginChartDef[]', required: true, description: 'Array of chart definitions for the main grid.' },
+  { name: 'widgets', type: 'DashboardWidget[]', description: 'Flexible widget grid with metric, chart, gauge, table, status, list, and custom widgets.' },
+  { name: 'layout', type: "'auto' | '2-col' | '3-col'", description: 'Widget grid column layout.' },
   { name: 'properties', type: 'PluginPropertyDef[]', required: true, description: 'Array of property definitions for the sidebar.' },
   { name: 'statusKey', type: 'string', description: 'Key of the metric used to derive overall dashboard status.' },
 ]
@@ -623,6 +637,33 @@ const pluginPropertyDefProps: PropDef[] = [
   { name: 'label', type: 'string', required: true, description: 'Display label for the property.' },
   { name: 'format', type: "'text'|'code'|'link'|'badge'|'timestamp'", description: 'How to render the property value.' },
   { name: 'copyable', type: 'boolean', description: 'Show copy button next to the value.' },
+]
+
+const dashboardWidgetProps: PropDef[] = [
+  { name: 'id', type: 'string', required: true, description: 'Unique identifier for the widget.' },
+  { name: 'type', type: "'metric'|'chart'|'table'|'status'|'list'|'gauge'|'custom'", required: true, description: 'Widget type determines rendering strategy.' },
+  { name: 'title', type: 'string', required: true, description: 'Widget header title.' },
+  { name: 'span', type: '1 | 2 | 3', description: 'Grid column span for wider widgets.' },
+  { name: 'height', type: 'number | string', description: 'Minimum widget height.' },
+  { name: 'metricKey', type: 'string', description: "Data key for metric value. Used with type='metric'." },
+  { name: 'metricFormat', type: "'number'|'bytes'|'percent'|'duration'|'rate'", description: 'How to format the metric value.' },
+  { name: 'metricUnit', type: 'string', description: 'Unit suffix for metric display.' },
+  { name: 'metricThresholds', type: '{ warning: number; critical: number }', description: 'Auto-derive status colors from value thresholds.' },
+  { name: 'metricSparkline', type: 'boolean', description: 'Show inline sparkline from timeSeries data.' },
+  { name: 'metricTrend', type: 'boolean', description: 'Show trend arrow based on timeSeries.' },
+  { name: 'chartSeries', type: 'Array<{key, label, color?}>', description: "Series definitions for type='chart'." },
+  { name: 'chartType', type: "'line'|'area'|'bar'", description: 'Chart visualization type.' },
+  { name: 'chartHeight', type: 'number', description: 'Chart height in pixels.' },
+  { name: 'gaugeKey', type: 'string', description: "Data key for gauge value. Used with type='gauge'." },
+  { name: 'gaugeMax', type: 'number', description: 'Maximum value for gauge scale.' },
+  { name: 'gaugeThresholds', type: '{ warning: number; critical: number }', description: 'Color thresholds for gauge fill.' },
+  { name: 'tableColumns', type: 'Array<{key, label, format?}>', description: "Column definitions for type='table'." },
+  { name: 'tableDataKey', type: 'string', description: 'Data key for array of table row objects.' },
+  { name: 'statusKey', type: 'string', description: "Data key for status value. Used with type='status'." },
+  { name: 'statusLabels', type: 'Record<string, string>', description: 'Map raw status values to display labels.' },
+  { name: 'listKey', type: 'string', description: "Data key for array of items. Used with type='list'." },
+  { name: 'listItemFormat', type: "'text'|'badge'|'link'", description: 'How to render list items.' },
+  { name: 'render', type: '(data) => ReactNode', description: "Custom render function for type='custom'." },
 ]
 
 // ─── Helpers ────────────────────────────────────────────────────────────────
@@ -677,6 +718,9 @@ function generateReactCode(
 
 // ─── Playground Section ─────────────────────────────────────────────────────
 
+const WIDGET_TYPES = ['metric', 'chart', 'table', 'status', 'list', 'gauge', 'custom'] as const
+type WidgetType = typeof WIDGET_TYPES[number]
+
 function PlaygroundSection({ tier: tierProp }: { tier: Tier }) {
   const { tier: contextTier } = useTier()
   const tier = tierProp ?? contextTier
@@ -684,8 +728,26 @@ function PlaygroundSection({ tier: tierProp }: { tier: Tier }) {
   const [motion, setMotion] = useState<0 | 1 | 2 | 3>(3)
   const [isLoading, setIsLoading] = useState(false)
   const [copyStatus, setCopyStatus] = useState('')
+  const [enabledWidgetTypes, setEnabledWidgetTypes] = useState<Set<WidgetType>>(new Set(WIDGET_TYPES))
+  const [widgetLayout, setWidgetLayout] = useState<'auto' | '2-col' | '3-col'>('auto')
 
-  const { config, data } = CONFIG_MAP[selectedConfig]
+  const { config: baseConfig, data } = CONFIG_MAP[selectedConfig]
+
+  // Filter widgets by enabled types
+  const config = useMemo(() => {
+    if (!baseConfig.widgets) return baseConfig
+    const filtered = baseConfig.widgets.filter(w => enabledWidgetTypes.has(w.type as WidgetType))
+    return { ...baseConfig, widgets: filtered.length > 0 ? filtered : undefined, layout: widgetLayout }
+  }, [baseConfig, enabledWidgetTypes, widgetLayout])
+
+  const toggleWidgetType = (type: WidgetType) => {
+    setEnabledWidgetTypes(prev => {
+      const next = new Set(prev)
+      if (next.has(type)) next.delete(type)
+      else next.add(type)
+      return next
+    })
+  }
 
   const reactCode = useMemo(
     () => generateReactCode(tier, selectedConfig, motion, isLoading),
@@ -776,6 +838,39 @@ function PlaygroundSection({ tier: tierProp }: { tier: Tier }) {
               />
               Loading state
             </label>
+          </div>
+
+          <div className="plugin-dashboard-page__control-group">
+            <span className="plugin-dashboard-page__control-label">Widget Types</span>
+            <div className="plugin-dashboard-page__control-options" style={{ flexDirection: 'column', gap: '0.25rem' }}>
+              {WIDGET_TYPES.map(type => (
+                <label key={type} style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.375rem' }}>
+                  <input
+                    type="checkbox"
+                    checked={enabledWidgetTypes.has(type)}
+                    onChange={() => toggleWidgetType(type)}
+                    style={{ accentColor: 'var(--brand)' }}
+                  />
+                  {type}
+                </label>
+              ))}
+            </div>
+          </div>
+
+          <div className="plugin-dashboard-page__control-group">
+            <span className="plugin-dashboard-page__control-label">Widget Layout</span>
+            <div className="plugin-dashboard-page__control-options">
+              {(['auto', '2-col', '3-col'] as const).map(v => (
+                <button
+                  key={v}
+                  type="button"
+                  className={`plugin-dashboard-page__option-btn${widgetLayout === v ? ' plugin-dashboard-page__option-btn--active' : ''}`}
+                  onClick={() => setWidgetLayout(v)}
+                >
+                  {v}
+                </button>
+              ))}
+            </div>
           </div>
         </div>
       </div>
@@ -970,6 +1065,19 @@ export default function PluginDashboardPage() {
         </h2>
         <Card variant="default" padding="md">
           <PropsTable props={pluginPropertyDefProps} />
+        </Card>
+      </section>
+
+      <section className="plugin-dashboard-page__section" id="widget-def">
+        <h2 className="plugin-dashboard-page__section-title">
+          <a href="#widget-def">DashboardWidget</a>
+        </h2>
+        <p className="plugin-dashboard-page__section-desc">
+          Flexible widget interface supporting 7 types: metric, chart, gauge, table, status, list, and custom.
+          Each widget type uses a subset of the props below. Use the playground above to toggle widget types and see them in action.
+        </p>
+        <Card variant="default" padding="md">
+          <PropsTable props={dashboardWidgetProps} />
         </Card>
       </section>
 

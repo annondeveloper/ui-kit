@@ -14,7 +14,7 @@ import {
   formatMetricValue,
   deriveStatus,
 } from '../../domain/plugin-dashboard'
-import type { PluginDashboardConfig } from '../../domain/plugin-dashboard'
+import type { PluginDashboardConfig, DashboardWidget } from '../../domain/plugin-dashboard'
 
 expect.extend(toHaveNoViolations)
 
@@ -62,10 +62,10 @@ describe('PluginDashboard', () => {
 
     it('renders metrics from config', () => {
       render(<PluginDashboard config={POSTGRES_DASHBOARD} data={samplePostgresData} />)
-      expect(screen.getByText('Active Connections')).toBeInTheDocument()
-      expect(screen.getByText('Queries/sec')).toBeInTheDocument()
-      expect(screen.getByText('Cache Hit Ratio')).toBeInTheDocument()
-      expect(screen.getByText('Replication Lag')).toBeInTheDocument()
+      expect(screen.getAllByText('Active Connections').length).toBeGreaterThanOrEqual(1)
+      expect(screen.getAllByText('Queries/sec').length).toBeGreaterThanOrEqual(1)
+      expect(screen.getAllByText('Cache Hit Ratio').length).toBeGreaterThanOrEqual(1)
+      expect(screen.getAllByText('Replication Lag').length).toBeGreaterThanOrEqual(1)
     })
   })
 
@@ -320,6 +320,171 @@ describe('PluginDashboard', () => {
       )
       expect(container.querySelector('.ui-plugin-dashboard')).toBeInTheDocument()
       expect(screen.getByText('Empty')).toBeInTheDocument()
+    })
+  })
+
+  // ─── Widget System ────────────────────────────────────────────────
+
+  describe('widget system', () => {
+    const widgetConfig: PluginDashboardConfig = {
+      name: 'Widget Test',
+      metrics: [],
+      charts: [],
+      properties: [],
+      widgets: [
+        { id: 'w1', type: 'metric', title: 'CPU Metric', metricKey: 'cpu', metricFormat: 'percent', metricThresholds: { warning: 70, critical: 90 } },
+        { id: 'w2', type: 'gauge', title: 'Memory Gauge', gaugeKey: 'memory', gaugeMax: 100 },
+        { id: 'w3', type: 'status', title: 'Service Status', statusKey: 'health', statusLabels: { healthy: 'Healthy', degraded: 'Degraded' } },
+        { id: 'w4', type: 'table', title: 'Processes', tableDataKey: 'processes', tableColumns: [{ key: 'name', label: 'Name' }, { key: 'cpu', label: 'CPU' }] },
+        { id: 'w5', type: 'list', title: 'Recent Logs', listKey: 'logs', listItemFormat: 'text' },
+        { id: 'w6', type: 'chart', title: 'Throughput', chartSeries: [{ key: 'tp', label: 'Throughput' }], chartType: 'area' },
+        { id: 'w7', type: 'custom', title: 'Custom Widget', render: () => <span data-testid="custom-widget">Custom content</span> },
+      ],
+      layout: '3-col',
+    }
+
+    const widgetData: Record<string, unknown> = {
+      cpu: 65,
+      memory: 72,
+      health: 'healthy',
+      processes: [{ name: 'nginx', cpu: 12 }, { name: 'node', cpu: 45 }],
+      logs: ['Error: timeout', 'Warning: slow query', 'Info: deploy complete'],
+    }
+
+    it('renders widget grid when widgets are provided', () => {
+      const { container } = render(
+        <PluginDashboard config={widgetConfig} data={widgetData} />
+      )
+      const grid = container.querySelector('.ui-plugin-dashboard__widget-grid')
+      expect(grid).toBeInTheDocument()
+    })
+
+    it('renders metric widgets with formatted values', () => {
+      render(<PluginDashboard config={widgetConfig} data={widgetData} />)
+      expect(screen.getByText('CPU Metric')).toBeInTheDocument()
+      expect(screen.getByText('65%')).toBeInTheDocument()
+    })
+
+    it('renders gauge widgets with SVG', () => {
+      const { container } = render(
+        <PluginDashboard config={widgetConfig} data={widgetData} />
+      )
+      expect(screen.getByText('Memory Gauge')).toBeInTheDocument()
+      const gauge = container.querySelector('.ui-plugin-dashboard__gauge-wrap svg')
+      expect(gauge).toBeInTheDocument()
+    })
+
+    it('renders status widgets with labels', () => {
+      render(<PluginDashboard config={widgetConfig} data={widgetData} />)
+      expect(screen.getByText('Service Status')).toBeInTheDocument()
+      expect(screen.getByText('Healthy')).toBeInTheDocument()
+    })
+
+    it('renders table widgets with data', () => {
+      const { container } = render(
+        <PluginDashboard config={widgetConfig} data={widgetData} />
+      )
+      expect(screen.getByText('Processes')).toBeInTheDocument()
+      const table = container.querySelector('.ui-plugin-dashboard__widget-table')
+      expect(table).toBeInTheDocument()
+      expect(screen.getByText('nginx')).toBeInTheDocument()
+      expect(screen.getByText('node')).toBeInTheDocument()
+    })
+
+    it('renders list widgets', () => {
+      render(<PluginDashboard config={widgetConfig} data={widgetData} />)
+      expect(screen.getByText('Recent Logs')).toBeInTheDocument()
+      expect(screen.getByText('Error: timeout')).toBeInTheDocument()
+    })
+
+    it('renders chart widgets as placeholders', () => {
+      const { container } = render(
+        <PluginDashboard config={widgetConfig} data={widgetData} />
+      )
+      // Title + chart placeholder content both contain series label
+      expect(screen.getAllByText('Throughput').length).toBeGreaterThanOrEqual(1)
+      expect(container.querySelector('.ui-plugin-dashboard__chart-placeholder')).toBeInTheDocument()
+    })
+
+    it('renders custom widgets via render prop', () => {
+      render(<PluginDashboard config={widgetConfig} data={widgetData} />)
+      expect(screen.getByTestId('custom-widget')).toBeInTheDocument()
+      expect(screen.getByText('Custom content')).toBeInTheDocument()
+    })
+
+    it('applies span classes to widgets', () => {
+      const spanConfig: PluginDashboardConfig = {
+        name: 'Span Test',
+        metrics: [],
+        charts: [],
+        properties: [],
+        widgets: [
+          { id: 'w1', type: 'metric', title: 'Wide', metricKey: 'x', span: 2 },
+          { id: 'w2', type: 'metric', title: 'Full', metricKey: 'y', span: 3 },
+        ],
+      }
+      const { container } = render(
+        <PluginDashboard config={spanConfig} data={{ x: 1, y: 2 }} />
+      )
+      expect(container.querySelector('.ui-plugin-dashboard__widget--span-2')).toBeInTheDocument()
+      expect(container.querySelector('.ui-plugin-dashboard__widget--span-3')).toBeInTheDocument()
+    })
+
+    it('applies layout class to widget grid', () => {
+      const { container } = render(
+        <PluginDashboard config={widgetConfig} data={widgetData} />
+      )
+      expect(container.querySelector('.ui-plugin-dashboard__widget-grid--3-col')).toBeInTheDocument()
+    })
+
+    it('backward compatible - configs without widgets still work', () => {
+      const oldConfig: PluginDashboardConfig = {
+        name: 'Legacy',
+        metrics: [{ key: 'val', label: 'Value', format: 'number' }],
+        charts: [],
+        properties: [],
+      }
+      const { container } = render(
+        <PluginDashboard config={oldConfig} data={{ val: 42 }} />
+      )
+      expect(container.querySelector('.ui-plugin-dashboard')).toBeInTheDocument()
+      expect(container.querySelector('.ui-plugin-dashboard__widget-grid')).not.toBeInTheDocument()
+    })
+
+    it('handles empty table data gracefully', () => {
+      const tableConfig: PluginDashboardConfig = {
+        name: 'Empty Table',
+        metrics: [],
+        charts: [],
+        properties: [],
+        widgets: [{ id: 'w1', type: 'table', title: 'Empty', tableDataKey: 'rows', tableColumns: [{ key: 'x', label: 'X' }] }],
+      }
+      render(<PluginDashboard config={tableConfig} data={{}} />)
+      expect(screen.getByText('No data')).toBeInTheDocument()
+    })
+
+    it('handles empty list data gracefully', () => {
+      const listConfig: PluginDashboardConfig = {
+        name: 'Empty List',
+        metrics: [],
+        charts: [],
+        properties: [],
+        widgets: [{ id: 'w1', type: 'list', title: 'Empty', listKey: 'items' }],
+      }
+      render(<PluginDashboard config={listConfig} data={{}} />)
+      expect(screen.getByText('No items')).toBeInTheDocument()
+    })
+
+    it('all built-in configs have widgets defined', () => {
+      expect(POSTGRES_DASHBOARD.widgets).toBeDefined()
+      expect(POSTGRES_DASHBOARD.widgets!.length).toBeGreaterThan(0)
+      expect(MYSQL_DASHBOARD.widgets).toBeDefined()
+      expect(REDIS_DASHBOARD.widgets).toBeDefined()
+      expect(KAFKA_DASHBOARD.widgets).toBeDefined()
+      expect(KUBERNETES_DASHBOARD.widgets).toBeDefined()
+      expect(DOCKER_DASHBOARD.widgets).toBeDefined()
+      expect(NGINX_DASHBOARD.widgets).toBeDefined()
+      expect(ELASTICSEARCH_DASHBOARD.widgets).toBeDefined()
     })
   })
 })

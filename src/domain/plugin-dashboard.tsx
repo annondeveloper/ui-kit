@@ -38,6 +38,47 @@ export interface PluginPropertyDef {
   copyable?: boolean
 }
 
+export interface DashboardWidget {
+  id: string
+  type: 'metric' | 'chart' | 'table' | 'status' | 'list' | 'gauge' | 'custom'
+  title: string
+  span?: 1 | 2 | 3
+  height?: number | string
+
+  // For 'metric' type
+  metricKey?: string
+  metricFormat?: 'number' | 'bytes' | 'percent' | 'duration' | 'rate'
+  metricUnit?: string
+  metricThresholds?: { warning: number; critical: number }
+  metricSparkline?: boolean
+  metricTrend?: boolean
+
+  // For 'chart' type
+  chartSeries?: Array<{ key: string; label: string; color?: string }>
+  chartHeight?: number
+  chartType?: 'line' | 'area' | 'bar'
+
+  // For 'gauge' type
+  gaugeKey?: string
+  gaugeMax?: number
+  gaugeThresholds?: { warning: number; critical: number }
+
+  // For 'table' type
+  tableColumns?: Array<{ key: string; label: string; format?: string }>
+  tableDataKey?: string
+
+  // For 'status' type
+  statusKey?: string
+  statusLabels?: Record<string, string>
+
+  // For 'list' type
+  listKey?: string
+  listItemFormat?: 'text' | 'badge' | 'link'
+
+  // For 'custom' type
+  render?: (data: Record<string, unknown>) => ReactNode
+}
+
 export interface PluginDashboardConfig {
   name: string
   icon?: ReactNode
@@ -45,6 +86,8 @@ export interface PluginDashboardConfig {
   charts: PluginChartDef[]
   properties: PluginPropertyDef[]
   statusKey?: string
+  widgets?: DashboardWidget[]
+  layout?: 'auto' | '2-col' | '3-col'
 }
 
 export interface PluginDashboardProps extends HTMLAttributes<HTMLDivElement> {
@@ -236,6 +279,244 @@ const pluginDashboardStyles = css`
         outline-offset: 2px;
       }
 
+      /* ── Widget Grid ──────────────────────────────── */
+
+      .ui-plugin-dashboard__widget-grid {
+        display: grid;
+        gap: 1rem;
+        grid-template-columns: repeat(3, 1fr);
+      }
+
+      .ui-plugin-dashboard__widget-grid--2-col {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .ui-plugin-dashboard__widget-grid--3-col {
+        grid-template-columns: repeat(3, 1fr);
+      }
+
+      .ui-plugin-dashboard__widget {
+        background: var(--bg-surface, oklch(18% 0.01 270));
+        border: 1px solid var(--border-subtle, oklch(100% 0 0 / 0.06));
+        border-radius: var(--radius-md, 0.5rem);
+        padding: 1rem;
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+        min-inline-size: 0;
+        overflow: hidden;
+      }
+
+      .ui-plugin-dashboard__widget--span-2 {
+        grid-column: span 2;
+      }
+
+      .ui-plugin-dashboard__widget--span-3 {
+        grid-column: span 3;
+      }
+
+      .ui-plugin-dashboard__widget-title {
+        font-size: var(--text-xs, 0.75rem);
+        font-weight: 600;
+        color: var(--text-tertiary, oklch(55% 0 0));
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        margin: 0;
+      }
+
+      /* ── Widget: Metric ────────────────────────────── */
+
+      .ui-plugin-dashboard__widget-metric-value {
+        font-size: clamp(1.25rem, 2.5vw, 1.75rem);
+        font-weight: 700;
+        color: var(--text-primary, oklch(90% 0 0));
+        line-height: 1.2;
+        font-variant-numeric: tabular-nums;
+      }
+
+      .ui-plugin-dashboard__widget-metric-row {
+        display: flex;
+        align-items: baseline;
+        gap: 0.5rem;
+      }
+
+      .ui-plugin-dashboard__widget-trend {
+        font-size: var(--text-sm, 0.875rem);
+        font-weight: 600;
+      }
+
+      .ui-plugin-dashboard__widget-trend--up {
+        color: oklch(72% 0.19 155);
+      }
+
+      .ui-plugin-dashboard__widget-trend--down {
+        color: oklch(62% 0.22 25);
+      }
+
+      .ui-plugin-dashboard__widget-status-indicator {
+        display: inline-block;
+        inline-size: 0.5rem;
+        block-size: 0.5rem;
+        border-radius: 50%;
+        margin-inline-end: 0.375rem;
+        vertical-align: middle;
+      }
+
+      .ui-plugin-dashboard__widget-status-indicator--ok {
+        background: oklch(72% 0.19 155);
+      }
+
+      .ui-plugin-dashboard__widget-status-indicator--warning {
+        background: oklch(80% 0.18 85);
+      }
+
+      .ui-plugin-dashboard__widget-status-indicator--critical {
+        background: oklch(62% 0.22 25);
+      }
+
+      /* ── Widget: Gauge ─────────────────────────────── */
+
+      .ui-plugin-dashboard__gauge-wrap {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding-block: 0.25rem;
+      }
+
+      .ui-plugin-dashboard__gauge-label {
+        font-size: var(--text-lg, 1.125rem);
+        font-weight: 700;
+        fill: var(--text-primary, oklch(90% 0 0));
+        text-anchor: middle;
+        dominant-baseline: central;
+      }
+
+      .ui-plugin-dashboard__gauge-track {
+        fill: none;
+        stroke: var(--border-default, oklch(100% 0 0 / 0.08));
+        stroke-linecap: round;
+      }
+
+      .ui-plugin-dashboard__gauge-fill {
+        fill: none;
+        stroke-linecap: round;
+        transition: stroke-dashoffset 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+      }
+
+      /* ── Widget: Table ─────────────────────────────── */
+
+      .ui-plugin-dashboard__widget-table {
+        inline-size: 100%;
+        border-collapse: collapse;
+        font-size: var(--text-sm, 0.875rem);
+      }
+
+      .ui-plugin-dashboard__widget-table th {
+        text-align: start;
+        font-weight: 600;
+        font-size: var(--text-xs, 0.75rem);
+        color: var(--text-tertiary, oklch(55% 0 0));
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        padding: 0.375rem 0.5rem;
+        border-block-end: 1px solid var(--border-subtle, oklch(100% 0 0 / 0.06));
+      }
+
+      .ui-plugin-dashboard__widget-table td {
+        padding: 0.375rem 0.5rem;
+        color: var(--text-secondary, oklch(70% 0 0));
+        border-block-end: 1px solid var(--border-subtle, oklch(100% 0 0 / 0.03));
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-inline-size: 200px;
+      }
+
+      /* ── Widget: Status ────────────────────────────── */
+
+      .ui-plugin-dashboard__widget-status-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.375rem;
+        font-size: var(--text-sm, 0.875rem);
+        font-weight: 600;
+        padding: 0.25rem 0.75rem;
+        border-radius: var(--radius-full, 9999px);
+      }
+
+      .ui-plugin-dashboard__widget-status-badge--ok {
+        background: oklch(72% 0.19 155 / 0.15);
+        color: oklch(78% 0.14 155);
+      }
+
+      .ui-plugin-dashboard__widget-status-badge--warning {
+        background: oklch(80% 0.18 85 / 0.15);
+        color: oklch(85% 0.14 85);
+      }
+
+      .ui-plugin-dashboard__widget-status-badge--critical {
+        background: oklch(62% 0.22 25 / 0.15);
+        color: oklch(72% 0.16 25);
+      }
+
+      .ui-plugin-dashboard__widget-status-badge--unknown {
+        background: oklch(50% 0 0 / 0.15);
+        color: oklch(65% 0 0);
+      }
+
+      /* ── Widget: List ──────────────────────────────── */
+
+      .ui-plugin-dashboard__widget-list {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 0.375rem;
+      }
+
+      .ui-plugin-dashboard__widget-list-item {
+        font-size: var(--text-sm, 0.875rem);
+        color: var(--text-secondary, oklch(70% 0 0));
+        padding: 0.25rem 0;
+        border-block-end: 1px solid var(--border-subtle, oklch(100% 0 0 / 0.03));
+        line-height: 1.4;
+      }
+
+      .ui-plugin-dashboard__widget-list-item:last-child {
+        border-block-end: none;
+      }
+
+      .ui-plugin-dashboard__widget-list-badge {
+        display: inline-block;
+        font-size: var(--text-xs, 0.75rem);
+        font-weight: 600;
+        padding: 0.125rem 0.5rem;
+        border-radius: var(--radius-full, 9999px);
+        background: oklch(65% 0.2 270 / 0.15);
+        color: oklch(78% 0.12 270);
+      }
+
+      .ui-plugin-dashboard__widget-list-link {
+        color: oklch(70% 0.15 270);
+        text-decoration: none;
+        font-size: var(--text-sm, 0.875rem);
+      }
+
+      .ui-plugin-dashboard__widget-list-link:hover {
+        text-decoration: underline;
+      }
+
+      @container (max-width: 600px) {
+        .ui-plugin-dashboard__widget-grid {
+          grid-template-columns: 1fr;
+        }
+        .ui-plugin-dashboard__widget--span-2,
+        .ui-plugin-dashboard__widget--span-3 {
+          grid-column: span 1;
+        }
+      }
+
       /* ── Chart placeholder ──────────────────────── */
 
       .ui-plugin-dashboard__chart-placeholder {
@@ -306,6 +587,18 @@ const pluginDashboardStyles = css`
         .ui-plugin-dashboard__chart-placeholder {
           border: 2px dashed ButtonText;
         }
+        .ui-plugin-dashboard__widget {
+          border: 1px solid ButtonText;
+        }
+        .ui-plugin-dashboard__widget-status-badge {
+          border: 1px solid ButtonText;
+        }
+        .ui-plugin-dashboard__gauge-track {
+          stroke: ButtonText;
+        }
+        .ui-plugin-dashboard__gauge-fill {
+          stroke: Highlight;
+        }
       }
 
       @media (prefers-reduced-motion: reduce) {
@@ -330,6 +623,230 @@ function CopyButton({ value }: { value: string }) {
     >
       copy
     </button>
+  )
+}
+
+// ─── Widget Renderers ──────────────────────────────────────────────────────
+
+function renderGaugeSvg(value: number, max: number, thresholds?: { warning: number; critical: number }) {
+  const pct = Math.min(Math.max(value / max, 0), 1)
+  const radius = 40
+  const strokeWidth = 8
+  const circumference = Math.PI * radius // semicircle
+  const offset = circumference * (1 - pct)
+
+  let color = 'oklch(72% 0.19 155)' // ok green
+  if (thresholds) {
+    const status = deriveStatus(value, thresholds)
+    if (status === 'warning') color = 'oklch(80% 0.18 85)'
+    else if (status === 'critical') color = 'oklch(62% 0.22 25)'
+  }
+
+  return (
+    <div className="ui-plugin-dashboard__gauge-wrap">
+      <svg viewBox="0 0 100 60" width="120" height="72" aria-hidden="true">
+        <path
+          className="ui-plugin-dashboard__gauge-track"
+          d="M 10 50 A 40 40 0 0 1 90 50"
+          strokeWidth={strokeWidth}
+        />
+        <path
+          className="ui-plugin-dashboard__gauge-fill"
+          d="M 10 50 A 40 40 0 0 1 90 50"
+          strokeWidth={strokeWidth}
+          stroke={color}
+          strokeDasharray={circumference}
+          strokeDashoffset={offset}
+        />
+        <text x="50" y="45" className="ui-plugin-dashboard__gauge-label">
+          {Math.round(pct * 100)}%
+        </text>
+      </svg>
+    </div>
+  )
+}
+
+function renderWidgetContent(widget: DashboardWidget, data: Record<string, unknown>, timeSeries?: Record<string, Array<{ timestamp: number; value: number }>>): ReactNode {
+  switch (widget.type) {
+    case 'metric': {
+      const raw = widget.metricKey ? data[widget.metricKey] : undefined
+      const formatted = formatMetricValue(raw, widget.metricFormat, widget.metricUnit)
+      const status = deriveStatus(raw, widget.metricThresholds)
+      const tsData = widget.metricSparkline && widget.metricKey ? timeSeries?.[widget.metricKey] : undefined
+      const trend = widget.metricTrend && tsData && tsData.length >= 2
+        ? (tsData[tsData.length - 1].value >= tsData[tsData.length - 2].value ? 'up' : 'down')
+        : undefined
+
+      return (
+        <>
+          <div className="ui-plugin-dashboard__widget-metric-row">
+            <span className="ui-plugin-dashboard__widget-metric-value">
+              {status && (
+                <span className={`ui-plugin-dashboard__widget-status-indicator ui-plugin-dashboard__widget-status-indicator--${status}`} />
+              )}
+              {formatted}
+            </span>
+            {trend && (
+              <span className={`ui-plugin-dashboard__widget-trend ui-plugin-dashboard__widget-trend--${trend}`}>
+                {trend === 'up' ? '\u2191' : '\u2193'}
+              </span>
+            )}
+          </div>
+          {widget.metricSparkline && tsData && (
+            <svg
+              viewBox={`0 0 ${tsData.length - 1} 20`}
+              preserveAspectRatio="none"
+              width="100%"
+              height="24"
+              aria-hidden="true"
+              style={{ display: 'block' }}
+            >
+              <polyline
+                fill="none"
+                stroke="oklch(65% 0.2 270)"
+                strokeWidth="1.5"
+                points={tsData.map((p, i) => {
+                  const max = Math.max(...tsData.map(d => d.value))
+                  const min = Math.min(...tsData.map(d => d.value))
+                  const range = max - min || 1
+                  const y = 20 - ((p.value - min) / range) * 18
+                  return `${i},${y}`
+                }).join(' ')}
+              />
+            </svg>
+          )}
+        </>
+      )
+    }
+
+    case 'chart': {
+      const series = widget.chartSeries ?? []
+      const h = widget.chartHeight ?? 120
+      return (
+        <div
+          className="ui-plugin-dashboard__chart-placeholder"
+          style={{ minBlockSize: h }}
+        >
+          {series.map((s, i) => (
+            <span key={s.key} style={{ color: s.color ?? 'oklch(65% 0.2 270)', marginInlineEnd: i < series.length - 1 ? '0.75rem' : 0 }}>
+              {s.label}
+            </span>
+          ))}
+          {series.length > 0 && ` (${widget.chartType ?? 'line'})`}
+        </div>
+      )
+    }
+
+    case 'gauge': {
+      const raw = widget.gaugeKey ? data[widget.gaugeKey] : 0
+      const value = Number(raw) || 0
+      const max = widget.gaugeMax ?? 100
+      return renderGaugeSvg(value, max, widget.gaugeThresholds)
+    }
+
+    case 'table': {
+      const columns = widget.tableColumns ?? []
+      const rows = (widget.tableDataKey ? data[widget.tableDataKey] : []) as Array<Record<string, unknown>>
+      if (!Array.isArray(rows) || rows.length === 0) {
+        return <span style={{ color: 'var(--text-tertiary)', fontSize: 'var(--text-sm)' }}>No data</span>
+      }
+      return (
+        <table className="ui-plugin-dashboard__widget-table">
+          <thead>
+            <tr>
+              {columns.map(col => (
+                <th key={col.key}>{col.label}</th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {rows.slice(0, 10).map((row, i) => (
+              <tr key={i}>
+                {columns.map(col => (
+                  <td key={col.key}>{formatMetricValue(row[col.key], col.format)}</td>
+                ))}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      )
+    }
+
+    case 'status': {
+      const raw = widget.statusKey ? data[widget.statusKey] : undefined
+      const strVal = String(raw ?? 'unknown')
+      const label = widget.statusLabels?.[strVal] ?? strVal
+      const statusClass = strVal === 'ok' || strVal === 'healthy' || strVal === 'green' || strVal === 'running' || strVal === 'active'
+        ? 'ok'
+        : strVal === 'warning' || strVal === 'degraded' || strVal === 'yellow'
+          ? 'warning'
+          : strVal === 'critical' || strVal === 'error' || strVal === 'red' || strVal === 'down'
+            ? 'critical'
+            : 'unknown'
+      return (
+        <span className={`ui-plugin-dashboard__widget-status-badge ui-plugin-dashboard__widget-status-badge--${statusClass}`}>
+          <span className={`ui-plugin-dashboard__widget-status-indicator ui-plugin-dashboard__widget-status-indicator--${statusClass}`} />
+          {label}
+        </span>
+      )
+    }
+
+    case 'list': {
+      const items = (widget.listKey ? data[widget.listKey] : []) as unknown[]
+      if (!Array.isArray(items) || items.length === 0) {
+        return <span style={{ color: 'var(--text-tertiary)', fontSize: 'var(--text-sm)' }}>No items</span>
+      }
+      const fmt = widget.listItemFormat ?? 'text'
+      return (
+        <ul className="ui-plugin-dashboard__widget-list">
+          {items.slice(0, 20).map((item, i) => (
+            <li key={i} className="ui-plugin-dashboard__widget-list-item">
+              {fmt === 'badge' ? (
+                <span className="ui-plugin-dashboard__widget-list-badge">{String(item)}</span>
+              ) : fmt === 'link' ? (
+                <a className="ui-plugin-dashboard__widget-list-link" href={String(item)} target="_blank" rel="noopener noreferrer">{String(item)}</a>
+              ) : (
+                String(item)
+              )}
+            </li>
+          ))}
+        </ul>
+      )
+    }
+
+    case 'custom': {
+      return widget.render ? widget.render(data) : null
+    }
+
+    default:
+      return null
+  }
+}
+
+function renderWidgetGrid(widgets: DashboardWidget[], data: Record<string, unknown>, layout?: 'auto' | '2-col' | '3-col', timeSeries?: Record<string, Array<{ timestamp: number; value: number }>>) {
+  const layoutClass = layout === '2-col'
+    ? ' ui-plugin-dashboard__widget-grid--2-col'
+    : layout === '3-col'
+      ? ' ui-plugin-dashboard__widget-grid--3-col'
+      : ''
+
+  return (
+    <div className={`ui-plugin-dashboard__widget-grid${layoutClass}`} role="region" aria-label="Dashboard widgets">
+      {widgets.map(widget => (
+        <div
+          key={widget.id}
+          className={cn(
+            'ui-plugin-dashboard__widget',
+            widget.span === 2 && 'ui-plugin-dashboard__widget--span-2',
+            widget.span === 3 && 'ui-plugin-dashboard__widget--span-3',
+          )}
+          style={widget.height ? { minBlockSize: typeof widget.height === 'number' ? `${widget.height}px` : widget.height } : undefined}
+        >
+          <h4 className="ui-plugin-dashboard__widget-title">{widget.title}</h4>
+          {renderWidgetContent(widget, data, timeSeries)}
+        </div>
+      ))}
+    </div>
   )
 }
 
@@ -375,9 +892,9 @@ function PluginDashboardInner({
     return deriveStatus(data[def.key], def.thresholds)
   }, [config.statusKey, config.metrics, data])
 
-  // Build sections from charts
+  // Build sections from charts + widgets
   const sections: DashboardSection[] = useMemo(() => {
-    return config.charts.map(chart => ({
+    const chartSections: DashboardSection[] = config.charts.map(chart => ({
       id: chart.id,
       title: chart.title,
       content: (
@@ -389,7 +906,19 @@ function PluginDashboardInner({
         </div>
       ),
     }))
-  }, [config.charts])
+
+    // If widgets exist, add them as a section
+    if (config.widgets && config.widgets.length > 0) {
+      chartSections.push({
+        id: '__widgets__',
+        title: 'Widgets',
+        span: 3,
+        content: renderWidgetGrid(config.widgets, data, config.layout, timeSeries),
+      })
+    }
+
+    return chartSections
+  }, [config.charts, config.widgets, config.layout, data, timeSeries])
 
   // Build sidebar from properties
   const sidebar = useMemo(() => {
@@ -483,6 +1012,18 @@ export const POSTGRES_DASHBOARD: PluginDashboardConfig = {
     { key: 'uptime', label: 'Uptime', format: 'duration' },
   ],
   statusKey: 'connections',
+  widgets: [
+    { id: 'w-conn', type: 'metric', title: 'Active Connections', metricKey: 'connections', metricFormat: 'number', metricThresholds: { warning: 80, critical: 95 }, metricTrend: true },
+    { id: 'w-qps', type: 'metric', title: 'Queries/sec', metricKey: 'qps', metricFormat: 'rate', metricSparkline: true },
+    { id: 'w-cache', type: 'metric', title: 'Cache Hit Ratio', metricKey: 'cache_hit_ratio', metricFormat: 'percent', metricThresholds: { warning: 90, critical: 80 } },
+    { id: 'w-lag', type: 'metric', title: 'Replication Lag', metricKey: 'replication_lag', metricFormat: 'duration', metricThresholds: { warning: 1000, critical: 5000 } },
+    { id: 'w-qps-chart', type: 'chart', title: 'QPS Over Time', span: 2, chartSeries: [{ key: 'qps', label: 'QPS' }], chartType: 'area', chartHeight: 140 },
+    { id: 'w-pool-gauge', type: 'gauge', title: 'Connection Pool', gaugeKey: 'connections', gaugeMax: 100, gaugeThresholds: { warning: 80, critical: 95 } },
+    { id: 'w-queries', type: 'table', title: 'Active Queries', span: 2, tableDataKey: 'active_queries', tableColumns: [{ key: 'pid', label: 'PID' }, { key: 'query', label: 'Query' }, { key: 'duration', label: 'Duration', format: 'duration' }, { key: 'state', label: 'State' }] },
+    { id: 'w-repl-status', type: 'status', title: 'Replication', statusKey: 'replication_status', statusLabels: { streaming: 'Streaming', stopped: 'Stopped', catchup: 'Catching Up' } },
+    { id: 'w-slow', type: 'list', title: 'Recent Slow Queries', span: 3, listKey: 'slow_queries_list', listItemFormat: 'text' },
+  ],
+  layout: 'auto',
 }
 
 export const MYSQL_DASHBOARD: PluginDashboardConfig = {
@@ -505,6 +1046,14 @@ export const MYSQL_DASHBOARD: PluginDashboardConfig = {
     { key: 'uptime', label: 'Uptime', format: 'duration' },
   ],
   statusKey: 'threads_connected',
+  widgets: [
+    { id: 'w-threads', type: 'metric', title: 'Threads Connected', metricKey: 'threads_connected', metricFormat: 'number', metricThresholds: { warning: 100, critical: 150 } },
+    { id: 'w-qps', type: 'metric', title: 'Queries/sec', metricKey: 'qps', metricFormat: 'rate', metricSparkline: true },
+    { id: 'w-buffer', type: 'gauge', title: 'Buffer Pool Hit Ratio', gaugeKey: 'innodb_buffer_hit_ratio', gaugeMax: 100, gaugeThresholds: { warning: 95, critical: 90 } },
+    { id: 'w-slow', type: 'metric', title: 'Slow Queries', metricKey: 'slow_queries', metricFormat: 'number', metricThresholds: { warning: 10, critical: 50 } },
+    { id: 'w-qps-chart', type: 'chart', title: 'QPS Over Time', span: 2, chartSeries: [{ key: 'qps', label: 'QPS' }], chartType: 'line', chartHeight: 140 },
+    { id: 'w-repl', type: 'status', title: 'Replication Status', statusKey: 'replication_status' },
+  ],
 }
 
 export const REDIS_DASHBOARD: PluginDashboardConfig = {
@@ -527,6 +1076,14 @@ export const REDIS_DASHBOARD: PluginDashboardConfig = {
     { key: 'uptime', label: 'Uptime', format: 'duration' },
   ],
   statusKey: 'connected_clients',
+  widgets: [
+    { id: 'w-clients', type: 'metric', title: 'Connected Clients', metricKey: 'connected_clients', metricFormat: 'number', metricThresholds: { warning: 500, critical: 1000 } },
+    { id: 'w-ops', type: 'metric', title: 'Ops/sec', metricKey: 'ops_per_sec', metricFormat: 'rate', metricSparkline: true },
+    { id: 'w-mem', type: 'metric', title: 'Used Memory', metricKey: 'used_memory', metricFormat: 'bytes' },
+    { id: 'w-hit', type: 'gauge', title: 'Hit Rate', gaugeKey: 'hit_rate', gaugeMax: 100, gaugeThresholds: { warning: 90, critical: 80 } },
+    { id: 'w-mem-chart', type: 'chart', title: 'Memory Over Time', span: 2, chartSeries: [{ key: 'used_memory', label: 'Used' }, { key: 'max_memory', label: 'Max', color: 'oklch(62% 0.22 25)' }], chartType: 'area' },
+    { id: 'w-keys', type: 'list', title: 'Hot Keys', listKey: 'hot_keys', listItemFormat: 'badge' },
+  ],
 }
 
 export const KAFKA_DASHBOARD: PluginDashboardConfig = {
@@ -549,6 +1106,15 @@ export const KAFKA_DASHBOARD: PluginDashboardConfig = {
     { key: 'uptime', label: 'Uptime', format: 'duration' },
   ],
   statusKey: 'under_replicated',
+  widgets: [
+    { id: 'w-msgs', type: 'metric', title: 'Messages/sec', metricKey: 'messages_per_sec', metricFormat: 'rate', metricSparkline: true },
+    { id: 'w-lag', type: 'metric', title: 'Consumer Lag', metricKey: 'consumer_lag', metricFormat: 'number', metricThresholds: { warning: 10_000, critical: 100_000 } },
+    { id: 'w-parts', type: 'metric', title: 'Partitions', metricKey: 'partitions', metricFormat: 'number' },
+    { id: 'w-underrepl', type: 'metric', title: 'Under-replicated', metricKey: 'under_replicated', metricFormat: 'number', metricThresholds: { warning: 1, critical: 5 } },
+    { id: 'w-throughput', type: 'chart', title: 'Message Throughput', span: 3, chartSeries: [{ key: 'messages_in', label: 'In' }, { key: 'messages_out', label: 'Out', color: 'oklch(72% 0.19 155)' }], chartType: 'area', chartHeight: 160 },
+    { id: 'w-groups', type: 'table', title: 'Consumer Groups', span: 2, tableDataKey: 'consumer_groups', tableColumns: [{ key: 'group', label: 'Group' }, { key: 'members', label: 'Members' }, { key: 'lag', label: 'Lag', format: 'number' }] },
+    { id: 'w-broker-status', type: 'status', title: 'Cluster Health', statusKey: 'cluster_health' },
+  ],
 }
 
 export const KUBERNETES_DASHBOARD: PluginDashboardConfig = {
@@ -571,6 +1137,14 @@ export const KUBERNETES_DASHBOARD: PluginDashboardConfig = {
     { key: 'context', label: 'Context', format: 'code', copyable: true },
   ],
   statusKey: 'cpu_usage',
+  widgets: [
+    { id: 'w-pods', type: 'metric', title: 'Running Pods', metricKey: 'pod_count', metricFormat: 'number', metricTrend: true },
+    { id: 'w-cpu', type: 'gauge', title: 'CPU Usage', gaugeKey: 'cpu_usage', gaugeMax: 100, gaugeThresholds: { warning: 75, critical: 90 } },
+    { id: 'w-mem', type: 'gauge', title: 'Memory Usage', gaugeKey: 'memory_usage', gaugeMax: 100, gaugeThresholds: { warning: 80, critical: 95 } },
+    { id: 'w-restarts', type: 'metric', title: 'Pod Restarts (1h)', metricKey: 'restart_count', metricFormat: 'number', metricThresholds: { warning: 5, critical: 20 } },
+    { id: 'w-events', type: 'list', title: 'Recent Events', span: 2, listKey: 'recent_events', listItemFormat: 'text' },
+    { id: 'w-ns-status', type: 'status', title: 'Namespace Status', statusKey: 'namespace_status' },
+  ],
 }
 
 export const DOCKER_DASHBOARD: PluginDashboardConfig = {
@@ -593,6 +1167,13 @@ export const DOCKER_DASHBOARD: PluginDashboardConfig = {
     { key: 'networks', label: 'Networks', format: 'text' },
   ],
   statusKey: 'cpu_usage',
+  widgets: [
+    { id: 'w-containers', type: 'metric', title: 'Running Containers', metricKey: 'running_containers', metricFormat: 'number' },
+    { id: 'w-cpu', type: 'gauge', title: 'CPU Usage', gaugeKey: 'cpu_usage', gaugeMax: 100, gaugeThresholds: { warning: 70, critical: 90 } },
+    { id: 'w-mem', type: 'metric', title: 'Memory Usage', metricKey: 'memory_usage', metricFormat: 'bytes' },
+    { id: 'w-disk', type: 'metric', title: 'Disk Usage', metricKey: 'disk_usage', metricFormat: 'bytes' },
+    { id: 'w-container-list', type: 'table', title: 'Container List', span: 3, tableDataKey: 'containers', tableColumns: [{ key: 'name', label: 'Name' }, { key: 'image', label: 'Image' }, { key: 'status', label: 'Status' }, { key: 'cpu', label: 'CPU', format: 'percent' }] },
+  ],
 }
 
 export const NGINX_DASHBOARD: PluginDashboardConfig = {
@@ -615,6 +1196,14 @@ export const NGINX_DASHBOARD: PluginDashboardConfig = {
     { key: 'uptime', label: 'Uptime', format: 'duration' },
   ],
   statusKey: 'active_connections',
+  widgets: [
+    { id: 'w-conns', type: 'metric', title: 'Active Connections', metricKey: 'active_connections', metricFormat: 'number', metricThresholds: { warning: 5000, critical: 10_000 }, metricTrend: true },
+    { id: 'w-rps', type: 'metric', title: 'Requests/sec', metricKey: 'requests_per_sec', metricFormat: 'rate', metricSparkline: true },
+    { id: 'w-err', type: 'metric', title: 'Error Rate', metricKey: 'error_rate', metricFormat: 'percent', metricThresholds: { warning: 1, critical: 5 } },
+    { id: 'w-resp', type: 'metric', title: 'Avg Response', metricKey: 'avg_response_time', metricFormat: 'duration', metricThresholds: { warning: 500, critical: 2000 } },
+    { id: 'w-status-codes', type: 'table', title: 'Status Code Breakdown', span: 2, tableDataKey: 'status_codes', tableColumns: [{ key: 'code', label: 'Code' }, { key: 'count', label: 'Count', format: 'number' }, { key: 'percent', label: '%', format: 'percent' }] },
+    { id: 'w-health', type: 'status', title: 'Service Health', statusKey: 'health_status' },
+  ],
 }
 
 export const ELASTICSEARCH_DASHBOARD: PluginDashboardConfig = {
@@ -638,4 +1227,12 @@ export const ELASTICSEARCH_DASHBOARD: PluginDashboardConfig = {
     { key: 'uptime', label: 'Uptime', format: 'duration' },
   ],
   statusKey: 'docs_count',
+  widgets: [
+    { id: 'w-docs', type: 'metric', title: 'Documents', metricKey: 'docs_count', metricFormat: 'number', metricTrend: true },
+    { id: 'w-search', type: 'metric', title: 'Search Rate', metricKey: 'search_rate', metricFormat: 'rate', metricSparkline: true },
+    { id: 'w-index', type: 'metric', title: 'Index Rate', metricKey: 'index_rate', metricFormat: 'rate' },
+    { id: 'w-store', type: 'metric', title: 'Store Size', metricKey: 'store_size', metricFormat: 'bytes' },
+    { id: 'w-health', type: 'status', title: 'Cluster Health', statusKey: 'cluster_status', statusLabels: { green: 'Healthy', yellow: 'Degraded', red: 'Critical' } },
+    { id: 'w-indices', type: 'table', title: 'Top Indices', span: 2, tableDataKey: 'top_indices', tableColumns: [{ key: 'name', label: 'Index' }, { key: 'docs', label: 'Docs', format: 'number' }, { key: 'size', label: 'Size', format: 'bytes' }] },
+  ],
 }

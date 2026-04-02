@@ -61,6 +61,25 @@ export interface DashboardTemplateProps extends Omit<HTMLAttributes<HTMLDivEleme
   onRefresh?: () => void
   lastUpdated?: number | Date
 
+  // Layout customization
+  headerHeight?: number | string
+  metricsScrollable?: boolean
+  sidebarWidth?: number | string
+
+  // Visual customization
+  variant?: 'default' | 'compact' | 'fullscreen'
+  showBreadcrumb?: ReactNode
+  showStatusBar?: boolean
+  statusBarContent?: ReactNode
+
+  // Behavior
+  onSectionToggle?: (sectionId: string, collapsed: boolean) => void
+  stickyHeader?: boolean
+
+  // Metric strip enhancements
+  metricsLayout?: 'row' | 'grid'
+  onMetricClick?: (metric: DashboardMetric) => void
+
   children?: ReactNode
   motion?: 0 | 1 | 2 | 3
 }
@@ -222,6 +241,90 @@ const dashboardTemplateStyles = css`
         gap: var(--space-sm, 0.5rem);
       }
 
+      /* ── Breadcrumb ─────────────────────────────── */
+
+      .ui-dashboard-template__breadcrumb {
+        font-size: var(--text-xs, 0.75rem);
+        color: var(--text-tertiary, oklch(55% 0 0));
+        margin-block-end: 0.25rem;
+      }
+
+      /* ── Status bar ──────────────────────────────── */
+
+      .ui-dashboard-template__status-bar {
+        display: flex;
+        align-items: center;
+        gap: var(--space-sm, 0.5rem);
+        padding: 0.5rem 0.75rem;
+        font-size: var(--text-xs, 0.75rem);
+        background: var(--bg-surface, oklch(20% 0.01 270));
+        border: 1px solid var(--border-default, oklch(100% 0 0 / 0.08));
+        border-radius: var(--radius-md, 0.5rem);
+        color: var(--text-secondary, oklch(70% 0 0));
+      }
+
+      /* ── Sticky header ──────────────────────────── */
+
+      :scope[data-sticky-header] .ui-dashboard-template__header {
+        position: sticky;
+        inset-block-start: 0;
+        z-index: 10;
+        background: var(--bg-base, oklch(15% 0.01 270));
+        padding-block: 0.75rem;
+        border-block-end: 1px solid var(--border-subtle, oklch(100% 0 0 / 0.06));
+        backdrop-filter: blur(12px);
+      }
+
+      /* ── Variant: compact ─────────────────────────── */
+
+      :scope[data-variant="compact"] {
+        gap: var(--space-sm, 0.5rem);
+      }
+
+      :scope[data-variant="compact"] .ui-dashboard-template__title {
+        font-size: clamp(1rem, 2.5vw, 1.25rem);
+      }
+
+      :scope[data-variant="compact"] .ui-dashboard-template__metric {
+        padding: 0.5rem 0.75rem;
+        min-inline-size: 110px;
+      }
+
+      :scope[data-variant="compact"] .ui-dashboard-template__metric-value {
+        font-size: var(--text-base, 1rem);
+      }
+
+      :scope[data-variant="compact"] .ui-dashboard-template__section-header {
+        padding: 0.5rem 0.75rem;
+      }
+
+      :scope[data-variant="compact"] .ui-dashboard-template__section-content {
+        padding: 0.75rem;
+      }
+
+      :scope[data-variant="compact"] .ui-dashboard-template__body {
+        gap: var(--space-sm, 0.5rem);
+      }
+
+      :scope[data-variant="compact"] .ui-dashboard-template__main {
+        gap: var(--space-sm, 0.5rem);
+      }
+
+      /* ── Variant: fullscreen ──────────────────────── */
+
+      :scope[data-variant="fullscreen"] {
+        min-block-size: 100dvh;
+        border-radius: 0;
+      }
+
+      :scope[data-variant="fullscreen"] .ui-dashboard-template__section {
+        border-radius: var(--radius-sm, 0.375rem);
+      }
+
+      :scope[data-variant="fullscreen"] .ui-dashboard-template__metric {
+        border-radius: var(--radius-sm, 0.375rem);
+      }
+
       /* ── Metric strip ────────────────────────────── */
 
       .ui-dashboard-template__metrics {
@@ -231,6 +334,43 @@ const dashboardTemplateStyles = css`
         scrollbar-width: thin;
         scrollbar-color: var(--border-default, oklch(100% 0 0 / 0.1)) transparent;
         padding-block: 0.125rem;
+      }
+
+      .ui-dashboard-template__metrics[data-scrollable] {
+        scroll-snap-type: x mandatory;
+      }
+
+      .ui-dashboard-template__metrics[data-scrollable] .ui-dashboard-template__metric {
+        scroll-snap-align: start;
+      }
+
+      .ui-dashboard-template__metrics[data-layout="grid"] {
+        flex-wrap: wrap;
+        overflow-x: visible;
+      }
+
+      .ui-dashboard-template__metrics[data-layout="grid"] .ui-dashboard-template__metric {
+        flex: 1 1 140px;
+      }
+
+      .ui-dashboard-template__metric[data-clickable] {
+        cursor: pointer;
+        transition: border-color 0.15s, box-shadow 0.15s, transform 0.15s;
+      }
+
+      .ui-dashboard-template__metric[data-clickable]:hover {
+        border-color: var(--border-strong, oklch(100% 0 0 / 0.2));
+        box-shadow: 0 2px 8px oklch(0% 0 0 / 0.15);
+        transform: translateY(-1px);
+      }
+
+      .ui-dashboard-template__metric[data-clickable]:active {
+        transform: translateY(0);
+      }
+
+      .ui-dashboard-template__metric[data-clickable]:focus-visible {
+        outline: 2px solid var(--focus-ring, oklch(65% 0.2 270));
+        outline-offset: 2px;
       }
 
       .ui-dashboard-template__metric {
@@ -464,7 +604,8 @@ const dashboardTemplateStyles = css`
 
       :scope[data-motion="0"] .ui-dashboard-template__section-content,
       :scope[data-motion="0"] .ui-dashboard-template__section-toggle,
-      :scope[data-motion="0"] .ui-dashboard-template__sidebar {
+      :scope[data-motion="0"] .ui-dashboard-template__sidebar,
+      :scope[data-motion="0"] .ui-dashboard-template__metric[data-clickable] {
         transition: none;
       }
 
@@ -500,10 +641,16 @@ const dashboardTemplateStyles = css`
         .ui-dashboard-template__metric {
           border: 2px solid ButtonText;
         }
+        .ui-dashboard-template__metric[data-clickable]:focus-visible {
+          outline: 2px solid Highlight;
+        }
         .ui-dashboard-template__section {
           border: 2px solid ButtonText;
         }
         .ui-dashboard-template__status-badge {
+          border: 1px solid ButtonText;
+        }
+        .ui-dashboard-template__status-bar {
           border: 1px solid ButtonText;
         }
         .ui-dashboard-template__section-toggle:focus-visible {
@@ -516,7 +663,8 @@ const dashboardTemplateStyles = css`
       @media (prefers-reduced-motion: reduce) {
         .ui-dashboard-template__section-content,
         .ui-dashboard-template__section-toggle,
-        .ui-dashboard-template__sidebar {
+        .ui-dashboard-template__sidebar,
+        .ui-dashboard-template__metric[data-clickable] {
           transition: none;
         }
         .ui-dashboard-template__refresh-dot {
@@ -588,8 +736,14 @@ function TrendArrow({ trend }: { trend: 'up' | 'down' | 'flat' }) {
 
 // ─── Section Component ──────────────────────────────────────────────────────
 
-function SectionCard({ section }: { section: DashboardSection }) {
+function SectionCard({ section, onSectionToggle }: { section: DashboardSection; onSectionToggle?: (sectionId: string, collapsed: boolean) => void }) {
   const [collapsed, setCollapsed] = useState(section.defaultCollapsed ?? false)
+
+  const handleToggle = () => {
+    const next = !collapsed
+    setCollapsed(next)
+    onSectionToggle?.(section.id, next)
+  }
 
   return (
     <section
@@ -602,7 +756,7 @@ function SectionCard({ section }: { section: DashboardSection }) {
           <button
             type="button"
             className="ui-dashboard-template__section-toggle"
-            onClick={() => setCollapsed(c => !c)}
+            onClick={handleToggle}
             aria-expanded={!collapsed}
             aria-label={collapsed ? `Expand ${section.title}` : `Collapse ${section.title}`}
           >
@@ -640,9 +794,21 @@ function DashboardTemplateInner({
   actions,
   autoRefresh,
   onRefresh,
+  headerHeight,
+  metricsScrollable = true,
+  sidebarWidth,
+  variant = 'default',
+  showBreadcrumb,
+  showStatusBar = false,
+  statusBarContent,
+  onSectionToggle,
+  stickyHeader = false,
+  metricsLayout = 'row',
+  onMetricClick,
   children,
   motion: motionProp,
   className,
+  style,
   ...rest
 }: DashboardTemplateProps) {
   useStyles('dashboard-template', dashboardTemplateStyles)
@@ -663,19 +829,34 @@ function DashboardTemplateInner({
     ? (sidebarCollapsed ? 'none' : sidebarPosition)
     : 'none'
 
+  // Build CSS custom properties for dynamic values
+  const rootStyle: Record<string, unknown> = { ...style }
+  if (sidebarWidth) {
+    rootStyle['--dt-sidebar-w'] = typeof sidebarWidth === 'number' ? `${sidebarWidth}px` : sidebarWidth
+  }
+
   return (
     <div
       className={cn('ui-dashboard-template', className)}
       data-motion={motionLevel}
       data-columns={columns}
+      data-variant={variant !== 'default' ? variant : undefined}
+      {...(stickyHeader && { 'data-sticky-header': '' })}
       role="group"
       aria-label={typeof title === 'string' ? `Dashboard: ${title}` : 'Dashboard'}
+      style={Object.keys(rootStyle).length > 0 ? rootStyle as React.CSSProperties : undefined}
       {...rest}
     >
       {/* Header */}
-      {(title || status || lastUpdated || actions) && (
-        <div className="ui-dashboard-template__header">
+      {(title || status || lastUpdated || actions || showBreadcrumb) && (
+        <div
+          className="ui-dashboard-template__header"
+          style={headerHeight ? { minBlockSize: typeof headerHeight === 'number' ? `${headerHeight}px` : headerHeight } : undefined}
+        >
           <div className="ui-dashboard-template__title-group">
+            {showBreadcrumb && (
+              <div className="ui-dashboard-template__breadcrumb">{showBreadcrumb}</div>
+            )}
             {title && <h2 className="ui-dashboard-template__title">{title}</h2>}
             {subtitle && <p className="ui-dashboard-template__subtitle">{subtitle}</p>}
           </div>
@@ -707,45 +888,87 @@ function DashboardTemplateInner({
         </div>
       )}
 
+      {/* Status bar */}
+      {showStatusBar && (
+        <div className="ui-dashboard-template__status-bar" role="status">
+          {statusBarContent ?? (
+            <span>
+              {status === 'ok' ? 'All systems operational' :
+               status === 'warning' ? 'Some systems degraded' :
+               status === 'critical' ? 'System outage detected' :
+               status === 'maintenance' ? 'Scheduled maintenance' :
+               'Status unknown'}
+            </span>
+          )}
+        </div>
+      )}
+
       {/* Metric strip */}
       {metrics && metrics.length > 0 && (
-        <div className="ui-dashboard-template__metrics" role="list" aria-label="Key metrics">
-          {metrics.map(metric => (
-            <div
-              key={metric.id}
-              className="ui-dashboard-template__metric"
-              data-status={metric.status}
-              role="listitem"
-            >
-              <div className="ui-dashboard-template__metric-header">
-                {metric.icon && (
-                  <span className="ui-dashboard-template__metric-icon">{metric.icon}</span>
-                )}
-                <span className="ui-dashboard-template__metric-title">{metric.title}</span>
+        <div
+          className="ui-dashboard-template__metrics"
+          role="list"
+          aria-label="Key metrics"
+          data-layout={metricsLayout}
+          {...(metricsScrollable && metricsLayout === 'row' && { 'data-scrollable': '' })}
+        >
+          {metrics.map(metric => {
+            const isClickable = !!onMetricClick
+            return (
+              <div
+                key={metric.id}
+                className="ui-dashboard-template__metric"
+                data-status={metric.status}
+                {...(isClickable && { 'data-clickable': '' })}
+                role={isClickable ? 'button' : 'listitem'}
+                tabIndex={isClickable ? 0 : undefined}
+                onClick={isClickable ? () => onMetricClick(metric) : undefined}
+                onKeyDown={isClickable ? (e: React.KeyboardEvent) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault()
+                    onMetricClick(metric)
+                  }
+                } : undefined}
+                aria-label={isClickable ? `${metric.title}: ${typeof metric.value === 'string' ? metric.value : ''}` : undefined}
+              >
+                <div className="ui-dashboard-template__metric-header">
+                  {metric.icon && (
+                    <span className="ui-dashboard-template__metric-icon">{metric.icon}</span>
+                  )}
+                  <span className="ui-dashboard-template__metric-title">{metric.title}</span>
+                </div>
+                <span className="ui-dashboard-template__metric-value">{metric.value}</span>
+                <div className="ui-dashboard-template__metric-footer">
+                  {metric.trend && metric.change && (
+                    <span className="ui-dashboard-template__metric-change" data-trend={metric.trend}>
+                      <TrendArrow trend={metric.trend} />
+                      {Math.abs(metric.change.value)}%
+                    </span>
+                  )}
+                  {metric.change?.period && (
+                    <span className="ui-dashboard-template__metric-period">{metric.change.period}</span>
+                  )}
+                  {metric.sparkline && metric.sparkline.length >= 2 && (
+                    <Sparkline data={metric.sparkline} />
+                  )}
+                </div>
               </div>
-              <span className="ui-dashboard-template__metric-value">{metric.value}</span>
-              <div className="ui-dashboard-template__metric-footer">
-                {metric.trend && metric.change && (
-                  <span className="ui-dashboard-template__metric-change" data-trend={metric.trend}>
-                    <TrendArrow trend={metric.trend} />
-                    {Math.abs(metric.change.value)}%
-                  </span>
-                )}
-                {metric.change?.period && (
-                  <span className="ui-dashboard-template__metric-period">{metric.change.period}</span>
-                )}
-                {metric.sparkline && metric.sparkline.length >= 2 && (
-                  <Sparkline data={metric.sparkline} />
-                )}
-              </div>
-            </div>
-          ))}
+            )
+          })}
         </div>
       )}
 
       {/* Body: grid + sidebar */}
       {(sections || sidebar || children) && (
-        <div className="ui-dashboard-template__body" data-sidebar={sidebarLayout}>
+        <div
+          className="ui-dashboard-template__body"
+          data-sidebar={sidebarLayout}
+          style={sidebarWidth && !sidebarCollapsed && sidebar ? {
+            gridTemplateColumns: sidebarPosition === 'left'
+              ? `var(--dt-sidebar-w, 280px) 1fr`
+              : `1fr var(--dt-sidebar-w, 280px)`,
+          } : undefined}
+        >
           {/* Sidebar on left */}
           {sidebar && sidebarPosition === 'left' && (
             <aside
@@ -770,7 +993,7 @@ function DashboardTemplateInner({
           {/* Main content */}
           <div className="ui-dashboard-template__main">
             {sections?.map(section => (
-              <SectionCard key={section.id} section={section} />
+              <SectionCard key={section.id} section={section} onSectionToggle={onSectionToggle} />
             ))}
             {children}
           </div>

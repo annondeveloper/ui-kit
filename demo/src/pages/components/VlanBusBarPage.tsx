@@ -468,6 +468,14 @@ const vlanBusBarProps: PropDef[] = [
   { name: 'onVlanClick', type: '(vlan: VlanEntry) => void', description: 'Click handler for VLAN segments.' },
   { name: 'onPortClick', type: '(port: number, vlans: VlanEntry[]) => void', description: 'Click handler for port ticks. Receives port number and containing VLANs.' },
   { name: 'motion', type: '0 | 1 | 2 | 3', description: 'Animation intensity override.' },
+  { name: 'highlightPorts', type: 'number[]', description: 'Externally highlight specific ports. Dims all other segments.' },
+  { name: 'highlightVlans', type: 'number[]', description: 'Externally highlight specific VLANs by ID. Dims all non-matching segments.' },
+  { name: 'showTrunkIndicator', type: 'boolean', default: 'false', description: 'Show T (trunk) / A (access) mode indicator below each port.' },
+  { name: 'compactMode', type: 'boolean', default: 'false', description: 'Thin bars without labels for embedding in small spaces.' },
+  { name: 'maxHeight', type: "number | string", description: 'Constrain the diagram height. Enables scroll when content overflows.' },
+  { name: 'colorScheme', type: "'auto' | 'categorical' | 'sequential'", default: "'auto'", description: 'Color generation mode. Sequential uses a single-hue lightness ramp.' },
+  { name: 'onPortHover', type: '(port: number | null) => void', description: 'Callback when a port is hovered. Receives null on leave.' },
+  { name: 'onVlanHover', type: '(vlan: VlanEntry | null) => void', description: 'Callback when a VLAN row is hovered. Receives null on leave.' },
 ]
 
 const vlanEntryProps: PropDef[] = [
@@ -589,6 +597,9 @@ function generateReactCode(tier: Tier, size: Size, showLabels: boolean, showPort
 
 // ─── Playground Section ──────────────────────────────────────────────────────
 
+type ColorScheme = 'auto' | 'categorical' | 'sequential'
+const COLOR_SCHEMES: ColorScheme[] = ['auto', 'categorical', 'sequential']
+
 function PlaygroundSection({ tier: tierProp }: { tier: Tier }) {
   const { tier: contextTier } = useTier()
   const tier = tierProp ?? contextTier
@@ -597,6 +608,11 @@ function PlaygroundSection({ tier: tierProp }: { tier: Tier }) {
   const [showPortNumbers, setShowPortNumbers] = useState(true)
   const [orientation, setOrientation] = useState<'horizontal' | 'vertical'>('horizontal')
   const [motion, setMotion] = useState<0 | 1 | 2 | 3>(3)
+  const [showTrunkIndicator, setShowTrunkIndicator] = useState(false)
+  const [compactMode, setCompactMode] = useState(false)
+  const [colorScheme, setColorScheme] = useState<ColorScheme>('auto')
+  const [highlightPort, setHighlightPort] = useState<string>('')
+  const [highlightVlan, setHighlightVlan] = useState<string>('')
   const [copyStatus, setCopyStatus] = useState('')
 
   const VlanComponent = tier === 'lite'
@@ -624,6 +640,16 @@ function PlaygroundSection({ tier: tierProp }: { tier: Tier }) {
   <!-- SVG content rendered by the component -->
 </div>`
 
+  const parsedHighlightPorts = useMemo(() => {
+    if (!highlightPort.trim()) return undefined
+    return highlightPort.split(',').map(s => parseInt(s.trim(), 10)).filter(n => !isNaN(n))
+  }, [highlightPort])
+
+  const parsedHighlightVlans = useMemo(() => {
+    if (!highlightVlan.trim()) return undefined
+    return highlightVlan.split(',').map(s => parseInt(s.trim(), 10)).filter(n => !isNaN(n))
+  }, [highlightVlan])
+
   const previewProps: Record<string, unknown> = {
     vlans: sampleVlans,
     totalPorts: 24,
@@ -631,6 +657,11 @@ function PlaygroundSection({ tier: tierProp }: { tier: Tier }) {
     showLabels,
     showPortNumbers,
     orientation,
+    showTrunkIndicator,
+    compactMode,
+    colorScheme,
+    ...(parsedHighlightPorts ? { highlightPorts: parsedHighlightPorts } : {}),
+    ...(parsedHighlightVlans ? { highlightVlans: parsedHighlightVlans } : {}),
   }
   if (tier !== 'lite') {
     previewProps.motion = motion
@@ -697,13 +728,155 @@ function PlaygroundSection({ tier: tierProp }: { tier: Tier }) {
             />
           )}
 
+          <OptionGroup label="Color Scheme" options={COLOR_SCHEMES} value={colorScheme} onChange={setColorScheme} />
+
           <div className="vlan-bus-bar-page__control-group">
             <span className="vlan-bus-bar-page__control-label">Toggles</span>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.375rem' }}>
               <Toggle label="Show labels" checked={showLabels} onChange={setShowLabels} />
               <Toggle label="Show port numbers" checked={showPortNumbers} onChange={setShowPortNumbers} />
+              <Toggle label="Trunk indicator" checked={showTrunkIndicator} onChange={setShowTrunkIndicator} />
+              <Toggle label="Compact mode" checked={compactMode} onChange={setCompactMode} />
             </div>
           </div>
+
+          <div className="vlan-bus-bar-page__control-group">
+            <span className="vlan-bus-bar-page__control-label">Highlight Ports</span>
+            <input
+              type="text"
+              placeholder="e.g. 1,2,5"
+              value={highlightPort}
+              onChange={e => setHighlightPort(e.target.value)}
+              style={{
+                background: 'transparent',
+                border: '1px solid var(--border-default)',
+                borderRadius: 'var(--radius-sm)',
+                padding: '0.25rem 0.5rem',
+                color: 'var(--text-primary)',
+                fontFamily: 'inherit',
+                fontSize: 'var(--text-xs, 0.75rem)',
+              }}
+            />
+          </div>
+
+          <div className="vlan-bus-bar-page__control-group">
+            <span className="vlan-bus-bar-page__control-label">Highlight VLANs</span>
+            <input
+              type="text"
+              placeholder="e.g. 100,200"
+              value={highlightVlan}
+              onChange={e => setHighlightVlan(e.target.value)}
+              style={{
+                background: 'transparent',
+                border: '1px solid var(--border-default)',
+                borderRadius: 'var(--radius-sm)',
+                padding: '0.25rem 0.5rem',
+                color: 'var(--text-primary)',
+                fontFamily: 'inherit',
+                fontSize: 'var(--text-xs, 0.75rem)',
+              }}
+            />
+          </div>
+        </div>
+      </div>
+    </section>
+  )
+}
+
+// ─── Cross-Highlight Section ─────────────────────────────────────────────────
+
+function CrossHighlightSection() {
+  const [hoveredPort, setHoveredPort] = useState<number | null>(null)
+  const [hoveredVlan, setHoveredVlan] = useState<VlanEntry | null>(null)
+  const [selectedPorts, setSelectedPorts] = useState<number[]>([])
+
+  const togglePort = (port: number) => {
+    setSelectedPorts(prev =>
+      prev.includes(port) ? prev.filter(p => p !== port) : [...prev, port]
+    )
+  }
+
+  return (
+    <section className="vlan-bus-bar-page__section" id="cross-highlight">
+      <h2 className="vlan-bus-bar-page__section-title">
+        <a href="#cross-highlight">Cross-Highlighting</a>
+      </h2>
+      <p className="vlan-bus-bar-page__section-desc">
+        Hover over any port to highlight all VLANs it belongs to. Hover a VLAN row to
+        highlight all its member ports. Click port buttons below to set external highlights
+        via the <code>highlightPorts</code> prop.
+      </p>
+
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+        <div className="vlan-bus-bar-page__preview">
+          <VlanBusBar
+            vlans={sampleVlans}
+            totalPorts={24}
+            showPortNumbers
+            showTrunkIndicator
+            highlightPorts={selectedPorts.length > 0 ? selectedPorts : undefined}
+            onPortHover={setHoveredPort}
+            onVlanHover={setHoveredVlan}
+          />
+        </div>
+
+        <div style={{
+          display: 'flex',
+          flexWrap: 'wrap',
+          gap: '0.375rem',
+          alignItems: 'center',
+        }}>
+          <span style={{
+            fontSize: 'var(--text-xs, 0.75rem)',
+            color: 'var(--text-tertiary)',
+            fontWeight: 600,
+            textTransform: 'uppercase' as const,
+            letterSpacing: '0.05em',
+            marginInlineEnd: '0.5rem',
+          }}>
+            Toggle ports:
+          </span>
+          {Array.from({ length: 24 }, (_, i) => i + 1).map(port => (
+            <button
+              key={port}
+              type="button"
+              className={`vlan-bus-bar-page__option-btn${selectedPorts.includes(port) ? ' vlan-bus-bar-page__option-btn--active' : ''}`}
+              onClick={() => togglePort(port)}
+              style={{ minWidth: '2rem' }}
+            >
+              {port}
+            </button>
+          ))}
+          {selectedPorts.length > 0 && (
+            <button
+              type="button"
+              className="vlan-bus-bar-page__option-btn"
+              onClick={() => setSelectedPorts([])}
+              style={{ marginInlineStart: '0.5rem' }}
+            >
+              Clear
+            </button>
+          )}
+        </div>
+
+        <div style={{
+          fontSize: 'var(--text-sm, 0.875rem)',
+          color: 'var(--text-secondary)',
+          minHeight: '1.5rem',
+        }}>
+          {hoveredPort !== null && (
+            <span>Port <strong>{hoveredPort}</strong> — member of {
+              sampleVlans.filter(v => v.ports.includes(hoveredPort)).map(v => v.name || `VLAN ${v.id}`).join(', ') || 'no VLANs'
+            }</span>
+          )}
+          {hoveredVlan !== null && hoveredPort === null && (
+            <span><strong>{hoveredVlan.name || `VLAN ${hoveredVlan.id}`}</strong> — ports {hoveredVlan.ports.join(', ')}</span>
+          )}
+          {hoveredPort === null && hoveredVlan === null && selectedPorts.length === 0 && (
+            <span style={{ fontStyle: 'italic', color: 'var(--text-tertiary)' }}>
+              Hover over the diagram or click port buttons to see cross-highlighting
+            </span>
+          )}
         </div>
       </div>
     </section>
@@ -765,6 +938,9 @@ export default function VlanBusBarPage() {
 
       {/* ── 2. Live Playground ──────────────────────────── */}
       <PlaygroundSection tier={tier} />
+
+      {/* ── 2b. Cross-Highlighting Demo ─────────────────── */}
+      <CrossHighlightSection />
 
       {/* ── 3. Weight Tiers ────────────────────────────── */}
       <section className="vlan-bus-bar-page__section" id="tiers">
