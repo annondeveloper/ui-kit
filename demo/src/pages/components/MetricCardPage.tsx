@@ -950,8 +950,10 @@ function PlaygroundSection({ tier: tierProp, brandColor }: { tier: Tier; brandCo
       <div className="mc-page__playground">
         {/* Preview area */}
         <div className="mc-page__playground-preview">
-          <div className="mc-page__playground-result" style={{ ...previewStyle, minInlineSize: '280px', maxInlineSize: '360px', margin: '0 auto' }}>
-            <MetricCard {...cardProps as any} />
+          <div className="mc-page__playground-result" style={{ ...previewStyle, minInlineSize: '320px', maxInlineSize: '400px', margin: '0 auto' }}>
+            <div style={{ width: '100%' }}>
+              <MetricCard {...cardProps as any} />
+            </div>
           </div>
 
           {/* Tabbed code output */}
