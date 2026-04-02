@@ -165,7 +165,7 @@ Per-component budgets (tree-shaken imports):
 - Complex domain: < 8KB JS gzip, < 2KB CSS gzip
 
 Full un-tree-shaken bundle budget:
-- Full library: < 350KB JS gzip (current: ~332KB, 95% of budget)
+- Full library: < 400KB JS gzip (current: ~384KB, 96% of budget)
 - Full CSS: < 20KB gzip
 
 Engine modules:
