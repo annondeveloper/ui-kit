@@ -126,7 +126,6 @@ const chartStyles = css`
         pointer-events: none;
         white-space: nowrap;
         z-index: 1000;
-        transform: translate(-50%, calc(-100% - 8px));
         line-height: 1.4;
         box-shadow: 0 4px 12px oklch(0% 0 0 / 0.3);
       }
@@ -338,7 +337,7 @@ function TimeSeriesChartInner({
   )
 
   // Tooltip: find nearest timestamp
-  const [tooltipPos, setTooltipPos] = useState<{ x: number; y: number } | null>(null)
+  const tooltipRef = useRef<HTMLDivElement>(null)
   const handleMouseMove = useCallback(
     (e: React.MouseEvent<SVGRectElement>) => {
       if (!showTooltip || allTimestamps.length === 0) return
@@ -353,7 +352,19 @@ function TimeSeriesChartInner({
         if (dist < minDist) { minDist = dist; closest = i }
       }
       setHoveredIdx(closest)
-      setTooltipPos({ x: e.clientX, y: rect.top + PADDING.top })
+      // Position tooltip imperatively for zero-lag
+      const tip = tooltipRef.current
+      if (tip) {
+        const tw = tip.offsetWidth
+        const th = tip.offsetHeight
+        let x = e.clientX - tw / 2
+        let y = e.clientY - th - 12
+        if (x + tw > window.innerWidth - 8) x = window.innerWidth - tw - 8
+        if (x < 8) x = 8
+        if (y < 8) y = e.clientY + 16
+        tip.style.left = `${x}px`
+        tip.style.top = `${y}px`
+      }
     },
     [showTooltip, allTimestamps, xScale],
   )
@@ -465,18 +476,16 @@ function TimeSeriesChartInner({
           width={plotW}
           height={plotH}
           onMouseMove={handleMouseMove}
-          onMouseLeave={() => { setHoveredIdx(null); setTooltipPos(null) }}
+          onMouseLeave={() => setHoveredIdx(null)}
         />
       </svg>
 
       {/* Tooltip */}
-      {showTooltip && hoveredTimestamp !== null && tooltipPos && (
+      {showTooltip && hoveredTimestamp !== null && (
         <div
           className="ui-time-series-chart__tooltip-box"
-          style={{
-            left: `${tooltipPos.x}px`,
-            top: `${tooltipPos.y}px`,
-          }}
+          ref={tooltipRef}
+          style={{ left: -9999, top: -9999 }}
         >
           <div className="ui-time-series-chart__tooltip-time">
             {formatTime(hoveredTimestamp)}
