@@ -103,6 +103,12 @@ export { SeverityTimeline, type LiteSeverityTimelineProps, type LiteTimelineEven
 export { PortStatusGrid, type LitePortStatusGridProps, type LitePortStatus } from './port-status-grid'
 export { TimeSeriesChart, type LiteTimeSeriesChartProps, type LiteTimeSeriesData, type LiteTimeSeriesSeries } from './time-series-chart'
 export { SwitchFaceplate, type LiteSwitchFaceplateProps, type LiteSwitchPort } from './switch-faceplate'
+export { VlanBusBar, type LiteVlanBusBarProps, type LiteVlanEntry } from './vlan-bus-bar'
+export { NetworkInterfaceGrid, type LiteNetworkInterfaceGridProps, type LiteNetworkInterface } from './network-interface-grid'
+export { TopologyGraph, type LiteTopologyGraphProps, type LiteTopologyNode, type LiteTopologyEdge } from './topology-graph'
+export { PipelineDAG, type LitePipelineDAGProps, type LitePipelineNode, type LitePipelineEdge } from './pipeline-dag'
+export { DashboardTemplate, type LiteDashboardTemplateProps } from './dashboard-template'
+export { PluginDashboard, type LitePluginDashboardProps } from './plugin-dashboard'
 export { NotificationStack, type LiteNotificationStackProps, type LiteNotification } from './notification-stack'
 
 // ─── AI / Real-time ──────────────────────────────────────────────────────────

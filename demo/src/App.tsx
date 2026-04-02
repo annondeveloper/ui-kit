@@ -171,6 +171,8 @@ const componentGroups: ComponentGroup[] = [
       { name: 'Highlight', path: '/components/highlight' },
       { name: 'TransferList', path: '/components/transfer-list' },
       { name: 'ScrollReveal', path: '/components/scroll-reveal' },
+      { name: 'TopologyGraph', path: '/components/topology-graph' },
+      { name: 'PipelineDAG', path: '/components/pipeline-dag' },
     ],
   },
   {
@@ -197,6 +199,10 @@ const componentGroups: ComponentGroup[] = [
       { name: 'ServiceStrip', path: '/components/service-strip' },
       { name: 'DiskMountBar', path: '/components/disk-mount-bar' },
       { name: 'ConnectionTestPanel', path: '/components/connection-test-panel' },
+      { name: 'NetworkInterfaceGrid', path: '/components/network-interface-grid' },
+      { name: 'VlanBusBar', path: '/components/vlan-bus-bar' },
+      { name: 'DashboardTemplate', path: '/components/dashboard-template' },
+      { name: 'PluginDashboard', path: '/components/plugin-dashboard' },
     ],
   },
   {

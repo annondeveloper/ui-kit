@@ -8,6 +8,7 @@ import {
   useRef,
   useEffect,
 } from 'react'
+import { createPortal } from 'react-dom'
 import { css } from '../core/styles/css-tag'
 import { useStyles } from '../core/styles/use-styles'
 import { useMotionLevel } from '../core/motion/use-motion-level'
@@ -28,6 +29,14 @@ export interface TimeSeriesSeries {
   color?: string
 }
 
+export interface ChartAnnotation {
+  type: 'horizontal' | 'vertical'
+  value: number                  // y-value for horizontal, timestamp for vertical
+  label?: string
+  color?: string                 // OKLCH color, default: oklch(70% 0 0)
+  dashed?: boolean               // default: true
+}
+
 export interface TimeSeriesChartProps extends HTMLAttributes<HTMLDivElement> {
   series: TimeSeriesSeries[]
   height?: number
@@ -41,6 +50,12 @@ export interface TimeSeriesChartProps extends HTMLAttributes<HTMLDivElement> {
   formatValue?: (v: number) => string
   formatTime?: (t: number) => string
   motion?: 0 | 1 | 2 | 3
+  brushable?: boolean
+  onBrush?: (range: [number, number]) => void
+  zoomable?: boolean
+  onZoom?: (domain: { x: [number, number]; y: [number, number] }) => void
+  toggleableSeries?: boolean
+  annotations?: ChartAnnotation[]
 }
 
 // ─── Constants ──────────────────────────────────────────────────────────────
@@ -171,6 +186,70 @@ const chartStyles = css`
         border-radius: 1px;
       }
 
+      .ui-time-series-chart__brush {
+        fill: oklch(65% 0.15 270 / 0.15);
+        stroke: oklch(65% 0.15 270 / 0.4);
+        stroke-width: 1;
+        cursor: ew-resize;
+      }
+
+      .ui-time-series-chart__brush-handle {
+        fill: oklch(65% 0.15 270 / 0.6);
+        stroke: oklch(65% 0.15 270);
+        stroke-width: 1;
+        cursor: ew-resize;
+      }
+
+      .ui-time-series-chart__annotation {
+        pointer-events: none;
+      }
+
+      .ui-time-series-chart__annotation-label {
+        font-size: 0.5625rem;
+        font-variant-numeric: tabular-nums;
+        pointer-events: none;
+      }
+
+      .ui-time-series-chart__legend-checkbox {
+        appearance: none;
+        -webkit-appearance: none;
+        inline-size: 0.75rem;
+        block-size: 0.75rem;
+        border: 1.5px solid var(--border-strong, oklch(60% 0 0));
+        border-radius: 2px;
+        cursor: pointer;
+        flex-shrink: 0;
+        position: relative;
+      }
+
+      .ui-time-series-chart__legend-checkbox:checked::after {
+        content: '';
+        position: absolute;
+        inset: 1px;
+        border-radius: 1px;
+        background: var(--cb-color, oklch(65% 0.2 270));
+      }
+
+      .ui-time-series-chart__zoom-reset {
+        position: absolute;
+        inset-block-start: 0.375rem;
+        inset-inline-end: 0.375rem;
+        font-size: 0.625rem;
+        font-family: inherit;
+        padding: 0.1875rem 0.5rem;
+        border-radius: var(--radius-sm, 0.25rem);
+        border: 1px solid var(--border-default, oklch(100% 0 0 / 0.1));
+        background: var(--bg-elevated, oklch(22% 0.02 270));
+        color: var(--text-secondary, oklch(70% 0 0));
+        cursor: pointer;
+        z-index: 2;
+        line-height: 1.4;
+      }
+      .ui-time-series-chart__zoom-reset:hover {
+        background: var(--bg-surface, oklch(25% 0.02 270));
+        color: var(--text-primary, oklch(90% 0 0));
+      }
+
       /* Forced colors */
       @media (forced-colors: active) {
         .ui-time-series-chart__series-line { stroke: CanvasText; }
@@ -234,6 +313,12 @@ function TimeSeriesChartInner({
   formatValue = defaultFormatValue,
   formatTime = defaultFormatTime,
   motion: motionProp,
+  brushable = false,
+  onBrush,
+  zoomable = false,
+  onZoom,
+  toggleableSeries = false,
+  annotations,
   className,
   style,
   ...rest
@@ -243,6 +328,19 @@ function TimeSeriesChartInner({
   const svgRef = useRef<SVGSVGElement>(null)
   const [width, setWidth] = useState(400)
   const [hoveredIdx, setHoveredIdx] = useState<number | null>(null)
+
+  // ─── Brush state ──────────────────────────────────────────────────
+  const [brushStart, setBrushStart] = useState<number | null>(null)
+  const [brushEnd, setBrushEnd] = useState<number | null>(null)
+  const brushing = useRef(false)
+
+  // ─── Zoom state ───────────────────────────────────────────────────
+  const [zoomX, setZoomX] = useState<[number, number] | null>(null)
+  const [zoomY, setZoomY] = useState<[number, number] | null>(null)
+  const isZoomed = zoomX !== null || zoomY !== null
+
+  // ─── Toggleable series state ──────────────────────────────────────
+  const [hiddenSeries, setHiddenSeries] = useState<Set<string>>(new Set())
 
   // Responsive width via ResizeObserver
   const containerRef = useRef<HTMLDivElement>(null)
@@ -287,31 +385,44 @@ function TimeSeriesChartInner({
   const plotW = width - PADDING.left - PADDING.right
   const plotH = height - PADDING.top - PADDING.bottom
 
+  // Effective domains accounting for zoom
+  const effectiveXMin = zoomX ? zoomX[0] : (allTimestamps.length > 0 ? allTimestamps[0] : 0)
+  const effectiveXMax = zoomX ? zoomX[1] : (allTimestamps.length > 0 ? allTimestamps[allTimestamps.length - 1] : 1)
+  const effectiveYMin = zoomY ? zoomY[0] : yMin
+  const effectiveYMax = zoomY ? zoomY[1] : yMax
+
   const xScale = useCallback(
     (t: number) => {
-      if (allTimestamps.length < 2) return PADDING.left + plotW / 2
-      const tMin = allTimestamps[0]
-      const tMax = allTimestamps[allTimestamps.length - 1]
-      const range = tMax - tMin || 1
-      return PADDING.left + ((t - tMin) / range) * plotW
+      if (allTimestamps.length < 2 && !zoomX) return PADDING.left + plotW / 2
+      const range = effectiveXMax - effectiveXMin || 1
+      return PADDING.left + ((t - effectiveXMin) / range) * plotW
     },
-    [allTimestamps, plotW],
+    [allTimestamps, plotW, effectiveXMin, effectiveXMax, zoomX],
   )
 
   const yScale = useCallback(
     (v: number) => {
-      const range = yMax - yMin || 1
-      return PADDING.top + plotH - ((v - yMin) / range) * plotH
+      const range = effectiveYMax - effectiveYMin || 1
+      return PADDING.top + plotH - ((v - effectiveYMin) / range) * plotH
     },
-    [yMin, yMax, plotH],
+    [effectiveYMin, effectiveYMax, plotH],
+  )
+
+  // Inverse x scale: pixel to timestamp
+  const xScaleInverse = useCallback(
+    (px: number) => {
+      const range = effectiveXMax - effectiveXMin || 1
+      return effectiveXMin + ((px - PADDING.left) / plotW) * range
+    },
+    [effectiveXMin, effectiveXMax, plotW],
   )
 
   // Grid ticks
   const yTicks = useMemo(() => {
     const count = Math.max(2, Math.min(6, Math.floor(plotH / 36)))
-    const step = (yMax - yMin) / count
-    return Array.from({ length: count + 1 }, (_, i) => yMin + step * i)
-  }, [yMin, yMax, plotH])
+    const step = (effectiveYMax - effectiveYMin) / count
+    return Array.from({ length: count + 1 }, (_, i) => effectiveYMin + step * i)
+  }, [effectiveYMin, effectiveYMax, plotH])
 
   const xTicks = useMemo(() => {
     if (allTimestamps.length <= 1) return allTimestamps
@@ -332,9 +443,20 @@ function TimeSeriesChartInner({
         ...s,
         color: s.color || DEFAULT_COLORS[i % DEFAULT_COLORS.length],
         path: buildSeriesPath(s.data, xScale, yScale),
+        hidden: hiddenSeries.has(s.id),
       })),
-    [series, xScale, yScale],
+    [series, xScale, yScale, hiddenSeries],
   )
+
+  // Toggle a series
+  const toggleSeriesVisibility = useCallback((id: string) => {
+    setHiddenSeries(prev => {
+      const next = new Set(prev)
+      if (next.has(id)) next.delete(id)
+      else next.add(id)
+      return next
+    })
+  }, [])
 
   // Tooltip: find nearest timestamp
   const tooltipRef = useRef<HTMLDivElement>(null)
@@ -375,6 +497,119 @@ function TimeSeriesChartInner({
     [showTooltip, allTimestamps, xScale],
   )
 
+  // ─── Brush handlers ─────────────────────────────────────────────────
+  const handleBrushDown = useCallback(
+    (e: React.MouseEvent<SVGRectElement>) => {
+      if (!brushable) return
+      const svg = svgRef.current
+      if (!svg) return
+      const rect = svg.getBoundingClientRect()
+      const mouseX = e.clientX - rect.left
+      setBrushStart(mouseX)
+      setBrushEnd(mouseX)
+      brushing.current = true
+    },
+    [brushable],
+  )
+
+  const handleBrushMove = useCallback(
+    (e: React.MouseEvent<SVGRectElement>) => {
+      if (brushing.current && brushable) {
+        const svg = svgRef.current
+        if (!svg) return
+        const rect = svg.getBoundingClientRect()
+        const mouseX = Math.max(PADDING.left, Math.min(e.clientX - rect.left, PADDING.left + plotW))
+        setBrushEnd(mouseX)
+      }
+    },
+    [brushable, plotW],
+  )
+
+  const handleBrushUp = useCallback(
+    () => {
+      if (!brushing.current || !brushable) return
+      brushing.current = false
+      if (brushStart !== null && brushEnd !== null) {
+        const left = Math.min(brushStart, brushEnd)
+        const right = Math.max(brushStart, brushEnd)
+        if (right - left > 4) {
+          const tLeft = xScaleInverse(left)
+          const tRight = xScaleInverse(right)
+          onBrush?.([tLeft, tRight])
+        }
+      }
+      setBrushStart(null)
+      setBrushEnd(null)
+    },
+    [brushable, brushStart, brushEnd, xScaleInverse, onBrush],
+  )
+
+  // Global mouse up for brush
+  useEffect(() => {
+    if (!brushable) return
+    const up = () => {
+      if (brushing.current) {
+        brushing.current = false
+        setBrushStart(null)
+        setBrushEnd(null)
+      }
+    }
+    window.addEventListener('mouseup', up)
+    return () => window.removeEventListener('mouseup', up)
+  }, [brushable])
+
+  // ─── Zoom handler ─────────────────────────────────────────────────
+  const handleWheel = useCallback(
+    (e: React.WheelEvent<SVGSVGElement>) => {
+      if (!zoomable) return
+      e.preventDefault()
+      const svg = svgRef.current
+      if (!svg) return
+      const rect = svg.getBoundingClientRect()
+      const mouseX = e.clientX - rect.left
+      const fraction = (mouseX - PADDING.left) / plotW
+
+      const curXMin = effectiveXMin
+      const curXMax = effectiveXMax
+      const curYMin_ = effectiveYMin
+      const curYMax_ = effectiveYMax
+
+      const dataXMin = allTimestamps.length > 0 ? allTimestamps[0] : 0
+      const dataXMax = allTimestamps.length > 0 ? allTimestamps[allTimestamps.length - 1] : 1
+
+      const factor = e.deltaY > 0 ? 1.15 : 1 / 1.15
+      const xRange = curXMax - curXMin
+      const newXRange = xRange * factor
+      const pivot = curXMin + fraction * xRange
+      let newXMin = pivot - fraction * newXRange
+      let newXMax = pivot + (1 - fraction) * newXRange
+
+      // Clamp to data bounds
+      if (newXMin < dataXMin) newXMin = dataXMin
+      if (newXMax > dataXMax) newXMax = dataXMax
+      // If zoomed out beyond data, reset
+      if (newXRange >= (dataXMax - dataXMin) * 1.01) {
+        setZoomX(null)
+        setZoomY(null)
+        onZoom?.({ x: [dataXMin, dataXMax], y: [yMin, yMax] })
+        return
+      }
+
+      setZoomX([newXMin, newXMax])
+      // Keep Y domain from props (don't zoom Y on scroll)
+      onZoom?.({ x: [newXMin, newXMax], y: [curYMin_, curYMax_] })
+    },
+    [zoomable, plotW, effectiveXMin, effectiveXMax, effectiveYMin, effectiveYMax, allTimestamps, onZoom, yMin, yMax],
+  )
+
+  const resetZoom = useCallback(() => {
+    setZoomX(null)
+    setZoomY(null)
+    const dataXMin = allTimestamps.length > 0 ? allTimestamps[0] : 0
+    const dataXMax = allTimestamps.length > 0 ? allTimestamps[allTimestamps.length - 1] : 1
+    onZoom?.({ x: [dataXMin, dataXMax], y: [yMin, yMax] })
+  }, [allTimestamps, onZoom, yMin, yMax])
+
   const hoveredTimestamp = hoveredIdx !== null ? allTimestamps[hoveredIdx] : null
 
   return (
@@ -385,6 +620,16 @@ function TimeSeriesChartInner({
       style={style}
       {...rest}
     >
+      {/* Zoom reset button */}
+      {zoomable && isZoomed && (
+        <button
+          className="ui-time-series-chart__zoom-reset"
+          onClick={resetZoom}
+          type="button"
+        >
+          Reset zoom
+        </button>
+      )}
       <svg
         ref={svgRef}
         width={width}
@@ -392,6 +637,7 @@ function TimeSeriesChartInner({
         viewBox={`0 0 ${width} ${height}`}
         aria-label="Time series chart"
         role="img"
+        onWheel={zoomable ? handleWheel : undefined}
       >
         {/* Grid lines */}
         {showGrid && yTicks.map(v => (
@@ -434,7 +680,7 @@ function TimeSeriesChartInner({
 
         {/* Series lines */}
         {seriesData.map(s => (
-          s.path && (
+          s.path && !s.hidden && (
             <path
               key={s.id}
               className="ui-time-series-chart__series-line"
@@ -444,6 +690,65 @@ function TimeSeriesChartInner({
             />
           )
         ))}
+
+        {/* Annotations */}
+        {annotations?.map((ann, i) => {
+          const annColor = ann.color || 'oklch(70% 0 0)'
+          const dashArray = ann.dashed !== false ? '6 4' : undefined
+          if (ann.type === 'horizontal') {
+            const y = yScale(ann.value)
+            return (
+              <g key={`ann-${i}`} className="ui-time-series-chart__annotation">
+                <line
+                  x1={PADDING.left}
+                  y1={y}
+                  x2={width - PADDING.right}
+                  y2={y}
+                  stroke={annColor}
+                  strokeWidth={1.5}
+                  strokeDasharray={dashArray}
+                />
+                {ann.label && (
+                  <text
+                    className="ui-time-series-chart__annotation-label"
+                    x={width - PADDING.right - 4}
+                    y={y - 4}
+                    textAnchor="end"
+                    fill={annColor}
+                  >
+                    {ann.label}
+                  </text>
+                )}
+              </g>
+            )
+          }
+          // vertical
+          const x = xScale(ann.value)
+          return (
+            <g key={`ann-${i}`} className="ui-time-series-chart__annotation">
+              <line
+                x1={x}
+                y1={PADDING.top}
+                x2={x}
+                y2={height - PADDING.bottom}
+                stroke={annColor}
+                strokeWidth={1.5}
+                strokeDasharray={dashArray}
+              />
+              {ann.label && (
+                <text
+                  className="ui-time-series-chart__annotation-label"
+                  x={x + 4}
+                  y={PADDING.top + 10}
+                  textAnchor="start"
+                  fill={annColor}
+                >
+                  {ann.label}
+                </text>
+              )}
+            </g>
+          )
+        })}
 
         {/* Crosshair */}
         {hoveredTimestamp !== null && (
@@ -458,6 +763,7 @@ function TimeSeriesChartInner({
 
         {/* Hover dots */}
         {hoveredTimestamp !== null && seriesData.map(s => {
+          if (s.hidden) return null
           const pt = s.data.find(d => d.timestamp === hoveredTimestamp)
           if (!pt) return null
           return (
@@ -474,6 +780,35 @@ function TimeSeriesChartInner({
           )
         })}
 
+        {/* Brush overlay */}
+        {brushable && brushStart !== null && brushEnd !== null && (
+          <>
+            <rect
+              className="ui-time-series-chart__brush"
+              x={Math.min(brushStart, brushEnd)}
+              y={PADDING.top}
+              width={Math.abs(brushEnd - brushStart)}
+              height={plotH}
+            />
+            <rect
+              className="ui-time-series-chart__brush-handle"
+              x={Math.min(brushStart, brushEnd) - 2}
+              y={PADDING.top}
+              width={4}
+              height={plotH}
+              rx={2}
+            />
+            <rect
+              className="ui-time-series-chart__brush-handle"
+              x={Math.max(brushStart, brushEnd) - 2}
+              y={PADDING.top}
+              width={4}
+              height={plotH}
+              rx={2}
+            />
+          </>
+        )}
+
         {/* Hit area */}
         <rect
           className="ui-time-series-chart__hit-area"
@@ -481,17 +816,37 @@ function TimeSeriesChartInner({
           y={PADDING.top}
           width={plotW}
           height={plotH}
-          onMouseMove={handleMouseMove}
-          onMouseLeave={() => setHoveredIdx(null)}
+          onMouseMove={(e) => {
+            handleMouseMove(e)
+            handleBrushMove(e)
+          }}
+          onMouseDown={brushable ? handleBrushDown : undefined}
+          onMouseUp={brushable ? handleBrushUp : undefined}
+          onMouseLeave={() => { setHoveredIdx(null); if (brushing.current) handleBrushUp() }}
         />
       </svg>
 
-      {/* Tooltip */}
-      {showTooltip && hoveredTimestamp !== null && (
+      {/* Tooltip — portaled to body to avoid ancestor transform breaking position:fixed */}
+      {showTooltip && hoveredTimestamp !== null && typeof document !== 'undefined' && createPortal(
         <div
           className="ui-time-series-chart__tooltip-box"
           ref={tooltipRef}
-          style={{ left: -9999, top: -9999 }}
+          style={{
+            position: 'fixed',
+            left: -9999,
+            top: -9999,
+            padding: '0.375rem 0.5rem',
+            background: 'oklch(22% 0.02 270)',
+            border: '1px solid oklch(100% 0 0 / 0.1)',
+            borderRadius: '0.375rem',
+            fontSize: '0.75rem',
+            color: 'oklch(90% 0 0)',
+            pointerEvents: 'none',
+            whiteSpace: 'nowrap',
+            zIndex: 1000,
+            lineHeight: 1.4,
+            boxShadow: '0 4px 12px oklch(0% 0 0 / 0.3)',
+          }}
         >
           <div className="ui-time-series-chart__tooltip-time">
             {formatTime(hoveredTimestamp)}
@@ -506,14 +861,25 @@ function TimeSeriesChartInner({
               </div>
             )
           })}
-        </div>
+        </div>,
+        document.body,
       )}
 
       {/* Legend */}
       {showLegend && series.length > 1 && (
         <div className="ui-time-series-chart__legend">
           {seriesData.map(s => (
-            <div key={s.id} className="ui-time-series-chart__legend-item">
+            <div key={s.id} className="ui-time-series-chart__legend-item" style={s.hidden ? { opacity: 0.4 } : undefined}>
+              {toggleableSeries && (
+                <input
+                  type="checkbox"
+                  className="ui-time-series-chart__legend-checkbox"
+                  checked={!s.hidden}
+                  onChange={() => toggleSeriesVisibility(s.id)}
+                  aria-label={`Toggle ${s.label}`}
+                  style={{ '--cb-color': s.color, background: s.hidden ? 'transparent' : undefined } as React.CSSProperties}
+                />
+              )}
               <span className="ui-time-series-chart__legend-swatch" style={{ background: s.color }} />
               <span>{s.label}</span>
             </div>

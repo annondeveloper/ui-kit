@@ -37,3 +37,7 @@ export * from './components'
 
 // Domain
 export * from './domain'
+
+// Graph layout engine (for advanced users)
+export { computeLayout, forceDirectedLayout, dagreLayout, circularLayout, gridLayout, Quadtree } from './core/graph'
+export type { GraphNode, GraphEdge, LayoutOptions, LayoutResult, QuadtreeNode } from './core/graph'

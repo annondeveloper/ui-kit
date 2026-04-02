@@ -3,7 +3,7 @@
 import { useState, useMemo, useCallback, useRef, useEffect } from 'react'
 import { css } from '@ui/core/styles/css-tag'
 import { useStyles } from '@ui/core/styles/use-styles'
-import { TimeSeriesChart, type TimeSeriesSeries } from '@ui/domain/time-series-chart'
+import { TimeSeriesChart, type TimeSeriesSeries, type ChartAnnotation } from '@ui/domain/time-series-chart'
 import { TimeSeriesChart as LiteTimeSeriesChart } from '@ui/lite/time-series-chart'
 import { TimeSeriesChart as PremiumTimeSeriesChart } from '@ui/premium/time-series-chart'
 import { Button } from '@ui/components/button'
@@ -585,6 +585,20 @@ const chartProps: PropDef[] = [
   { name: 'formatValue', type: '(v: number) => string', description: 'Custom value formatter for y-axis labels and tooltips.' },
   { name: 'formatTime', type: '(t: number) => string', description: 'Custom time formatter for x-axis labels.' },
   { name: 'motion', type: '0 | 1 | 2 | 3', description: 'Animation intensity override. Controls line draw animation speed.' },
+  { name: 'brushable', type: 'boolean', description: 'Enable time range brush selection by click-dragging on the chart area.' },
+  { name: 'onBrush', type: '(range: [number, number]) => void', description: 'Callback fired with the selected timestamp range after a brush gesture.' },
+  { name: 'zoomable', type: 'boolean', description: 'Enable scroll-to-zoom on the chart x-axis.' },
+  { name: 'onZoom', type: '(domain: { x: [number, number]; y: [number, number] }) => void', description: 'Callback fired with the new domain after a zoom gesture.' },
+  { name: 'toggleableSeries', type: 'boolean', description: 'Show checkboxes in the legend to toggle series visibility.' },
+  { name: 'annotations', type: 'ChartAnnotation[]', description: 'Array of horizontal/vertical reference lines rendered on the chart.' },
+]
+
+const chartAnnotationProps: PropDef[] = [
+  { name: 'type', type: "'horizontal' | 'vertical'", required: true, description: "Orientation of the annotation line." },
+  { name: 'value', type: 'number', required: true, description: 'Y-value for horizontal lines, timestamp for vertical lines.' },
+  { name: 'label', type: 'string', description: 'Optional text label rendered near the annotation line.' },
+  { name: 'color', type: 'string', description: "OKLCH color for the line. Default: oklch(70% 0 0)." },
+  { name: 'dashed', type: 'boolean', description: 'Whether the line is dashed (stroke-dasharray: 6 4). Default: true.' },
 ]
 
 const timeSeriesDataProps: PropDef[] = [
@@ -965,6 +979,109 @@ function PlaygroundSection({ tier: tierProp }: { tier: Tier }) {
   )
 }
 
+// ─── Section: Brush Demo ─────────────────────────────────────────────────────
+
+function BrushDemoSection({ ChartComponent }: { ChartComponent: React.ComponentType<any> }) {
+  const [brushRange, setBrushRange] = useState<[number, number] | null>(null)
+
+  return (
+    <section className="time-series-chart-page__section" id="brush">
+      <h2 className="time-series-chart-page__section-title">
+        <a href="#brush">Brush Selection</a>
+      </h2>
+      <p className="time-series-chart-page__section-desc">
+        Click and drag on the chart to select a time range. The selected range is reported via the <code>onBrush</code> callback.
+      </p>
+      <div className="time-series-chart-page__preview time-series-chart-page__preview--full">
+        <ChartComponent
+          series={ALL_SERIES}
+          height={220}
+          brushable
+          onBrush={(range: [number, number]) => setBrushRange(range)}
+        />
+        {brushRange && (
+          <div style={{ fontSize: 'var(--text-sm, 0.875rem)', color: 'var(--text-secondary)', marginBlockStart: '0.75rem' }}>
+            Selected range: <strong>{new Date(brushRange[0]).toLocaleTimeString()}</strong> to <strong>{new Date(brushRange[1]).toLocaleTimeString()}</strong>
+          </div>
+        )}
+      </div>
+    </section>
+  )
+}
+
+// ─── Section: Zoom Demo ──────────────────────────────────────────────────────
+
+function ZoomDemoSection({ ChartComponent }: { ChartComponent: React.ComponentType<any> }) {
+  return (
+    <section className="time-series-chart-page__section" id="zoom">
+      <h2 className="time-series-chart-page__section-title">
+        <a href="#zoom">Scroll to Zoom</a>
+      </h2>
+      <p className="time-series-chart-page__section-desc">
+        Use the mouse wheel over the chart to zoom in/out on the time axis. A "Reset zoom" button appears when zoomed.
+      </p>
+      <div className="time-series-chart-page__preview time-series-chart-page__preview--full">
+        <ChartComponent
+          series={ALL_SERIES}
+          height={220}
+          zoomable
+        />
+      </div>
+    </section>
+  )
+}
+
+// ─── Section: Annotations Demo ───────────────────────────────────────────────
+
+function AnnotationsDemoSection({ ChartComponent }: { ChartComponent: React.ComponentType<any> }) {
+  const now = Date.now()
+  const annotations: ChartAnnotation[] = useMemo(() => [
+    { type: 'horizontal' as const, value: 70, label: 'Warning threshold', color: 'oklch(80% 0.18 85)', dashed: true },
+    { type: 'horizontal' as const, value: 90, label: 'Critical threshold', color: 'oklch(70% 0.2 30)', dashed: true },
+    { type: 'vertical' as const, value: now - 8 * 3_600_000, label: 'Deploy v2.7', color: 'oklch(65% 0.15 270)', dashed: true },
+  ], [now])
+
+  return (
+    <section className="time-series-chart-page__section" id="annotations">
+      <h2 className="time-series-chart-page__section-title">
+        <a href="#annotations">Annotations</a>
+      </h2>
+      <p className="time-series-chart-page__section-desc">
+        Add horizontal threshold lines and vertical event markers. Lines can be dashed or solid, with optional labels.
+      </p>
+      <div className="time-series-chart-page__preview time-series-chart-page__preview--full">
+        <ChartComponent
+          series={ALL_SERIES}
+          height={250}
+          annotations={annotations}
+        />
+      </div>
+    </section>
+  )
+}
+
+// ─── Section: Toggleable Series Demo ─────────────────────────────────────────
+
+function ToggleableSeriesDemoSection({ ChartComponent }: { ChartComponent: React.ComponentType<any> }) {
+  return (
+    <section className="time-series-chart-page__section" id="toggleable-series">
+      <h2 className="time-series-chart-page__section-title">
+        <a href="#toggleable-series">Toggleable Series</a>
+      </h2>
+      <p className="time-series-chart-page__section-desc">
+        Enable <code>toggleableSeries</code> to add checkboxes in the legend. Click to toggle individual series visibility.
+      </p>
+      <div className="time-series-chart-page__preview time-series-chart-page__preview--full">
+        <ChartComponent
+          series={ALL_SERIES}
+          height={220}
+          toggleableSeries
+        />
+      </div>
+    </section>
+  )
+}
+
 // ─── Main Page ────────────────────────────────────────────────────────────────
 
 export default function TimeSeriesChartPage() {
@@ -1076,7 +1193,19 @@ export default function TimeSeriesChartPage() {
         </div>
       </section>
 
-      {/* ── 6. Weight Tiers ────────────────────────────── */}
+      {/* ── 6. Brush Selection ──────────────────────────── */}
+      <BrushDemoSection ChartComponent={ChartComponent} />
+
+      {/* ── 7. Zoom ──────────────────────────────────────── */}
+      <ZoomDemoSection ChartComponent={ChartComponent} />
+
+      {/* ── 8. Annotations ───────────────────────────────── */}
+      <AnnotationsDemoSection ChartComponent={ChartComponent} />
+
+      {/* ── 9. Toggleable Series ─────────────────────────── */}
+      <ToggleableSeriesDemoSection ChartComponent={ChartComponent} />
+
+      {/* ── 10. Weight Tiers ────────────────────────────── */}
       <section className="time-series-chart-page__section" id="tiers">
         <h2 className="time-series-chart-page__section-title">
           <a href="#tiers">Weight Tiers</a>
@@ -1170,6 +1299,13 @@ export default function TimeSeriesChartPage() {
         </p>
         <Card variant="default" padding="md">
           <PropsTable props={chartProps} />
+        </Card>
+        <h3 className="time-series-chart-page__section-title" style={{ marginBlockStart: 'var(--space-lg, 1.5rem)', fontSize: 'var(--text-base, 1rem)' }}>
+          ChartAnnotation
+        </h3>
+        <p className="time-series-chart-page__section-desc">Sub-type for annotation lines passed via the <code>annotations</code> prop.</p>
+        <Card variant="default" padding="md">
+          <PropsTable props={chartAnnotationProps} />
         </Card>
         <h3 className="time-series-chart-page__section-title" style={{ marginBlockStart: 'var(--space-lg, 1.5rem)', fontSize: 'var(--text-base, 1rem)' }}>
           TimeSeriesData

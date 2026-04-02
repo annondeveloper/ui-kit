@@ -105,6 +105,7 @@ const StatusBadgePage = lazy(() => import('./pages/components/StatusBadgePage'))
 const StatusPulsePage = lazy(() => import('./pages/components/StatusPulsePage'))
 const StorageBarPage = lazy(() => import('./pages/components/StorageBarPage'))
 const SwitchFaceplatePage = lazy(() => import('./pages/components/SwitchFaceplatePage'))
+const NetworkInterfaceGridPage = lazy(() => import('./pages/components/NetworkInterfaceGridPage'))
 const StepWizardPage = lazy(() => import('./pages/components/StepWizardPage'))
 const StreamingTextPage = lazy(() => import('./pages/components/StreamingTextPage'))
 const TabsPage = lazy(() => import('./pages/components/TabsPage'))
@@ -168,6 +169,13 @@ const EntityCardPage = lazy(() => import('./pages/components/EntityCardPage'))
 const ServiceStripPage = lazy(() => import('./pages/components/ServiceStripPage'))
 const DiskMountBarPage = lazy(() => import('./pages/components/DiskMountBarPage'))
 const ConnectionTestPanelPage = lazy(() => import('./pages/components/ConnectionTestPanelPage'))
+
+// ─── Netrak Infrastructure Components ─────────────────────────────────────
+const VlanBusBarPage = lazy(() => import('./pages/components/VlanBusBarPage'))
+const TopologyGraphPage = lazy(() => import('./pages/components/TopologyGraphPage'))
+const PipelineDagPage = lazy(() => import('./pages/components/PipelineDagPage'))
+const DashboardTemplatePage = lazy(() => import('./pages/components/DashboardTemplatePage'))
+const PluginDashboardPage = lazy(() => import('./pages/components/PluginDashboardPage'))
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
@@ -276,6 +284,7 @@ createRoot(document.getElementById('root')!).render(
             <Route path="components/storage-bar" element={<Suspense><StorageBarPage /></Suspense>} />
             <Route path="components/streaming-text" element={<Suspense><StreamingTextPage /></Suspense>} />
             <Route path="components/switch-faceplate" element={<Suspense><SwitchFaceplatePage /></Suspense>} />
+            <Route path="components/network-interface-grid" element={<Suspense><NetworkInterfaceGridPage /></Suspense>} />
             <Route path="components/tabs" element={<Suspense><TabsPage /></Suspense>} />
             <Route path="components/tag-input" element={<Suspense><TagInputPage /></Suspense>} />
             <Route path="components/text-reveal" element={<Suspense><TextRevealPage /></Suspense>} />
@@ -337,6 +346,13 @@ createRoot(document.getElementById('root')!).render(
             <Route path="components/service-strip" element={<Suspense><ServiceStripPage /></Suspense>} />
             <Route path="components/disk-mount-bar" element={<Suspense><DiskMountBarPage /></Suspense>} />
             <Route path="components/connection-test-panel" element={<Suspense><ConnectionTestPanelPage /></Suspense>} />
+
+            {/* Netrak infrastructure components */}
+            <Route path="components/vlan-bus-bar" element={<Suspense><VlanBusBarPage /></Suspense>} />
+            <Route path="components/topology-graph" element={<Suspense><TopologyGraphPage /></Suspense>} />
+            <Route path="components/pipeline-dag" element={<Suspense><PipelineDagPage /></Suspense>} />
+            <Route path="components/dashboard-template" element={<Suspense><DashboardTemplatePage /></Suspense>} />
+            <Route path="components/plugin-dashboard" element={<Suspense><PluginDashboardPage /></Suspense>} />
           </Route>
 
           {/* Embed route — rendered WITHOUT App shell (no sidebar/header) */}

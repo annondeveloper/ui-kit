@@ -4,6 +4,24 @@ All notable changes to this project will be documented in this file.
 
 This changelog is auto-generated from [conventional commits](https://www.conventionalcommits.org/).
 
+## 2.8.0 (2026-04-02)
+
+### Features
+
+- **feat:** NetworkInterfaceGrid — Grid visualization of network interfaces with status, speed, traffic sparklines
+- **feat:** VlanBusBar — SVG bus diagram showing VLAN membership across ports with color-coded segments
+- **feat:** TopologyGraph — Interactive network topology with SVG + Canvas renderers, pan/zoom, minimap, 10K+ node support
+- **feat:** PipelineDAG — SVG DAG visualization for data pipelines with animated flow and status indicators
+- **feat:** DashboardTemplate — Composable dashboard layout with metric strip, content grid, collapsible sidebar, auto-refresh
+- **feat:** PluginDashboard — Declarative dashboard builder with 8 built-in configs (PostgreSQL, MySQL, Redis, Kafka, K8s, Docker, Nginx, Elasticsearch)
+- **feat:** Graph layout engine — Zero-dependency force-directed, Sugiyama DAG, circular, and grid layout algorithms with Barnes-Hut quadtree
+- **feat:** TimeSeriesChart enhancements — brush selection, scroll-to-zoom, toggleable series, chart annotations
+
+### Documentation
+
+- Demo pages for all 7 new components with interactive playgrounds
+- All components registered in MCP server with categories and related groups
+
 ## 2.6.0 (2026-03-28)
 
 ### Features
