@@ -352,16 +352,22 @@ function TimeSeriesChartInner({
         if (dist < minDist) { minDist = dist; closest = i }
       }
       setHoveredIdx(closest)
-      // Position tooltip imperatively for zero-lag
+      // Position tooltip within chart bounds, close to cursor
       const tip = tooltipRef.current
       if (tip) {
         const tw = tip.offsetWidth
         const th = tip.offsetHeight
+        // Use chart container bounds, not viewport
         let x = e.clientX - tw / 2
         let y = e.clientY - th - 12
-        if (x + tw > window.innerWidth - 8) x = window.innerWidth - tw - 8
-        if (x < 8) x = 8
-        if (y < 8) y = e.clientY + 16
+        // Clamp right: keep tooltip inside chart right edge
+        if (x + tw > rect.right - 4) x = rect.right - tw - 4
+        // Clamp left: keep tooltip inside chart left edge
+        if (x < rect.left + 4) x = rect.left + 4
+        // Clamp top: flip below cursor if near chart top
+        if (y < rect.top + 4) y = e.clientY + 16
+        // Clamp bottom: keep above chart bottom
+        if (y + th > rect.bottom - 4) y = rect.bottom - th - 4
         tip.style.left = `${x}px`
         tip.style.top = `${y}px`
       }
