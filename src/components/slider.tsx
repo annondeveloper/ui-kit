@@ -328,8 +328,8 @@ export const Slider = forwardRef<HTMLDivElement, SliderProps>(
     const isControlled = controlledValue !== undefined
     const currentValue = isControlled ? controlledValue : internalValue
 
-    // Calculate fill percentage for track background
-    const fillPct = ((currentValue - min) / (max - min)) * 100
+    // Calculate fill percentage for track background (guard against min === max)
+    const fillPct = max === min ? 100 : ((currentValue - min) / (max - min)) * 100
 
     const handleChange = useCallback(
       (e: ChangeEvent<HTMLInputElement>) => {

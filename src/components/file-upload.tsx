@@ -3,6 +3,7 @@
 import {
   forwardRef,
   useCallback,
+  useEffect,
   useRef,
   useState,
   useMemo,
@@ -345,10 +346,15 @@ export const FileUpload = forwardRef<HTMLDivElement, FileUploadProps>(
 
     const validateFiles = useCallback(
       (incoming: File[]): File[] | null => {
-        // Check max files
-        if (maxFiles !== undefined && incoming.length > maxFiles) {
-          onError?.(`Maximum ${maxFiles} file${maxFiles === 1 ? '' : 's'} allowed`)
-          return null
+        // Check max files (accounting for existing files)
+        if (maxFiles !== undefined && files.length + incoming.length > maxFiles) {
+          const remaining = maxFiles - files.length
+          if (remaining <= 0) {
+            onError?.(`Maximum ${maxFiles} file${maxFiles === 1 ? '' : 's'} already selected`)
+            return null
+          }
+          // Accept partial — take only what fits
+          incoming = incoming.slice(0, remaining)
         }
 
         // Check each file
@@ -367,7 +373,7 @@ export const FileUpload = forwardRef<HTMLDivElement, FileUploadProps>(
 
         return incoming
       },
-      [accept, maxSize, maxFiles, onError]
+      [accept, maxSize, maxFiles, onError, files.length]
     )
 
     const handleFiles = useCallback(
@@ -448,17 +454,37 @@ export const FileUpload = forwardRef<HTMLDivElement, FileUploadProps>(
       [files, onChange]
     )
 
-    // ── Preview URL memoization ───────────────────────────────────────
+    // ── Preview URLs with proper revocation ────────────────────────────
 
-    const filePreviews = useMemo(
-      () =>
-        files.map(file => ({
-          file,
-          isImage: file.type.startsWith('image/'),
-          url: file.type.startsWith('image/') ? URL.createObjectURL(file) : null,
-        })),
-      [files]
-    )
+    const urlMapRef = useRef<Map<File, string>>(new Map())
+
+    const filePreviews = useMemo(() => {
+      const oldMap = urlMapRef.current
+      const newMap = new Map<File, string>()
+      const result = files.map(file => {
+        const isImage = file.type.startsWith('image/')
+        let url: string | null = null
+        if (isImage) {
+          url = oldMap.get(file) ?? URL.createObjectURL(file)
+          newMap.set(file, url)
+        }
+        return { file, isImage, url }
+      })
+      // Revoke URLs for files no longer in the list
+      for (const [file, url] of oldMap) {
+        if (!newMap.has(file)) URL.revokeObjectURL(url)
+      }
+      urlMapRef.current = newMap
+      return result
+    }, [files])
+
+    // Revoke all URLs on unmount
+    useEffect(() => {
+      return () => {
+        for (const url of urlMapRef.current.values()) URL.revokeObjectURL(url)
+        urlMapRef.current.clear()
+      }
+    }, [])
 
     // ── Render ────────────────────────────────────────────────────────
 

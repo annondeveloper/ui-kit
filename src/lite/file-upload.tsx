@@ -40,6 +40,8 @@ export const FileUpload = forwardRef<HTMLInputElement, LiteFileUploadProps>(
       }
 
       if (showPreview) {
+        // Revoke old URLs before creating new ones
+        previews.forEach(url => URL.revokeObjectURL(url))
         const urls = files
           .filter(f => f.type.startsWith('image/'))
           .map(f => URL.createObjectURL(f))
@@ -67,8 +69,8 @@ export const FileUpload = forwardRef<HTMLInputElement, LiteFileUploadProps>(
         {hint && <span className="ui-lite-file-upload__hint">{hint}</span>}
         {showPreview && previews.length > 0 && (
           <div className="ui-lite-file-upload__previews">
-            {previews.map(url => (
-              <img key={url} src={url} className="ui-lite-file-upload__preview" alt="Preview" />
+            {previews.map((url, i) => (
+              <img key={url} src={url} className="ui-lite-file-upload__preview" alt={`Preview ${i + 1}`} />
             ))}
           </div>
         )}

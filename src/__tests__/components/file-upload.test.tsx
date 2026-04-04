@@ -215,11 +215,10 @@ describe('FileUpload', () => {
   // ─── Max files ─────────────────────────────────────────────────────
 
   describe('max files', () => {
-    it('limits number of files to maxFiles', () => {
+    it('accepts partial files when exceeding maxFiles', () => {
       const onChange = vi.fn()
-      const onError = vi.fn()
       const { container } = render(
-        <FileUpload name="files" multiple maxFiles={2} onChange={onChange} onError={onError} />
+        <FileUpload name="files" multiple maxFiles={2} onChange={onChange} />
       )
       const fileInput = container.querySelector('input[type="file"]') as HTMLInputElement
       const files = [
@@ -229,7 +228,10 @@ describe('FileUpload', () => {
       ]
       Object.defineProperty(fileInput, 'files', { value: files, writable: false })
       fireEvent.change(fileInput)
-      expect(onError).toHaveBeenCalled()
+      // Partial accept: takes only the first 2
+      expect(onChange).toHaveBeenCalled()
+      const accepted = onChange.mock.calls[0][0]
+      expect(accepted).toHaveLength(2)
     })
   })
 
