@@ -28,7 +28,7 @@ const pages: { path: string; label: string; icon: IconName }[] = [
   { path: '/performance', label: 'Performance', icon: 'zap' },
   { path: '/generator', label: 'Code Generator', icon: 'code' },
   { path: '/choreography', label: 'Choreography', icon: 'activity' },
-  { path: '/mcp', label: 'MCP Server', icon: 'terminal' },
+  { path: '/mcp', label: 'AI Plugins', icon: 'zap' },
   { path: '/figma', label: 'Figma Integration', icon: 'image' },
   { path: '/comparison', label: 'Tier Comparison', icon: 'bar-chart' as IconName },
   { path: '/embed', label: 'Embed', icon: 'code' },
