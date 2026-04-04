@@ -1,5 +1,7 @@
 'use client'
 
+import { type ReactElement } from 'react'
+
 import { type SpotlightCardProps, SpotlightCard as BaseSpotlightCard } from '../domain/spotlight-card'
 import { useMotionLevel } from '../core/motion/use-motion-level'
 import { css } from '../core/styles/css-tag'
@@ -88,7 +90,7 @@ const premiumSpotlightCardStyles = css`
   }
 `
 
-export function SpotlightCard({ motion: motionProp, ...rest }: SpotlightCardProps) {
+export function SpotlightCard({ motion: motionProp, ...rest }: SpotlightCardProps): ReactElement {
   const motionLevel = useMotionLevel(motionProp)
   useStyles('premium-spotlight-card', premiumSpotlightCardStyles)
 

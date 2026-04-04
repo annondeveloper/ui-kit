@@ -1,6 +1,6 @@
 'use client'
 
-import { useRef, useCallback } from 'react'
+import { useRef, useCallback, type ReactElement } from 'react'
 import { ColumnVisibilityToggle as BaseColumnVisibilityToggle, type ColumnVisibilityToggleProps } from '../domain/column-visibility-toggle'
 import { useMotionLevel } from '../core/motion/use-motion-level'
 import { useEntrance } from '../core/motion/use-entrance'
@@ -52,7 +52,7 @@ const premiumColumnVisibilityStyles = css`
 export function ColumnVisibilityToggle({
   motion: motionProp,
   ...rest
-}: ColumnVisibilityToggleProps) {
+}: ColumnVisibilityToggleProps): ReactElement {
   const wrapperRef = useRef<HTMLDivElement>(null)
   const motionLevel = useMotionLevel(motionProp)
   useEntrance(wrapperRef, motionLevel >= 2 ? 'fade-up' : 'none', { duration: 200 })

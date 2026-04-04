@@ -6,6 +6,7 @@ import {
   useCallback,
   type HTMLAttributes,
   type ReactNode,
+  type ReactElement,
 } from 'react'
 import { css } from '../core/styles/css-tag'
 import { useStyles } from '../core/styles/use-styles'
@@ -102,7 +103,7 @@ export function Ripple({
   style,
   onClick: onClickProp,
   ...rest
-}: RippleProps) {
+}: RippleProps): ReactElement {
   useStyles('ripple', rippleStyles)
   const motionLevel = useMotionLevel(motionProp)
   const ref = useRef<HTMLDivElement>(null)

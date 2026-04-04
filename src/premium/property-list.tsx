@@ -1,6 +1,6 @@
 'use client'
 
-import { useRef } from 'react'
+import { useRef, type ReactElement } from 'react'
 import { PropertyList as BasePropertyList, type PropertyListProps } from '../domain/property-list'
 import { useMotionLevel } from '../core/motion/use-motion-level'
 import { useEntrance } from '../core/motion/use-entrance'
@@ -68,7 +68,7 @@ const premiumPropertyListStyles = css`
 export function PropertyList({
   motion: motionProp,
   ...rest
-}: PropertyListProps) {
+}: PropertyListProps): ReactElement {
   const wrapperRef = useRef<HTMLDivElement>(null)
   const motionLevel = useMotionLevel(motionProp)
   useEntrance(wrapperRef, motionLevel >= 2 ? 'fade-up' : 'none', { duration: 280 })

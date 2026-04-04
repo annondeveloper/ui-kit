@@ -6,6 +6,7 @@ import {
   useCallback,
   useRef,
   type ReactNode,
+  type ReactElement,
 } from 'react'
 import { css } from '../core/styles/css-tag'
 import { useStyles } from '../core/styles/use-styles'
@@ -307,7 +308,7 @@ export function Tour({
   showProgress = true,
   showSkip = true,
   motion: motionProp,
-}: TourProps) {
+}: TourProps): ReactElement | null {
   useStyles('tour', tourStyles)
   const motionLevel = useMotionLevel(motionProp)
 

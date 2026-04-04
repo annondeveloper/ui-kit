@@ -1,5 +1,7 @@
 'use client'
 
+import { type ReactElement } from 'react'
+
 import { GeoMap as BaseGeoMap, type GeoMapProps } from '../domain/geo-map'
 import { useMotionLevel } from '../core/motion/use-motion-level'
 import { css } from '../core/styles/css-tag'
@@ -77,7 +79,7 @@ const premiumGeoMapStyles = css`
   }
 `
 
-export function GeoMap({ motion: motionProp, ...rest }: GeoMapProps) {
+export function GeoMap({ motion: motionProp, ...rest }: GeoMapProps): ReactElement {
   const motionLevel = useMotionLevel(motionProp)
   useStyles('premium-geo-map', premiumGeoMapStyles)
 

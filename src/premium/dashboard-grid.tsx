@@ -1,6 +1,6 @@
 'use client'
 
-import { useRef } from 'react'
+import { useRef, type ReactElement } from 'react'
 import { DashboardGrid as BaseDashboardGrid, type DashboardGridProps } from '../domain/dashboard-grid'
 import { useMotionLevel } from '../core/motion/use-motion-level'
 import { useEntrance } from '../core/motion/use-entrance'
@@ -91,7 +91,7 @@ const premiumDashboardGridStyles = css`
 export function DashboardGrid({
   motion: motionProp,
   ...rest
-}: DashboardGridProps) {
+}: DashboardGridProps): ReactElement {
   const wrapperRef = useRef<HTMLDivElement>(null)
   const motionLevel = useMotionLevel(motionProp)
   useEntrance(wrapperRef, motionLevel >= 2 ? 'fade-up' : 'none', { duration: 300 })

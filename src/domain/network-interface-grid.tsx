@@ -4,6 +4,7 @@ import {
   type HTMLAttributes,
   useState,
   useMemo,
+  type ReactElement,
 } from 'react'
 import { css } from '../core/styles/css-tag'
 import { useStyles } from '../core/styles/use-styles'
@@ -459,7 +460,7 @@ function NetworkInterfaceGridInner({
   )
 }
 
-export function NetworkInterfaceGrid(props: NetworkInterfaceGridProps) {
+export function NetworkInterfaceGrid(props: NetworkInterfaceGridProps): ReactElement {
   return (
     <ComponentErrorBoundary>
       <NetworkInterfaceGridInner {...props} />

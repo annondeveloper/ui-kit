@@ -6,6 +6,7 @@ import {
   useState,
   useMemo,
   useCallback,
+  type ReactElement,
 } from 'react'
 import { css } from '../core/styles/css-tag'
 import { useStyles } from '../core/styles/use-styles'
@@ -654,7 +655,7 @@ function VlanBusBarInner({
   }
 }
 
-export function VlanBusBar(props: VlanBusBarProps) {
+export function VlanBusBar(props: VlanBusBarProps): ReactElement {
   return (
     <ComponentErrorBoundary>
       <VlanBusBarInner {...props} />

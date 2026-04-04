@@ -6,6 +6,7 @@ import {
   useState,
   type HTMLAttributes,
   type ReactNode,
+  type ReactElement,
 } from 'react'
 import { css } from '../core/styles/css-tag'
 import { useStyles } from '../core/styles/use-styles'
@@ -2765,7 +2766,7 @@ function UpstreamDashboardInner({
   )
 }
 
-export function UpstreamDashboard(props: UpstreamDashboardProps) {
+export function UpstreamDashboard(props: UpstreamDashboardProps): ReactElement {
   return (
     <ComponentErrorBoundary>
       <UpstreamDashboardInner {...props} />

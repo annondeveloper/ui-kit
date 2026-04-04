@@ -6,6 +6,7 @@ import {
   useState,
   type HTMLAttributes,
   type ReactNode,
+  type ReactElement,
 } from 'react'
 import { css } from '../core/styles/css-tag'
 import { useStyles } from '../core/styles/use-styles'
@@ -151,7 +152,7 @@ export function ScrollReveal({
   className,
   style,
   ...rest
-}: ScrollRevealProps) {
+}: ScrollRevealProps): ReactElement {
   const cls = useStyles('scroll-reveal', scrollRevealStyles)
   const motionLevel = useMotionLevel(motionProp)
   const ref = useRef<HTMLDivElement>(null)

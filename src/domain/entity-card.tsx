@@ -4,6 +4,7 @@ import {
   useRef,
   type HTMLAttributes,
   type ReactNode,
+  type ReactElement,
 } from 'react'
 import { css } from '../core/styles/css-tag'
 import { useStyles } from '../core/styles/use-styles'
@@ -493,7 +494,7 @@ function EntityCardInner({
   )
 }
 
-export function EntityCard(props: EntityCardProps) {
+export function EntityCard(props: EntityCardProps): ReactElement {
   return (
     <ComponentErrorBoundary>
       <EntityCardInner {...props} />

@@ -1,5 +1,7 @@
 'use client'
 
+import { type ReactElement } from 'react'
+
 import { LogViewer as BaseLogViewer, type LogViewerProps } from '../domain/log-viewer'
 import { useMotionLevel } from '../core/motion/use-motion-level'
 import { css } from '../core/styles/css-tag'
@@ -87,7 +89,7 @@ const premiumLogViewerStyles = css`
   }
 `
 
-export function LogViewer({ motion: motionProp, ...rest }: LogViewerProps) {
+export function LogViewer({ motion: motionProp, ...rest }: LogViewerProps): ReactElement {
   const motionLevel = useMotionLevel(motionProp)
   useStyles('premium-log-viewer', premiumLogViewerStyles)
 

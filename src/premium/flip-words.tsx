@@ -1,6 +1,6 @@
 'use client'
 
-import { useRef } from 'react'
+import { useRef, type ReactElement } from 'react'
 import { FlipWords as BaseFlipWords, type FlipWordsProps } from '../domain/flip-words'
 import { useMotionLevel } from '../core/motion/use-motion-level'
 import { css } from '../core/styles/css-tag'
@@ -105,7 +105,7 @@ const premiumFlipWordsStyles = css`
 export function FlipWords({
   motion: motionProp,
   ...rest
-}: FlipWordsProps) {
+}: FlipWordsProps): ReactElement {
   const wrapperRef = useRef<HTMLSpanElement>(null)
   const motionLevel = useMotionLevel(motionProp)
   useStyles('premium-flip-words', premiumFlipWordsStyles)

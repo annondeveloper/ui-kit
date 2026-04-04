@@ -8,6 +8,7 @@ import {
   useEffect,
   type HTMLAttributes,
   type ReactNode,
+  type ReactElement,
 } from 'react'
 import { css } from '../core/styles/css-tag'
 import { useStyles } from '../core/styles/use-styles'
@@ -407,7 +408,7 @@ function TopologyGraphInner({
   )
 }
 
-export function TopologyGraph(props: TopologyGraphProps) {
+export function TopologyGraph(props: TopologyGraphProps): ReactElement {
   return (
     <ComponentErrorBoundary>
       <TopologyGraphInner {...props} />

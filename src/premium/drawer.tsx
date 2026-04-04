@@ -1,5 +1,7 @@
 'use client'
 
+import { type ReactElement } from 'react'
+
 import type { ReactNode } from 'react'
 import { Drawer as BaseDrawer, type DrawerProps } from '../components/drawer'
 import { useMotionLevel } from '../core/motion/use-motion-level'
@@ -335,7 +337,7 @@ export function Drawer({
   motion: motionProp,
   children,
   ...rest
-}: DrawerProps) {
+}: DrawerProps): ReactElement {
   const motionLevel = useMotionLevel(motionProp)
   useStyles('premium-drawer', premiumDrawerStyles)
 

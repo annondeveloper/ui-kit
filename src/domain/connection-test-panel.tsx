@@ -2,6 +2,7 @@
 
 import {
   type HTMLAttributes,
+  type ReactElement,
 } from 'react'
 import { css } from '../core/styles/css-tag'
 import { useStyles } from '../core/styles/use-styles'
@@ -475,7 +476,7 @@ function ConnectionTestPanelInner({
   )
 }
 
-export function ConnectionTestPanel(props: ConnectionTestPanelProps) {
+export function ConnectionTestPanel(props: ConnectionTestPanelProps): ReactElement {
   return (
     <ComponentErrorBoundary>
       <ConnectionTestPanelInner {...props} />

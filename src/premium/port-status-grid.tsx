@@ -1,5 +1,7 @@
 'use client'
 
+import { type ReactElement } from 'react'
+
 import { PortStatusGrid as BasePortStatusGrid, type PortStatusGridProps } from '../domain/port-status-grid'
 import { useMotionLevel } from '../core/motion/use-motion-level'
 import { css } from '../core/styles/css-tag'
@@ -80,7 +82,7 @@ const premiumPortStatusGridStyles = css`
   }
 `
 
-export function PortStatusGrid({ motion: motionProp, ...rest }: PortStatusGridProps) {
+export function PortStatusGrid({ motion: motionProp, ...rest }: PortStatusGridProps): ReactElement {
   const motionLevel = useMotionLevel(motionProp)
   useStyles('premium-port-status-grid', premiumPortStatusGridStyles)
 

@@ -187,7 +187,7 @@ export function Tooltip({
   interactive = false,
   maxWidth,
   motion: motionProp,
-}: TooltipProps) {
+}: TooltipProps): ReactElement {
   useStyles('tooltip', tooltipStyles)
   const motionLevel = useMotionLevel(motionProp)
   const tooltipId = useStableId('tooltip')

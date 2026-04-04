@@ -3,6 +3,7 @@
 import {
   type HTMLAttributes,
   type ReactNode,
+  type ReactElement,
 } from 'react'
 import { css } from '../core/styles/css-tag'
 import { useStyles } from '../core/styles/use-styles'
@@ -120,7 +121,7 @@ export function BorderBeam({
   className,
   style,
   ...rest
-}: BorderBeamProps) {
+}: BorderBeamProps): ReactElement {
   useStyles('border-beam', borderBeamStyles)
   const motionLevel = useMotionLevel(motionProp)
 

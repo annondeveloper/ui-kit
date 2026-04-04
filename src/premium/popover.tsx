@@ -1,5 +1,7 @@
 'use client'
 
+import { type ReactElement } from 'react'
+
 import { Popover as BasePopover, type PopoverProps } from '../components/popover'
 import { useMotionLevel } from '../core/motion/use-motion-level'
 import { css } from '../core/styles/css-tag'
@@ -104,7 +106,7 @@ const premiumPopoverStyles = css`
   }
 `
 
-export function Popover({ motion: motionProp, ...rest }: PopoverProps) {
+export function Popover({ motion: motionProp, ...rest }: PopoverProps): ReactElement {
   const motionLevel = useMotionLevel(motionProp)
   useStyles('premium-popover', premiumPopoverStyles)
 

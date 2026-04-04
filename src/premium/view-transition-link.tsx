@@ -1,5 +1,7 @@
 'use client'
 
+import { type ReactElement } from 'react'
+
 import { ViewTransitionLink as BaseViewTransitionLink, type ViewTransitionLinkProps } from '../domain/view-transition-link'
 import { useMotionLevel } from '../core/motion/use-motion-level'
 import { css } from '../core/styles/css-tag'
@@ -72,7 +74,7 @@ const premiumViewTransitionLinkStyles = css`
   }
 `
 
-export function ViewTransitionLink(props: ViewTransitionLinkProps) {
+export function ViewTransitionLink(props: ViewTransitionLinkProps): ReactElement {
   const motionLevel = useMotionLevel()
   useStyles('premium-view-transition-link', premiumViewTransitionLinkStyles)
 

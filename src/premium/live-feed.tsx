@@ -1,5 +1,7 @@
 'use client'
 
+import { type ReactElement } from 'react'
+
 import { LiveFeed as BaseLiveFeed, type LiveFeedProps } from '../domain/live-feed'
 import { useMotionLevel } from '../core/motion/use-motion-level'
 import { css } from '../core/styles/css-tag'
@@ -94,7 +96,7 @@ const premiumLiveFeedStyles = css`
   }
 `
 
-export function LiveFeed({ motion: motionProp, ...rest }: LiveFeedProps) {
+export function LiveFeed({ motion: motionProp, ...rest }: LiveFeedProps): ReactElement {
   const motionLevel = useMotionLevel(motionProp)
   useStyles('premium-live-feed', premiumLiveFeedStyles)
 

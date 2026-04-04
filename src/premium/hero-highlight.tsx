@@ -1,5 +1,7 @@
 'use client'
 
+import { type ReactElement } from 'react'
+
 import { HeroHighlight as BaseHeroHighlight, Highlight as BaseHighlight, type HeroHighlightProps, type HighlightProps } from '../domain/hero-highlight'
 import { useMotionLevel } from '../core/motion/use-motion-level'
 import { css } from '../core/styles/css-tag'
@@ -73,7 +75,7 @@ const premiumHeroStyles = css`
   }
 `
 
-export function HeroHighlight({ motion: motionProp, ...rest }: HeroHighlightProps) {
+export function HeroHighlight({ motion: motionProp, ...rest }: HeroHighlightProps): ReactElement {
   const motionLevel = useMotionLevel(motionProp)
   useStyles('premium-hero-highlight', premiumHeroStyles)
 
@@ -86,7 +88,7 @@ export function HeroHighlight({ motion: motionProp, ...rest }: HeroHighlightProp
 
 HeroHighlight.displayName = 'HeroHighlight'
 
-export function Highlight(props: HighlightProps) {
+export function Highlight(props: HighlightProps): ReactElement {
   return <BaseHighlight {...props} />
 }
 

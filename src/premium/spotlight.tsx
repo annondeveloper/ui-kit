@@ -1,5 +1,7 @@
 'use client'
 
+import { type ReactElement } from 'react'
+
 import { Spotlight as BaseSpotlight, type SpotlightProps } from '../components/spotlight'
 import { useMotionLevel } from '../core/motion/use-motion-level'
 import { css } from '../core/styles/css-tag'
@@ -48,7 +50,7 @@ const premiumStyles = css`
   }
 `
 
-export function Spotlight({ motion: motionProp, ...rest }: SpotlightProps) {
+export function Spotlight({ motion: motionProp, ...rest }: SpotlightProps): ReactElement {
   const motionLevel = useMotionLevel(motionProp)
   useStyles('premium-spotlight', premiumStyles)
 

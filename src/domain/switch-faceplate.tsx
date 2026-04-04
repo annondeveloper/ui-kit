@@ -4,6 +4,7 @@ import {
   type HTMLAttributes,
   useState,
   useMemo,
+  type ReactElement,
 } from 'react'
 import { css } from '../core/styles/css-tag'
 import { useStyles } from '../core/styles/use-styles'
@@ -345,7 +346,7 @@ function SwitchFaceplateInner({
   )
 }
 
-export function SwitchFaceplate(props: SwitchFaceplateProps) {
+export function SwitchFaceplate(props: SwitchFaceplateProps): ReactElement {
   return (
     <ComponentErrorBoundary>
       <SwitchFaceplateInner {...props} />

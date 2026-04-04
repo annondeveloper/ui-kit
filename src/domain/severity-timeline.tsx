@@ -4,6 +4,7 @@ import {
   type HTMLAttributes,
   type ReactNode,
   useState,
+  type ReactElement,
 } from 'react'
 import { css } from '../core/styles/css-tag'
 import { useStyles } from '../core/styles/use-styles'
@@ -299,7 +300,7 @@ function SeverityTimelineInner({
   )
 }
 
-export function SeverityTimeline(props: SeverityTimelineProps) {
+export function SeverityTimeline(props: SeverityTimelineProps): ReactElement {
   return (
     <ComponentErrorBoundary>
       <SeverityTimelineInner {...props} />

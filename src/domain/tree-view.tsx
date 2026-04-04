@@ -7,6 +7,7 @@ import {
   useState,
   type HTMLAttributes,
   type ReactNode,
+  type ReactElement,
 } from 'react'
 import { css } from '../core/styles/css-tag'
 import { useStyles } from '../core/styles/use-styles'
@@ -442,7 +443,7 @@ export function TreeView({
   motion: motionProp,
   className,
   ...rest
-}: TreeViewProps) {
+}: TreeViewProps): ReactElement {
   const cls = useStyles('tree-view', treeViewStyles)
   const motionLevel = useMotionLevel(motionProp)
   const treeRef = useRef<HTMLUListElement>(null)

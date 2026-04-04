@@ -1,5 +1,7 @@
 'use client'
 
+import { type ReactElement } from 'react'
+
 import { SeverityTimeline as BaseSeverityTimeline, type SeverityTimelineProps } from '../domain/severity-timeline'
 import { useMotionLevel } from '../core/motion/use-motion-level'
 import { css } from '../core/styles/css-tag'
@@ -95,7 +97,7 @@ const premiumSeverityTimelineStyles = css`
   }
 `
 
-export function SeverityTimeline({ motion: motionProp, ...rest }: SeverityTimelineProps) {
+export function SeverityTimeline({ motion: motionProp, ...rest }: SeverityTimelineProps): ReactElement {
   const motionLevel = useMotionLevel(motionProp)
   useStyles('premium-severity-timeline', premiumSeverityTimelineStyles)
 

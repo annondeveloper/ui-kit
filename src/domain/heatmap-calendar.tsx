@@ -4,6 +4,7 @@ import {
   type HTMLAttributes,
   useMemo,
   useState,
+  type ReactElement,
 } from 'react'
 import { css } from '../core/styles/css-tag'
 import { useStyles } from '../core/styles/use-styles'
@@ -327,7 +328,7 @@ function HeatmapCalendarInner({
   )
 }
 
-export function HeatmapCalendar(props: HeatmapCalendarProps) {
+export function HeatmapCalendar(props: HeatmapCalendarProps): ReactElement {
   return (
     <ComponentErrorBoundary>
       <HeatmapCalendarInner {...props} />

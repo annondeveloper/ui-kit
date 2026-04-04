@@ -1,6 +1,6 @@
 'use client'
 
-import { useRef } from 'react'
+import { useRef, type ReactElement } from 'react'
 import { DensitySelector as BaseDensitySelector, type DensitySelectorProps } from '../domain/density-selector'
 import { useMotionLevel } from '../core/motion/use-motion-level'
 import { useEntrance } from '../core/motion/use-entrance'
@@ -50,7 +50,7 @@ export function DensitySelector({
   motion: motionProp,
   onChange,
   ...rest
-}: DensitySelectorProps) {
+}: DensitySelectorProps): ReactElement {
   const wrapperRef = useRef<HTMLDivElement>(null)
   const motionLevel = useMotionLevel(motionProp)
   useEntrance(wrapperRef, motionLevel >= 2 ? 'fade-up' : 'none', { duration: 200 })

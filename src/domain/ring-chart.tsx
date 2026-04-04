@@ -3,6 +3,7 @@
 import {
   type HTMLAttributes,
   type ReactNode,
+  type ReactElement,
 } from 'react'
 import { css } from '../core/styles/css-tag'
 import { useStyles } from '../core/styles/use-styles'
@@ -180,7 +181,7 @@ function RingChartInner({
   )
 }
 
-export function RingChart(props: RingChartProps) {
+export function RingChart(props: RingChartProps): ReactElement {
   return (
     <ComponentErrorBoundary>
       <RingChartInner {...props} />

@@ -1,5 +1,7 @@
 'use client'
 
+import { type ReactElement } from 'react'
+
 import { ToastProvider as BaseToastProvider, useToast, type ToastProviderProps, type ToastApi, type ToastOptions } from '../domain/toast'
 import { useMotionLevel } from '../core/motion/use-motion-level'
 import { css } from '../core/styles/css-tag'
@@ -80,7 +82,7 @@ export function ToastProvider({
   motion: motionProp,
   children,
   ...rest
-}: ToastProviderProps) {
+}: ToastProviderProps): ReactElement {
   const motionLevel = useMotionLevel(motionProp)
   useStyles('premium-toast', premiumToastStyles)
 

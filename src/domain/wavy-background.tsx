@@ -4,6 +4,7 @@ import {
   useMemo,
   type HTMLAttributes,
   type ReactNode,
+  type ReactElement,
 } from 'react'
 import { css } from '../core/styles/css-tag'
 import { useStyles } from '../core/styles/use-styles'
@@ -134,7 +135,7 @@ export function WavyBackground({
   className,
   style,
   ...rest
-}: WavyBackgroundProps) {
+}: WavyBackgroundProps): ReactElement {
   useStyles('wavy-background', wavyBackgroundStyles)
   const motionLevel = useMotionLevel(motionProp)
 

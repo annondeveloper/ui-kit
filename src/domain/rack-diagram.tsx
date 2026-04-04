@@ -3,6 +3,7 @@
 import {
   type HTMLAttributes,
   useState,
+  type ReactElement,
 } from 'react'
 import { css } from '../core/styles/css-tag'
 import { useStyles } from '../core/styles/use-styles'
@@ -160,7 +161,7 @@ function RackDiagramInner({
   )
 }
 
-export function RackDiagram(props: RackDiagramProps) {
+export function RackDiagram(props: RackDiagramProps): ReactElement {
   return (
     <ComponentErrorBoundary>
       <RackDiagramInner {...props} />

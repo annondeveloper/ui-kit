@@ -3,6 +3,7 @@
 import {
   type HTMLAttributes,
   useRef,
+  type ReactElement,
 } from 'react'
 import { css } from '../core/styles/css-tag'
 import { useStyles } from '../core/styles/use-styles'
@@ -227,7 +228,7 @@ function TimeRangeSelectorInner({
   )
 }
 
-export function TimeRangeSelector(props: TimeRangeSelectorProps) {
+export function TimeRangeSelector(props: TimeRangeSelectorProps): ReactElement {
   return (
     <ComponentErrorBoundary>
       <TimeRangeSelectorInner {...props} />

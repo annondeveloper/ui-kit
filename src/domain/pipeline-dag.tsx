@@ -5,6 +5,7 @@ import {
   useState,
   type HTMLAttributes,
   type ReactNode,
+  type ReactElement,
 } from 'react'
 import { css } from '../core/styles/css-tag'
 import { useStyles } from '../core/styles/use-styles'
@@ -556,7 +557,7 @@ function PipelineDAGInner({
   )
 }
 
-export function PipelineDAG(props: PipelineDAGProps) {
+export function PipelineDAG(props: PipelineDAGProps): ReactElement {
   return (
     <ComponentErrorBoundary>
       <PipelineDAGInner {...props} />

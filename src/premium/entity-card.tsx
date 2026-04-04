@@ -1,6 +1,6 @@
 'use client'
 
-import { useRef } from 'react'
+import { useRef, type ReactElement } from 'react'
 import { EntityCard as BaseEntityCard, type EntityCardProps } from '../domain/entity-card'
 import { useMotionLevel } from '../core/motion/use-motion-level'
 import { useEntrance } from '../core/motion/use-entrance'
@@ -92,7 +92,7 @@ const premiumEntityCardStyles = css`
 export function EntityCard({
   motion: motionProp,
   ...rest
-}: EntityCardProps) {
+}: EntityCardProps): ReactElement {
   const wrapperRef = useRef<HTMLDivElement>(null)
   const motionLevel = useMotionLevel(motionProp)
   useEntrance(wrapperRef, motionLevel >= 2 ? 'fade-up' : 'none', { duration: 280 })

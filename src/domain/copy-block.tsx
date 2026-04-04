@@ -5,6 +5,7 @@ import {
   useCallback,
   type HTMLAttributes,
   type ReactNode,
+  type ReactElement,
 } from 'react'
 import { css } from '../core/styles/css-tag'
 import { useStyles } from '../core/styles/use-styles'
@@ -596,7 +597,7 @@ export function CopyBlock({
   motion: motionProp,
   className,
   ...rest
-}: CopyBlockProps) {
+}: CopyBlockProps): ReactElement {
   useStyles('copy-block', copyBlockStyles)
   const motionLevel = useMotionLevel(motionProp)
   const [copied, setCopied] = useState(false)

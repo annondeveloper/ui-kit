@@ -6,6 +6,7 @@ import {
   useCallback,
   useEffect,
   type MouseEvent as ReactMouseEvent,
+  type ReactElement,
 } from 'react'
 import type { LayoutResult } from '../core/graph'
 
@@ -154,7 +155,7 @@ export function TopologyGraphSVG({
   motionLevel,
   width,
   height,
-}: TopologyGraphSVGProps) {
+}: TopologyGraphSVGProps): ReactElement {
   const svgRef = useRef<SVGSVGElement>(null)
   const [pan, setPan] = useState({ x: 0, y: 0 })
   const [zoom, setZoom] = useState(1)

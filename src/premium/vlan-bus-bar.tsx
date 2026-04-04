@@ -1,5 +1,7 @@
 'use client'
 
+import { type ReactElement } from 'react'
+
 import { type VlanBusBarProps, VlanBusBar as BaseVlanBusBar } from '../domain/vlan-bus-bar'
 import { useMotionLevel } from '../core/motion/use-motion-level'
 import { css } from '../core/styles/css-tag'
@@ -72,7 +74,7 @@ const premiumVlanBusBarStyles = css`
   }
 `
 
-export function VlanBusBar({ motion: motionProp, ...rest }: VlanBusBarProps) {
+export function VlanBusBar({ motion: motionProp, ...rest }: VlanBusBarProps): ReactElement {
   const motionLevel = useMotionLevel(motionProp)
   useStyles('premium-vlan-bus-bar', premiumVlanBusBarStyles)
 

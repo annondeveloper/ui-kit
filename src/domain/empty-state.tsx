@@ -4,6 +4,7 @@ import {
   useRef,
   type HTMLAttributes,
   type ReactNode,
+  type ReactElement,
 } from 'react'
 import { css } from '../core/styles/css-tag'
 import { useStyles } from '../core/styles/use-styles'
@@ -227,7 +228,7 @@ export function EmptyState({
   motion: motionProp,
   className,
   ...rest
-}: EmptyStateProps) {
+}: EmptyStateProps): ReactElement {
   useStyles('empty-state', emptyStateStyles)
   const motionLevel = useMotionLevel(motionProp)
   const containerRef = useRef<HTMLDivElement>(null)

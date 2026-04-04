@@ -1,5 +1,7 @@
 'use client'
 
+import { type ReactElement } from 'react'
+
 import React, {
   useCallback,
   useEffect,
@@ -227,7 +229,7 @@ export function SortableList({
   className,
   'aria-label': ariaLabel,
   ...rest
-}: SortableListProps) {
+}: SortableListProps): ReactElement {
   const cls = useStyles('sortable-list', sortableListStyles)
   const motionLevel = useMotionLevel(motionProp)
   const listRef = useRef<HTMLDivElement>(null)

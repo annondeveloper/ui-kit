@@ -4,6 +4,7 @@ import {
   useMemo,
   type HTMLAttributes,
   type ReactNode,
+  type ReactElement,
 } from 'react'
 import { css } from '../core/styles/css-tag'
 import { useStyles } from '../core/styles/use-styles'
@@ -980,7 +981,7 @@ function PluginDashboardInner({
   )
 }
 
-export function PluginDashboard(props: PluginDashboardProps) {
+export function PluginDashboard(props: PluginDashboardProps): ReactElement {
   return (
     <ComponentErrorBoundary>
       <PluginDashboardInner {...props} />

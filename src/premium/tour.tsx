@@ -1,5 +1,7 @@
 'use client'
 
+import { type ReactElement } from 'react'
+
 import { Tour as BaseTour, type TourProps } from '../domain/tour'
 import { useMotionLevel } from '../core/motion/use-motion-level'
 import { css } from '../core/styles/css-tag'
@@ -56,7 +58,7 @@ const premiumTourStyles = css`
   }
 `
 
-export function Tour({ motion: motionProp, ...rest }: TourProps) {
+export function Tour({ motion: motionProp, ...rest }: TourProps): ReactElement {
   const motionLevel = useMotionLevel(motionProp)
   useStyles('premium-tour', premiumTourStyles)
 

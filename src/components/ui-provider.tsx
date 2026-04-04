@@ -1,4 +1,4 @@
-import { useEffect, type ReactNode } from 'react'
+import { useEffect, type ReactNode, type ReactElement } from 'react'
 import type { ThemeTokens } from '../core/tokens/tokens'
 import { applyTheme } from '../core/tokens/generator'
 import { ThemeProvider } from '../core/tokens/theme-context'
@@ -23,7 +23,7 @@ export function UIProvider({
   motion = 3,
   density = 'default',
   onModeChange,
-}: UIProviderProps) {
+}: UIProviderProps): ReactElement {
   // Inject OKLCH fallbacks for older browsers (no-op if already injected)
   useEffect(() => {
     injectCSS(oklchFallbackStyles.id, oklchFallbackStyles.css)

@@ -5,6 +5,7 @@ import {
   useCallback,
   type HTMLAttributes,
   type ReactNode,
+  type ReactElement,
 } from 'react'
 import { css } from '../core/styles/css-tag'
 import { useStyles } from '../core/styles/use-styles'
@@ -121,7 +122,7 @@ export function Card3D({
   onMouseMove: onMouseMoveProp,
   onMouseLeave: onMouseLeaveProp,
   ...rest
-}: Card3DProps) {
+}: Card3DProps): ReactElement {
   useStyles('card-3d', card3DStyles)
   const motionLevel = useMotionLevel(motionProp)
   const innerRef = useRef<HTMLDivElement>(null)

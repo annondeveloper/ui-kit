@@ -1,5 +1,7 @@
 'use client'
 
+import { type ReactElement } from 'react'
+
 import { DiskMountBar as BaseDiskMountBar, type DiskMountBarProps } from '../domain/disk-mount-bar'
 import { useMotionLevel } from '../core/motion/use-motion-level'
 import { css } from '../core/styles/css-tag'
@@ -88,7 +90,7 @@ const premiumDiskMountBarStyles = css`
   }
 `
 
-export function DiskMountBar({ motion: motionProp, ...rest }: DiskMountBarProps) {
+export function DiskMountBar({ motion: motionProp, ...rest }: DiskMountBarProps): ReactElement {
   const motionLevel = useMotionLevel(motionProp)
   useStyles('premium-disk-mount-bar', premiumDiskMountBarStyles)
 

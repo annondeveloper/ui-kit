@@ -6,6 +6,7 @@ import {
   useEffect,
   type HTMLAttributes,
   type ReactNode,
+  type ReactElement,
 } from 'react'
 import { css } from '../core/styles/css-tag'
 import { useStyles } from '../core/styles/use-styles'
@@ -1024,7 +1025,7 @@ function DashboardTemplateInner({
   )
 }
 
-export function DashboardTemplate(props: DashboardTemplateProps) {
+export function DashboardTemplate(props: DashboardTemplateProps): ReactElement {
   return (
     <ComponentErrorBoundary>
       <DashboardTemplateInner {...props} />

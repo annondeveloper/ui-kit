@@ -7,6 +7,7 @@ import {
   useState,
   type HTMLAttributes,
   type ReactNode,
+  type ReactElement,
 } from 'react'
 import { css } from '../core/styles/css-tag'
 import { useStyles } from '../core/styles/use-styles'
@@ -337,7 +338,7 @@ export function CommandBar({
   motion: motionProp,
   className,
   ...rest
-}: CommandBarProps) {
+}: CommandBarProps): ReactElement {
   useStyles('command-bar', commandBarStyles)
   const motionLevel = useMotionLevel(motionProp)
   const dialogRef = useRef<HTMLDialogElement>(null)

@@ -1,5 +1,7 @@
 'use client'
 
+import { type ReactElement } from 'react'
+
 import { DropdownMenu as BaseDropdownMenu, type DropdownMenuProps } from '../components/dropdown-menu'
 import { useMotionLevel } from '../core/motion/use-motion-level'
 import { css } from '../core/styles/css-tag'
@@ -75,7 +77,7 @@ const premiumDropdownMenuStyles = css`
   }
 `
 
-export function DropdownMenu({ motion: motionProp, ...rest }: DropdownMenuProps) {
+export function DropdownMenu({ motion: motionProp, ...rest }: DropdownMenuProps): ReactElement {
   const motionLevel = useMotionLevel(motionProp)
   useStyles('premium-dropdown-menu', premiumDropdownMenuStyles)
 

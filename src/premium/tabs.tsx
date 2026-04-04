@@ -1,6 +1,6 @@
 'use client'
 
-import { useRef, useEffect, useCallback, useState } from 'react'
+import { useRef, useEffect, useCallback, useState, type ReactElement } from 'react'
 import { Tabs as BaseTabs, TabPanel, type TabsProps, type TabPanelProps } from '../components/tabs'
 import { useMotionLevel } from '../core/motion/use-motion-level'
 import { css } from '../core/styles/css-tag'
@@ -77,7 +77,7 @@ export function Tabs({
   motion: motionProp,
   onChange,
   ...rest
-}: TabsProps) {
+}: TabsProps): ReactElement {
   const motionLevel = useMotionLevel(motionProp)
   useStyles('premium-tabs', premiumTabsStyles)
   const wrapperRef = useRef<HTMLDivElement>(null)

@@ -5,6 +5,7 @@ import {
   useEffect,
   useRef,
   type HTMLAttributes,
+  type ReactElement,
 } from 'react'
 import { css } from '../core/styles/css-tag'
 import { useStyles } from '../core/styles/use-styles'
@@ -89,7 +90,7 @@ export function FlipWords({
   motion: motionProp,
   className,
   ...rest
-}: FlipWordsProps) {
+}: FlipWordsProps): ReactElement {
   useStyles('flip-words', flipWordsStyles)
   const motionLevel = useMotionLevel(motionProp)
   const [currentIndex, setCurrentIndex] = useState(0)

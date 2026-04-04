@@ -1,5 +1,7 @@
 'use client'
 
+import { type ReactElement } from 'react'
+
 import { CodeEditor as BaseCodeEditor, type CodeEditorProps } from '../domain/code-editor'
 import { useMotionLevel } from '../core/motion/use-motion-level'
 import { css } from '../core/styles/css-tag'
@@ -50,7 +52,7 @@ const premiumCodeEditorStyles = css`
   }
 `
 
-export function CodeEditor({ motion: motionProp, ...rest }: CodeEditorProps) {
+export function CodeEditor({ motion: motionProp, ...rest }: CodeEditorProps): ReactElement {
   const motionLevel = useMotionLevel(motionProp)
   useStyles('premium-code-editor', premiumCodeEditorStyles)
 

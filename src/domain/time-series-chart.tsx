@@ -7,6 +7,7 @@ import {
   useCallback,
   useRef,
   useEffect,
+  type ReactElement,
 } from 'react'
 import { createPortal } from 'react-dom'
 import { css } from '../core/styles/css-tag'
@@ -890,7 +891,7 @@ function TimeSeriesChartInner({
   )
 }
 
-export function TimeSeriesChart(props: TimeSeriesChartProps) {
+export function TimeSeriesChart(props: TimeSeriesChartProps): ReactElement {
   return (
     <ComponentErrorBoundary>
       <TimeSeriesChartInner {...props} />

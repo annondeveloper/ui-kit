@@ -4,6 +4,7 @@ import {
   forwardRef,
   type HTMLAttributes,
   type ReactNode,
+  type ReactElement,
 } from 'react'
 import { css } from '../core/styles/css-tag'
 import { useStyles } from '../core/styles/use-styles'
@@ -263,7 +264,7 @@ export function SidebarHeader({
   children,
   className,
   ...rest
-}: HTMLAttributes<HTMLDivElement>) {
+}: HTMLAttributes<HTMLDivElement>): ReactElement {
   return (
     <div className={cn('ui-sidebar__header', className)} {...rest}>
       {children}
@@ -276,7 +277,7 @@ export function SidebarContent({
   children,
   className,
   ...rest
-}: HTMLAttributes<HTMLDivElement>) {
+}: HTMLAttributes<HTMLDivElement>): ReactElement {
   return (
     <div className={cn('ui-sidebar__content', className)} {...rest}>
       {children}
@@ -289,7 +290,7 @@ export function SidebarFooter({
   children,
   className,
   ...rest
-}: HTMLAttributes<HTMLDivElement>) {
+}: HTMLAttributes<HTMLDivElement>): ReactElement {
   return (
     <div className={cn('ui-sidebar__footer', className)} {...rest}>
       {children}
@@ -306,7 +307,7 @@ export function SidebarItem({
   onClick,
   className,
   ...rest
-}: SidebarItemProps) {
+}: SidebarItemProps): ReactElement {
   const Tag = href ? 'a' : 'button'
   const linkProps = href ? { href } : { type: 'button' as const }
 

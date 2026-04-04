@@ -6,6 +6,7 @@ import {
   useMemo,
   type HTMLAttributes,
   type ReactNode,
+  type ReactElement,
 } from 'react'
 import { css } from '../core/styles/css-tag'
 import { useStyles } from '../core/styles/use-styles'
@@ -558,7 +559,7 @@ export function JsonViewer({
   motion: motionProp,
   className,
   ...rest
-}: JsonViewerProps) {
+}: JsonViewerProps): ReactElement {
   useStyles('json-viewer', jsonViewerStyles)
   const motionLevel = useMotionLevel(motionProp)
 

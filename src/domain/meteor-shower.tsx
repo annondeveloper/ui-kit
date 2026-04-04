@@ -4,6 +4,7 @@ import {
   useMemo,
   type HTMLAttributes,
   type ReactNode,
+  type ReactElement,
 } from 'react'
 import { css } from '../core/styles/css-tag'
 import { useStyles } from '../core/styles/use-styles'
@@ -122,7 +123,7 @@ export function MeteorShower({
   motion: motionProp,
   className,
   ...rest
-}: MeteorShowerProps) {
+}: MeteorShowerProps): ReactElement {
   useStyles('meteor-shower', meteorShowerStyles)
   const motionLevel = useMotionLevel(motionProp)
 

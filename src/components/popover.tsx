@@ -216,7 +216,7 @@ export function Popover({
   className,
   motion: motionProp,
   'aria-label': ariaLabel,
-}: PopoverProps) {
+}: PopoverProps): ReactElement {
   useStyles('popover', popoverStyles)
   const motionLevel = useMotionLevel(motionProp)
   const popoverId = useStableId('popover')

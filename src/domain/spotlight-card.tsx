@@ -5,6 +5,7 @@ import {
   useCallback,
   type HTMLAttributes,
   type ReactNode,
+  type ReactElement,
 } from 'react'
 import { css } from '../core/styles/css-tag'
 import { useStyles } from '../core/styles/use-styles'
@@ -113,7 +114,7 @@ export function SpotlightCard({
   onMouseEnter: onMouseEnterProp,
   onMouseLeave: onMouseLeaveProp,
   ...rest
-}: SpotlightCardProps) {
+}: SpotlightCardProps): ReactElement {
   useStyles('spotlight-card', spotlightCardStyles)
   const motionLevel = useMotionLevel(motionProp)
   const ref = useRef<HTMLDivElement>(null)

@@ -8,6 +8,7 @@ import {
   useMemo,
   type HTMLAttributes,
   type ReactNode,
+  type ReactElement,
 } from 'react'
 import { css } from '../core/styles/css-tag'
 import { useStyles } from '../core/styles/use-styles'
@@ -397,7 +398,7 @@ export function Spotlight({
   motion: motionProp,
   className,
   ...rest
-}: SpotlightProps) {
+}: SpotlightProps): ReactElement | null {
   useStyles('spotlight', spotlightStyles)
   const motionLevel = useMotionLevel(motionProp)
   const overlayRef = useRef<HTMLDivElement>(null)

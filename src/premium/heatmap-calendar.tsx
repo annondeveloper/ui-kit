@@ -1,5 +1,7 @@
 'use client'
 
+import { type ReactElement } from 'react'
+
 import { HeatmapCalendar as BaseHeatmapCalendar, type HeatmapCalendarProps } from '../domain/heatmap-calendar'
 import { useMotionLevel } from '../core/motion/use-motion-level'
 import { css } from '../core/styles/css-tag'
@@ -77,7 +79,7 @@ const premiumHeatmapStyles = css`
   }
 `
 
-export function HeatmapCalendar({ motion: motionProp, ...rest }: HeatmapCalendarProps) {
+export function HeatmapCalendar({ motion: motionProp, ...rest }: HeatmapCalendarProps): ReactElement {
   const motionLevel = useMotionLevel(motionProp)
   useStyles('premium-heatmap-calendar', premiumHeatmapStyles)
 

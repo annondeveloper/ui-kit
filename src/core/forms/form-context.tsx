@@ -7,7 +7,7 @@
  *   </FormContextProvider>
  */
 
-import { createContext, useContext, type ReactNode } from 'react'
+import { createContext, useContext, type ReactNode, type ReactElement } from 'react'
 import type { FormState } from './use-form'
 import type { FieldConfig } from './create-form'
 
@@ -19,7 +19,7 @@ export interface FormContextProviderProps {
   children: ReactNode
 }
 
-export function FormContextProvider({ form, children }: FormContextProviderProps) {
+export function FormContextProvider({ form, children }: FormContextProviderProps): ReactElement {
   return <FormContext.Provider value={form}>{children}</FormContext.Provider>
 }
 

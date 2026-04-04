@@ -1,5 +1,7 @@
 'use client'
 
+import { type ReactElement } from 'react'
+
 import { ResponsiveCard as BaseResponsiveCard, type ResponsiveCardProps } from '../domain/responsive-card'
 import { useMotionLevel } from '../core/motion/use-motion-level'
 import { css } from '../core/styles/css-tag'
@@ -78,7 +80,7 @@ const premiumResponsiveCardStyles = css`
   }
 `
 
-export function ResponsiveCard({ motion: motionProp, ...rest }: ResponsiveCardProps) {
+export function ResponsiveCard({ motion: motionProp, ...rest }: ResponsiveCardProps): ReactElement {
   const motionLevel = useMotionLevel(motionProp)
   useStyles('premium-responsive-card', premiumResponsiveCardStyles)
 

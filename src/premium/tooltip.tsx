@@ -1,5 +1,7 @@
 'use client'
 
+import { type ReactElement } from 'react'
+
 import { Tooltip as BaseTooltip, type TooltipProps } from '../components/tooltip'
 import { useMotionLevel } from '../core/motion/use-motion-level'
 import { css } from '../core/styles/css-tag'
@@ -86,7 +88,7 @@ export function Tooltip({
   motion: motionProp,
   children,
   ...rest
-}: TooltipProps) {
+}: TooltipProps): ReactElement {
   const motionLevel = useMotionLevel(motionProp)
   useStyles('premium-tooltip', premiumTooltipStyles)
 

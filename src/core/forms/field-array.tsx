@@ -15,7 +15,7 @@
  *   </FieldArray>
  */
 
-import { useState, useCallback, type ReactNode } from 'react'
+import { useState, useCallback, type ReactNode, type ReactElement } from 'react'
 import { useFormContext } from './form-context'
 
 export interface FieldArrayItem {
@@ -45,7 +45,7 @@ export interface FieldArrayProps {
 
 let fieldKeyCounter = 0
 
-export function FieldArray({ name, children }: FieldArrayProps) {
+export function FieldArray({ name, children }: FieldArrayProps): ReactElement {
   const form = useFormContext()
 
   const [keys, setKeys] = useState<string[]>(() => {

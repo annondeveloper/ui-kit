@@ -3,6 +3,7 @@
 import {
   useState,
   type HTMLAttributes,
+  type ReactElement,
 } from 'react'
 import { css } from '../core/styles/css-tag'
 import { useStyles } from '../core/styles/use-styles'
@@ -107,7 +108,7 @@ export function TruncatedText({
   showTooltip = true,
   className,
   ...rest
-}: TruncatedTextProps) {
+}: TruncatedTextProps): ReactElement {
   useStyles('truncated-text', truncatedTextStyles)
   const [expanded, setExpanded] = useState(false)
 

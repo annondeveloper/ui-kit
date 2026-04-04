@@ -1,6 +1,6 @@
 'use client'
 
-import { useRef } from 'react'
+import { useRef, type ReactElement } from 'react'
 import { DiffViewer as BaseDiffViewer, type DiffViewerProps } from '../domain/diff-viewer'
 import { useMotionLevel } from '../core/motion/use-motion-level'
 import { useEntrance } from '../core/motion/use-entrance'
@@ -94,7 +94,7 @@ const premiumDiffViewerStyles = css`
 export function DiffViewer({
   motion: motionProp,
   ...rest
-}: DiffViewerProps) {
+}: DiffViewerProps): ReactElement {
   const wrapperRef = useRef<HTMLDivElement>(null)
   const motionLevel = useMotionLevel(motionProp)
   useEntrance(wrapperRef, motionLevel >= 2 ? 'fade-up' : 'none', { duration: 280 })

@@ -1,6 +1,6 @@
 'use client'
 
-import { useRef } from 'react'
+import { useRef, type ReactElement } from 'react'
 import { EncryptedText as BaseEncryptedText, type EncryptedTextProps } from '../domain/encrypted-text'
 import { useMotionLevel } from '../core/motion/use-motion-level'
 import { css } from '../core/styles/css-tag'
@@ -103,7 +103,7 @@ const premiumEncryptedTextStyles = css`
 export function EncryptedText({
   motion: motionProp,
   ...rest
-}: EncryptedTextProps) {
+}: EncryptedTextProps): ReactElement {
   const wrapperRef = useRef<HTMLSpanElement>(null)
   const motionLevel = useMotionLevel(motionProp)
   useStyles('premium-encrypted-text', premiumEncryptedTextStyles)

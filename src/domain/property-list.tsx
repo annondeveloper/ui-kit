@@ -6,6 +6,7 @@ import {
   useCallback,
   type HTMLAttributes,
   type ReactNode,
+  type ReactElement,
 } from 'react'
 import { css } from '../core/styles/css-tag'
 import { useStyles } from '../core/styles/use-styles'
@@ -308,7 +309,7 @@ function PropertyListInner({
   )
 }
 
-export function PropertyList(props: PropertyListProps) {
+export function PropertyList(props: PropertyListProps): ReactElement {
   return (
     <ComponentErrorBoundary>
       <PropertyListInner {...props} />

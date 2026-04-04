@@ -1,5 +1,7 @@
 'use client'
 
+import { type ReactElement } from 'react'
+
 import { JsonViewer as BaseJsonViewer, type JsonViewerProps } from '../domain/json-viewer'
 import { useMotionLevel } from '../core/motion/use-motion-level'
 import { css } from '../core/styles/css-tag'
@@ -66,7 +68,7 @@ const premiumJsonViewerStyles = css`
   }
 `
 
-export function JsonViewer({ motion: motionProp, ...rest }: JsonViewerProps) {
+export function JsonViewer({ motion: motionProp, ...rest }: JsonViewerProps): ReactElement {
   const motionLevel = useMotionLevel(motionProp)
   useStyles('premium-json-viewer', premiumJsonViewerStyles)
 

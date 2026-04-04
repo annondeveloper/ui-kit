@@ -1,5 +1,7 @@
 'use client'
 
+import { type ReactElement } from 'react'
+
 import { type TopologyGraphProps, TopologyGraph as BaseTopologyGraph } from '../domain/topology-graph'
 import { useMotionLevel } from '../core/motion/use-motion-level'
 import { css } from '../core/styles/css-tag'
@@ -95,7 +97,7 @@ const premiumTopologyGraphStyles = css`
   }
 `
 
-export function TopologyGraph({ motion: motionProp, ...rest }: TopologyGraphProps) {
+export function TopologyGraph({ motion: motionProp, ...rest }: TopologyGraphProps): ReactElement {
   const motionLevel = useMotionLevel(motionProp)
   useStyles('premium-topology-graph', premiumTopologyGraphStyles)
 

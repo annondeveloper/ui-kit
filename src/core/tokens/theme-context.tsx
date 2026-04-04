@@ -1,4 +1,4 @@
-import { createContext, useContext, type ReactNode } from 'react'
+import { createContext, useContext, type ReactNode, type ReactElement } from 'react'
 import type { ThemeTokens } from './tokens'
 
 interface ThemeContextValue {
@@ -18,7 +18,7 @@ export function ThemeProvider({ tokens, mode = 'dark', onModeChange, children }:
   mode?: 'dark' | 'light'
   onModeChange?: (mode: 'dark' | 'light') => void
   children: ReactNode
-}) {
+}): ReactElement {
   return (
     <ThemeContext.Provider value={{
       tokens: tokens ?? null,

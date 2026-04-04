@@ -4,6 +4,7 @@ import {
   useState,
   type HTMLAttributes,
   type ReactNode,
+  type ReactElement,
 } from 'react'
 import { css } from '../core/styles/css-tag'
 import { useStyles } from '../core/styles/use-styles'
@@ -313,7 +314,7 @@ function DashboardGridInner({
   )
 }
 
-export function DashboardGrid(props: DashboardGridProps) {
+export function DashboardGrid(props: DashboardGridProps): ReactElement {
   return (
     <ComponentErrorBoundary>
       <DashboardGridInner {...props} />

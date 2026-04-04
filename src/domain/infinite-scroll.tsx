@@ -6,6 +6,7 @@ import {
   useCallback,
   type HTMLAttributes,
   type ReactNode,
+  type ReactElement,
 } from 'react'
 import { css } from '../core/styles/css-tag'
 import { useStyles } from '../core/styles/use-styles'
@@ -157,7 +158,7 @@ export function InfiniteScroll({
   children,
   className,
   ...rest
-}: InfiniteScrollProps) {
+}: InfiniteScrollProps): ReactElement {
   useStyles('infinite-scroll', infiniteScrollStyles)
   const sentinelRef = useRef<HTMLDivElement>(null)
   const loadingRef = useRef(false)

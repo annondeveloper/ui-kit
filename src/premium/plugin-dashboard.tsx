@@ -1,5 +1,7 @@
 'use client'
 
+import { type ReactElement } from 'react'
+
 import { type PluginDashboardProps, PluginDashboard as BasePluginDashboard } from '../domain/plugin-dashboard'
 import { useMotionLevel } from '../core/motion/use-motion-level'
 import { css } from '../core/styles/css-tag'
@@ -117,7 +119,7 @@ const premiumPluginDashboardStyles = css`
   }
 `
 
-export function PluginDashboard({ motion: motionProp, ...rest }: PluginDashboardProps) {
+export function PluginDashboard({ motion: motionProp, ...rest }: PluginDashboardProps): ReactElement {
   const motionLevel = useMotionLevel(motionProp)
   useStyles('premium-plugin-dashboard', premiumPluginDashboardStyles)
 

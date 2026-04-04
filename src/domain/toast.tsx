@@ -9,6 +9,7 @@ import {
   useState,
   type HTMLAttributes,
   type ReactNode,
+  type ReactElement,
 } from 'react'
 import { css } from '../core/styles/css-tag'
 import { useStyles } from '../core/styles/use-styles'
@@ -493,7 +494,7 @@ export function ToastProvider({
   position = 'top-right',
   maxVisible = 5,
   motion: motionProp,
-}: ToastProviderProps) {
+}: ToastProviderProps): ReactElement {
   useStyles('toast', toastStyles)
   const motionLevel = useMotionLevel(motionProp)
   const [toasts, setToasts] = useState<InternalToast[]>([])

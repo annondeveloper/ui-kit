@@ -1,5 +1,7 @@
 'use client'
 
+import { type ReactElement } from 'react'
+
 import { RackDiagram as BaseRackDiagram, type RackDiagramProps } from '../domain/rack-diagram'
 import { useMotionLevel } from '../core/motion/use-motion-level'
 import { css } from '../core/styles/css-tag'
@@ -59,7 +61,7 @@ const premiumRackDiagramStyles = css`
   }
 `
 
-export function RackDiagram({ motion: motionProp, ...rest }: RackDiagramProps) {
+export function RackDiagram({ motion: motionProp, ...rest }: RackDiagramProps): ReactElement {
   const motionLevel = useMotionLevel(motionProp)
   useStyles('premium-rack-diagram', premiumRackDiagramStyles)
 

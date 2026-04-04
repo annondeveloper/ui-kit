@@ -5,6 +5,7 @@ import {
   useEffect,
   useRef,
   useState,
+  type ReactElement,
 } from 'react'
 import { css } from '../core/styles/css-tag'
 import { useStyles } from '../core/styles/use-styles'
@@ -209,7 +210,7 @@ function RealtimeValueInner({
   )
 }
 
-export function RealtimeValue(props: RealtimeValueProps) {
+export function RealtimeValue(props: RealtimeValueProps): ReactElement {
   return (
     <ComponentErrorBoundary>
       <RealtimeValueInner {...props} />

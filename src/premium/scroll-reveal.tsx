@@ -1,5 +1,7 @@
 'use client'
 
+import { type ReactElement } from 'react'
+
 import { ScrollReveal as BaseScrollReveal, type ScrollRevealProps } from '../domain/scroll-reveal'
 import { useMotionLevel } from '../core/motion/use-motion-level'
 import { css } from '../core/styles/css-tag'
@@ -89,7 +91,7 @@ const premiumScrollRevealStyles = css`
   }
 `
 
-export function ScrollReveal({ motion: motionProp, ...rest }: ScrollRevealProps) {
+export function ScrollReveal({ motion: motionProp, ...rest }: ScrollRevealProps): ReactElement {
   const motionLevel = useMotionLevel(motionProp)
   useStyles('premium-scroll-reveal', premiumScrollRevealStyles)
 

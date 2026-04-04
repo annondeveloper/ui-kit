@@ -6,6 +6,7 @@ import {
   useState,
   type HTMLAttributes,
   type ReactNode,
+  type ReactElement,
 } from 'react'
 import { css } from '../core/styles/css-tag'
 import { useStyles } from '../core/styles/use-styles'
@@ -107,7 +108,7 @@ export function HeroHighlight({
   motion: motionProp,
   className,
   ...rest
-}: HeroHighlightProps) {
+}: HeroHighlightProps): ReactElement {
   useStyles('hero-highlight', heroHighlightStyles)
   const motionLevel = useMotionLevel(motionProp)
 
@@ -133,7 +134,7 @@ export function Highlight({
   className,
   style,
   ...rest
-}: HighlightProps) {
+}: HighlightProps): ReactElement {
   useStyles('highlight', highlightStyles)
   const motionLevel = useMotionLevel(motionProp)
   const ref = useRef<HTMLSpanElement>(null)

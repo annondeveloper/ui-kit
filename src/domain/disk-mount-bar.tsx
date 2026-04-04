@@ -4,6 +4,7 @@ import {
   type HTMLAttributes,
   useState,
   useMemo,
+  type ReactElement,
 } from 'react'
 import { css } from '../core/styles/css-tag'
 import { useStyles } from '../core/styles/use-styles'
@@ -318,7 +319,7 @@ function DiskMountBarInner({
   )
 }
 
-export function DiskMountBar(props: DiskMountBarProps) {
+export function DiskMountBar(props: DiskMountBarProps): ReactElement {
   return (
     <ComponentErrorBoundary>
       <DiskMountBarInner {...props} />

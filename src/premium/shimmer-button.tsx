@@ -1,5 +1,7 @@
 'use client'
 
+import { type ReactElement } from 'react'
+
 import { ShimmerButton as BaseShimmerButton, type ShimmerButtonProps } from '../domain/shimmer-button'
 import { useMotionLevel } from '../core/motion/use-motion-level'
 import { css } from '../core/styles/css-tag'
@@ -97,7 +99,7 @@ const premiumShimmerButtonStyles = css`
   }
 `
 
-export function ShimmerButton({ motion: motionProp, ...rest }: ShimmerButtonProps) {
+export function ShimmerButton({ motion: motionProp, ...rest }: ShimmerButtonProps): ReactElement {
   const motionLevel = useMotionLevel(motionProp)
   useStyles('premium-shimmer-button', premiumShimmerButtonStyles)
 

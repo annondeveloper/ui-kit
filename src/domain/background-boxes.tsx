@@ -4,6 +4,7 @@ import {
   useMemo,
   type HTMLAttributes,
   type ReactNode,
+  type ReactElement,
 } from 'react'
 import { css } from '../core/styles/css-tag'
 import { useStyles } from '../core/styles/use-styles'
@@ -110,7 +111,7 @@ export function BackgroundBoxes({
   className,
   style,
   ...rest
-}: BackgroundBoxesProps) {
+}: BackgroundBoxesProps): ReactElement {
   useStyles('background-boxes', backgroundBoxesStyles)
   const motionLevel = useMotionLevel(motionProp)
 

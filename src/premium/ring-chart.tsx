@@ -1,5 +1,7 @@
 'use client'
 
+import { type ReactElement } from 'react'
+
 import { RingChart as BaseRingChart, type RingChartProps } from '../domain/ring-chart'
 import { useMotionLevel } from '../core/motion/use-motion-level'
 import { css } from '../core/styles/css-tag'
@@ -63,7 +65,7 @@ const premiumRingChartStyles = css`
   }
 `
 
-export function RingChart({ motion: motionProp, ...rest }: RingChartProps) {
+export function RingChart({ motion: motionProp, ...rest }: RingChartProps): ReactElement {
   const motionLevel = useMotionLevel(motionProp)
   useStyles('premium-ring-chart', premiumRingChartStyles)
 

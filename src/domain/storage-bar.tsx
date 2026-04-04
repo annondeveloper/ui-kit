@@ -3,6 +3,7 @@
 import {
   type HTMLAttributes,
   useState,
+  type ReactElement,
 } from 'react'
 import { css } from '../core/styles/css-tag'
 import { useStyles } from '../core/styles/use-styles'
@@ -227,7 +228,7 @@ function StorageBarInner({
   )
 }
 
-export function StorageBar(props: StorageBarProps) {
+export function StorageBar(props: StorageBarProps): ReactElement {
   return (
     <ComponentErrorBoundary>
       <StorageBarInner {...props} />

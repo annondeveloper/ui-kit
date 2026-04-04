@@ -4,6 +4,7 @@ import {
   useState,
   useMemo,
   type HTMLAttributes,
+  type ReactElement,
 } from 'react'
 import { css } from '../core/styles/css-tag'
 import { useStyles } from '../core/styles/use-styles'
@@ -378,7 +379,7 @@ export function DiffViewer({
   motion: motionProp,
   className,
   ...rest
-}: DiffViewerProps) {
+}: DiffViewerProps): ReactElement {
   useStyles('diff-viewer', diffViewerStyles)
   const motionLevel = useMotionLevel(motionProp)
 

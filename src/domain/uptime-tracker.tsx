@@ -4,6 +4,7 @@ import {
   type HTMLAttributes,
   useMemo,
   useState,
+  type ReactElement,
 } from 'react'
 import { css } from '../core/styles/css-tag'
 import { useStyles } from '../core/styles/use-styles'
@@ -197,7 +198,7 @@ function UptimeTrackerInner({
   )
 }
 
-export function UptimeTracker(props: UptimeTrackerProps) {
+export function UptimeTracker(props: UptimeTrackerProps): ReactElement {
   return (
     <ComponentErrorBoundary>
       <UptimeTrackerInner {...props} />

@@ -6,6 +6,7 @@ import {
   useRef,
   useCallback,
   type HTMLAttributes,
+  type ReactElement,
 } from 'react'
 import { css } from '../core/styles/css-tag'
 import { useStyles } from '../core/styles/use-styles'
@@ -84,7 +85,7 @@ export function EncryptedText({
   className,
   onMouseEnter: onMouseEnterProp,
   ...rest
-}: EncryptedTextProps) {
+}: EncryptedTextProps): ReactElement {
   useStyles('encrypted-text', encryptedTextStyles)
   const motionLevel = useMotionLevel(motionProp)
   const ref = useRef<HTMLSpanElement>(null)

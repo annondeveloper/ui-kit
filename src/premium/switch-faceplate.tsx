@@ -1,5 +1,7 @@
 'use client'
 
+import { type ReactElement } from 'react'
+
 import { type SwitchFaceplateProps, SwitchFaceplate as BaseSwitchFaceplate } from '../domain/switch-faceplate'
 import { useMotionLevel } from '../core/motion/use-motion-level'
 import { css } from '../core/styles/css-tag'
@@ -99,7 +101,7 @@ const premiumSwitchFaceplateStyles = css`
   }
 `
 
-export function SwitchFaceplate({ motion: motionProp, ...rest }: SwitchFaceplateProps) {
+export function SwitchFaceplate({ motion: motionProp, ...rest }: SwitchFaceplateProps): ReactElement {
   const motionLevel = useMotionLevel(motionProp)
   useStyles('premium-switch-faceplate', premiumSwitchFaceplateStyles)
 

@@ -5,6 +5,7 @@ import {
   type AnchorHTMLAttributes,
   type ReactNode,
   type MouseEvent,
+  type ReactElement,
 } from 'react'
 import { css } from '../core/styles/css-tag'
 import { useStyles } from '../core/styles/use-styles'
@@ -59,7 +60,7 @@ export function ViewTransitionLink({
   onClick,
   href,
   ...rest
-}: ViewTransitionLinkProps) {
+}: ViewTransitionLinkProps): ReactElement {
   useStyles('view-transition-link', viewTransitionLinkStyles)
 
   const handleClick = useCallback(

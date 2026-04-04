@@ -1,5 +1,7 @@
 'use client'
 
+import { type ReactElement } from 'react'
+
 import { Ripple as BaseRipple, type RippleProps } from '../domain/ripple'
 import { useMotionLevel } from '../core/motion/use-motion-level'
 import { css } from '../core/styles/css-tag'
@@ -87,7 +89,7 @@ const premiumRippleStyles = css`
   }
 `
 
-export function Ripple({ motion: motionProp, ...rest }: RippleProps) {
+export function Ripple({ motion: motionProp, ...rest }: RippleProps): ReactElement {
   const motionLevel = useMotionLevel(motionProp)
   useStyles('premium-ripple', premiumRippleStyles)
 

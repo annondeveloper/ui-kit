@@ -1,5 +1,7 @@
 'use client'
 
+import { type ReactElement } from 'react'
+
 import { type NetworkInterfaceGridProps, NetworkInterfaceGrid as BaseNetworkInterfaceGrid } from '../domain/network-interface-grid'
 import { useMotionLevel } from '../core/motion/use-motion-level'
 import { css } from '../core/styles/css-tag'
@@ -102,7 +104,7 @@ const premiumStyles = css`
   }
 `
 
-export function NetworkInterfaceGrid({ motion: motionProp, ...rest }: NetworkInterfaceGridProps) {
+export function NetworkInterfaceGrid({ motion: motionProp, ...rest }: NetworkInterfaceGridProps): ReactElement {
   const motionLevel = useMotionLevel(motionProp)
   useStyles('premium-network-interface-grid', premiumStyles)
 

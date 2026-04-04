@@ -1,6 +1,6 @@
 'use client'
 
-import { useRef } from 'react'
+import { useRef, type ReactElement } from 'react'
 import { EmptyState as BaseEmptyState, type EmptyStateProps } from '../domain/empty-state'
 import { useMotionLevel } from '../core/motion/use-motion-level'
 import { useEntrance } from '../core/motion/use-entrance'
@@ -98,7 +98,7 @@ const premiumEmptyStateStyles = css`
 export function EmptyState({
   motion: motionProp,
   ...rest
-}: EmptyStateProps) {
+}: EmptyStateProps): ReactElement {
   const wrapperRef = useRef<HTMLDivElement>(null)
   const motionLevel = useMotionLevel(motionProp)
   useEntrance(wrapperRef, motionLevel >= 2 ? 'fade-up' : 'none', { duration: 320 })

@@ -9,7 +9,7 @@
  *   </Form>
  */
 
-import { type FormEvent, type ReactNode, useCallback } from 'react'
+import { type FormEvent, type ReactNode, useCallback, type ReactElement } from 'react'
 import { FormContextProvider } from './form-context'
 import type { FormState } from './use-form'
 
@@ -32,7 +32,7 @@ export function Form({
   style,
   noValidate = true,
   onSubmit,
-}: FormProps) {
+}: FormProps): ReactElement {
   const handleSubmit = useCallback(
     (e: FormEvent) => {
       e.preventDefault()

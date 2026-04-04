@@ -1,5 +1,7 @@
 'use client'
 
+import { type ReactElement } from 'react'
+
 import { InfiniteScroll as BaseInfiniteScroll, type InfiniteScrollProps } from '../domain/infinite-scroll'
 import { useMotionLevel } from '../core/motion/use-motion-level'
 import { css } from '../core/styles/css-tag'
@@ -84,7 +86,7 @@ const premiumInfiniteScrollStyles = css`
   }
 `
 
-export function InfiniteScroll({ ...rest }: InfiniteScrollProps) {
+export function InfiniteScroll({ ...rest }: InfiniteScrollProps): ReactElement {
   const motionLevel = useMotionLevel()
   useStyles('premium-infinite-scroll', premiumInfiniteScrollStyles)
 

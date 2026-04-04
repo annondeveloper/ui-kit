@@ -1,5 +1,7 @@
 'use client'
 
+import { type ReactElement } from 'react'
+
 import { type PipelineDAGProps, PipelineDAG as BasePipelineDAG } from '../domain/pipeline-dag'
 import { useMotionLevel } from '../core/motion/use-motion-level'
 import { css } from '../core/styles/css-tag'
@@ -117,7 +119,7 @@ const premiumPipelineDAGStyles = css`
   }
 `
 
-export function PipelineDAG({ motion: motionProp, ...rest }: PipelineDAGProps) {
+export function PipelineDAG({ motion: motionProp, ...rest }: PipelineDAGProps): ReactElement {
   const motionLevel = useMotionLevel(motionProp)
   useStyles('premium-pipeline-dag', premiumPipelineDAGStyles)
 

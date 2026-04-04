@@ -1,6 +1,6 @@
 'use client'
 
-import { useRef } from 'react'
+import { useRef, type ReactElement } from 'react'
 import { ServiceStrip as BaseServiceStrip, type ServiceStripProps } from '../domain/service-strip'
 import { useMotionLevel } from '../core/motion/use-motion-level'
 import { useEntrance } from '../core/motion/use-entrance'
@@ -80,7 +80,7 @@ const premiumServiceStripStyles = css`
 export function ServiceStrip({
   motion: motionProp,
   ...rest
-}: ServiceStripProps) {
+}: ServiceStripProps): ReactElement {
   const wrapperRef = useRef<HTMLDivElement>(null)
   const motionLevel = useMotionLevel(motionProp)
   useEntrance(wrapperRef, motionLevel >= 2 ? 'fade-up' : 'none', { duration: 280 })

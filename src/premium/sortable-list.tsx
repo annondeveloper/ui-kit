@@ -1,5 +1,7 @@
 'use client'
 
+import { type ReactElement } from 'react'
+
 import { type SortableListProps, SortableList as BaseSortableList } from '../domain/sortable-list'
 import { useMotionLevel } from '../core/motion/use-motion-level'
 import { css } from '../core/styles/css-tag'
@@ -84,7 +86,7 @@ const premiumSortableListStyles = css`
   }
 `
 
-export function SortableList({ motion: motionProp, ...rest }: SortableListProps) {
+export function SortableList({ motion: motionProp, ...rest }: SortableListProps): ReactElement {
   const motionLevel = useMotionLevel(motionProp)
   useStyles('premium-sortable-list', premiumSortableListStyles)
 

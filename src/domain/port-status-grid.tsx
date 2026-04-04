@@ -3,6 +3,7 @@
 import {
   type HTMLAttributes,
   useState,
+  type ReactElement,
 } from 'react'
 import { css } from '../core/styles/css-tag'
 import { useStyles } from '../core/styles/use-styles'
@@ -200,7 +201,7 @@ function PortStatusGridInner({
   )
 }
 
-export function PortStatusGrid(props: PortStatusGridProps) {
+export function PortStatusGrid(props: PortStatusGridProps): ReactElement {
   return (
     <ComponentErrorBoundary>
       <PortStatusGridInner {...props} />

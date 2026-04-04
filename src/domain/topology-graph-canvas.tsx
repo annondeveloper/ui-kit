@@ -5,6 +5,7 @@ import {
   useEffect,
   useCallback,
   useState,
+  type ReactElement,
 } from 'react'
 import { Quadtree } from '../core/graph/quadtree'
 import type { LayoutResult } from '../core/graph'
@@ -52,7 +53,7 @@ export function TopologyGraphCanvas({
   motionLevel,
   width,
   height,
-}: TopologyGraphCanvasProps) {
+}: TopologyGraphCanvasProps): ReactElement {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const [pan, setPan] = useState({ x: 0, y: 0 })
   const [zoom, setZoom] = useState(1)

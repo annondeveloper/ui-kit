@@ -1,6 +1,6 @@
 'use client'
 
-import { useRef, useEffect, useState, useCallback } from 'react'
+import { useRef, useEffect, useState, useCallback, type ReactElement } from 'react'
 import { MetricCard as BaseMetricCard, type MetricCardProps } from '../domain/metric-card'
 import { useMotionLevel } from '../core/motion/use-motion-level'
 import { useEntrance } from '../core/motion/use-entrance'
@@ -74,7 +74,7 @@ export function MetricCard({
   motion: motionProp,
   value,
   ...rest
-}: MetricCardProps) {
+}: MetricCardProps): ReactElement {
   const wrapperRef = useRef<HTMLDivElement>(null)
   const motionLevel = useMotionLevel(motionProp)
   useEntrance(wrapperRef, motionLevel >= 2 ? 'fade-up' : 'none', { duration: 280 })

@@ -6,6 +6,7 @@ import {
   useState,
   useMemo,
   type HTMLAttributes,
+  type ReactElement,
 } from 'react'
 import { css } from '../core/styles/css-tag'
 import { useStyles } from '../core/styles/use-styles'
@@ -106,7 +107,7 @@ export function NumberTicker({
   motion: motionProp,
   className,
   ...rest
-}: NumberTickerProps) {
+}: NumberTickerProps): ReactElement {
   useStyles('number-ticker', numberTickerStyles)
   const motionLevel = useMotionLevel(motionProp)
   const [displayValue, setDisplayValue] = useState<number | null>(null)

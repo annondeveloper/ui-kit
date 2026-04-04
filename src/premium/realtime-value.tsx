@@ -1,5 +1,7 @@
 'use client'
 
+import { type ReactElement } from 'react'
+
 import { RealtimeValue as BaseRealtimeValue, type RealtimeValueProps } from '../domain/realtime-value'
 import { useMotionLevel } from '../core/motion/use-motion-level'
 import { css } from '../core/styles/css-tag'
@@ -93,7 +95,7 @@ const premiumRealtimeValueStyles = css`
   }
 `
 
-export function RealtimeValue({ motion: motionProp, ...rest }: RealtimeValueProps) {
+export function RealtimeValue({ motion: motionProp, ...rest }: RealtimeValueProps): ReactElement {
   const motionLevel = useMotionLevel(motionProp)
   useStyles('premium-realtime-value', premiumRealtimeValueStyles)
 

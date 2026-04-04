@@ -5,6 +5,7 @@ import {
   useEffect,
   useState,
   type HTMLAttributes,
+  type ReactElement,
 } from 'react'
 import { css } from '../core/styles/css-tag'
 import { useStyles } from '../core/styles/use-styles'
@@ -86,7 +87,7 @@ export function TextReveal({
   motion: motionProp,
   className,
   ...rest
-}: TextRevealProps) {
+}: TextRevealProps): ReactElement {
   useStyles('text-reveal', textRevealStyles)
   const motionLevel = useMotionLevel(motionProp)
   const ref = useRef<HTMLDivElement>(null)

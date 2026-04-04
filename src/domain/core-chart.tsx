@@ -3,6 +3,7 @@
 import {
   type HTMLAttributes,
   useState,
+  type ReactElement,
 } from 'react'
 import { css } from '../core/styles/css-tag'
 import { useStyles } from '../core/styles/use-styles'
@@ -188,7 +189,7 @@ function CoreChartInner({
   )
 }
 
-export function CoreChart(props: CoreChartProps) {
+export function CoreChart(props: CoreChartProps): ReactElement {
   return (
     <ComponentErrorBoundary>
       <CoreChartInner {...props} />

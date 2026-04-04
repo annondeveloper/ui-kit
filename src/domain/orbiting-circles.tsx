@@ -4,6 +4,7 @@ import {
   type HTMLAttributes,
   type ReactNode,
   Children,
+  type ReactElement,
 } from 'react'
 import { css } from '../core/styles/css-tag'
 import { useStyles } from '../core/styles/use-styles'
@@ -130,7 +131,7 @@ export function OrbitingCircles({
   className,
   style,
   ...rest
-}: OrbitingCirclesProps) {
+}: OrbitingCirclesProps): ReactElement {
   useStyles('orbiting-circles', orbitingCirclesStyles)
   const motionLevel = useMotionLevel(motionProp)
   const items = Children.toArray(children)

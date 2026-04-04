@@ -1,10 +1,10 @@
-import { createContext, useContext, type ReactNode } from 'react'
+import { createContext, useContext, type ReactNode, type ReactElement } from 'react'
 
 export type Density = 'compact' | 'default' | 'comfortable' | 'auto'
 
 const DensityContext = createContext<Density>('default')
 
-export function DensityProvider({ density, children }: { density: Density; children: ReactNode }) {
+export function DensityProvider({ density, children }: { density: Density; children: ReactNode }): ReactElement {
   // If 'auto', could detect viewport width and set accordingly
   // For now, 'auto' defaults to 'default' — real viewport detection can be added later
   const resolved = density === 'auto' ? 'default' : density

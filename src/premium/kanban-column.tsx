@@ -1,5 +1,7 @@
 'use client'
 
+import { type ReactElement } from 'react'
+
 import { KanbanColumn as BaseKanbanColumn, type KanbanColumnProps } from '../domain/kanban-column'
 import { useMotionLevel } from '../core/motion/use-motion-level'
 import { css } from '../core/styles/css-tag'
@@ -76,7 +78,7 @@ const premiumKanbanStyles = css`
   }
 `
 
-export function KanbanColumn({ motion: motionProp, ...rest }: KanbanColumnProps) {
+export function KanbanColumn({ motion: motionProp, ...rest }: KanbanColumnProps): ReactElement {
   const motionLevel = useMotionLevel(motionProp)
   useStyles('premium-kanban-column', premiumKanbanStyles)
 

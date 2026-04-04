@@ -6,6 +6,7 @@ import {
   useEffect,
   useRef,
   useMemo,
+  type ReactElement,
 } from 'react'
 import { css } from '../core/styles/css-tag'
 import { useStyles } from '../core/styles/use-styles'
@@ -295,7 +296,7 @@ function LiveFeedInner({
   )
 }
 
-export function LiveFeed(props: LiveFeedProps) {
+export function LiveFeed(props: LiveFeedProps): ReactElement {
   return (
     <ComponentErrorBoundary>
       <LiveFeedInner {...props} />

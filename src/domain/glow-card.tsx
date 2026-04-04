@@ -5,6 +5,7 @@ import {
   useCallback,
   type HTMLAttributes,
   type ReactNode,
+  type ReactElement,
 } from 'react'
 import { css } from '../core/styles/css-tag'
 import { useStyles } from '../core/styles/use-styles'
@@ -121,7 +122,7 @@ export function GlowCard({
   onMouseEnter: onMouseEnterProp,
   onMouseLeave: onMouseLeaveProp,
   ...rest
-}: GlowCardProps) {
+}: GlowCardProps): ReactElement {
   useStyles('glow-card', glowCardStyles)
   const motionLevel = useMotionLevel(motionProp)
   const ref = useRef<HTMLDivElement>(null)

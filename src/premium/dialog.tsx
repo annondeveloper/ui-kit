@@ -1,6 +1,6 @@
 'use client'
 
-import { useRef, useEffect, useCallback, type ReactNode } from 'react'
+import { useRef, useEffect, useCallback, type ReactNode, type ReactElement } from 'react'
 import { Dialog as BaseDialog, type DialogProps } from '../components/dialog'
 import { useMotionLevel } from '../core/motion/use-motion-level'
 import { css } from '../core/styles/css-tag'
@@ -142,7 +142,7 @@ export function Dialog({
   motion: motionProp,
   children,
   ...rest
-}: DialogProps) {
+}: DialogProps): ReactElement {
   const motionLevel = useMotionLevel(motionProp)
   useStyles('premium-dialog', premiumDialogStyles)
 

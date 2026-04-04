@@ -1,5 +1,7 @@
 'use client'
 
+import { type ReactElement } from 'react'
+
 import { ConfirmDialog as BaseConfirmDialog, type ConfirmDialogProps } from '../components/confirm-dialog'
 import { useMotionLevel } from '../core/motion/use-motion-level'
 import { css } from '../core/styles/css-tag'
@@ -72,7 +74,7 @@ const premiumConfirmDialogStyles = css`
   }
 `
 
-export function ConfirmDialog({ motion: motionProp, ...rest }: ConfirmDialogProps) {
+export function ConfirmDialog({ motion: motionProp, ...rest }: ConfirmDialogProps): ReactElement {
   const motionLevel = useMotionLevel(motionProp)
   useStyles('premium-confirm-dialog', premiumConfirmDialogStyles)
 

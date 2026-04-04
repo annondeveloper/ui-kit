@@ -1,5 +1,7 @@
 'use client'
 
+import { type ReactElement } from 'react'
+
 import { type TimeSeriesChartProps, TimeSeriesChart as BaseTimeSeriesChart } from '../domain/time-series-chart'
 import { useMotionLevel } from '../core/motion/use-motion-level'
 import { css } from '../core/styles/css-tag'
@@ -105,7 +107,7 @@ const premiumTimeSeriesStyles = css`
   }
 `
 
-export function TimeSeriesChart({ motion: motionProp, ...rest }: TimeSeriesChartProps) {
+export function TimeSeriesChart({ motion: motionProp, ...rest }: TimeSeriesChartProps): ReactElement {
   const motionLevel = useMotionLevel(motionProp)
   useStyles('premium-time-series-chart', premiumTimeSeriesStyles)
 

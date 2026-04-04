@@ -1,5 +1,7 @@
 'use client'
 
+import { type ReactElement } from 'react'
+
 import { type DashboardTemplateProps, DashboardTemplate as BaseDashboardTemplate } from '../domain/dashboard-template'
 import { useMotionLevel } from '../core/motion/use-motion-level'
 import { css } from '../core/styles/css-tag'
@@ -151,7 +153,7 @@ const premiumDashboardTemplateStyles = css`
   }
 `
 
-export function DashboardTemplate({ motion: motionProp, ...rest }: DashboardTemplateProps) {
+export function DashboardTemplate({ motion: motionProp, ...rest }: DashboardTemplateProps): ReactElement {
   const motionLevel = useMotionLevel(motionProp)
   useStyles('premium-dashboard-template', premiumDashboardTemplateStyles)
 

@@ -3,6 +3,7 @@
 import {
   type HTMLAttributes,
   type ReactNode,
+  type ReactElement,
 } from 'react'
 import { css } from '../core/styles/css-tag'
 import { useStyles } from '../core/styles/use-styles'
@@ -248,7 +249,7 @@ function ThresholdGaugeInner({
   )
 }
 
-export function ThresholdGauge(props: ThresholdGaugeProps) {
+export function ThresholdGauge(props: ThresholdGaugeProps): ReactElement {
   return (
     <ComponentErrorBoundary>
       <ThresholdGaugeInner {...props} />

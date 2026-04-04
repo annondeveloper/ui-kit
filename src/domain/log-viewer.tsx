@@ -8,6 +8,7 @@ import {
   useMemo,
   useState,
   useCallback,
+  type ReactElement,
 } from 'react'
 import { css } from '../core/styles/css-tag'
 import { useStyles } from '../core/styles/use-styles'
@@ -300,7 +301,7 @@ function LogViewerInner({
   )
 }
 
-export function LogViewer(props: LogViewerProps) {
+export function LogViewer(props: LogViewerProps): ReactElement {
   return (
     <ComponentErrorBoundary>
       <LogViewerInner {...props} />

@@ -1,5 +1,7 @@
 'use client'
 
+import { type ReactElement } from 'react'
+
 import React, {
   useCallback,
   useRef,
@@ -337,7 +339,7 @@ export function KanbanColumn({
   motion: motionProp,
   className,
   ...rest
-}: KanbanColumnProps) {
+}: KanbanColumnProps): ReactElement {
   useStyles('kanban-column', kanbanColumnStyles)
   const motionLevel = useMotionLevel(motionProp)
   const headerId = useStableId('kanban-header')

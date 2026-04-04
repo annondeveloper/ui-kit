@@ -3,6 +3,7 @@
 import {
   type ButtonHTMLAttributes,
   type ReactNode,
+  type ReactElement,
 } from 'react'
 import { css } from '../core/styles/css-tag'
 import { useStyles } from '../core/styles/use-styles'
@@ -170,7 +171,7 @@ export function ShimmerButton({
   style,
   disabled,
   ...rest
-}: ShimmerButtonProps) {
+}: ShimmerButtonProps): ReactElement {
   useStyles('shimmer-button', shimmerButtonStyles)
   const motionLevel = useMotionLevel(motionProp)
 

@@ -1,6 +1,6 @@
 'use client'
 
-import { useRef } from 'react'
+import { useRef, type ReactElement } from 'react'
 import { EvervaultCard as BaseEvervaultCard, type EvervaultCardProps } from '../domain/evervault-card'
 import { useMotionLevel } from '../core/motion/use-motion-level'
 import { useEntrance } from '../core/motion/use-entrance'
@@ -101,7 +101,7 @@ const premiumEvervaultCardStyles = css`
 export function EvervaultCard({
   motion: motionProp,
   ...rest
-}: EvervaultCardProps) {
+}: EvervaultCardProps): ReactElement {
   const wrapperRef = useRef<HTMLDivElement>(null)
   const motionLevel = useMotionLevel(motionProp)
   useEntrance(wrapperRef, motionLevel >= 2 ? 'fade-up' : 'none', { duration: 300 })

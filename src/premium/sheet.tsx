@@ -1,5 +1,7 @@
 'use client'
 
+import { type ReactElement } from 'react'
+
 import { Sheet as BaseSheet, type SheetProps } from '../components/sheet'
 import { useMotionLevel } from '../core/motion/use-motion-level'
 import { css } from '../core/styles/css-tag'
@@ -122,7 +124,7 @@ const premiumSheetStyles = css`
 
 // ─── Component ──────────────────────────────────────────────────────────────
 
-export function Sheet({ motion: motionProp, ...rest }: SheetProps) {
+export function Sheet({ motion: motionProp, ...rest }: SheetProps): ReactElement {
   const motionLevel = useMotionLevel(motionProp)
   useStyles('premium-sheet', premiumSheetStyles)
 

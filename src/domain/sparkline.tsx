@@ -3,6 +3,7 @@
 import {
   type HTMLAttributes,
   useState,
+  type ReactElement,
 } from 'react'
 import { css } from '../core/styles/css-tag'
 import { useStyles } from '../core/styles/use-styles'
@@ -232,7 +233,7 @@ function SparklineInner({
   )
 }
 
-export function Sparkline(props: SparklineProps) {
+export function Sparkline(props: SparklineProps): ReactElement {
   return (
     <ComponentErrorBoundary>
       <SparklineInner {...props} />

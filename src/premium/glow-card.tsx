@@ -1,5 +1,7 @@
 'use client'
 
+import { type ReactElement } from 'react'
+
 import { GlowCard as BaseGlowCard, type GlowCardProps } from '../domain/glow-card'
 import { useMotionLevel } from '../core/motion/use-motion-level'
 import { css } from '../core/styles/css-tag'
@@ -80,7 +82,7 @@ const premiumGlowCardStyles = css`
   }
 `
 
-export function GlowCard({ motion: motionProp, ...rest }: GlowCardProps) {
+export function GlowCard({ motion: motionProp, ...rest }: GlowCardProps): ReactElement {
   const motionLevel = useMotionLevel(motionProp)
   useStyles('premium-glow-card', premiumGlowCardStyles)
 

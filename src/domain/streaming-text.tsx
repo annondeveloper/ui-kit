@@ -7,6 +7,7 @@ import {
   useRef,
   useState,
   useMemo,
+  type ReactElement,
 } from 'react'
 import { css } from '../core/styles/css-tag'
 import { useStyles } from '../core/styles/use-styles'
@@ -280,7 +281,7 @@ function StreamingTextInner({
   )
 }
 
-export function StreamingText(props: StreamingTextProps) {
+export function StreamingText(props: StreamingTextProps): ReactElement {
   return (
     <ComponentErrorBoundary>
       <StreamingTextInner {...props} />

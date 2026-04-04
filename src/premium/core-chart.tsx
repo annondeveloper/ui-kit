@@ -1,5 +1,7 @@
 'use client'
 
+import { type ReactElement } from 'react'
+
 import { CoreChart as BaseCoreChart, type CoreChartProps } from '../domain/core-chart'
 import { useMotionLevel } from '../core/motion/use-motion-level'
 import { css } from '../core/styles/css-tag'
@@ -48,7 +50,7 @@ const premiumCoreChartStyles = css`
   }
 `
 
-export function CoreChart({ motion: motionProp, ...rest }: CoreChartProps) {
+export function CoreChart({ motion: motionProp, ...rest }: CoreChartProps): ReactElement {
   const motionLevel = useMotionLevel(motionProp)
   useStyles('premium-core-chart', premiumCoreChartStyles)
 

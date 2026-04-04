@@ -1,5 +1,7 @@
 'use client'
 
+import { type ReactElement } from 'react'
+
 import { type TextRevealProps, TextReveal as BaseTextReveal } from '../domain/text-reveal'
 import { useMotionLevel } from '../core/motion/use-motion-level'
 import { css } from '../core/styles/css-tag'
@@ -96,7 +98,7 @@ const premiumTextRevealStyles = css`
   }
 `
 
-export function TextReveal({ motion: motionProp, ...rest }: TextRevealProps) {
+export function TextReveal({ motion: motionProp, ...rest }: TextRevealProps): ReactElement {
   const motionLevel = useMotionLevel(motionProp)
   useStyles('premium-text-reveal', premiumTextRevealStyles)
 

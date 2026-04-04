@@ -4,6 +4,7 @@ import {
   useRef,
   type HTMLAttributes,
   type ReactNode,
+  type ReactElement,
 } from 'react'
 import { css } from '../core/styles/css-tag'
 import { useStyles } from '../core/styles/use-styles'
@@ -440,7 +441,7 @@ function NetworkTrafficCardInner({
   )
 }
 
-export function NetworkTrafficCard(props: NetworkTrafficCardProps) {
+export function NetworkTrafficCard(props: NetworkTrafficCardProps): ReactElement {
   return (
     <ComponentErrorBoundary>
       <NetworkTrafficCardInner {...props} />

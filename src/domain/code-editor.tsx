@@ -8,6 +8,7 @@ import {
   type HTMLAttributes,
   type KeyboardEvent,
   type ChangeEvent,
+  type ReactElement,
 } from 'react'
 import { css } from '../core/styles/css-tag'
 import { useStyles } from '../core/styles/use-styles'
@@ -410,7 +411,7 @@ export function CodeEditor({
   motion: motionProp,
   className,
   ...rest
-}: CodeEditorProps) {
+}: CodeEditorProps): ReactElement {
   useStyles('code-editor', codeEditorStyles)
   const motionLevel = useMotionLevel(motionProp)
 

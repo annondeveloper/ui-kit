@@ -1,5 +1,7 @@
 'use client'
 
+import { type ReactElement } from 'react'
+
 import { StorageBar as BaseStorageBar, type StorageBarProps } from '../domain/storage-bar'
 import { useMotionLevel } from '../core/motion/use-motion-level'
 import { css } from '../core/styles/css-tag'
@@ -62,7 +64,7 @@ const premiumStorageBarStyles = css`
   }
 `
 
-export function StorageBar({ motion: motionProp, ...rest }: StorageBarProps) {
+export function StorageBar({ motion: motionProp, ...rest }: StorageBarProps): ReactElement {
   const motionLevel = useMotionLevel(motionProp)
   useStyles('premium-storage-bar', premiumStorageBarStyles)
 

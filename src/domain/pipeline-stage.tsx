@@ -2,6 +2,7 @@
 
 import {
   type HTMLAttributes,
+  type ReactElement,
 } from 'react'
 import { css } from '../core/styles/css-tag'
 import { useStyles } from '../core/styles/use-styles'
@@ -268,7 +269,7 @@ function PipelineStageInner({
   )
 }
 
-export function PipelineStage(props: PipelineStageProps) {
+export function PipelineStage(props: PipelineStageProps): ReactElement {
   return (
     <ComponentErrorBoundary>
       <PipelineStageInner {...props} />

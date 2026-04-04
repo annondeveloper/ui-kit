@@ -1,6 +1,6 @@
 'use client'
 
-import { useRef } from 'react'
+import { useRef, type ReactElement } from 'react'
 import { DataTable as BaseDataTable, type DataTableProps } from '../domain/data-table'
 import { useMotionLevel } from '../core/motion/use-motion-level'
 import { css } from '../core/styles/css-tag'
@@ -91,7 +91,7 @@ const premiumDataTableStyles = css`
 export function DataTable<T extends object>({
   motion: motionProp,
   ...rest
-}: DataTableProps<T>) {
+}: DataTableProps<T>): ReactElement {
   const wrapperRef = useRef<HTMLDivElement>(null)
   const motionLevel = useMotionLevel(motionProp)
   useStyles('premium-data-table', premiumDataTableStyles)

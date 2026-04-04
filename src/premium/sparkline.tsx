@@ -1,5 +1,7 @@
 'use client'
 
+import { type ReactElement } from 'react'
+
 import { type SparklineProps, Sparkline as BaseSparkline } from '../domain/sparkline'
 import { useMotionLevel } from '../core/motion/use-motion-level'
 import { css } from '../core/styles/css-tag'
@@ -85,7 +87,7 @@ const premiumSparklineStyles = css`
   }
 `
 
-export function Sparkline({ motion: motionProp, ...rest }: SparklineProps) {
+export function Sparkline({ motion: motionProp, ...rest }: SparklineProps): ReactElement {
   const motionLevel = useMotionLevel(motionProp)
   useStyles('premium-sparkline', premiumSparklineStyles)
 

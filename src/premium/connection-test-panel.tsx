@@ -1,5 +1,7 @@
 'use client'
 
+import { type ReactElement } from 'react'
+
 import { ConnectionTestPanel as BaseConnectionTestPanel, type ConnectionTestPanelProps } from '../domain/connection-test-panel'
 import { useMotionLevel } from '../core/motion/use-motion-level'
 import { css } from '../core/styles/css-tag'
@@ -94,7 +96,7 @@ const premiumConnectionTestPanelStyles = css`
   }
 `
 
-export function ConnectionTestPanel({ motion: motionProp, ...rest }: ConnectionTestPanelProps) {
+export function ConnectionTestPanel({ motion: motionProp, ...rest }: ConnectionTestPanelProps): ReactElement {
   const motionLevel = useMotionLevel(motionProp)
   useStyles('premium-connection-test-panel', premiumConnectionTestPanelStyles)
 

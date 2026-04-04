@@ -1,5 +1,7 @@
 'use client'
 
+import { type ReactElement } from 'react'
+
 import { type StreamingTextProps, StreamingText as BaseStreamingText } from '../domain/streaming-text'
 import { useMotionLevel } from '../core/motion/use-motion-level'
 import { css } from '../core/styles/css-tag'
@@ -95,7 +97,7 @@ const premiumStreamingTextStyles = css`
   }
 `
 
-export function StreamingText({ motion: motionProp, streaming, ...rest }: StreamingTextProps) {
+export function StreamingText({ motion: motionProp, streaming, ...rest }: StreamingTextProps): ReactElement {
   const motionLevel = useMotionLevel(motionProp)
   useStyles('premium-streaming-text', premiumStreamingTextStyles)
 

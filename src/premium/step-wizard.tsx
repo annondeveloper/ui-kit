@@ -1,5 +1,7 @@
 'use client'
 
+import { type ReactElement } from 'react'
+
 import { type StepWizardProps, StepWizard as BaseStepWizard } from '../domain/step-wizard'
 import { useMotionLevel } from '../core/motion/use-motion-level'
 import { css } from '../core/styles/css-tag'
@@ -86,7 +88,7 @@ const premiumStepWizardStyles = css`
   }
 `
 
-export function StepWizard({ motion: motionProp, ...rest }: StepWizardProps) {
+export function StepWizard({ motion: motionProp, ...rest }: StepWizardProps): ReactElement {
   const motionLevel = useMotionLevel(motionProp)
   useStyles('premium-step-wizard', premiumStepWizardStyles)
 

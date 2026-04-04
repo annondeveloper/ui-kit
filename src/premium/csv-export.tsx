@@ -1,6 +1,6 @@
 'use client'
 
-import { useRef, useCallback, type MouseEvent } from 'react'
+import { useRef, useCallback, type MouseEvent, type ReactElement } from 'react'
 import { CSVExportButton as BaseCSVExportButton, type CSVExportButtonProps } from '../domain/csv-export'
 import { useMotionLevel } from '../core/motion/use-motion-level'
 import { useEntrance } from '../core/motion/use-entrance'
@@ -70,7 +70,7 @@ export function CSVExportButton({
   motion: motionProp,
   onExport,
   ...rest
-}: CSVExportButtonProps) {
+}: CSVExportButtonProps): ReactElement {
   const wrapperRef = useRef<HTMLDivElement>(null)
   const motionLevel = useMotionLevel(motionProp)
   useEntrance(wrapperRef, motionLevel >= 2 ? 'fade-up' : 'none', { duration: 200 })

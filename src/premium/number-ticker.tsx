@@ -1,5 +1,7 @@
 'use client'
 
+import { type ReactElement } from 'react'
+
 import { NumberTicker as BaseNumberTicker, type NumberTickerProps } from '../domain/number-ticker'
 import { useMotionLevel } from '../core/motion/use-motion-level'
 import { css } from '../core/styles/css-tag'
@@ -81,7 +83,7 @@ const premiumNumberTickerStyles = css`
   }
 `
 
-export function NumberTicker({ motion: motionProp, ...rest }: NumberTickerProps) {
+export function NumberTicker({ motion: motionProp, ...rest }: NumberTickerProps): ReactElement {
   const motionLevel = useMotionLevel(motionProp)
   useStyles('premium-number-ticker', premiumNumberTickerStyles)
 
