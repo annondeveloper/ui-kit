@@ -1,0 +1,6 @@
+{
+  "ui-kit-mcp": {
+    "type": "sse",
+    "url": "https://ui-kit-mcp.annondeveloper.workers.dev/sse"
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "name": "ui-kit",
+  "description": "Native Claude Code integration for @annondeveloper/ui-kit — 147 zero-dependency React components with Aurora Fluid design, physics animations, OKLCH colors, and 3 weight tiers. Gives Claude deep awareness of components, design patterns, and conventions.",
+  "version": "1.0.0",
+  "author": {
+    "name": "annondeveloper",
+    "url": "https://github.com/annondeveloper/ui-kit"
+  },
+  "homepage": "https://github.com/annondeveloper/ui-kit/tree/main/plugins/claude-code"
+}
