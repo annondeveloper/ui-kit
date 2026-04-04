@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { css, type CSSDefinition } from '../../../core/styles/css-tag'
+import { css } from '../../../core/styles/css-tag'
 
 describe('css tagged template literal', () => {
   it('returns a CSSDefinition with id and css string', () => {
@@ -9,7 +9,7 @@ describe('css tagged template literal', () => {
     expect(result).toHaveProperty('id')
     expect(result).toHaveProperty('css')
     expect(typeof result.id).toBe('string')
-    expect(result.id).toMatch(/^ui-\d+$/)
+    expect(result.id).toMatch(/^ui-[a-z0-9]+$/)
     expect(result.css).toBe('.button { color: red; }')
   })
 

@@ -11,14 +11,16 @@ type ClassNameBuilder = (...parts: (string | false | null | undefined | 0 | '')[
 export function useStyles(name: string, cssDef: CSSDefinition): ClassNameBuilder {
   const collector = useStyleCollector()
   const idRef = useRef(cssDef.id)
+  const isSSR = typeof document === 'undefined'
 
   if (collector) {
-    // SSR mode: register with collector, no DOM injection
+    // SSR mode with explicit collector: register styles for server rendering
     collector.add(cssDef.id, cssDef.css)
   }
 
   useEffect(() => {
-    if (collector) return // SSR mode, skip DOM injection
+    // useEffect never runs on the server, but guard for clarity
+    if (collector || isSSR) return
 
     const id = cssDef.id
     idRef.current = id
@@ -31,7 +33,7 @@ export function useStyles(name: string, cssDef: CSSDefinition): ClassNameBuilder
         removeCSS(id)
       }
     }
-  }, [cssDef.id, cssDef.css, collector])
+  }, [cssDef.id, cssDef.css, collector, isSSR])
 
   const cls: ClassNameBuilder = useCallback(
     (...parts: (string | false | null | undefined | 0 | '')[]) => {
