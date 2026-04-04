@@ -9,22 +9,15 @@ Status tracker for getting @annondeveloper/ui-kit recognized by AI platforms.
 **What to submit:** Plugin at `plugins/claude-code/`
 
 **Submission steps:**
-1. Fork `anthropics/claude-plugins-official`
-2. Add entry to the marketplace.json:
-```json
-{
-  "name": "ui-kit",
-  "description": "147 zero-dependency React components with Aurora Fluid design. 5 skills, 2 agents, hosted MCP. Search components, generate code, audit accessibility.",
-  "source": {
-    "type": "github",
-    "url": "https://github.com/annondeveloper/ui-kit.git",
-    "directory": "plugins/claude-code"
-  },
-  "homepage": "https://github.com/annondeveloper/ui-kit"
-}
-```
-3. Open PR with description of the plugin capabilities
-4. Wait for Anthropic review
+1. Go to https://claude.ai/settings/plugins/submit (or https://platform.claude.com/plugins/submit)
+2. Fill in plugin details:
+   - Name: ui-kit
+   - Source: https://github.com/annondeveloper/ui-kit.git
+   - Directory: plugins/claude-code
+   - Description: 147 zero-dependency React components. 5 skills, 2 agents, hosted MCP.
+3. Submit and wait for Anthropic review
+
+**Note:** PRs to anthropics/claude-plugins-official are NOT accepted — use the form above.
 
 ## 2. MCP Server Directory (modelcontextprotocol.io)
 

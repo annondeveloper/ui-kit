@@ -615,13 +615,76 @@ npx @annondeveloper/ui-kit-mcp --sse --port 3100`
         <div className="mcp-hero__badge">
           <Badge variant="info" color="blue">MCP Server</Badge>
         </div>
-        <h1 className="mcp-hero__title">MCP Server Integration</h1>
+        <h1 className="mcp-hero__title">AI Integrations</h1>
         <p className="mcp-hero__desc">
-          The Model Context Protocol (MCP) lets AI assistants like Claude, Cursor, and Copilot
-          talk directly to the UI Kit component registry. Instead of guessing APIs, the AI reads
-          ground truth -- every prop, type, default, example, and theme token -- and generates
-          correct, working code. No other React UI library ships an MCP server.
+          The first React component library your AI can use natively. Connect Claude, Cursor, Copilot,
+          Windsurf, or Codex to 178 components via MCP — the AI reads ground truth (every prop, type,
+          default, example, theme token) and generates correct, working code.
         </p>
+
+        {/* Hosted MCP quick connect */}
+        <div style={{
+          background: 'oklch(0% 0 0 / 0.3)',
+          border: '1px solid oklch(100% 0 0 / 0.08)',
+          borderRadius: '0.75rem',
+          padding: '1rem 1.25rem',
+          maxWidth: '560px',
+          margin: '1.5rem auto 0',
+          backdropFilter: 'blur(8px)',
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem' }}>
+            <span style={{ color: 'oklch(72% 0.19 155)', fontSize: '0.75rem' }}>{'●'}</span>
+            <span style={{ fontSize: '0.75rem', color: 'oklch(70% 0 0)', fontWeight: 600, textTransform: 'uppercase' as const, letterSpacing: '0.05em' }}>Hosted MCP — connect in 10 seconds</span>
+          </div>
+          <code style={{
+            display: 'block',
+            fontFamily: "'SF Mono', 'Fira Code', monospace",
+            fontSize: '0.8125rem',
+            color: 'oklch(85% 0 0)',
+            lineHeight: 1.5,
+            wordBreak: 'break-all' as const,
+          }}>https://ui-kit-mcp.annondeveloper.workers.dev/sse</code>
+          <p style={{ margin: '0.5rem 0 0', fontSize: '0.75rem', color: 'oklch(55% 0 0)' }}>
+            Add this URL to any MCP client config. No npm install needed. Works with Claude Code, Cursor, VS Code, Windsurf, Codex.
+          </p>
+        </div>
+
+        {/* Plugin badges */}
+        <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'center', marginTop: '1rem', flexWrap: 'wrap' as const }}>
+          <Badge variant="primary" size="sm">Claude Code Plugin</Badge>
+          <Badge variant="info" size="sm">Cursor</Badge>
+          <Badge variant="info" size="sm">VS Code</Badge>
+          <Badge variant="info" size="sm">Windsurf</Badge>
+          <Badge variant="info" size="sm">Codex CLI</Badge>
+        </div>
+      </section>
+
+      {/* ── Claude Code Plugin Features ──────────────────────────── */}
+      <section className="mcp-section">
+        <div className="mcp-section__header">
+          <Icon name="zap" size="sm" />
+          <h2 className="mcp-section__title">Claude Code Plugin</h2>
+          <Badge variant="success" size="sm">5 Skills + 2 Agents</Badge>
+        </div>
+        <p style={{ color: 'var(--text-secondary)', fontSize: '0.875rem', marginBottom: '1rem' }}>
+          The Claude Code plugin goes beyond MCP with skills Claude can invoke automatically, specialized agents, and session hooks.
+        </p>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '0.75rem' }}>
+          {[
+            { cmd: '/ui-kit:component-finder', desc: 'Search 178 components by name or use case' },
+            { cmd: '/ui-kit:generate-component', desc: 'Produce working TSX with correct imports' },
+            { cmd: '/ui-kit:design-system', desc: 'Learn OKLCH, motion levels, Aurora Fluid' },
+            { cmd: '/ui-kit:tier-guide', desc: 'Choose Lite / Standard / Premium' },
+            { cmd: '/ui-kit:audit-accessibility', desc: 'Check WCAG AA compliance' },
+            { cmd: 'component-architect', desc: 'Agent: designs multi-component layouts' },
+            { cmd: 'accessibility-reviewer', desc: 'Agent: deep a11y review' },
+          ].map(s => (
+            <Card key={s.cmd} padding="sm" style={{ background: 'var(--bg-surface)' }}>
+              <code style={{ fontSize: '0.75rem', color: 'var(--brand)', display: 'block', marginBottom: '0.25rem' }}>{s.cmd}</code>
+              <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>{s.desc}</span>
+            </Card>
+          ))}
+        </div>
       </section>
 
       {/* ── Architecture Diagram ──────────────────────────────── */}
@@ -653,7 +716,7 @@ npx @annondeveloper/ui-kit-mcp --sse --port 3100`
             <div className="mcp-arch__node">
               <Icon name="bar-chart" size="md" />
               <span className="mcp-arch__node-label">Component Registry</span>
-              <span className="mcp-arch__node-desc">154 components, 15 themes</span>
+              <span className="mcp-arch__node-desc">178 components, 15 themes</span>
             </div>
           </div>
         </Card>
