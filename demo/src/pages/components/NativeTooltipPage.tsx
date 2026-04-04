@@ -6,7 +6,9 @@ import { useStyles } from '@ui/core/styles/use-styles'
 import { NativeTooltip } from '@ui/components/native-tooltip'
 import { Button } from '@ui/components/button'
 import { CopyBlock } from '@ui/domain/copy-block'
+import { Card } from '@ui/components/card'
 import { PropsTable, type PropDef } from '../../components/PropsTable'
+import { useTier } from '../../App'
 
 // ─── Props ───────────────────────────────────────────────────────────────────
 
@@ -207,6 +209,7 @@ const IMPORT_STR = "import { NativeTooltip } from '@ui/components/native-tooltip
 
 export default function NativeTooltipPage() {
   useStyles('native-tooltip-page', pageStyles)
+  const { tier } = useTier()
 
   useEffect(() => {
     const sections = document.querySelectorAll('.native-tooltip-page__section')
@@ -300,6 +303,20 @@ export default function NativeTooltipPage() {
           <NativeTooltip content="This action will permanently delete all selected items from your account. This cannot be undone. Please make sure you have backed up any important data before proceeding.">
             <Button variant="secondary">Hover for details</Button>
           </NativeTooltip>
+        </div>
+      </section>
+
+      {/* ── Weight Tiers ──────────────────────────────────── */}
+      <section className="native-tooltip-page__section" id="tiers">
+        <h2 className="native-tooltip-page__section-title">Weight Tiers</h2>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '0.75rem' }}>
+          <Card padding="sm" style={{ borderColor: tier === 'standard' ? 'var(--brand)' : undefined }}>
+            <strong>Standard</strong>
+            <p style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', margin: '0.25rem 0' }}>
+              Full-featured with motion, theming, and accessibility.
+            </p>
+            <code style={{ fontSize: '0.6875rem' }}>import {'{'} NativeTooltip {'}'} from '@annondeveloper/ui-kit'</code>
+          </Card>
         </div>
       </section>
 

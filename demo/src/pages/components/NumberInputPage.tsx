@@ -8,6 +8,7 @@ import { Button } from '@ui/components/button'
 import { Card } from '@ui/components/card'
 import { Icon } from '@ui/core/icons/icon'
 import { PropsTable, type PropDef } from '../../components/PropsTable'
+import { useTier } from '../../App'
 
 // ─── Page Styles ──────────────────────────────────────────────────────────────
 
@@ -229,6 +230,7 @@ const IMPORT_STR = "import { NumberInput } from '@anthropic/ui-kit'"
 
 export default function NumberInputPage() {
   useStyles('ni-page', pageStyles)
+  const { tier } = useTier()
 
   const [qty, setQty] = useState<number | null>(1)
   const [price, setPrice] = useState<number | null>(1250.5)
@@ -322,6 +324,34 @@ export default function NumberInputPage() {
           <NumberInput label="With error" error="Value must be positive" defaultValue={-5} />
           <NumberInput label="Disabled" disabled defaultValue={10} />
           <NumberInput label="Read only" readOnly defaultValue={99} />
+        </div>
+      </section>
+
+      {/* ── Weight Tiers ──────────────────────────────────── */}
+      <section className="ni-page__section" id="tiers">
+        <h2 className="ni-page__section-title">Weight Tiers</h2>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '0.75rem' }}>
+          <Card padding="sm" style={{ borderColor: tier === 'standard' ? 'var(--brand)' : undefined }}>
+            <strong>Standard</strong>
+            <p style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', margin: '0.25rem 0' }}>
+              Full-featured with motion, theming, and accessibility.
+            </p>
+            <code style={{ fontSize: '0.6875rem' }}>import {'{'} NumberInput {'}'} from '@annondeveloper/ui-kit'</code>
+          </Card>
+          <Card padding="sm" style={{ borderColor: tier === 'lite' ? 'var(--brand)' : undefined }}>
+            <strong>Lite</strong>
+            <p style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', margin: '0.25rem 0' }}>
+              Minimal footprint, no motion or advanced theming.
+            </p>
+            <code style={{ fontSize: '0.6875rem' }}>import {'{'} NumberInput {'}'} from '@annondeveloper/ui-kit/lite'</code>
+          </Card>
+          <Card padding="sm" style={{ borderColor: tier === 'premium' ? 'var(--brand)' : undefined }}>
+            <strong>Premium</strong>
+            <p style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', margin: '0.25rem 0' }}>
+              Aurora glow, spring animations, and shimmer effects.
+            </p>
+            <code style={{ fontSize: '0.6875rem' }}>import {'{'} NumberInput {'}'} from '@annondeveloper/ui-kit/premium'</code>
+          </Card>
         </div>
       </section>
 

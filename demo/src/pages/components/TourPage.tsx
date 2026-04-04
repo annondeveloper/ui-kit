@@ -6,7 +6,9 @@ import { useStyles } from '@ui/core/styles/use-styles'
 import { Tour, type TourStep } from '@ui/domain/tour'
 import { Button } from '@ui/components/button'
 import { CopyBlock } from '@ui/domain/copy-block'
+import { Card } from '@ui/components/card'
 import { PropsTable, type PropDef } from '../../components/PropsTable'
+import { useTier } from '../../App'
 
 // ─── Props ───────────────────────────────────────────────────────────────────
 
@@ -216,6 +218,7 @@ const IMPORT_STR = "import { Tour, type TourStep } from '@ui/domain/tour'"
 
 export default function TourPage() {
   useStyles('tour-page', pageStyles)
+  const { tier } = useTier()
 
   const [tourOpen, setTourOpen] = useState(false)
   const [minimalTourOpen, setMinimalTourOpen] = useState(false)
@@ -317,6 +320,34 @@ export default function TourPage() {
       <section className="tour-page__section" id="step-props">
         <h2 className="tour-page__section-title"><a href="#step-props">TourStep Props</a></h2>
         <PropsTable props={STEP_PROPS} />
+      </section>
+
+      {/* ── Weight Tiers ──────────────────────────────────── */}
+      <section className="tour-page__section" id="tiers">
+        <h2 className="tour-page__section-title">Weight Tiers</h2>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '0.75rem' }}>
+          <Card padding="sm" style={{ borderColor: tier === 'standard' ? 'var(--brand)' : undefined }}>
+            <strong>Standard</strong>
+            <p style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', margin: '0.25rem 0' }}>
+              Full-featured with motion, theming, and accessibility.
+            </p>
+            <code style={{ fontSize: '0.6875rem' }}>import {'{'} Tour {'}'} from '@annondeveloper/ui-kit'</code>
+          </Card>
+          <Card padding="sm" style={{ borderColor: tier === 'lite' ? 'var(--brand)' : undefined }}>
+            <strong>Lite</strong>
+            <p style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', margin: '0.25rem 0' }}>
+              Minimal footprint, no motion or advanced theming.
+            </p>
+            <code style={{ fontSize: '0.6875rem' }}>import {'{'} Tour {'}'} from '@annondeveloper/ui-kit/lite'</code>
+          </Card>
+          <Card padding="sm" style={{ borderColor: tier === 'premium' ? 'var(--brand)' : undefined }}>
+            <strong>Premium</strong>
+            <p style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', margin: '0.25rem 0' }}>
+              Aurora glow, spring animations, and shimmer effects.
+            </p>
+            <code style={{ fontSize: '0.6875rem' }}>import {'{'} Tour {'}'} from '@annondeveloper/ui-kit/premium'</code>
+          </Card>
+        </div>
       </section>
 
       {/* ── Props: Tour ───────────────────────────────── */}

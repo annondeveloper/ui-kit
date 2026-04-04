@@ -6,6 +6,7 @@ import { useStyles } from '@ui/core/styles/use-styles'
 import { Spoiler } from '@ui/components/spoiler'
 import { Card } from '@ui/components/card'
 import { PropsTable, type PropDef } from '../../components/PropsTable'
+import { useTier } from '../../App'
 
 // ─── Styles ──────────────────────────────────────────────────────────────────
 
@@ -206,6 +207,7 @@ const propsData: PropDef[] = [
 
 export default function SpoilerPage() {
   useStyles('spoiler-page', pageStyles)
+  const { tier } = useTier()
 
   useEffect(() => {
     const sections = document.querySelectorAll('.spoiler-page__section')
@@ -282,6 +284,34 @@ export default function SpoilerPage() {
       </section>
 
       {/* ── Props ─────────────────────────────────── */}
+      {/* ── Weight Tiers ──────────────────────────────────── */}
+      <section className="spoiler-page__section" id="tiers">
+        <h2 className="spoiler-page__section-title">Weight Tiers</h2>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '0.75rem' }}>
+          <Card padding="sm" style={{ borderColor: tier === 'standard' ? 'var(--brand)' : undefined }}>
+            <strong>Standard</strong>
+            <p style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', margin: '0.25rem 0' }}>
+              Full-featured with motion, theming, and accessibility.
+            </p>
+            <code style={{ fontSize: '0.6875rem' }}>import {'{'} Spoiler {'}'} from '@annondeveloper/ui-kit'</code>
+          </Card>
+          <Card padding="sm" style={{ borderColor: tier === 'lite' ? 'var(--brand)' : undefined }}>
+            <strong>Lite</strong>
+            <p style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', margin: '0.25rem 0' }}>
+              Minimal footprint, no motion or advanced theming.
+            </p>
+            <code style={{ fontSize: '0.6875rem' }}>import {'{'} Spoiler {'}'} from '@annondeveloper/ui-kit/lite'</code>
+          </Card>
+          <Card padding="sm" style={{ borderColor: tier === 'premium' ? 'var(--brand)' : undefined }}>
+            <strong>Premium</strong>
+            <p style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', margin: '0.25rem 0' }}>
+              Aurora glow, spring animations, and shimmer effects.
+            </p>
+            <code style={{ fontSize: '0.6875rem' }}>import {'{'} Spoiler {'}'} from '@annondeveloper/ui-kit/premium'</code>
+          </Card>
+        </div>
+      </section>
+
       <section className="spoiler-page__section" id="props">
         <h2 className="spoiler-page__section-title"><a href="#props">Props API</a></h2>
         <p className="spoiler-page__section-desc">

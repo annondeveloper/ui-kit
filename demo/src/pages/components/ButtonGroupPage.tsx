@@ -8,6 +8,7 @@ import { Button } from '@ui/components/button'
 import { Card } from '@ui/components/card'
 import { Icon } from '@ui/core/icons/icon'
 import { PropsTable, type PropDef } from '../../components/PropsTable'
+import { useTier } from '../../App'
 
 // ─── Styles ──────────────────────────────────────────────────────────────────
 
@@ -208,6 +209,7 @@ const propsData: PropDef[] = [
 
 export default function ButtonGroupPage() {
   useStyles('button-group-page', pageStyles)
+  const { tier } = useTier()
 
   const [selected, setSelected] = useState('week')
 
@@ -305,6 +307,34 @@ export default function ButtonGroupPage() {
               </Button>
             ))}
           </ButtonGroup>
+        </div>
+      </section>
+
+      {/* ── Weight Tiers ──────────────────────────────────── */}
+      <section className="button-group-page__section" id="tiers">
+        <h2 className="button-group-page__section-title">Weight Tiers</h2>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '0.75rem' }}>
+          <Card padding="sm" style={{ borderColor: tier === 'standard' ? 'var(--brand)' : undefined }}>
+            <strong>Standard</strong>
+            <p style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', margin: '0.25rem 0' }}>
+              Full-featured with motion, theming, and accessibility.
+            </p>
+            <code style={{ fontSize: '0.6875rem' }}>import {'{'} ButtonGroup {'}'} from '@annondeveloper/ui-kit'</code>
+          </Card>
+          <Card padding="sm" style={{ borderColor: tier === 'lite' ? 'var(--brand)' : undefined }}>
+            <strong>Lite</strong>
+            <p style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', margin: '0.25rem 0' }}>
+              Minimal footprint, no motion or advanced theming.
+            </p>
+            <code style={{ fontSize: '0.6875rem' }}>import {'{'} ButtonGroup {'}'} from '@annondeveloper/ui-kit/lite'</code>
+          </Card>
+          <Card padding="sm" style={{ borderColor: tier === 'premium' ? 'var(--brand)' : undefined }}>
+            <strong>Premium</strong>
+            <p style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', margin: '0.25rem 0' }}>
+              Aurora glow, spring animations, and shimmer effects.
+            </p>
+            <code style={{ fontSize: '0.6875rem' }}>import {'{'} ButtonGroup {'}'} from '@annondeveloper/ui-kit/premium'</code>
+          </Card>
         </div>
       </section>
 
