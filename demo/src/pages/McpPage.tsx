@@ -1309,7 +1309,7 @@ npx @annondeveloper/ui-kit-mcp --sse --port 3100`
                   </li>
                 ))}
               </ol>
-              <CopyBlock code={a.config} language={a.configLang} />
+              <CopyBlock code={a.config} language={a.configLang as any} />
             </Card>
           ))}
         </div>
@@ -1479,7 +1479,7 @@ npx @annondeveloper/ui-kit-mcp --sse --port 3100`
               <div className="mcp-usecase__label">Use Case {i + 1}</div>
               <div className="mcp-usecase__prompt">{uc.prompt}</div>
               <div className="mcp-usecase__result-label">AI Response</div>
-              <CopyBlock code={uc.result} language={uc.lang} />
+              <CopyBlock code={uc.result} language={uc.lang as any} />
             </Card>
           ))}
         </div>

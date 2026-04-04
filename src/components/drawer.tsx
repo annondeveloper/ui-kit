@@ -239,6 +239,7 @@ export const Drawer = forwardRef<HTMLDivElement, DrawerProps>(
     }, [handleEscape])
 
     if (!open) return null
+    if (typeof document === 'undefined') return null
 
     return createPortal(
       <div

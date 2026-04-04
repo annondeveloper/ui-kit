@@ -176,6 +176,8 @@ const TopologyGraphPage = lazy(() => import('./pages/components/TopologyGraphPag
 const PipelineDagPage = lazy(() => import('./pages/components/PipelineDagPage'))
 const DashboardTemplatePage = lazy(() => import('./pages/components/DashboardTemplatePage'))
 const PluginDashboardPage = lazy(() => import('./pages/components/PluginDashboardPage'))
+const ContainerQueryPage = lazy(() => import('./pages/components/ContainerQueryPage'))
+const SuccessCheckmarkPage = lazy(() => import('./pages/components/SuccessCheckmarkPage'))
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
@@ -353,6 +355,8 @@ createRoot(document.getElementById('root')!).render(
             <Route path="components/pipeline-dag" element={<Suspense><PipelineDagPage /></Suspense>} />
             <Route path="components/dashboard-template" element={<Suspense><DashboardTemplatePage /></Suspense>} />
             <Route path="components/plugin-dashboard" element={<Suspense><PluginDashboardPage /></Suspense>} />
+            <Route path="components/container-query" element={<Suspense><ContainerQueryPage /></Suspense>} />
+            <Route path="components/success-checkmark" element={<Suspense><SuccessCheckmarkPage /></Suspense>} />
           </Route>
 
           {/* Embed route — rendered WITHOUT App shell (no sidebar/header) */}

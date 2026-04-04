@@ -836,7 +836,7 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(
         </button>
 
         {/* Dropdown — portaled to body to escape ancestor transforms */}
-        {isOpen && createPortal(
+        {isOpen && typeof document !== 'undefined' && createPortal(
           <div
             ref={popoverRef}
             className="ui-select__dropdown"

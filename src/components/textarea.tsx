@@ -41,6 +41,7 @@ export interface TextareaProps extends Omit<HTMLAttributes<HTMLDivElement>, 'onC
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
 function getLineHeight(el: HTMLTextAreaElement): number {
+  if (typeof window === 'undefined') return 20 // SSR fallback
   const computed = window.getComputedStyle(el)
   const lh = parseFloat(computed.lineHeight)
   return isNaN(lh) ? parseFloat(computed.fontSize) * 1.5 : lh
@@ -329,8 +330,10 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
       el.style.height = 'auto'
 
       const lineHeight = getLineHeight(el)
-      const paddingBlock = parseFloat(getComputedStyle(el).paddingTop) + parseFloat(getComputedStyle(el).paddingBottom)
-      const borderBlock = parseFloat(getComputedStyle(el).borderTopWidth) + parseFloat(getComputedStyle(el).borderBottomWidth)
+      if (typeof window === 'undefined') return // SSR guard
+      const styles = window.getComputedStyle(el)
+      const paddingBlock = parseFloat(styles.paddingTop) + parseFloat(styles.paddingBottom)
+      const borderBlock = parseFloat(styles.borderTopWidth) + parseFloat(styles.borderBottomWidth)
 
       const minHeight = lineHeight * minRows + paddingBlock + borderBlock
       const maxHeight = maxRows ? lineHeight * maxRows + paddingBlock + borderBlock : Infinity

@@ -656,7 +656,7 @@ export const TimePicker = forwardRef<HTMLDivElement, TimePickerProps>(
           )}
         </button>
 
-        {isOpen && createPortal(
+        {isOpen && typeof document !== 'undefined' && createPortal(
           <div
             ref={dropdownRef}
             className="ui-time-picker__dropdown"

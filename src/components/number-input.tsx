@@ -571,7 +571,7 @@ export const NumberInput = forwardRef<HTMLInputElement, NumberInputProps>(
     const handleWheel = useCallback(
       (e: WheelEvent<HTMLInputElement>) => {
         if (readOnly || disabled) return
-        if (document.activeElement !== inputRef.current) return
+        if (typeof document === 'undefined' || document.activeElement !== inputRef.current) return
         e.preventDefault()
         if (e.deltaY < 0) {
           increment()

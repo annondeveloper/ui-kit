@@ -540,7 +540,7 @@ export const DateRangePicker = forwardRef<HTMLDivElement, DateRangePickerProps>(
           )}
         </button>
 
-        {isOpen && createPortal(
+        {isOpen && typeof document !== 'undefined' && createPortal(
           <div
             ref={popoverRef}
             className="ui-date-range-picker__popover"
