@@ -1,0 +1,7 @@
+{
+  "mcpServers": {
+    "ui-kit": {
+      "url": "https://ui-kit-mcp.annondeveloper.workers.dev/sse"
+    }
+  }
+}
