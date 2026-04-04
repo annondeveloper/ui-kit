@@ -1,3 +1,12 @@
+/**
+ * @module @annondeveloper/ui-kit/premium
+ *
+ * Premium component variants with enhanced visual effects: spring-scale
+ * entrance animations, aurora glow, shimmer accents, floating particles,
+ * and physics-based interactions. Re-exports all standard components and
+ * overrides select ones with premium implementations.
+ */
+
 // Re-export all standard components
 export * from '../components'
 export * from '../domain'

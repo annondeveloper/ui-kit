@@ -1,3 +1,11 @@
+/**
+ * @module @annondeveloper/ui-kit/lite
+ *
+ * Lightweight CSS-only component variants (~0.3-1.2 KB each). Minimal
+ * JavaScript wrappers with no motion engine, ideal for performance-critical
+ * or low-bandwidth scenarios. 144 components available.
+ */
+
 // ─── Core (existing) ─────────────────────────────────────────────────────────
 export { Button, type LiteButtonProps } from './button'
 export { Badge, type LiteBadgeProps } from './badge'

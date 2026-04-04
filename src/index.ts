@@ -1,3 +1,28 @@
+/**
+ * @module @annondeveloper/ui-kit
+ *
+ * Zero-dependency React component library with 147 components across 3 weight
+ * tiers (Lite/Standard/Premium). Features physics-based animations, OKLCH color
+ * system, Aurora Fluid design identity, built-in form engine, and MCP server
+ * for AI-assisted development.
+ *
+ * @example
+ * ```tsx
+ * import { UIProvider, Button, Card, MetricCard } from '@annondeveloper/ui-kit'
+ *
+ * function App() {
+ *   return (
+ *     <UIProvider>
+ *       <Card>
+ *         <Button variant="primary">Deploy</Button>
+ *         <MetricCard title="CPU" value="87.4%" trend="up" />
+ *       </Card>
+ *     </UIProvider>
+ *   )
+ * }
+ * ```
+ */
+
 // Core engines
 export * from './core/styles'
 // Motion — re-export everything except Timeline (name conflict with component)

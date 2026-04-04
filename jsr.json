@@ -1,10 +1,13 @@
 {
   "name": "@annondeveloper/ui-kit",
   "version": "2.7.0",
+  "description": "Zero-dependency React component library with 147 components, 3 weight tiers (Lite/Standard/Premium), physics-based animations, OKLCH color system, Aurora Fluid design, and built-in MCP server for AI assistants.",
   "exports": {
     ".": "./src/index.ts",
     "./form": "./src/form.ts",
-    "./theme": "./src/theme.ts"
+    "./theme": "./src/theme.ts",
+    "./lite": "./src/lite/index.ts",
+    "./premium": "./src/premium/index.ts"
   },
   "publish": {
     "include": [
@@ -15,6 +18,7 @@
     "exclude": [
       "src/__tests__/",
       "src/cli/",
+      "src/mcp/",
       "**/*.stories.tsx",
       "**/*.test.tsx"
     ]
@@ -22,5 +26,9 @@
   "imports": {
     "react": "npm:react@^19",
     "react-dom": "npm:react-dom@^19"
+  },
+  "compilerOptions": {
+    "jsx": "react-jsx",
+    "jsxImportSource": "react"
   }
 }
