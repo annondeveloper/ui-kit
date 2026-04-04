@@ -12,6 +12,7 @@ import { css } from '../core/styles/css-tag'
 import { useStyles } from '../core/styles/use-styles'
 import { useMotionLevel } from '../core/motion/use-motion-level'
 import { cn } from '../core/utils/cn'
+import { useStableId } from '../core/a11y/stable-id'
 
 export interface RatingProps extends Omit<HTMLAttributes<HTMLDivElement>, 'onChange'> {
   value?: number
@@ -41,15 +42,15 @@ const StarEmpty = () => (
   </svg>
 )
 
-const StarHalf = () => (
+const StarHalf = ({ clipId }: { clipId: string }) => (
   <svg viewBox="0 0 24 24" aria-hidden="true">
     <defs>
-      <clipPath id="star-half-clip">
+      <clipPath id={clipId}>
         <rect x="0" y="0" width="12" height="24" />
       </clipPath>
     </defs>
     <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" fill="none" stroke="currentColor" strokeWidth="1.5" />
-    <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" fill="currentColor" clipPath="url(#star-half-clip)" />
+    <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" fill="currentColor" clipPath={`url(#${clipId})`} />
   </svg>
 )
 
@@ -175,6 +176,7 @@ export const Rating = forwardRef<HTMLDivElement, RatingProps>(
   ) => {
     const cls = useStyles('rating', ratingStyles)
     const motionLevel = useMotionLevel(motionProp)
+    const halfClipId = useStableId('star-half-clip')
 
     const isControlled = valueProp !== undefined
     const [internalValue, setInternalValue] = useState(defaultValue)
@@ -254,7 +256,7 @@ export const Rating = forwardRef<HTMLDivElement, RatingProps>(
 
     const renderStar = (state: 'full' | 'half' | 'empty') => {
       if (state === 'full') return icon || <StarFull />
-      if (state === 'half') return <StarHalf />
+      if (state === 'half') return <StarHalf clipId={halfClipId} />
       return emptyIcon || <StarEmpty />
     }
 
@@ -267,9 +269,11 @@ export const Rating = forwardRef<HTMLDivElement, RatingProps>(
         data-readonly={readOnly || undefined}
         role="slider"
         tabIndex={readOnly ? -1 : 0}
+        aria-label={rest['aria-label'] || 'Rating'}
         aria-valuenow={currentValue}
         aria-valuemin={0}
         aria-valuemax={max}
+        aria-valuetext={`${currentValue} of ${max} stars`}
         aria-readonly={readOnly || undefined}
         onKeyDown={handleKeyDown}
         onMouseLeave={handleMouseLeave}

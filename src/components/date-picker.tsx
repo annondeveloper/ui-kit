@@ -440,6 +440,7 @@ export const DatePicker = forwardRef<HTMLDivElement, DatePickerProps>(
 
     const calendarRef = useRef<HTMLDivElement>(null)
     const dayRefs = useRef<Map<number, HTMLButtonElement>>(new Map())
+    const pendingFocusDay = useRef<number | null>(null)
 
     const today = new Date()
     const dayNames = firstDayOfWeek === 1 ? DAY_NAMES_MON : DAY_NAMES_SUN
@@ -505,6 +506,16 @@ export const DatePicker = forwardRef<HTMLDivElement, DatePickerProps>(
       setIsOpen(true)
     }, [disabled])
 
+    const navigateMonth = useCallback((delta: number) => {
+      setViewDate(prev => {
+        let month = prev.month + delta
+        let year = prev.year
+        if (month < 0) { month = 11; year-- }
+        if (month > 11) { month = 0; year++ }
+        return { year, month }
+      })
+    }, [])
+
     const handleCalendarKeyDown = useCallback(
       (e: KeyboardEvent) => {
         if (e.key === 'Escape') {
@@ -538,20 +549,32 @@ export const DatePicker = forwardRef<HTMLDivElement, DatePickerProps>(
 
         if (newDay >= 1 && newDay <= daysInMonth) {
           dayRefs.current.get(newDay)?.focus()
+        } else if (newDay < 1) {
+          // Navigate to previous month and focus the appropriate day
+          const prevMonth = viewDate.month === 0 ? 11 : viewDate.month - 1
+          const prevYear = viewDate.month === 0 ? viewDate.year - 1 : viewDate.year
+          const prevMonthDays = getDaysInMonth(prevYear, prevMonth)
+          pendingFocusDay.current = prevMonthDays + newDay // newDay is negative offset from 1
+          navigateMonth(-1)
+        } else {
+          // Navigate to next month and focus the appropriate day
+          pendingFocusDay.current = newDay - daysInMonth
+          navigateMonth(1)
         }
       },
-      [viewDate, daysInMonth, isDateDisabled, selectDate]
+      [viewDate, daysInMonth, isDateDisabled, selectDate, navigateMonth]
     )
 
-    const navigateMonth = useCallback((delta: number) => {
-      setViewDate(prev => {
-        let month = prev.month + delta
-        let year = prev.year
-        if (month < 0) { month = 11; year-- }
-        if (month > 11) { month = 0; year++ }
-        return { year, month }
-      })
-    }, [])
+    // Focus a day after month navigation re-renders
+    useEffect(() => {
+      if (pendingFocusDay.current !== null) {
+        const dayToFocus = pendingFocusDay.current
+        pendingFocusDay.current = null
+        requestAnimationFrame(() => {
+          dayRefs.current.get(dayToFocus)?.focus()
+        })
+      }
+    }, [viewDate])
 
     // Close on click outside
     useEffect(() => {

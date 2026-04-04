@@ -297,8 +297,9 @@ export const SearchInput = forwardRef<HTMLInputElement, SearchInputProps>(
         setInternalValue('')
       }
       if (debounceRef.current) clearTimeout(debounceRef.current)
+      onChange?.('')
       onClear?.()
-    }, [isControlled, onClear])
+    }, [isControlled, onChange, onClear])
 
     const hasValue = currentValue.length > 0
     const showClear = clearable && hasValue && !disabled
@@ -327,6 +328,7 @@ export const SearchInput = forwardRef<HTMLInputElement, SearchInputProps>(
           className="ui-search-input__field"
           value={currentValue}
           disabled={disabled}
+          aria-label="Search"
           onChange={handleChange}
           onKeyDown={handleKeyDown}
           {...rest}

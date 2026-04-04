@@ -1,10 +1,10 @@
 import { forwardRef, useCallback, useRef, useState, type InputHTMLAttributes, type ReactNode } from 'react'
 
-export interface LiteSearchInputProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 'type' | 'size'> {
+export interface LiteSearchInputProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 'type' | 'size' | 'onChange'> {
   size?: 'sm' | 'md' | 'lg'
   value?: string
   defaultValue?: string
-  onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void
+  onChange?: (value: string) => void
   /** Called with the search string; fired on Enter or after debounce */
   onSearch?: (value: string) => void
   /** Called when the clear button is clicked */
@@ -28,7 +28,7 @@ export const SearchInput = forwardRef<HTMLInputElement, LiteSearchInputProps>(
     const handleChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
       const val = e.target.value
       if (controlledValue === undefined) setInternalValue(val)
-      onChange?.(e)
+      onChange?.(val)
 
       if (onSearch) {
         if (debounceMs) {
@@ -47,8 +47,9 @@ export const SearchInput = forwardRef<HTMLInputElement, LiteSearchInputProps>(
 
     const handleClear = useCallback(() => {
       if (controlledValue === undefined) setInternalValue('')
+      onChange?.('')
       onClear?.()
-    }, [controlledValue, onClear])
+    }, [controlledValue, onChange, onClear])
 
     return (
       <div className={`ui-lite-search-input${className ? ` ${className}` : ''}`} data-size={size} data-loading={loading ? '' : undefined}>
@@ -57,6 +58,7 @@ export const SearchInput = forwardRef<HTMLInputElement, LiteSearchInputProps>(
           ref={ref}
           type="search"
           value={currentValue}
+          aria-label="Search"
           onChange={handleChange}
           onKeyDown={handleKeyDown}
           {...rest}

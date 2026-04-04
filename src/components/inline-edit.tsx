@@ -232,6 +232,8 @@ export const InlineEdit = forwardRef<HTMLDivElement, InlineEditProps>(
     const [isEditing, setIsEditing] = useState(false)
     const [editValue, setEditValue] = useState(value)
     const inputRef = useRef<HTMLInputElement | HTMLTextAreaElement | null>(null)
+    const displayRef = useRef<HTMLDivElement>(null)
+    const wasEditingRef = useRef(false)
 
     // Sync edit value when entering edit mode
     useEffect(() => {
@@ -239,6 +241,16 @@ export const InlineEdit = forwardRef<HTMLDivElement, InlineEditProps>(
         inputRef.current.focus()
         inputRef.current.select()
       }
+    }, [isEditing])
+
+    // Return focus to display element when exiting edit mode
+    useEffect(() => {
+      if (wasEditingRef.current && !isEditing) {
+        requestAnimationFrame(() => {
+          displayRef.current?.focus()
+        })
+      }
+      wasEditingRef.current = isEditing
     }, [isEditing])
 
     // ── Enter edit mode ───────────────────────────────────────────────
@@ -355,6 +367,7 @@ export const InlineEdit = forwardRef<HTMLDivElement, InlineEditProps>(
           )
         ) : (
           <div
+            ref={displayRef}
             className="ui-inline-edit__display"
             role="button"
             tabIndex={disabled ? -1 : 0}
