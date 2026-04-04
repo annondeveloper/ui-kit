@@ -11,7 +11,7 @@ export interface NativeTooltipProps {
 
 // ─── Component ──────────────────────────────────────────────────────────────
 
-export function NativeTooltip({ content, children }: NativeTooltipProps) {
+export function NativeTooltip({ content, children }: NativeTooltipProps): ReactElement {
   return cloneElement(children, { title: content } as Record<string, unknown>)
 }
 

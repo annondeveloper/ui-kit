@@ -6,6 +6,7 @@ import {
   useRef,
   type HTMLAttributes,
   type ReactNode,
+  type ReactElement,
 } from 'react'
 import { css } from '../core/styles/css-tag'
 import { useStyles } from '../core/styles/use-styles'
@@ -259,7 +260,7 @@ export function Dialog({
   classNames,
   className,
   ...rest
-}: DialogProps) {
+}: DialogProps): ReactElement {
   useStyles('dialog', dialogStyles)
   const motionLevel = useMotionLevel(motionProp)
   const dialogRef = useRef<HTMLDialogElement>(null)

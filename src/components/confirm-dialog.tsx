@@ -1,6 +1,6 @@
 'use client'
 
-import { type ReactNode } from 'react'
+import { type ReactNode, type ReactElement } from 'react'
 import { css } from '../core/styles/css-tag'
 import { useStyles } from '../core/styles/use-styles'
 import { Dialog } from './dialog'
@@ -68,7 +68,7 @@ export function ConfirmDialog({
   variant = 'default',
   loading = false,
   motion: motionProp,
-}: ConfirmDialogProps) {
+}: ConfirmDialogProps): ReactElement {
   useStyles('confirm-dialog', confirmDialogStyles)
 
   return (

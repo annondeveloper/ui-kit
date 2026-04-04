@@ -214,7 +214,7 @@ export function DropdownMenu({
   open: controlledOpen,
   onOpenChange,
   motion: motionProp,
-}: DropdownMenuProps) {
+}: DropdownMenuProps): ReactElement {
   useStyles('dropdown-menu', dropdownMenuStyles)
   const motionLevel = useMotionLevel(motionProp)
   const menuId = useStableId('dropdown-menu')

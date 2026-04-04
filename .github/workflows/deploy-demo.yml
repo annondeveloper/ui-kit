@@ -3,6 +3,7 @@ name: Deploy Demo
 on:
   push:
     branches: [main]
+    tags-ignore: ['v*']  # Don't deploy on tag pushes — Publish handles releases
   workflow_dispatch:
 
 permissions:
