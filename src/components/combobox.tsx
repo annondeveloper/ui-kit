@@ -486,6 +486,7 @@ export const Combobox = forwardRef<HTMLDivElement, ComboboxProps>(
     const motionLevel = useMotionLevel(motionProp)
     const id = useStableId('combobox')
     const listboxId = `${id}-listbox`
+    const inputId = `${id}-input`
     const labelId = `${id}-label`
     const errorId = `${id}-error`
 
@@ -765,7 +766,7 @@ export const Combobox = forwardRef<HTMLDivElement, ComboboxProps>(
         {...rest}
       >
         {label && (
-          <label className="ui-combobox__label" id={labelId}>
+          <label className="ui-combobox__label" id={labelId} htmlFor={inputId}>
             {label}
           </label>
         )}
@@ -777,12 +778,13 @@ export const Combobox = forwardRef<HTMLDivElement, ComboboxProps>(
         <div ref={wrapperRef} className="ui-combobox__input-wrapper">
           <input
             ref={inputRef}
+            id={inputId}
             className="ui-combobox__input"
             type="text"
             role="combobox"
             aria-expanded={isOpen}
             aria-haspopup="listbox"
-            aria-controls={isOpen ? listboxId : undefined}
+            aria-controls={listboxId}
             aria-activedescendant={activeDescendantId}
             aria-autocomplete="list"
             aria-labelledby={label ? labelId : undefined}

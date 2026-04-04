@@ -47,7 +47,7 @@ export const OtpInput = forwardRef<HTMLDivElement, LiteOtpInputProps>(
             maxLength={1}
             value={value[i] ?? ''}
             disabled={disabled}
-            aria-label={`Digit ${i + 1}`}
+            aria-label={`Digit ${i + 1} of ${length}`}
             onChange={e => handleInput(i, e.target.value)}
             onKeyDown={e => { if (e.key === 'Backspace' && !value[i] && i > 0) inputsRef.current[i - 1]?.focus() }}
           />

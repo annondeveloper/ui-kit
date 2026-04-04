@@ -82,9 +82,9 @@ export const Combobox = forwardRef<HTMLDivElement, ComboboxProps>(
     useStyles('premium-combobox', premiumComboboxStyles)
 
     return (
-      <span className="ui-premium-combobox" data-motion={motionLevel}>
+      <div className="ui-premium-combobox" data-motion={motionLevel}>
         <BaseCombobox ref={ref} motion={motionProp} {...rest} />
-      </span>
+      </div>
     )
   }
 )

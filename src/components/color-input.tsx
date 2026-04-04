@@ -496,6 +496,13 @@ export const ColorInput = forwardRef<HTMLDivElement, ColorInputProps>(
       []
     )
 
+    // Focus the SL area when popover opens
+    useEffect(() => {
+      if (isOpen && slAreaRef.current) {
+        slAreaRef.current.focus()
+      }
+    }, [isOpen])
+
     // Close on click outside
     useEffect(() => {
       if (!isOpen) return
@@ -535,6 +542,48 @@ export const ColorInput = forwardRef<HTMLDivElement, ColorInputProps>(
         updateColor(hex)
       },
       [saturation, lightness, updateColor]
+    )
+
+    const handleSLKeyDown = useCallback(
+      (e: KeyboardEvent<HTMLDivElement>) => {
+        let newS = saturation
+        let newL = lightness
+        let handled = true
+
+        switch (e.key) {
+          case 'ArrowRight':
+            newS = Math.min(100, saturation + 1)
+            break
+          case 'ArrowLeft':
+            newS = Math.max(0, saturation - 1)
+            break
+          case 'ArrowUp':
+            newL = Math.min(100, lightness + 1)
+            break
+          case 'ArrowDown':
+            newL = Math.max(0, lightness - 1)
+            break
+          case 'Home':
+            newS = 0
+            newL = 0
+            break
+          case 'End':
+            newS = 100
+            newL = 100
+            break
+          default:
+            handled = false
+        }
+
+        if (handled) {
+          e.preventDefault()
+          setSaturation(newS)
+          setLightness(newL)
+          const hex = hslToHex(hue, newS, newL)
+          updateColor(hex)
+        }
+      },
+      [saturation, lightness, hue, updateColor]
     )
 
     const handleSLPointerDown = useCallback(
@@ -599,7 +648,7 @@ export const ColorInput = forwardRef<HTMLDivElement, ColorInputProps>(
         {...rest}
       >
         {label && (
-          <label className="ui-color-input__label">{label}</label>
+          <label className="ui-color-input__label" htmlFor={`${stableId}-hex`}>{label}</label>
         )}
 
         <div className="ui-color-input__row">
@@ -621,6 +670,7 @@ export const ColorInput = forwardRef<HTMLDivElement, ColorInputProps>(
           {showInput && (
             <input
               type="text"
+              id={`${stableId}-hex`}
               className="ui-color-input__hex-input"
               name={name}
               value={hexInputValue}
@@ -650,6 +700,7 @@ export const ColorInput = forwardRef<HTMLDivElement, ColorInputProps>(
               className="ui-color-input__sl-area"
               style={{ background: slBackground }}
               onPointerDown={handleSLPointerDown}
+              onKeyDown={handleSLKeyDown}
               role="slider"
               aria-label="Saturation and lightness"
               aria-valuetext={`Saturation ${saturation}%, Lightness ${lightness}%`}

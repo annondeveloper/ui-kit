@@ -5,6 +5,7 @@ import {
   useState,
   useRef,
   useCallback,
+  useEffect,
   type HTMLAttributes,
   type ChangeEvent,
   type KeyboardEvent,
@@ -204,6 +205,10 @@ export const OtpInput = forwardRef<HTMLDivElement, OtpInputProps>(
 
     const digits = currentValue.split('').concat(Array(length).fill('')).slice(0, length)
 
+    useEffect(() => {
+      if (autoFocus) inputRefs.current[0]?.focus()
+    }, [autoFocus])
+
     const updateValue = useCallback(
       (newValue: string) => {
         if (!isControlled) {
@@ -294,7 +299,6 @@ export const OtpInput = forwardRef<HTMLDivElement, OtpInputProps>(
               value={digit}
               maxLength={1}
               disabled={disabled}
-              autoFocus={autoFocus && i === 0}
               autoComplete="one-time-code"
               aria-label={`Digit ${i + 1} of ${length}`}
               aria-invalid={error ? true : undefined}

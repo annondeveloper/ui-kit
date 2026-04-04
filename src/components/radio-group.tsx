@@ -291,6 +291,8 @@ export const RadioGroup = forwardRef<HTMLFieldSetElement, RadioGroupProps>(
         items[currentIdx].setAttribute('tabindex', '-1')
         items[newIndex].setAttribute('tabindex', '0')
         items[newIndex].focus()
+        // WAI-ARIA APG: arrow keys both move focus and select the radio
+        items[newIndex].click()
       }
 
       container.addEventListener('keydown', onKeyDown)
@@ -318,7 +320,7 @@ export const RadioGroup = forwardRef<HTMLFieldSetElement, RadioGroupProps>(
         {...rest}
       >
         {label && <legend className="ui-radio-group__legend">{label}</legend>}
-        <div className="ui-radio-group__options" ref={optionsRef} role="radiogroup">
+        <div className="ui-radio-group__options" ref={optionsRef}>
           {options.map((option) => {
             const optionId = `${groupId}-${option.value}`
             const isChecked = currentValue === option.value
@@ -332,7 +334,6 @@ export const RadioGroup = forwardRef<HTMLFieldSetElement, RadioGroupProps>(
               >
                 <input
                   type="radio"
-                  role="radio"
                   id={optionId}
                   name={name}
                   value={option.value}

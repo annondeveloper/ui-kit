@@ -1381,7 +1381,7 @@ export default function FormInputPage() {
               label="Search"
               placeholder="Type to search..."
               clearable
-              icon="search"
+              icon={<Icon name="search" size="sm" />}
               size="md"
             />
             <InputComponent
@@ -1503,9 +1503,9 @@ export default function FormInputPage() {
             </div>
             <div className="form-input-page__size-breakdown">
               <div className="form-input-page__size-row">
-                <span>Component: <strong style={{ color: 'var(--text-primary)' }}>2.0 KB</strong></span>
+                <span>Component: <strong style={{ color: 'var(--text-primary)' }}>~3.5 KB</strong></span>
                 <span>+ Shared: <strong style={{ color: 'var(--text-primary)' }}>0.9 KB</strong></span>
-                <span>= <strong style={{ color: 'var(--brand)' }}>2.9 KB</strong> gzip</span>
+                <span>= <strong style={{ color: 'var(--brand)' }}>4.4 KB</strong> gzip</span>
               </div>
             </div>
           </div>
