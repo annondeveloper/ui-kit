@@ -105,6 +105,98 @@ export default async function Page() {
 }
 ```
 
+## `useSearchParams` and `UIProvider` Interaction
+
+`UIProvider` is a client component (it uses hooks internally). In Next.js App Router, wrapping a page that calls `useSearchParams()` inside `UIProvider` can trigger unexpected Suspense boundary issues. Next.js requires a `<Suspense>` boundary above any component that reads `useSearchParams()` during static rendering, and if `UIProvider` sits above the page without an intervening boundary, you may see a build-time error or a flash of fallback content.
+
+### Workaround 1: Wrap page content in `<Suspense>`
+
+Place a `<Suspense>` boundary between `UIProvider` and the page content that uses `useSearchParams()`:
+
+```tsx
+// app/layout.tsx
+'use client'
+
+import { Suspense } from 'react'
+import { UIProvider } from '@annondeveloper/ui-kit'
+
+export default function RootLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <html lang="en">
+      <body>
+        <UIProvider>
+          <Suspense fallback={null}>
+            {children}
+          </Suspense>
+        </UIProvider>
+      </body>
+    </html>
+  )
+}
+```
+
+```tsx
+// app/search/page.tsx
+'use client'
+
+import { useSearchParams } from 'next/navigation'
+
+export default function SearchPage() {
+  const searchParams = useSearchParams()
+  const query = searchParams.get('q') ?? ''
+
+  return <div>Results for: {query}</div>
+}
+```
+
+### Workaround 2: Move `UIProvider` below the Suspense boundary
+
+Keep the layout as a Server Component and push `UIProvider` into a client wrapper that sits below `<Suspense>`:
+
+```tsx
+// app/layout.tsx (Server Component)
+import { Suspense } from 'react'
+
+export default function RootLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <html lang="en">
+      <body>
+        <Suspense fallback={null}>
+          {children}
+        </Suspense>
+      </body>
+    </html>
+  )
+}
+```
+
+```tsx
+// app/search/layout.tsx
+'use client'
+
+import { UIProvider } from '@annondeveloper/ui-kit'
+
+export default function SearchLayout({ children }: { children: React.ReactNode }) {
+  return <UIProvider>{children}</UIProvider>
+}
+```
+
+```tsx
+// app/search/page.tsx
+'use client'
+
+import { useSearchParams } from 'next/navigation'
+
+export default function SearchPage() {
+  const searchParams = useSearchParams()
+  const query = searchParams.get('q') ?? ''
+
+  return <div>Results for: {query}</div>
+}
+```
+
+In this approach, `UIProvider` is a sibling of the Suspense boundary rather than a parent, so Next.js can correctly suspend the `useSearchParams()` call without bubbling through the provider.
+
 ## Source
 
 - RSC entry point: `src/rsc/index.ts`

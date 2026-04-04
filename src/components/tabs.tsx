@@ -1,6 +1,8 @@
 'use client'
 
 import {
+  createContext,
+  useContext,
   useState,
   useCallback,
   useRef,
@@ -9,6 +11,7 @@ import {
   type HTMLAttributes,
   type ReactNode,
   type KeyboardEvent,
+  type ReactElement,
 } from 'react'
 import { css } from '../core/styles/css-tag'
 import { useStyles } from '../core/styles/use-styles'
@@ -28,9 +31,14 @@ export interface Tab {
 }
 
 export interface TabsProps extends Omit<HTMLAttributes<HTMLDivElement>, 'onChange'> {
-  tabs: Tab[]
+  /** Array-driven API: provide tab definitions */
+  tabs?: Tab[]
   activeTab?: string
   defaultTab?: string
+  /** Composed API alias for defaultTab */
+  defaultValue?: string
+  /** Composed API alias for activeTab */
+  value?: string
   onChange?: (tabId: string) => void
   onClose?: (tabId: string) => void
   variant?: 'underline' | 'pills' | 'enclosed'
@@ -38,8 +46,36 @@ export interface TabsProps extends Omit<HTMLAttributes<HTMLDivElement>, 'onChang
   orientation?: 'horizontal' | 'vertical'
   lazy?: boolean
   motion?: 0 | 1 | 2 | 3
+  children?: ReactNode
+}
+
+// ─── Composed API types ────────────────────────────────────────────────────
+
+export interface TabListProps extends HTMLAttributes<HTMLDivElement> {
   children: ReactNode
 }
+
+export interface TabTriggerProps extends HTMLAttributes<HTMLButtonElement> {
+  value: string
+  disabled?: boolean
+  children: ReactNode
+}
+
+export interface TabContentProps extends HTMLAttributes<HTMLDivElement> {
+  value: string
+  children: ReactNode
+}
+
+// ─── Internal context for composed API ─────────────────────────────────────
+
+interface TabsContextValue {
+  activeId: string
+  onSelect: (id: string) => void
+  baseId: string
+  orientation: 'horizontal' | 'vertical'
+}
+
+const TabsContext = createContext<TabsContextValue | null>(null)
 
 export interface TabPanelProps extends HTMLAttributes<HTMLDivElement> {
   tabId: string
@@ -372,7 +408,7 @@ const tabsStyles = css`
 
 // ─── TabPanel ───────────────────────────────────────────────────────────────
 
-export function TabPanel({ tabId, children, className, ...rest }: TabPanelProps) {
+export function TabPanel({ tabId, children, className, ...rest }: TabPanelProps): ReactElement {
   return (
     <div className={cn('ui-tabs__panel-inner', className)} data-tab-id={tabId} {...rest}>
       {children}
@@ -381,12 +417,122 @@ export function TabPanel({ tabId, children, className, ...rest }: TabPanelProps)
 }
 TabPanel.displayName = 'TabPanel'
 
+// ─── Composed Sub-components ───────────────────────────────────────────────
+
+export function TabList({ children, className, ...rest }: TabListProps): ReactElement {
+  const ctx = useContext(TabsContext)
+  const listRef = useRef<HTMLDivElement>(null)
+
+  const handleKeyDown = useCallback(
+    (e: KeyboardEvent<HTMLDivElement>) => {
+      if (!ctx) return
+      const isVertical = ctx.orientation === 'vertical'
+      const nextKey = isVertical ? 'ArrowDown' : 'ArrowRight'
+      const prevKey = isVertical ? 'ArrowUp' : 'ArrowLeft'
+
+      if (![nextKey, prevKey, 'Home', 'End', 'Enter', ' '].includes(e.key)) return
+      e.preventDefault()
+
+      const allTabEls = Array.from(
+        listRef.current?.querySelectorAll<HTMLElement>('[role="tab"]:not([aria-disabled="true"])') ?? []
+      )
+      if (allTabEls.length === 0) return
+
+      const currentIdx = allTabEls.indexOf(document.activeElement as HTMLElement)
+
+      if (e.key === 'Enter' || e.key === ' ') {
+        const focused = document.activeElement as HTMLElement
+        focused?.click()
+        return
+      }
+
+      let targetIdx: number
+      if (e.key === 'Home') {
+        targetIdx = 0
+      } else if (e.key === 'End') {
+        targetIdx = allTabEls.length - 1
+      } else if (e.key === nextKey) {
+        targetIdx = currentIdx + 1 >= allTabEls.length ? 0 : currentIdx + 1
+      } else {
+        targetIdx = currentIdx - 1 < 0 ? allTabEls.length - 1 : currentIdx - 1
+      }
+
+      allTabEls[targetIdx]?.focus()
+      allTabEls.forEach((el, i) => {
+        el.setAttribute('tabindex', i === targetIdx ? '0' : '-1')
+      })
+    },
+    [ctx]
+  )
+
+  return (
+    <div className="ui-tabs__list-wrapper">
+      <div
+        ref={listRef}
+        role="tablist"
+        aria-orientation={ctx?.orientation}
+        className={cn('ui-tabs__list', className)}
+        onKeyDown={handleKeyDown}
+        {...rest}
+      >
+        {children}
+      </div>
+    </div>
+  )
+}
+TabList.displayName = 'TabList'
+
+export function TabTrigger({ value, disabled, children, className, ...rest }: TabTriggerProps): ReactElement {
+  const ctx = useContext(TabsContext)
+  const isActive = ctx?.activeId === value
+  return (
+    <button
+      id={ctx ? `${ctx.baseId}-tab-${value}` : undefined}
+      role="tab"
+      type="button"
+      aria-selected={isActive}
+      aria-controls={ctx ? `${ctx.baseId}-panel-${value}` : undefined}
+      aria-disabled={disabled || undefined}
+      tabIndex={disabled ? -1 : isActive ? 0 : -1}
+      className={cn('ui-tabs__tab', className)}
+      onClick={() => {
+        if (!disabled) ctx?.onSelect(value)
+      }}
+      {...rest}
+    >
+      {children}
+    </button>
+  )
+}
+TabTrigger.displayName = 'TabTrigger'
+
+export function TabContent({ value, children, className, ...rest }: TabContentProps): ReactElement {
+  const ctx = useContext(TabsContext)
+  const isActive = ctx?.activeId === value
+  return (
+    <div
+      id={ctx ? `${ctx.baseId}-panel-${value}` : undefined}
+      role="tabpanel"
+      aria-labelledby={ctx ? `${ctx.baseId}-tab-${value}` : undefined}
+      className={cn('ui-tabs__panel', className)}
+      hidden={!isActive}
+      tabIndex={isActive ? 0 : -1}
+      {...rest}
+    >
+      {children}
+    </div>
+  )
+}
+TabContent.displayName = 'TabContent'
+
 // ─── Component ──────────────────────────────────────────────────────────────
 
 export function Tabs({
   tabs,
   activeTab: controlledActive,
   defaultTab,
+  defaultValue,
+  value,
   onChange,
   onClose,
   variant = 'underline',
@@ -397,18 +543,62 @@ export function Tabs({
   children,
   className,
   ...rest
-}: TabsProps) {
+}: TabsProps): ReactElement {
   const cls = useStyles('tabs', tabsStyles)
   const motionLevel = useMotionLevel(motionProp)
   const baseId = useStableId('tabs')
   const tablistRef = useRef<HTMLDivElement>(null)
 
+  // Detect composed vs array API
+  const isComposedAPI = !tabs
+
+  // Merge aliased props (value/activeTab, defaultValue/defaultTab)
+  const controlledValue = value ?? controlledActive
+  const defaultValue_ = defaultValue ?? defaultTab
+
   // Determine initial tab
-  const isControlled = controlledActive !== undefined
+  const isControlled = controlledValue !== undefined
   const [internalActive, setInternalActive] = useState(
-    () => defaultTab ?? tabs[0]?.id ?? ''
+    () => defaultValue_ ?? (tabs ? tabs[0]?.id : '') ?? ''
   )
-  const activeId = isControlled ? controlledActive : internalActive
+  const activeId = isControlled ? controlledValue : internalActive
+
+  const handleSelect = useCallback(
+    (tabId: string) => {
+      if (!isControlled) {
+        setInternalActive(tabId)
+      }
+      onChange?.(tabId)
+    },
+    [isControlled, onChange]
+  )
+
+  // ── Composed API path ─────────────────────────────────────────────
+  if (isComposedAPI) {
+    const ctxValue: TabsContextValue = {
+      activeId,
+      onSelect: handleSelect,
+      baseId,
+      orientation,
+    }
+
+    return (
+      <TabsContext.Provider value={ctxValue}>
+        <div
+          className={cn(cls('root'), className)}
+          data-variant={variant}
+          data-size={size}
+          data-orientation={orientation}
+          data-motion={motionLevel}
+          {...rest}
+        >
+          {children}
+        </div>
+      </TabsContext.Provider>
+    )
+  }
+
+  // ── Array API path (original) ─────────────────────────────────────
 
   // Collect TabPanel children
   const panelChildren: { tabId: string; content: ReactNode }[] = []
@@ -431,12 +621,9 @@ export function Tabs({
     (tabId: string) => {
       const tab = tabs.find((t) => t.id === tabId)
       if (tab?.disabled) return
-      if (!isControlled) {
-        setInternalActive(tabId)
-      }
-      onChange?.(tabId)
+      handleSelect(tabId)
     },
-    [tabs, isControlled, onChange]
+    [tabs, handleSelect]
   )
 
   const handleKeyDown = useCallback(
