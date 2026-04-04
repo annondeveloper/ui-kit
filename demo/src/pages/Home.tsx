@@ -1156,12 +1156,12 @@ export default function Home() {
 
         <div className="home-hero-entrance">
           <div className="home-hero-actions">
-            <Link to="/mcp" style={{ textDecoration: 'none' }}>
+            <a href="https://ui-kit-mcp.annondeveloper.workers.dev" target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'none' }}>
               <ShimmerButton size="lg" shimmerColor="oklch(70% 0.2 270)">
                 <Icon name="zap" size="sm" />
-                Set Up MCP
+                Try MCP Server
               </ShimmerButton>
-            </Link>
+            </a>
             <Button
               variant="secondary"
               size="lg"
@@ -1170,6 +1170,36 @@ export default function Home() {
             >
               GitHub
             </Button>
+          </div>
+        </div>
+
+        {/* Hosted MCP quick connect */}
+        <div className="home-hero-entrance" style={{ marginBlockStart: '1.5rem' }}>
+          <div style={{
+            background: 'oklch(0% 0 0 / 0.3)',
+            border: '1px solid oklch(100% 0 0 / 0.08)',
+            borderRadius: '0.75rem',
+            padding: '1rem 1.25rem',
+            maxWidth: '520px',
+            margin: '0 auto',
+            backdropFilter: 'blur(8px)',
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem' }}>
+              <span style={{ color: 'oklch(72% 0.19 155)', fontSize: '0.75rem' }}>●</span>
+              <span style={{ fontSize: '0.75rem', color: 'oklch(70% 0 0)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Hosted MCP — connect in 10 seconds</span>
+            </div>
+            <code style={{
+              display: 'block',
+              fontFamily: "'SF Mono', 'Fira Code', monospace",
+              fontSize: '0.8125rem',
+              color: 'oklch(85% 0 0)',
+              lineHeight: 1.5,
+              whiteSpace: 'pre',
+              overflowX: 'auto',
+            }}>{'{ "url": "https://ui-kit-mcp.annondeveloper.workers.dev/sse" }'}</code>
+            <p style={{ margin: '0.5rem 0 0', fontSize: '0.75rem', color: 'oklch(55% 0 0)' }}>
+              Add to Claude, Cursor, or any MCP client config. No npm install needed for AI access.
+            </p>
           </div>
         </div>
 

@@ -17,9 +17,13 @@
 npm install @annondeveloper/ui-kit
 ```
 
-**Step 2.** Connect your AI assistant
+**Step 2.** Connect your AI assistant (pick one)
 
 ```bash
+# Zero setup — hosted MCP (works instantly, no install needed)
+# Add to your MCP config: { "url": "https://ui-kit-mcp.annondeveloper.workers.dev/sse" }
+
+# Or run locally
 npx @annondeveloper/ui-kit mcp
 ```
 
@@ -60,13 +64,27 @@ The built-in MCP server exposes 6 tools that give AI assistants structured acces
 | `generate_snippet` | Generate working TSX code with correct imports for any component combination |
 | `get_icons` | Browse 50+ built-in SVG icons with search and usage examples |
 
-Start the server:
+### Hosted (zero setup — just add the URL)
+
+No install needed. Connect any MCP client to the hosted server:
+
+```json
+{
+  "mcpServers": {
+    "ui-kit": {
+      "url": "https://ui-kit-mcp.annondeveloper.workers.dev/sse"
+    }
+  }
+}
+```
+
+### Local (for offline use)
 
 ```bash
 npx @annondeveloper/ui-kit mcp
 ```
 
-Or add it to your MCP config (e.g., `claude_desktop_config.json`):
+Or add to your MCP config (`claude_desktop_config.json`, `.cursor/mcp.json`):
 
 ```json
 {
@@ -79,7 +97,9 @@ Or add it to your MCP config (e.g., `claude_desktop_config.json`):
 }
 ```
 
-Your AI assistant can now use ui-kit components directly. Try asking:
+### Try it
+
+Ask your AI assistant:
 - "Build a dashboard with MetricCard, DataTable, and TimeSeriesChart using ui-kit"
 - "Create a multi-step form wizard with validation"
 - "Add a real-time log viewer with severity filtering"

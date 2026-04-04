@@ -156,33 +156,96 @@ function createMcpServer(): McpServer {
 const sessions = new Map<string, SSEServerTransport>()
 
 const LANDING_HTML = `<!DOCTYPE html>
-<html><head><title>ui-kit MCP Server</title><meta charset="utf-8">
-<style>body{font-family:system-ui;background:#0a0a0f;color:#e0e0e0;max-width:640px;margin:4rem auto;padding:0 1.5rem;line-height:1.6}
-h1{background:linear-gradient(135deg,#818cf8,#c084fc);-webkit-background-clip:text;-webkit-text-fill-color:transparent;font-size:2rem}
-code{background:#1a1a2e;padding:0.15em 0.4em;border-radius:4px;font-size:0.9em}
-pre{background:#1a1a2e;padding:1rem;border-radius:8px;overflow-x:auto}
-a{color:#818cf8}</style></head>
+<html><head><title>ui-kit MCP Server</title><meta charset="utf-8"><meta name="viewport" content="width=device-width">
+<style>
+*{box-sizing:border-box;margin:0}
+body{font-family:system-ui,-apple-system,sans-serif;background:#08080d;color:#c8c8d0;min-height:100vh;padding:0}
+.hero{text-align:center;padding:4rem 1.5rem 3rem;background:radial-gradient(ellipse at 50% 0%,oklch(25% 0.08 270 / 0.4),transparent 70%)}
+h1{font-size:clamp(1.75rem,5vw,2.5rem);font-weight:800;letter-spacing:-0.03em;background:linear-gradient(135deg,#818cf8 0%,#c084fc 50%,#f472b6 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.sub{color:#8888a0;font-size:1rem;margin-top:0.75rem;max-width:480px;margin-inline:auto;line-height:1.6}
+.badge{display:inline-flex;align-items:center;gap:0.375rem;background:#1a1a2e;border:1px solid #2a2a3e;border-radius:9999px;padding:0.25rem 0.75rem;font-size:0.75rem;color:#10b981;margin-top:1rem}
+.badge::before{content:'';width:6px;height:6px;background:#10b981;border-radius:50%;animation:pulse 2s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}
+.content{max-width:600px;margin:0 auto;padding:0 1.5rem 4rem}
+.step{margin-top:2.5rem}
+.step-num{display:inline-flex;align-items:center;justify-content:center;width:1.5rem;height:1.5rem;border-radius:50%;background:#818cf8;color:#fff;font-size:0.75rem;font-weight:700}
+.step h2{display:inline;font-size:1rem;font-weight:600;color:#e0e0e8;margin-left:0.5rem}
+.step p{color:#8888a0;font-size:0.875rem;margin-top:0.375rem;line-height:1.5}
+pre{background:#0f0f1a;border:1px solid #1e1e30;border-radius:0.5rem;padding:1rem;margin-top:0.75rem;overflow-x:auto;font-size:0.8125rem;line-height:1.5;color:#c8c8d0;position:relative}
+pre .copy{position:absolute;top:0.5rem;right:0.5rem;background:#1e1e30;border:1px solid #2e2e40;border-radius:0.25rem;color:#818cf8;padding:0.25rem 0.5rem;font-size:0.6875rem;cursor:pointer;font-family:inherit}
+pre .copy:hover{background:#2a2a3e}
+code{font-family:'SF Mono','Fira Code','JetBrains Mono',monospace}
+.tools{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:0.75rem;margin-top:1rem}
+.tool{background:#0f0f1a;border:1px solid #1e1e30;border-radius:0.5rem;padding:0.75rem;font-size:0.8125rem}
+.tool strong{color:#e0e0e8;display:block;margin-bottom:0.25rem}
+.tool span{color:#6b6b80;font-size:0.75rem;line-height:1.4}
+.prompts{margin-top:1rem;display:flex;flex-direction:column;gap:0.5rem}
+.prompt{background:#0f0f1a;border:1px solid #1e1e30;border-radius:0.5rem;padding:0.625rem 0.875rem;font-size:0.8125rem;color:#a0a0b0;font-style:italic;cursor:pointer;transition:border-color 0.15s}
+.prompt:hover{border-color:#818cf8}
+.links{margin-top:3rem;text-align:center;font-size:0.8125rem;color:#6b6b80}
+.links a{color:#818cf8;text-decoration:none;margin:0 0.75rem}
+.links a:hover{text-decoration:underline}
+</style></head>
 <body>
-<h1>@annondeveloper/ui-kit MCP</h1>
-<p>This is the hosted MCP server for the ui-kit component library. Connect your AI assistant to browse 147 components, generate code, and access theme tokens.</p>
-<h2>Connect</h2>
-<p>Add this to your MCP client config:</p>
-<pre><code>{
+<div class="hero">
+  <h1>ui-kit MCP Server</h1>
+  <p class="sub">147 React components your AI can discover, understand, and use. Zero setup required.</p>
+  <div class="badge">Live on Cloudflare Workers</div>
+</div>
+
+<div class="content">
+  <div class="step">
+    <span class="step-num">1</span>
+    <h2>Add to your AI assistant</h2>
+    <p>Copy this into your MCP config (Claude, Cursor, or any MCP client):</p>
+    <pre><button class="copy" onclick="navigator.clipboard.writeText(this.nextElementSibling.textContent)">Copy</button><code>{
   "mcpServers": {
     "ui-kit": {
       "url": "WORKER_URL/sse"
     }
   }
 }</code></pre>
-<h2>Endpoints</h2>
-<ul>
-<li><code>GET /sse</code> — SSE connection (MCP protocol)</li>
-<li><code>POST /messages?sessionId=ID</code> — Send messages</li>
-<li><code>GET /health</code> — Health check</li>
-</ul>
-<h2>Tools</h2>
-<p><code>list_components</code>, <code>get_component</code>, <code>search_components</code>, <code>generate_snippet</code>, <code>get_theme</code>, <code>get_icons</code></p>
-<p><a href="https://github.com/annondeveloper/ui-kit">GitHub</a> · <a href="https://www.npmjs.com/package/@annondeveloper/ui-kit">npm</a> · <a href="https://jsr.io/@annondeveloper/ui-kit">JSR</a></p>
+  </div>
+
+  <div class="step">
+    <span class="step-num">2</span>
+    <h2>Ask your AI to build</h2>
+    <p>Try these prompts — your AI will use real component APIs, not guesses:</p>
+    <div class="prompts">
+      <div class="prompt">"Build a dashboard with MetricCard, DataTable, and TimeSeriesChart"</div>
+      <div class="prompt">"Create a multi-step form wizard with validation"</div>
+      <div class="prompt">"Show me all the chart components available"</div>
+      <div class="prompt">"Generate a login page with the ui-kit design system"</div>
+    </div>
+  </div>
+
+  <div class="step">
+    <span class="step-num">3</span>
+    <h2>Install the library</h2>
+    <p>When you're ready to use the generated code:</p>
+    <pre><code>npm install @annondeveloper/ui-kit</code></pre>
+  </div>
+
+  <div class="step">
+    <h2 style="margin-left:0">Available Tools</h2>
+    <div class="tools">
+      <div class="tool"><strong>list_components</strong><span>Browse all 147 components by category or tier</span></div>
+      <div class="tool"><strong>get_component</strong><span>Full API reference — props, types, examples</span></div>
+      <div class="tool"><strong>search_components</strong><span>Find components by use case</span></div>
+      <div class="tool"><strong>generate_snippet</strong><span>Working TSX with correct imports</span></div>
+      <div class="tool"><strong>get_theme</strong><span>OKLCH theme tokens and CSS</span></div>
+      <div class="tool"><strong>get_icons</strong><span>50+ built-in SVG icons</span></div>
+    </div>
+  </div>
+
+  <div class="links">
+    <a href="https://github.com/annondeveloper/ui-kit">GitHub</a>
+    <a href="https://www.npmjs.com/package/@annondeveloper/ui-kit">npm</a>
+    <a href="https://jsr.io/@annondeveloper/ui-kit">JSR</a>
+    <a href="https://annondeveloper.github.io/ui-kit/">Demo</a>
+    <a href="WORKER_URL/health">Health</a>
+  </div>
+</div>
 </body></html>`
 
 export default {
