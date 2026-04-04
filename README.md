@@ -111,7 +111,7 @@ function App() {
 
 - **Zero dependencies** — only `react` and `react-dom` peer deps
 - **147 components** — 73 general-purpose + 74 domain-specific across 3 weight tiers
-- **3 weight tiers** — Lite (144), Standard (147), Premium (145) — optimize your bundle
+- **3 weight tiers** — Lite (144), Standard (147), Premium (14) — optimize your bundle
 - **MCP server** — Model Context Protocol integration for AI-assisted development workflows
 - **Aurora Fluid design** — deep atmospheric surfaces, ambient glows, OKLCH colors
 - **Physics animations** — real spring solver, configurable motion levels (0-3)
@@ -145,6 +145,7 @@ function App() {
 - [Theme Editor](docs/theme-editor.md) -- Color harmony, contrast audit, multi-format export
 - [AI Generator](docs/ai-generator.md) -- Template gallery, custom composition, 5 framework output
 - [CLI Scaffolding](docs/cli-scaffolding.md) -- Project templates, component add, Figma export
+- [Cursor MCP Setup](docs/guides/cursor-mcp-setup.md) -- Connect the MCP server to Cursor
 - [Figma Plugin](docs/figma-plugin.md) -- Token sync between code and Figma Variables
 - [Performance Dashboard](docs/performance-dashboard.md) -- Bundle tracking, render profiler, Web Vitals
 
@@ -388,14 +389,14 @@ import '@annondeveloper/ui-kit/css/theme.css'  // Standalone CSS (optional)
 |------|-----------|-------------|
 | Standard | 147 | Full-featured with motion, theming, a11y |
 | Lite | 144 | Minimal wrappers, no motion (~0.3-1.2 KB each) |
-| Premium | 145 | Aurora glow, spring animations, shimmer effects |
+| Premium | 14 | Aurora glow, spring animations, shimmer effects |
 
 ## Bundle Size
 
 | Metric | Value |
 |--------|-------|
-| Total (gzipped) | 332.1 KB |
-| Budget | 350 KB |
+| Total (gzipped) | ~384 KB |
+| Budget | 400 KB |
 | Tree-shaking | Full ESM — import only what you use |
 
 Typical app importing ~20 components: **~15-25 KB gzipped** after tree-shaking.
