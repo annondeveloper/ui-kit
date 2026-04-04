@@ -1,4 +1,16 @@
 // Entry point for ui-kit MCP server
+
+// Global error handlers — prevent silent crashes, log structured errors.
+// Registered once here (not in createServer) to avoid duplicate listeners.
+process.on('uncaughtException', (error) => {
+  console.error('[ui-kit-mcp] Uncaught exception:', error)
+  process.exit(1)
+})
+
+process.on('unhandledRejection', (reason) => {
+  console.error('[ui-kit-mcp] Unhandled rejection:', reason)
+})
+
 const args = process.argv.slice(2)
 
 if (args.includes('--sse')) {
