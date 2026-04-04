@@ -27,20 +27,15 @@ export function TransitionRouter({ children }: TransitionRouterProps) {
       // Only intercept left-clicks without modifier keys
       if (e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return
 
-      // Walk up from the target to find a link element
       const anchor = (e.target as HTMLElement).closest('a')
       if (!anchor) return
 
-      // Only intercept internal links (same origin, relative paths)
       const href = anchor.getAttribute('href')
       if (!href) return
-
-      // Skip external links, hash-only links, and target="_blank"
       if (anchor.target === '_blank') return
       if (href.startsWith('http') || href.startsWith('//')) return
       if (href.startsWith('#')) return
 
-      // Determine the path (strip basename if present)
       const url = new URL(anchor.href, window.location.origin)
       const basename = '/ui-kit'
       let path = url.pathname
@@ -49,36 +44,46 @@ export function TransitionRouter({ children }: TransitionRouterProps) {
       }
 
       // Skip if already on this path
-      if (path === window.location.pathname.replace(basename, '') || path === window.location.pathname) return
+      const currentPath = window.location.pathname.startsWith(basename)
+        ? window.location.pathname.slice(basename.length) || '/'
+        : window.location.pathname
+      if (path === currentPath) return
 
-      // Prevent default navigation
       e.preventDefault()
 
-      // If View Transition API is not available or already transitioning, navigate directly
+      // Always navigate immediately — never let View Transition block navigation
       if (!canTransition || transitioning.current) {
         navigate(path)
+        window.scrollTo(0, 0)
         return
       }
 
-      // Wrap navigation in a view transition
       transitioning.current = true
-      const transition = document.startViewTransition!(() => {
-        // flushSync not needed here — React Router navigation is async
-        // and the View Transition API handles the snapshot timing
-        navigate(path)
-        // Return a promise that resolves after a microtask to let React commit
-        return new Promise<void>((resolve) => {
-          requestAnimationFrame(() => {
-            requestAnimationFrame(() => {
-              resolve()
-            })
-          })
-        })
-      })
 
-      transition.finished.finally(() => {
+      // Safety timeout — never stay stuck for more than 500ms
+      const timeout = setTimeout(() => {
         transitioning.current = false
-      })
+      }, 500)
+
+      try {
+        const transition = document.startViewTransition!(() => {
+          navigate(path)
+          window.scrollTo(0, 0)
+          // Resolve immediately — let React handle rendering asynchronously
+          return Promise.resolve()
+        })
+
+        transition.finished.finally(() => {
+          clearTimeout(timeout)
+          transitioning.current = false
+        })
+      } catch {
+        // If View Transition fails for any reason, navigate anyway
+        clearTimeout(timeout)
+        transitioning.current = false
+        navigate(path)
+        window.scrollTo(0, 0)
+      }
     },
     [navigate],
   )

@@ -14,6 +14,7 @@ const PerformancePage = lazy(() => import('./pages/PerformancePage'))
 const GeneratorPage = lazy(() => import('./pages/GeneratorPage'))
 const ChoreographyPage = lazy(() => import('./pages/ChoreographyPage'))
 const McpPage = lazy(() => import('./pages/McpPage'))
+const AiPluginsPage = lazy(() => import('./pages/AiPluginsPage'))
 const FigmaPage = lazy(() => import('./pages/FigmaPage'))
 const ComparisonPage = lazy(() => import('./pages/ComparisonPage'))
 const EmbedPage = lazy(() => import('./pages/EmbedPage'))
@@ -194,6 +195,7 @@ createRoot(document.getElementById('root')!).render(
             <Route path="generator" element={<Suspense><GeneratorPage /></Suspense>} />
             <Route path="choreography" element={<Suspense><ChoreographyPage /></Suspense>} />
             <Route path="mcp" element={<Suspense><McpPage /></Suspense>} />
+            <Route path="ai-plugins" element={<Suspense><AiPluginsPage /></Suspense>} />
             <Route path="figma" element={<Suspense><FigmaPage /></Suspense>} />
             <Route path="comparison" element={<Suspense><ComparisonPage /></Suspense>} />
             <Route path="embed" element={<Suspense><EmbedPage /></Suspense>} />

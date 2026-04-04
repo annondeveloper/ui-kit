@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState, useMemo, useCallback, memo } from 'react'
 import { Link } from 'react-router-dom'
 import { Button } from '@ui/components/button'
 import { Badge } from '@ui/components/badge'
@@ -55,24 +55,42 @@ function RevealSection({ children, className = '', delay = 0 }: { children: Reac
   )
 }
 
-// ─── Stagger Item ────────────────────────────────────────────────────────────
+// ─── Shared Stagger Observer ────────────────────────────────────────────────
+
+// Single shared IntersectionObserver for all StaggerItems
+// Each element registers on mount, unregisters on unmount
+let sharedStaggerObserver: IntersectionObserver | null = null
+const staggerCallbacks = new Map<Element, () => void>()
+
+function getSharedStaggerObserver(): IntersectionObserver {
+  if (!sharedStaggerObserver) {
+    sharedStaggerObserver = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('home-stagger-visible')
+            sharedStaggerObserver!.unobserve(entry.target)
+            staggerCallbacks.delete(entry.target)
+          }
+        }
+      },
+      { threshold: 0.05 }
+    )
+  }
+  return sharedStaggerObserver
+}
 
 function StaggerItem({ children, index, className = '' }: { children: React.ReactNode; index: number; className?: string }) {
   const ref = useRef<HTMLDivElement>(null)
   useEffect(() => {
     const el = ref.current
     if (!el) return
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          el.classList.add('home-stagger-visible')
-          observer.unobserve(el)
-        }
-      },
-      { threshold: 0.05 }
-    )
+    const observer = getSharedStaggerObserver()
     observer.observe(el)
-    return () => observer.disconnect()
+    return () => {
+      observer.unobserve(el)
+      staggerCallbacks.delete(el)
+    }
   }, [])
 
   return (
@@ -379,6 +397,66 @@ const homeStyles = css`
       margin-inline: auto;
       line-height: 1.65;
       text-wrap: balance;
+    }
+
+    /* ─── Works With Your AI ─── */
+    .home-ai-strip {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+      gap: 0.75rem;
+    }
+
+    .home-ai-card {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.625rem;
+      padding: 1.25rem 0.75rem;
+      border-radius: var(--radius-lg, 0.75rem);
+      background: oklch(from var(--bg-elevated) l c h / 0.6);
+      border: 1px solid var(--border-default);
+      text-decoration: none;
+      color: inherit;
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      transition: border-color 0.25s, box-shadow 0.35s, transform 0.25s var(--spring);
+      cursor: pointer;
+    }
+    .home-ai-card:hover {
+      border-color: var(--brand, oklch(65% 0.2 270));
+      box-shadow: 0 0 24px -4px oklch(from var(--brand, oklch(65% 0.2 270)) l c h / 0.18);
+      transform: translateY(-3px);
+    }
+
+    .home-ai-card__icon {
+      width: 2.75rem;
+      height: 2.75rem;
+      border-radius: var(--radius-md, 0.5rem);
+      display: grid;
+      place-items: center;
+      font-size: 1.25rem;
+      font-weight: 800;
+      color: oklch(95% 0 0);
+      flex-shrink: 0;
+    }
+    .home-ai-card__icon--claude-code { background: linear-gradient(135deg, oklch(60% 0.2 30), oklch(65% 0.22 15)); }
+    .home-ai-card__icon--claude-desktop { background: linear-gradient(135deg, oklch(55% 0.18 285), oklch(60% 0.2 270)); }
+    .home-ai-card__icon--cursor { background: linear-gradient(135deg, oklch(45% 0.02 270), oklch(55% 0.03 270)); }
+    .home-ai-card__icon--vscode { background: linear-gradient(135deg, oklch(55% 0.18 250), oklch(60% 0.2 230)); }
+    .home-ai-card__icon--windsurf { background: linear-gradient(135deg, oklch(60% 0.18 170), oklch(65% 0.2 155)); }
+    .home-ai-card__icon--codex { background: linear-gradient(135deg, oklch(50% 0.15 145), oklch(60% 0.17 130)); }
+
+    .home-ai-card__name {
+      font-size: 0.8125rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      text-align: center;
+    }
+
+    @media (max-width: 640px) {
+      .home-ai-strip {
+        grid-template-columns: repeat(3, 1fr);
+      }
     }
 
     /* ─── Next-Gen Features ─── */
@@ -1065,7 +1143,7 @@ const tierStyle: Record<TierBadge, React.CSSProperties> = {
 
 // ─── Gallery Card ────────────────────────────────────────────────────────────
 
-function GalleryCard({ item }: { item: GalleryItem }) {
+const GalleryCard = memo(function GalleryCard({ item }: { item: GalleryItem }) {
   // Derive a CSS-safe view-transition-name from the component path
   const transitionName = `component-${item.path.split('/').pop()}`
   return (
@@ -1090,7 +1168,7 @@ function GalleryCard({ item }: { item: GalleryItem }) {
       </GlowCard>
     </Link>
   )
-}
+})
 
 // ─── Component ──────────────────────────────────────────────────────────────
 
@@ -1110,9 +1188,13 @@ export default function Home() {
     return () => obs.disconnect()
   }, [])
 
-  const filteredGroups = galleryFilter
-    ? galleryGroups.filter(g => g.label === galleryFilter)
-    : galleryGroups
+  const filteredGroups = useMemo(
+    () => galleryFilter ? galleryGroups.filter(g => g.label === galleryFilter) : galleryGroups,
+    [galleryFilter]
+  )
+
+  const handleClearFilter = useCallback(() => setGalleryFilter(null), [])
+  const handleGitHubClick = useCallback(() => window.open('https://github.com/annondeveloper/ui-kit', '_blank'), [])
 
   return (
     <div className="home">
@@ -1166,7 +1248,7 @@ export default function Home() {
               variant="secondary"
               size="lg"
               icon={<Icon name="code" size="sm" />}
-              onClick={() => window.open('https://github.com/annondeveloper/ui-kit', '_blank')}
+              onClick={handleGitHubClick}
             >
               GitHub
             </Button>
@@ -1249,6 +1331,34 @@ export default function Home() {
         </div>
       </section>
 
+      {/* ── Works With Your AI ── */}
+      <RevealSection className="home-section">
+        <div className="home-section-header">
+          <h2>Works With Your AI</h2>
+          <p>Connect in 10 seconds. Every major AI coding assistant supported out of the box.</p>
+        </div>
+
+        <div className="home-ai-strip">
+          {[
+            { id: 'claude-code', name: 'Claude Code', char: 'C' },
+            { id: 'claude-desktop', name: 'Claude Desktop', char: 'D' },
+            { id: 'cursor', name: 'Cursor', char: '{' },
+            { id: 'vscode', name: 'VS Code', char: 'V' },
+            { id: 'windsurf', name: 'Windsurf', char: 'W' },
+            { id: 'codex', name: 'Codex', char: 'X' },
+          ].map((ai, i) => (
+            <StaggerItem key={ai.id} index={i}>
+              <Link to="/ai-plugins" className="home-ai-card">
+                <div className={`home-ai-card__icon home-ai-card__icon--${ai.id}`}>
+                  {ai.char}
+                </div>
+                <span className="home-ai-card__name">{ai.name}</span>
+              </Link>
+            </StaggerItem>
+          ))}
+        </div>
+      </RevealSection>
+
       {/* ── Next-Gen Features ── */}
       <RevealSection className="home-section">
         <div className="home-section-header">
@@ -1292,7 +1402,7 @@ export default function Home() {
           <FilterPill
             label={`All (${totalComponents})`}
             active={galleryFilter === null}
-            onClick={() => setGalleryFilter(null)}
+            onClick={handleClearFilter}
           />
           {galleryGroups.map(g => (
             <FilterPill
