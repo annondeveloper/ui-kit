@@ -104,6 +104,28 @@ Ask your AI assistant:
 - "Create a multi-step form wizard with validation"
 - "Add a real-time log viewer with severity filtering"
 
+## AI Integrations
+
+Works with every major AI coding assistant. One URL, zero install:
+
+| Assistant | Setup | Guide |
+|-----------|-------|-------|
+| **Claude Code** | Full plugin with 5 skills + 2 agents + hooks | [plugins/claude-code](plugins/claude-code/README.md) |
+| **Claude Desktop** | Add MCP URL to `claude_desktop_config.json` | See MCP section above |
+| **Cursor** | Copy `.cursor/mcp.json` into your project | [plugins/cursor](plugins/cursor/README.md) |
+| **VS Code / Copilot** | Add to `.vscode/mcp.json` | [plugins/vscode](plugins/vscode/README.md) |
+| **Windsurf** | Add to MCP settings | [plugins/windsurf](plugins/windsurf/README.md) |
+| **Codex CLI** | Add to `~/.codex/config.json` | [plugins/codex](plugins/codex/README.md) |
+
+**Claude Code plugin features:**
+- `/ui-kit:component-finder` — search 147 components by name or use case
+- `/ui-kit:generate-component` — produce working TSX with correct imports
+- `/ui-kit:design-system` — learn Aurora Fluid, OKLCH, motion levels
+- `/ui-kit:tier-guide` — choose the right weight tier
+- `/ui-kit:audit-accessibility` — check WCAG AA compliance
+- `component-architect` agent — designs multi-component layouts
+- `accessibility-reviewer` agent — deep a11y audit
+
 ## Quick Start
 
 For manual usage without an AI assistant:
@@ -132,7 +154,8 @@ function App() {
 - **Zero dependencies** — only `react` and `react-dom` peer deps
 - **147 components** — 73 general-purpose + 74 domain-specific across 3 weight tiers
 - **3 weight tiers** — Lite (144), Standard (147), Premium (14) — optimize your bundle
-- **MCP server** — Model Context Protocol integration for AI-assisted development workflows
+- **AI-native** — Claude Code plugin, Cursor/VS Code/Windsurf/Codex integrations, hosted MCP server
+- **MCP server** — 6 tools for component discovery, API reference, code generation, theme tokens
 - **Aurora Fluid design** — deep atmospheric surfaces, ambient glows, OKLCH colors
 - **Physics animations** — real spring solver, configurable motion levels (0-3)
 - **Built-in form engine** — `createForm`, `useForm`, validators, zero external deps
