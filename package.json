@@ -58,7 +58,8 @@
     "dist"
   ],
   "scripts": {
-    "build": "tsup && tsup --config tsup.cli.config.ts && tsup --config tsup.mcp.config.ts && node scripts/extract-css.js",
+    "build": "tsup && tsup --config tsup.cli.config.ts && tsup --config tsup.mcp.config.ts && node scripts/extract-css.js && npx tsx scripts/extract-component-meta.ts",
+    "build:meta": "npx tsx scripts/extract-component-meta.ts",
     "build:registry": "node dist/mcp/scripts/build-registry.js",
     "build:mcp": "tsup --config tsup.mcp.config.ts && npm run build:registry",
     "typecheck": "tsc --noEmit",
