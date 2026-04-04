@@ -6,13 +6,21 @@ import { useStyles } from '../core/styles/use-styles'
 import { useMotionLevel } from '../core/motion/use-motion-level'
 import { cn } from '../core/utils/cn'
 
+/** Props for the Progress component. */
 export interface ProgressProps extends HTMLAttributes<HTMLDivElement> {
+  /** Current progress value. Omit for indeterminate mode. */
   value?: number
+  /** Maximum value for the progress bar. */
   max?: number
+  /** Controls the track height across five sizes. */
   size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl'
+  /** Visual color variant for semantic meaning. */
   variant?: 'default' | 'success' | 'warning' | 'danger'
+  /** Accessible label announced by screen readers via aria-label. */
   label?: string
+  /** Show the percentage value text next to the bar. */
   showValue?: boolean
+  /** Animation intensity override (0=instant, 1=CSS, 2=spring, 3=full physics). */
   motion?: 0 | 1 | 2 | 3
 }
 
@@ -133,6 +141,17 @@ const progressStyles = css`
         text-align: end;
         font-family: inherit;
         font-variant-numeric: tabular-nums;
+      }
+
+      /* Reduced motion */
+      @media (prefers-reduced-motion: reduce) {
+        .ui-progress__fill {
+          transition: none !important;
+          animation: none !important;
+        }
+        .ui-progress__fill::after {
+          animation: none !important;
+        }
       }
 
       /* Forced colors */

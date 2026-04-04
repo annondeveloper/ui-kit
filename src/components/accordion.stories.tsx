@@ -13,6 +13,8 @@ const meta: Meta<typeof Accordion> = {
   component: Accordion,
   argTypes: {
     type: { control: 'select', options: ['single', 'multiple'] },
+    variant: { control: 'select', options: ['default', 'bordered', 'separated'] },
+    size: { control: 'select', options: ['sm', 'md', 'lg'] },
     motion: { control: 'select', options: [0, 1, 2, 3] },
   },
 }
@@ -23,23 +25,48 @@ export const Default: Story = {
   args: { items: sampleItems, type: 'multiple' },
 }
 
+export const Single: Story = {
+  args: { items: sampleItems, type: 'single' },
+}
+
 export const AllVariants: Story = {
   render: () => (
     <div style={{ display: 'grid', gap: '2rem', maxInlineSize: '480px' }}>
       <div>
-        <h3 style={{ marginBlockEnd: '0.5rem', color: 'oklch(70% 0 0)' }}>Single</h3>
-        <Accordion items={sampleItems} type="single" />
+        <h3 style={{ marginBlockEnd: '0.5rem', color: 'oklch(70% 0 0)' }}>Default</h3>
+        <Accordion items={sampleItems} variant="default" />
       </div>
       <div>
-        <h3 style={{ marginBlockEnd: '0.5rem', color: 'oklch(70% 0 0)' }}>Multiple</h3>
-        <Accordion items={sampleItems} type="multiple" defaultOpen={['1', '2']} />
+        <h3 style={{ marginBlockEnd: '0.5rem', color: 'oklch(70% 0 0)' }}>Bordered</h3>
+        <Accordion items={sampleItems} variant="bordered" />
       </div>
       <div>
-        <h3 style={{ marginBlockEnd: '0.5rem', color: 'oklch(70% 0 0)' }}>No Motion</h3>
-        <Accordion items={sampleItems.slice(0, 2)} type="multiple" motion={0} />
+        <h3 style={{ marginBlockEnd: '0.5rem', color: 'oklch(70% 0 0)' }}>Separated</h3>
+        <Accordion items={sampleItems} variant="separated" />
       </div>
     </div>
   ),
+}
+
+export const AllSizes: Story = {
+  render: () => (
+    <div style={{ display: 'grid', gap: '2rem', maxInlineSize: '480px' }}>
+      {(['sm', 'md', 'lg'] as const).map((size) => (
+        <div key={size}>
+          <h3 style={{ marginBlockEnd: '0.5rem', color: 'oklch(70% 0 0)' }}>Size: {size}</h3>
+          <Accordion items={sampleItems.slice(0, 2)} size={size} defaultOpen={['1']} />
+        </div>
+      ))}
+    </div>
+  ),
+}
+
+export const DefaultOpen: Story = {
+  args: { items: sampleItems, type: 'multiple', defaultOpen: ['1', '2'] },
+}
+
+export const NoMotion: Story = {
+  args: { items: sampleItems.slice(0, 2), type: 'multiple', motion: 0 },
 }
 
 export const Interactive: Story = {

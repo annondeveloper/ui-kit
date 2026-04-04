@@ -14,21 +14,38 @@ import { cn } from '../core/utils/cn'
 
 // ─── Types ──────────────────────────────────────────────────────────────────
 
+/** A single item definition for the Accordion. */
 export interface AccordionItem {
+  /** Unique identifier for the item, used in defaultOpen and onOpenChange. */
   id: string
+  /** Content rendered as the clickable summary header. */
   trigger: ReactNode
+  /** Content revealed when the item is expanded. */
   content: ReactNode
+  /** When true, the item cannot be toggled. */
   disabled?: boolean
+  /** Leading icon rendered before the trigger text. */
   icon?: ReactNode
 }
 
+/**
+ * Accordion — an expandable/collapsible content panel built on native `<details>`.
+ * Supports single and multiple expansion modes with smooth height animation.
+ */
 export interface AccordionProps extends HTMLAttributes<HTMLDivElement> {
+  /** Array of accordion items to render. */
   items: AccordionItem[]
+  /** `'single'` closes others when one opens; `'multiple'` allows many open at once. */
   type?: 'single' | 'multiple'
+  /** Array of item IDs that should be expanded on initial render. */
   defaultOpen?: string[]
+  /** Callback fired when the set of open items changes. */
   onOpenChange?: (openIds: string[]) => void
+  /** Motion intensity override (0=none, 1=subtle, 2=expressive, 3=cinematic). */
   motion?: 0 | 1 | 2 | 3
+  /** Visual style variant. */
   variant?: 'default' | 'bordered' | 'separated'
+  /** Component size controlling padding and font-size. */
   size?: 'sm' | 'md' | 'lg'
 }
 
@@ -207,6 +224,16 @@ const accordionStyles = css`
         }
       }
 
+      /* Reduced motion */
+      @media (prefers-reduced-motion: reduce) {
+        summary,
+        .ui-accordion__chevron,
+        .ui-accordion__content-wrapper {
+          animation: none !important;
+          transition: none !important;
+        }
+      }
+
       /* Print */
       @media print {
         details {
@@ -268,7 +295,7 @@ export const Accordion = forwardRef<HTMLDivElement, AccordionProps>(
     },
     ref
   ) {
-    useStyles('accordion', accordionStyles)
+    const cls = useStyles('accordion', accordionStyles)
     const motionLevel = useMotionLevel(motionProp)
     const [openIds, setOpenIds] = useState<string[]>(defaultOpen)
 
@@ -309,7 +336,7 @@ export const Accordion = forwardRef<HTMLDivElement, AccordionProps>(
     return (
       <div
         ref={ref}
-        className={cn('ui-accordion', className)}
+        className={cn(cls('root'), className)}
         data-motion={motionLevel}
         data-variant={variant}
         data-size={size}

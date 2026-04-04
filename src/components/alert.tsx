@@ -6,21 +6,34 @@ import { useStyles } from '../core/styles/use-styles'
 import { useMotionLevel } from '../core/motion/use-motion-level'
 import { cn } from '../core/utils/cn'
 
+/**
+ * Alert — a contextual feedback message with variant-based colors and icons.
+ * Uses semantic `role="alert"` for errors/warnings and `role="status"` for info/success.
+ */
 export interface AlertProps extends Omit<HTMLAttributes<HTMLDivElement>, 'title'> {
+  /** Semantic variant controlling color scheme and default icon. */
   variant: 'info' | 'success' | 'warning' | 'error'
+  /** Optional bold heading rendered above the body content. */
   title?: ReactNode
+  /** Custom icon override — default icons are provided per variant. */
   icon?: ReactNode
+  /** Shows a dismiss button in the top-right corner. */
   dismissible?: boolean
+  /** Callback fired when the dismiss button is clicked. */
   onDismiss?: () => void
+  /** Action link rendered below the body text. */
   action?: { label: string; onClick: () => void }
+  /** Controls padding, font-size, and border width. */
   size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl'
-  /** Full-width banner mode (no border-radius, full-width border-top instead of border-left) */
+  /** Full-width banner mode (no border-radius, full-width border-top instead of border-left). */
   banner?: boolean
-  /** Reduced padding, single-line layout */
+  /** Reduced padding, single-line layout. */
   compact?: boolean
+  /** Motion intensity override (0=none, 1=subtle, 2=expressive, 3=cinematic). */
   motion?: 0 | 1 | 2 | 3
-  /** Custom class names for internal parts */
+  /** Custom class names for internal parts. */
   classNames?: Partial<Record<'root' | 'icon' | 'content' | 'title' | 'body' | 'dismiss', string>>
+  /** Alert body content. */
   children: ReactNode
 }
 
@@ -334,6 +347,15 @@ const alertStyles = css`
       /* Entry animation — motion level 1+ */
       :scope:not([data-motion="0"]) {
         animation: ui-alert-slide-in 0.25s var(--ease-out, ease-out);
+      }
+
+      /* Reduced motion */
+      @media (prefers-reduced-motion: reduce) {
+        :scope,
+        .ui-alert__dismiss {
+          animation: none !important;
+          transition: none !important;
+        }
       }
 
       /* Forced colors */

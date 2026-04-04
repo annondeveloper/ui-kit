@@ -9,10 +9,15 @@ import { cn } from '../core/utils/cn'
 import { Skeleton } from './skeleton'
 
 export interface CardProps extends HTMLAttributes<HTMLElement> {
+  /** Render as a different HTML element: div, article, a, section (default: 'div') */
   as?: ElementType
+  /** Visual style variant controlling surface, border, and shadow (default: 'default') */
   variant?: 'default' | 'elevated' | 'outlined' | 'ghost' | 'glass' | 'gradient'
+  /** Internal padding scale (default: 'md') */
   padding?: 'none' | 'sm' | 'md' | 'lg'
+  /** Enable hover lift and cursor pointer (default: false) */
   interactive?: boolean
+  /** Animation intensity override: 0=none, 1=subtle, 2=expressive, 3=cinematic */
   motion?: 0 | 1 | 2 | 3
   /** Card header area (image, title bar, etc.) */
   header?: ReactNode
@@ -28,9 +33,11 @@ export interface CardProps extends HTMLAttributes<HTMLElement> {
   bordered?: boolean
   /** Custom class names for internal parts */
   classNames?: Partial<Record<'root' | 'header' | 'footer' | 'content', string>>
-  /** Polymorphic pass-through: href, target, etc. */
+  /** Polymorphic pass-through: href for anchor element */
   href?: string
+  /** Link target when using as="a" */
   target?: string
+  /** Link relationship when using as="a" */
   rel?: string
 }
 
@@ -268,6 +275,20 @@ const cardStyles = css`
         }
       }
 
+      /* Reduced motion */
+      @media (prefers-reduced-motion: reduce) {
+        :scope,
+        :scope[data-interactive="true"] {
+          transition: none !important;
+        }
+        .ui-card__content {
+          transition: none !important;
+        }
+        .ui-card__expand-toggle {
+          transition: none !important;
+        }
+      }
+
       /* Print */
       @media print {
         :scope {
@@ -292,6 +313,10 @@ const cardStyles = css`
   }
 `
 
+/**
+ * Card — container component with 6 variants, expandable content, header/footer slots,
+ * polymorphic rendering, and entrance animations at motion level 2+.
+ */
 export const Card = forwardRef<HTMLElement, CardProps>(
   (
     {

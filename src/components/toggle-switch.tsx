@@ -11,10 +11,15 @@ import { useMotionLevel } from '../core/motion/use-motion-level'
 import { useStableId } from '../core/a11y/stable-id'
 import { cn } from '../core/utils/cn'
 
+/** Props for the ToggleSwitch component. */
 export interface ToggleSwitchProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 'type' | 'size'> {
+  /** Text label displayed adjacent to the toggle track. */
   label?: ReactNode
+  /** Controls the track and thumb dimensions across five sizes. */
   size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl'
+  /** Error message displayed below the toggle. Sets aria-invalid. */
   error?: string
+  /** Animation intensity override (0=instant, 1=CSS, 2=spring, 3=full physics). */
   motion?: 0 | 1 | 2 | 3
 }
 
@@ -213,6 +218,15 @@ const toggleSwitchStyles = css`
           position: absolute;
           inset: -12px;
           /* Ensures minimum 44px tap area without changing visual size */
+        }
+      }
+
+      /* Reduced motion */
+      @media (prefers-reduced-motion: reduce) {
+        .ui-toggle-switch__track,
+        .ui-toggle-switch__thumb {
+          transition: none !important;
+          animation: none !important;
         }
       }
 

@@ -2,7 +2,7 @@ import { forwardRef, type HTMLAttributes, type ReactNode } from 'react'
 
 export interface LiteBadgeProps extends HTMLAttributes<HTMLSpanElement> {
   variant?: 'default' | 'primary' | 'success' | 'warning' | 'danger' | 'info'
-  size?: 'xs' | 'sm' | 'md'
+  size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl'
   dot?: boolean
   pulse?: boolean
   count?: number
@@ -17,7 +17,7 @@ export const Badge = forwardRef<HTMLSpanElement, LiteBadgeProps>(
   (
     {
       variant = 'default',
-      size = 'sm',
+      size = 'md',
       dot = false,
       pulse = false,
       count,

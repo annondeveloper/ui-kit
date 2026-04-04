@@ -4,6 +4,7 @@ import { useState, useMemo, useRef, useEffect } from 'react'
 import { css } from '@ui/core/styles/css-tag'
 import { useStyles } from '@ui/core/styles/use-styles'
 import { Drawer } from '@ui/components/drawer'
+import { Drawer as LiteDrawer } from '@ui/lite/drawer'
 import { Drawer as PremiumDrawer } from '@ui/premium/drawer'
 import { Button } from '@ui/components/button'
 import { Card } from '@ui/components/card'
@@ -731,7 +732,7 @@ const COLOR_PRESETS = [
 ]
 
 const IMPORT_STRINGS: Record<Tier, string> = {
-  lite: "import { Drawer } from '@annondeveloper/ui-kit'",
+  lite: "import { Drawer } from '@annondeveloper/ui-kit/lite'",
   standard: "import { Drawer } from '@annondeveloper/ui-kit'",
   premium: "import { Drawer } from '@annondeveloper/ui-kit/premium'",
 }

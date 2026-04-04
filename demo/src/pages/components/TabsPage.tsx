@@ -699,17 +699,19 @@ const pageStyles = css`
 // ─── Props Data ───────────────────────────────────────────────────────────────
 
 const tabsProps: PropDef[] = [
-  { name: 'tabs', type: 'Tab[]', required: true, description: 'Array of tab definitions.' },
-  { name: 'activeTab', type: 'string', description: 'Currently active tab ID.' },
-  { name: 'defaultTab', type: 'string', description: 'Initial active tab ID.' },
-  { name: 'onChange', type: '(tabId: string) => void', description: 'Callback on value change.' },
-  { name: 'onClose', type: '(tabId: string) => void', description: 'Callback on close.' },
+  { name: 'tabs', type: 'Tab[]', description: 'Array of tab definitions. Omit to use composed API (TabList/TabTrigger/TabContent).' },
+  { name: 'activeTab', type: 'string', description: 'Currently active tab ID (controlled).' },
+  { name: 'defaultTab', type: 'string', description: 'Initial active tab ID (uncontrolled).' },
+  { name: 'value', type: 'string', description: 'Composed API alias for activeTab.' },
+  { name: 'defaultValue', type: 'string', description: 'Composed API alias for defaultTab.' },
+  { name: 'onChange', type: '(tabId: string) => void', description: 'Callback fired when the active tab changes.' },
+  { name: 'onClose', type: '(tabId: string) => void', description: 'Callback fired when a closeable tab close button is clicked.' },
   { name: 'variant', type: "'underline' | 'pills' | 'enclosed'", default: "'underline'", description: 'Visual style variant.' },
   { name: 'size', type: "'xs' | 'sm' | 'md' | 'lg' | 'xl'", default: "'md'", description: 'Component size.' },
   { name: 'orientation', type: "'horizontal' | 'vertical'", default: "'horizontal'", description: 'Horizontal or vertical layout.' },
-  { name: 'lazy', type: 'boolean', default: 'false', description: 'Lazy-load content.' },
+  { name: 'lazy', type: 'boolean', default: 'false', description: 'When true, inactive panels are not rendered.' },
   { name: 'motion', type: '0 | 1 | 2 | 3', description: 'Animation intensity (0=none, 1=subtle, 2=expressive, 3=cinematic).' },
-  { name: 'children', type: 'ReactNode', required: true, description: 'Child content.' },
+  { name: 'children', type: 'ReactNode', description: 'Child content (TabPanel children for array API, or composed sub-components).' },
 ]
 
 const tabSubTypeProps: PropDef[] = [

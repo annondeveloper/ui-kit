@@ -21,31 +21,52 @@ import { cn } from '../core/utils/cn'
 
 // ─── Types ──────────────────────────────────────────────────────────────────
 
+/** A single tab definition for the array-driven API. */
 export interface Tab {
+  /** Unique identifier for the tab. */
   id: string
+  /** Label content displayed on the tab button. */
   label: ReactNode
+  /** Leading icon rendered before the label. */
   icon?: ReactNode
+  /** When true, the tab cannot be selected. */
   disabled?: boolean
+  /** Badge or count rendered after the label. */
   badge?: ReactNode
+  /** Shows a close button on this tab. */
   closeable?: boolean
 }
 
+/**
+ * Tabs — a tabbed interface with array-driven and composed APIs.
+ * Follows WAI-ARIA Tabs pattern with roving tabindex keyboard navigation.
+ */
 export interface TabsProps extends Omit<HTMLAttributes<HTMLDivElement>, 'onChange'> {
-  /** Array-driven API: provide tab definitions */
+  /** Array-driven API: provide tab definitions. Omit to use composed API (TabList/TabTrigger/TabContent). */
   tabs?: Tab[]
+  /** Currently active tab ID (controlled). */
   activeTab?: string
+  /** Initial active tab ID (uncontrolled). */
   defaultTab?: string
-  /** Composed API alias for defaultTab */
+  /** Composed API alias for defaultTab. */
   defaultValue?: string
-  /** Composed API alias for activeTab */
+  /** Composed API alias for activeTab. */
   value?: string
+  /** Callback fired when the active tab changes. */
   onChange?: (tabId: string) => void
+  /** Callback fired when a closeable tab's close button is clicked. */
   onClose?: (tabId: string) => void
+  /** Visual style variant. */
   variant?: 'underline' | 'pills' | 'enclosed'
+  /** Component size controlling padding, font-size. */
   size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl'
+  /** Horizontal or vertical tab layout. */
   orientation?: 'horizontal' | 'vertical'
+  /** When true, inactive panels are not rendered (lazy loading). */
   lazy?: boolean
+  /** Motion intensity override (0=none, 1=subtle, 2=expressive, 3=cinematic). */
   motion?: 0 | 1 | 2 | 3
+  /** Child content — TabPanel children for array API, or composed sub-components. */
   children?: ReactNode
 }
 
@@ -384,6 +405,17 @@ const tabsStyles = css`
         }
         .ui-tabs__list {
           border-color: ButtonText;
+        }
+      }
+
+      /* ── Reduced motion ─────────────────────────────────── */
+
+      @media (prefers-reduced-motion: reduce) {
+        .ui-tabs__tab,
+        .ui-tabs__tab::after,
+        .ui-tabs__panel {
+          animation: none !important;
+          transition: none !important;
         }
       }
 

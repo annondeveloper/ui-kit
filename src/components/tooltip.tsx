@@ -17,15 +17,25 @@ import { useAnchorPosition } from '../core/a11y/anchor-position'
 
 // ─── Types ──────────────────────────────────────────────────────────────────
 
+/** Props for the Tooltip component. */
 export interface TooltipProps {
+  /** The tooltip content to display. Can be a string or any React node. */
   content: ReactNode
+  /** The trigger element the tooltip attaches to. Must be a single React element. */
   children: ReactElement
+  /** Preferred placement relative to the trigger element. */
   placement?: 'top' | 'bottom' | 'left' | 'right'
+  /** Delay in milliseconds before the tooltip appears on hover. */
   delay?: number
+  /** Distance in pixels between the tooltip and the trigger element. */
   offset?: number
+  /** When true, the tooltip will not appear on hover or focus. */
   disabled?: boolean
+  /** Enables hover interactions within the tooltip panel. */
   interactive?: boolean
+  /** Maximum width of the tooltip panel. */
   maxWidth?: number | string
+  /** Animation intensity override (0=instant, 1=CSS, 2=spring, 3=full physics). */
   motion?: 0 | 1 | 2 | 3
 }
 
@@ -111,6 +121,13 @@ const tooltipStyles = css`
         .ui-tooltip__arrow {
           background: Canvas;
           border: 1px solid CanvasText;
+        }
+      }
+
+      /* Reduced motion */
+      @media (prefers-reduced-motion: reduce) {
+        :scope {
+          animation: none !important;
         }
       }
 

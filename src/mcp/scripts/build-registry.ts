@@ -156,6 +156,9 @@ const CATEGORY_MAP: Record<string, string> = {
   FilterPillGroup: 'layout',
   TransferList: 'layout',
   UIProvider: 'layout',
+
+  // Feedback
+  Alert: 'feedback',
 }
 
 const DOMAIN_CATEGORY_MAP: Record<string, string> = {
@@ -282,7 +285,8 @@ const RELATED_GROUPS: string[][] = [
   ['Avatar', 'AvatarGroup', 'AvatarUpload'],
   ['Dialog', 'ConfirmDialog', 'Sheet', 'Drawer'],
   ['Tooltip', 'NativeTooltip', 'Popover'],
-  ['Tabs', 'SegmentedControl'],
+  ['Tabs', 'SegmentedControl', 'Accordion'],
+  ['Alert', 'Dialog', 'ConfirmDialog'],
   ['Sidebar', 'Navbar', 'AppShell'],
   ['Breadcrumbs', 'Pagination', 'TableOfContents'],
   ['Progress', 'Skeleton'],
@@ -475,8 +479,8 @@ function parsePropsFromSource(source: string, propsName: string): PropEntry[] {
     const propMatch = trimmed.match(/^(\w+)(\?)?:\s*(.+?)(?:\s*\/\/.*)?$/)
     if (propMatch) {
       const [, propName, optional, rawType] = propMatch
-      // Skip the 'children' prop from HTMLAttributes extends
-      if (propName === 'children') {
+      // Skip 'children' only when it has no JSDoc (inherited from HTMLAttributes)
+      if (propName === 'children' && !currentJsdoc.trim()) {
         currentJsdoc = ''
         continue
       }
@@ -563,7 +567,7 @@ function generateExamples(
     .join(' ')
 
   const hasChildren = needsChildren(name)
-  const childContent = hasChildren ? `Click me` : ''
+  const childContent = hasChildren ? childContentForComponent(name) : ''
   const selfClosing = !hasChildren && !childContent
 
   const basicJsx = selfClosing
@@ -594,6 +598,39 @@ function generateExamples(
     }
   }
 
+  // Size example (if component has size prop and no variant example was added)
+  if (examples.length < 2) {
+    const sizeProp = props.find((p) => p.name === 'size')
+    if (sizeProp) {
+      const sizes = sizeProp.type.match(/'([^']+)'/g)
+      if (sizes && sizes.length > 1) {
+        const lgSize = sizes.find(s => s.includes('lg')) || sizes[sizes.length - 1]
+        const sizeVal = lgSize.replace(/'/g, '')
+        const sizeJsx = selfClosing
+          ? `<${name} size="${sizeVal}" ${basicPropsStr}/>`
+          : `<${name} size="${sizeVal}" ${basicPropsStr}>${childContent}</${name}>`
+        examples.push({
+          title: `Large size`,
+          code: sizeJsx.replace(/\s+\/>/, ' />').replace(/\s+>/, '>'),
+        })
+      }
+    }
+  }
+
+  // Placement example (if component has placement prop and still < 2 examples)
+  if (examples.length < 2) {
+    const placementProp = props.find((p) => p.name === 'placement')
+    if (placementProp) {
+      const placementJsx = selfClosing
+        ? `<${name} placement="bottom" ${basicPropsStr}/>`
+        : `<${name} placement="bottom" ${basicPropsStr}>${childContent}</${name}>`
+      examples.push({
+        title: 'Bottom placement',
+        code: placementJsx.replace(/\s+\/>/, ' />').replace(/\s+>/, '>'),
+      })
+    }
+  }
+
   return examples
 }
 
@@ -602,6 +639,9 @@ function sampleValue(prop: PropEntry): string {
   if (name === 'title' || name === 'label') return 'Example'
   if (name === 'description') return 'A brief description'
   if (name === 'placeholder') return 'Enter value...'
+  if (name === 'onclose' || name === 'oncancel') return '() => setOpen(false)'
+  if (name === 'onconfirm') return '() => handleConfirm()'
+  if (name === 'onchange') return '(value) => setValue(value)'
   if (name === 'value') return 'value'
   if (name === 'name') return 'field-name'
   if (name.includes('url') || name.includes('href') || name.includes('src'))
@@ -616,6 +656,22 @@ function sampleNumberValue(prop: PropEntry): number {
   if (name.includes('page')) return 1
   if (name.includes('size') || name.includes('length')) return 6
   return 0
+}
+
+function childContentForComponent(name: string): string {
+  const contentMap: Record<string, string> = {
+    Button: 'Click me',
+    Card: 'Card content goes here.',
+    Dialog: '<p>Dialog body content.</p>',
+    ConfirmDialog: 'Are you sure?',
+    Sheet: '<p>Sheet content.</p>',
+    Drawer: '<p>Drawer content.</p>',
+    Alert: 'Something important happened.',
+    Tooltip: 'Hover target',
+    Badge: 'Badge',
+    Typography: 'Hello world',
+  }
+  return contentMap[name] || 'Content'
 }
 
 function needsChildren(name: string): boolean {

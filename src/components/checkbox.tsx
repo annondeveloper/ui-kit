@@ -13,11 +13,17 @@ import { useMotionLevel } from '../core/motion/use-motion-level'
 import { useStableId } from '../core/a11y/stable-id'
 import { cn } from '../core/utils/cn'
 
+/** Props for the Checkbox component. */
 export interface CheckboxProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 'type' | 'size'> {
+  /** Text label rendered beside the checkbox. */
   label?: ReactNode
+  /** Controls the checkbox box dimensions. */
   size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl'
+  /** Shows an indeterminate dash instead of a checkmark. */
   indeterminate?: boolean
+  /** Error message displayed below the checkbox. Sets aria-invalid. */
   error?: string
+  /** Animation intensity override (0=instant, 1=CSS, 2=spring, 3=full physics). */
   motion?: 0 | 1 | 2 | 3
 }
 
@@ -201,6 +207,16 @@ const checkboxStyles = css`
 
       :scope:not([data-motion="0"]):not([data-motion="1"]) .ui-checkbox__input:checked ~ .ui-checkbox__box {
         animation: ui-checkbox-bounce 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+      }
+
+      /* Reduced motion */
+      @media (prefers-reduced-motion: reduce) {
+        .ui-checkbox__box,
+        .ui-checkbox__check,
+        .ui-checkbox__check path {
+          transition: none !important;
+          animation: none !important;
+        }
       }
 
       /* Print */

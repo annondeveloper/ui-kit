@@ -17,19 +17,29 @@ import { cn } from '../core/utils/cn'
 // ─── Types ──────────────────────────────────────────────────────────────────
 
 export interface DialogProps extends Omit<HTMLAttributes<HTMLDialogElement>, 'title'> {
+  /** Whether the dialog is open (required) */
   open: boolean
+  /** Called when the dialog should close via overlay, escape, or close button (required) */
   onClose: () => void
+  /** Title text displayed in the dialog header */
   title?: ReactNode
+  /** Description text below the title */
   description?: string
+  /** Controls the maximum width of the dialog (default: 'md') */
   size?: 'sm' | 'md' | 'lg' | 'full'
+  /** Close when clicking the backdrop overlay (default: true) */
   closeOnOverlay?: boolean
+  /** Close when pressing the Escape key (default: true) */
   closeOnEscape?: boolean
+  /** Show the close button in the header (default: true) */
   showClose?: boolean
   /** A footer area below the body for action buttons */
   footer?: ReactNode
   /** Prevents closing via overlay click and escape (useful for important actions) */
   preventClose?: boolean
+  /** Content rendered inside the dialog body (required) */
   children: ReactNode
+  /** Animation intensity override: 0=none, 1=subtle, 2=expressive, 3=cinematic */
   motion?: 0 | 1 | 2 | 3
   /** Custom class names for internal parts */
   classNames?: Partial<Record<'root' | 'header' | 'title' | 'description' | 'body' | 'close' | 'footer', string>>
@@ -244,6 +254,10 @@ function CloseIcon() {
 
 // ─── Component ──────────────────────────────────────────────────────────────
 
+/**
+ * Dialog — modal overlay using native `<dialog>` element with `showModal()`,
+ * 4 sizes, entry animations via `@starting-style`, and configurable close behavior.
+ */
 export function Dialog({
   open,
   onClose,

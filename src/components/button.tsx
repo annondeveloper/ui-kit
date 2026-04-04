@@ -13,17 +13,23 @@ export interface ButtonShortcuts {
 }
 
 export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
+  /** Visual style variant (default: 'primary') */
   variant?: 'primary' | 'secondary' | 'ghost' | 'danger' | 'link'
+  /** Component size controlling padding, font-size, and min-height (default: 'md') */
   size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl'
+  /** Shows loading spinner and disables interaction (default: false) */
   loading?: boolean
   /** Custom text to display during loading state instead of hiding content */
   loadingText?: string
+  /** Leading icon element rendered before button text */
   icon?: ReactNode
+  /** Trailing icon element rendered after button text */
   iconEnd?: ReactNode
   /** Makes the button fill the full width of its container */
   fullWidth?: boolean
   /** Compact square button for icon-only usage (no text, adjusts sizing) */
   iconOnly?: boolean
+  /** Animation intensity override: 0=none, 1=subtle, 2=expressive, 3=cinematic */
   motion?: 0 | 1 | 2 | 3
   /** Enable haptic feedback on click. `true` uses 'light', or pass a specific pattern. */
   haptics?: boolean | HapticType
@@ -223,6 +229,16 @@ const buttonStyles = css`
         }
       }
 
+      /* Reduced motion */
+      @media (prefers-reduced-motion: reduce) {
+        :scope {
+          transition: none !important;
+        }
+        :scope::after {
+          animation-duration: 1.5s;
+        }
+      }
+
       /* Print */
       @media print {
         :scope {
@@ -318,6 +334,12 @@ const buttonStyles = css`
   }
 `
 
+/**
+ * Button — interactive action trigger with 5 variants, 5 sizes, motion levels,
+ * haptic feedback, and custom keyboard shortcuts.
+ *
+ * Uses native `<button>` element with `forwardRef` for full DOM access.
+ */
 export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
   (
     {

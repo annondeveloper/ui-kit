@@ -22,29 +22,53 @@ import { Icon } from '../core/icons'
 
 // ─── Types ──────────────────────────────────────────────────────────────────
 
+/** A single option in the Select dropdown. */
 export interface SelectOption {
+  /** Unique value used for selection tracking. */
   value: string
+  /** Human-readable label displayed in the dropdown. */
   label: string
+  /** When true, the option cannot be selected. */
   disabled?: boolean
+  /** Leading icon rendered before the label. */
   icon?: ReactNode
+  /** Group name — options with the same group are visually clustered. */
   group?: string
 }
 
+/**
+ * Select — a custom dropdown select with search, multi-select, and form integration.
+ * Built on `role="combobox"` + `role="listbox"` with full keyboard navigation.
+ */
 export interface SelectProps
   extends Omit<HTMLAttributes<HTMLDivElement>, 'onChange' | 'defaultValue'> {
+  /** Form field name — also used for the hidden `<input>` for native form submission. */
   name: string
+  /** Options to render in the dropdown. */
   options: SelectOption[]
+  /** Controlled value (single string or array for multi-select). */
   value?: string | string[]
+  /** Initial uncontrolled value. */
   defaultValue?: string | string[]
+  /** Callback fired when the value changes. */
   onChange?: (value: string | string[]) => void
+  /** Placeholder text shown when no value is selected. */
   placeholder?: string
+  /** Label rendered above the trigger button. */
   label?: ReactNode
+  /** Error message rendered below the trigger — also sets `aria-invalid`. */
   error?: string
+  /** Disables all interaction. */
   disabled?: boolean
+  /** Component size controlling height, padding, and font-size. */
   size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl'
+  /** Enables a search input at the top of the dropdown. */
   searchable?: boolean
+  /** Shows a clear button when a value is selected. */
   clearable?: boolean
+  /** Allows selecting multiple options (renders tags). */
   multiple?: boolean
+  /** Motion intensity override (0=none, 1=subtle, 2=expressive, 3=cinematic). */
   motion?: 0 | 1 | 2 | 3
 }
 
@@ -415,6 +439,17 @@ const selectStyles = css`
         .ui-select__dropdown {
           box-shadow: none;
           border: 1px solid;
+        }
+      }
+
+      /* Reduced motion — disable all transitions/animations */
+      @media (prefers-reduced-motion: reduce) {
+        .ui-select__chevron,
+        .ui-select__dropdown,
+        .ui-select__option,
+        .ui-select__error {
+          animation: none !important;
+          transition: none !important;
         }
       }
 

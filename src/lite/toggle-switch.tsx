@@ -13,7 +13,7 @@ export const ToggleSwitch = forwardRef<HTMLInputElement, LiteToggleSwitchProps>(
 
     return (
       <div
-        className={`ui-lite-toggle${className ? ` ${className}` : ''}`}
+        className={`ui-lite-toggle-switch${className ? ` ${className}` : ''}`}
         data-size={size}
         {...(disabled ? { 'data-disabled': '' } : {})}
         {...(error ? { 'data-error': '' } : {})}
@@ -32,7 +32,7 @@ export const ToggleSwitch = forwardRef<HTMLInputElement, LiteToggleSwitchProps>(
           {label != null && <span>{label}</span>}
         </label>
         {error && (
-          <span id={errorId} className="ui-lite-toggle__error" role="alert" style={{ display: 'block', fontSize: '0.75rem', color: 'var(--status-critical, oklch(65% 0.25 25))' }}>
+          <span id={errorId} className="ui-lite-toggle-switch__error" role="alert" style={{ display: 'block', fontSize: '0.75rem', color: 'var(--status-critical, oklch(65% 0.25 25))' }}>
             {error}
           </span>
         )}

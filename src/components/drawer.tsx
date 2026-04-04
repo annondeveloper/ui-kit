@@ -15,13 +15,21 @@ import { cn } from '../core/utils/cn'
 
 // ─── Types ──────────────────────────────────────────────────────────────────
 
+/** Props for the Drawer component. */
 export interface DrawerProps extends HTMLAttributes<HTMLDivElement> {
+  /** Controls whether the drawer is visible. */
   open: boolean
+  /** Callback fired when the drawer requests to close (overlay click, Escape key). */
   onClose: () => void
+  /** Which edge the drawer slides in from. */
   side?: 'left' | 'right' | 'top' | 'bottom'
+  /** Width (left/right) or height (top/bottom) of the drawer panel. */
   size?: 'sm' | 'md' | 'lg' | 'full'
+  /** Show a semi-transparent backdrop behind the drawer. */
   overlay?: boolean
+  /** Content rendered inside the drawer body. */
   children: ReactNode
+  /** Animation intensity override (0=instant, 1=CSS, 2=spring, 3=full physics). */
   motion?: 0 | 1 | 2 | 3
 }
 
@@ -157,6 +165,15 @@ const drawerStyles = css`
         overflow-y: auto;
       }
 
+      /* Reduced motion */
+      @media (prefers-reduced-motion: reduce) {
+        .ui-drawer__panel,
+        .ui-drawer__overlay {
+          transition: none !important;
+          animation: none !important;
+        }
+      }
+
       /* Touch targets */
       @media (pointer: coarse) {
         .ui-drawer__panel {
@@ -189,7 +206,7 @@ const drawerStyles = css`
         .ui-drawer__panel {
           position: static;
           box-shadow: none;
-          border: 1px solid #000;
+          border: 1px solid oklch(0% 0 0);
         }
       }
 

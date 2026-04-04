@@ -7,16 +7,27 @@ import { useMotionLevel } from '../core/motion/use-motion-level'
 import { cn } from '../core/utils/cn'
 
 export interface BadgeProps extends HTMLAttributes<HTMLSpanElement> {
+  /** Semantic color variant (default: 'default') */
   variant?: 'default' | 'primary' | 'success' | 'warning' | 'danger' | 'info'
+  /** Controls padding, font-size, and dimensions (default: 'md') */
   size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl'
+  /** Shows a small colored dot indicator (default: false) */
   dot?: boolean
+  /** Adds pulsing animation to the dot; requires motion level 2+ (default: false) */
   pulse?: boolean
+  /** Numeric count to display instead of children */
   count?: number
+  /** Maximum count before overflow display, e.g. "99+" (default: 99) */
   maxCount?: number
+  /** Leading icon element rendered before content */
   icon?: ReactNode
+  /** Shows a remove (X) button (default: false) */
   removable?: boolean
+  /** Called when the remove button is clicked */
   onRemove?: () => void
+  /** Outline mode with transparent background (default: false) */
   outline?: boolean
+  /** Animation intensity override: 0=none, 1=subtle, 2=expressive, 3=cinematic */
   motion?: 0 | 1 | 2 | 3
 }
 
@@ -177,6 +188,16 @@ const badgeStyles = css`
         }
       }
 
+      /* Reduced motion */
+      @media (prefers-reduced-motion: reduce) {
+        .ui-badge__dot[data-pulse="true"]::after {
+          animation: none;
+        }
+        .ui-badge__remove {
+          transition: none;
+        }
+      }
+
       /* Print */
       @media print {
         :scope {
@@ -209,6 +230,10 @@ const badgeStyles = css`
   }
 `
 
+/**
+ * Badge — inline status indicator with 6 semantic variants, dot/pulse animation,
+ * count display, removable state, and outline mode.
+ */
 export const Badge = forwardRef<HTMLSpanElement, BadgeProps>(
   (
     {
