@@ -1721,7 +1721,7 @@ export default function TooltipPage() {
         </p>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
           <a
-            href="https://github.com/annondeveloper/ui-kit/blob/v2/src/components/tooltip.tsx"
+            href="https://github.com/annondeveloper/ui-kit/blob/main/src/components/tooltip.tsx"
             target="_blank"
             rel="noopener noreferrer"
             className="tooltip-page__source-link"
@@ -1730,7 +1730,7 @@ export default function TooltipPage() {
             src/components/tooltip.tsx — Standard tier
           </a>
           <a
-            href="https://github.com/annondeveloper/ui-kit/blob/v2/src/lite/tooltip.tsx"
+            href="https://github.com/annondeveloper/ui-kit/blob/main/src/lite/tooltip.tsx"
             target="_blank"
             rel="noopener noreferrer"
             className="tooltip-page__source-link"

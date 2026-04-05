@@ -1962,7 +1962,7 @@ export default function DialogPage() {
         </p>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
           <a
-            href="https://github.com/annondeveloper/ui-kit/blob/v2/src/components/dialog.tsx"
+            href="https://github.com/annondeveloper/ui-kit/blob/main/src/components/dialog.tsx"
             target="_blank"
             rel="noopener noreferrer"
             className="dialog-page__source-link"
@@ -1971,7 +1971,7 @@ export default function DialogPage() {
             src/components/dialog.tsx (Standard)
           </a>
           <a
-            href="https://github.com/annondeveloper/ui-kit/blob/v2/src/lite/dialog.tsx"
+            href="https://github.com/annondeveloper/ui-kit/blob/main/src/lite/dialog.tsx"
             target="_blank"
             rel="noopener noreferrer"
             className="dialog-page__source-link"
@@ -1980,7 +1980,7 @@ export default function DialogPage() {
             src/lite/dialog.tsx (Lite)
           </a>
           <a
-            href="https://github.com/annondeveloper/ui-kit/blob/v2/src/premium/dialog.tsx"
+            href="https://github.com/annondeveloper/ui-kit/blob/main/src/premium/dialog.tsx"
             target="_blank"
             rel="noopener noreferrer"
             className="dialog-page__source-link"
@@ -1989,7 +1989,7 @@ export default function DialogPage() {
             src/premium/dialog.tsx (Premium)
           </a>
           <a
-            href="https://github.com/annondeveloper/ui-kit/blob/v2/src/components/confirm-dialog.tsx"
+            href="https://github.com/annondeveloper/ui-kit/blob/main/src/components/confirm-dialog.tsx"
             target="_blank"
             rel="noopener noreferrer"
             className="dialog-page__source-link"

@@ -985,6 +985,7 @@ function PlaygroundSection({ tier: tierProp }: { tier: Tier }) {
   const [message, setMessage] = useState('This is an informational alert message.')
   const [copyStatus, setCopyStatus] = useState('')
   const [dismissed, setDismissed] = useState(false)
+  const [motion, setMotion] = useState<0 | 1 | 2 | 3>(3)
 
   const reactCode = useMemo(
     () => generateReactCode(tier, variant, message, dismissible, showIcon, showTitle, title, showAction),
@@ -1078,6 +1079,7 @@ function PlaygroundSection({ tier: tierProp }: { tier: Tier }) {
                 onDismiss={() => setDismissed(true)}
                 icon={showIcon ? undefined : null as unknown as undefined}
                 action={showAction ? { label: 'Learn more', onClick: () => {} } : undefined}
+                motion={motion}
                 style={{ inlineSize: '100%', position: 'relative', zIndex: 1 }}
               >
                 {message}
@@ -1126,6 +1128,15 @@ function PlaygroundSection({ tier: tierProp }: { tier: Tier }) {
         {/* Controls panel */}
         <div className="alert-page__playground-controls">
           <OptionGroup label="Variant" options={VARIANTS} value={variant} onChange={setVariant} />
+
+          {tier !== 'lite' && (
+            <OptionGroup
+              label="Motion"
+              options={['0', '1', '2', '3'] as const}
+              value={String(motion) as '0' | '1' | '2' | '3'}
+              onChange={v => setMotion(Number(v) as 0 | 1 | 2 | 3)}
+            />
+          )}
 
           <div className="alert-page__control-group">
             <span className="alert-page__control-label">Toggles</span>
@@ -1658,7 +1669,7 @@ export default function AlertPage() {
         </p>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
           <a
-            href="https://github.com/annondeveloper/ui-kit/blob/v2/src/components/alert.tsx"
+            href="https://github.com/annondeveloper/ui-kit/blob/main/src/components/alert.tsx"
             target="_blank"
             rel="noopener noreferrer"
             className="alert-page__source-link"
@@ -1667,7 +1678,7 @@ export default function AlertPage() {
             src/components/alert.tsx (Standard)
           </a>
           <a
-            href="https://github.com/annondeveloper/ui-kit/blob/v2/src/lite/alert.tsx"
+            href="https://github.com/annondeveloper/ui-kit/blob/main/src/lite/alert.tsx"
             target="_blank"
             rel="noopener noreferrer"
             className="alert-page__source-link"
@@ -1676,7 +1687,7 @@ export default function AlertPage() {
             src/lite/alert.tsx (Lite)
           </a>
           <a
-            href="https://github.com/annondeveloper/ui-kit/blob/v2/src/premium/alert.tsx"
+            href="https://github.com/annondeveloper/ui-kit/blob/main/src/premium/alert.tsx"
             target="_blank"
             rel="noopener noreferrer"
             className="alert-page__source-link"

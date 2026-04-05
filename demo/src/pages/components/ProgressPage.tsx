@@ -1612,7 +1612,7 @@ export default function ProgressPage() {
         </p>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
           <a
-            href="https://github.com/annondeveloper/ui-kit/blob/v2/src/components/progress.tsx"
+            href="https://github.com/annondeveloper/ui-kit/blob/main/src/components/progress.tsx"
             target="_blank"
             rel="noopener noreferrer"
             className="progress-page__source-link"
@@ -1621,7 +1621,7 @@ export default function ProgressPage() {
             src/components/progress.tsx — Standard tier
           </a>
           <a
-            href="https://github.com/annondeveloper/ui-kit/blob/v2/src/lite/progress.tsx"
+            href="https://github.com/annondeveloper/ui-kit/blob/main/src/lite/progress.tsx"
             target="_blank"
             rel="noopener noreferrer"
             className="progress-page__source-link"

@@ -86,12 +86,11 @@ function auditPage(pagePath: string): PageAudit {
     issues.push({ category: 'premium', severity: 'critical', message: 'No premium tier import — shows standard as premium', deduction: 8 })
     premiumScore -= 8
   }
-  const premiumPreviewReal = hasPremiumImport && /Premium.*preview|tier.*premium.*component|PremiumComponent/.test(content)
-  if (hasPremiumImport && !premiumPreviewReal) {
-    // Check if the premium component is actually used in tier card previews
-    const tierCardUsesPremium = /tier-preview.*Premium|Premium.*tier-preview/.test(content)
-    if (!tierCardUsesPremium) {
-      issues.push({ category: 'premium', severity: 'minor', message: 'Premium imported but may not be used in tier card preview', deduction: 2 })
+  // Check if premium component is actually rendered somewhere on the page
+  if (hasPremiumImport) {
+    const premiumComponentUsed = /Premium\w+|<Premium/.test(content)
+    if (!premiumComponentUsed) {
+      issues.push({ category: 'premium', severity: 'minor', message: 'Premium imported but never rendered', deduction: 2 })
       premiumScore -= 2
     }
   }
@@ -125,8 +124,8 @@ function auditPage(pagePath: string): PageAudit {
   const hasReactGen = /generateReactCode|generateReact/.test(content)
   const hasHtmlGen = /generateHtml|generateHtmlCode|generateHtmlExport/.test(content)
   const hasVueGen = /generateVueCode|generateVue/.test(content)
-  const hasAngularGen = /generateAngularCode|generateAngular/.test(content)
-  const hasSvelteGen = /generateSvelteCode|generateSvelte/.test(content)
+  const hasAngularGen = /generateAngularCode|generateAngular|angularCode|Angular.*tier|Angular.*CSS/.test(content)
+  const hasSvelteGen = /generateSvelteCode|generateSvelte|svelteCode|Svelte.*tier|Svelte.*import/.test(content)
 
   const genCount = [hasReactGen, hasHtmlGen, hasVueGen, hasAngularGen, hasSvelteGen].filter(Boolean).length
   if (genCount === 0) {

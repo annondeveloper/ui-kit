@@ -2094,7 +2094,7 @@ export default function TabsPage() {
         </p>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
           <a
-            href="https://github.com/annondeveloper/ui-kit/blob/v2/src/components/tabs.tsx"
+            href="https://github.com/annondeveloper/ui-kit/blob/main/src/components/tabs.tsx"
             target="_blank"
             rel="noopener noreferrer"
             className="tabs-page__source-link"
@@ -2103,7 +2103,7 @@ export default function TabsPage() {
             src/components/tabs.tsx — Standard
           </a>
           <a
-            href="https://github.com/annondeveloper/ui-kit/blob/v2/src/lite/tabs.tsx"
+            href="https://github.com/annondeveloper/ui-kit/blob/main/src/lite/tabs.tsx"
             target="_blank"
             rel="noopener noreferrer"
             className="tabs-page__source-link"
@@ -2112,7 +2112,7 @@ export default function TabsPage() {
             src/lite/tabs.tsx — Lite
           </a>
           <a
-            href="https://github.com/annondeveloper/ui-kit/blob/v2/src/premium/tabs.tsx"
+            href="https://github.com/annondeveloper/ui-kit/blob/main/src/premium/tabs.tsx"
             target="_blank"
             rel="noopener noreferrer"
             className="tabs-page__source-link"

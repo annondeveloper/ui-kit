@@ -1644,7 +1644,7 @@ export default function ToggleSwitchPage() {
         </p>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
           <a
-            href="https://github.com/annondeveloper/ui-kit/blob/v2/src/components/toggle-switch.tsx"
+            href="https://github.com/annondeveloper/ui-kit/blob/main/src/components/toggle-switch.tsx"
             target="_blank"
             rel="noopener noreferrer"
             className="toggle-switch-page__source-link"
@@ -1653,7 +1653,7 @@ export default function ToggleSwitchPage() {
             src/components/toggle-switch.tsx (Standard)
           </a>
           <a
-            href="https://github.com/annondeveloper/ui-kit/blob/v2/src/lite/toggle-switch.tsx"
+            href="https://github.com/annondeveloper/ui-kit/blob/main/src/lite/toggle-switch.tsx"
             target="_blank"
             rel="noopener noreferrer"
             className="toggle-switch-page__source-link"

@@ -2195,7 +2195,7 @@ export default function SelectPage() {
         </p>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
           <a
-            href="https://github.com/annondeveloper/ui-kit/blob/v2/src/components/select.tsx"
+            href="https://github.com/annondeveloper/ui-kit/blob/main/src/components/select.tsx"
             target="_blank"
             rel="noopener noreferrer"
             className="select-page__source-link"
@@ -2204,7 +2204,7 @@ export default function SelectPage() {
             src/components/select.tsx (Standard)
           </a>
           <a
-            href="https://github.com/annondeveloper/ui-kit/blob/v2/src/lite/select.tsx"
+            href="https://github.com/annondeveloper/ui-kit/blob/main/src/lite/select.tsx"
             target="_blank"
             rel="noopener noreferrer"
             className="select-page__source-link"

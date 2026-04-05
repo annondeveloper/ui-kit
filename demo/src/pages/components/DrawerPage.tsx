@@ -953,6 +953,7 @@ function PlaygroundSection({ tier: tierProp }: { tier: Tier }) {
   const [playgroundOpen, setPlaygroundOpen] = useState(false)
   const [copyStatus, setCopyStatus] = useState('')
   const [activeCodeTab, setActiveCodeTab] = useState('react')
+  const [motion, setMotion] = useState<0 | 1 | 2 | 3>(3)
 
   const DrawerComponent = tier === 'premium' ? PremiumDrawer : Drawer
 
@@ -1022,6 +1023,7 @@ function PlaygroundSection({ tier: tierProp }: { tier: Tier }) {
               side={side}
               size={size}
               overlay={showOverlay}
+              motion={motion}
             >
               {showHeader && (
                 <h2 style={{ margin: '0 0 1rem', fontSize: '1.125rem', fontWeight: 700 }}>Drawer Title</h2>
@@ -1084,6 +1086,12 @@ function PlaygroundSection({ tier: tierProp }: { tier: Tier }) {
         <div className="drawer-page__playground-controls">
           <OptionGroup label="Side" options={SIDES} value={side} onChange={setSide} />
           <OptionGroup label="Size" options={DRAWER_SIZES} value={size} onChange={setSize} />
+          <OptionGroup
+            label="Motion"
+            options={['0', '1', '2', '3'] as const}
+            value={String(motion) as '0' | '1' | '2' | '3'}
+            onChange={v => setMotion(Number(v) as 0 | 1 | 2 | 3)}
+          />
 
           <div className="drawer-page__control-group">
             <span className="drawer-page__control-label">Toggles</span>
@@ -1546,7 +1554,7 @@ export default function DrawerPage() {
         </p>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
           <a
-            href="https://github.com/annondeveloper/ui-kit/blob/v2/src/components/drawer.tsx"
+            href="https://github.com/annondeveloper/ui-kit/blob/main/src/components/drawer.tsx"
             target="_blank"
             rel="noopener noreferrer"
             className="drawer-page__source-link"
@@ -1555,7 +1563,7 @@ export default function DrawerPage() {
             src/components/drawer.tsx (Standard)
           </a>
           <a
-            href="https://github.com/annondeveloper/ui-kit/blob/v2/src/premium/drawer.tsx"
+            href="https://github.com/annondeveloper/ui-kit/blob/main/src/premium/drawer.tsx"
             target="_blank"
             rel="noopener noreferrer"
             className="drawer-page__source-link"

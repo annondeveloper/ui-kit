@@ -1991,7 +1991,7 @@ export default function AccordionPage() {
         </p>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
           <a
-            href="https://github.com/annondeveloper/ui-kit/blob/v2/src/components/accordion.tsx"
+            href="https://github.com/annondeveloper/ui-kit/blob/main/src/components/accordion.tsx"
             target="_blank"
             rel="noopener noreferrer"
             className="accordion-page__source-link"
@@ -2000,7 +2000,7 @@ export default function AccordionPage() {
             src/components/accordion.tsx — Standard tier
           </a>
           <a
-            href="https://github.com/annondeveloper/ui-kit/blob/v2/src/lite/accordion.tsx"
+            href="https://github.com/annondeveloper/ui-kit/blob/main/src/lite/accordion.tsx"
             target="_blank"
             rel="noopener noreferrer"
             className="accordion-page__source-link"

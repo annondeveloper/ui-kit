@@ -1633,7 +1633,7 @@ export default function CheckboxPage() {
         </p>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
           <a
-            href="https://github.com/annondeveloper/ui-kit/blob/v2/src/components/checkbox.tsx"
+            href="https://github.com/annondeveloper/ui-kit/blob/main/src/components/checkbox.tsx"
             target="_blank"
             rel="noopener noreferrer"
             className="checkbox-page__source-link"
@@ -1642,7 +1642,7 @@ export default function CheckboxPage() {
             src/components/checkbox.tsx
           </a>
           <a
-            href="https://github.com/annondeveloper/ui-kit/blob/v2/src/lite/checkbox.tsx"
+            href="https://github.com/annondeveloper/ui-kit/blob/main/src/lite/checkbox.tsx"
             target="_blank"
             rel="noopener noreferrer"
             className="checkbox-page__source-link"

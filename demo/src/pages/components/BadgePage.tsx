@@ -1880,6 +1880,20 @@ export default function BadgePage() {
           </ul>
         </Card>
       </section>
+
+      {/* ── Source ──────────────────────────────────────── */}
+      <section className="badge-page__section" id="source">
+        <h2 className="badge-page__section-title"><a href="#source">Source</a></h2>
+        <p className="badge-page__section-desc">View the full component source code on GitHub.</p>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+          <a className="badge-page__source-link" href="https://github.com/annondeveloper/ui-kit/blob/main/src/components/badge.tsx" target="_blank" rel="noopener noreferrer">
+            <Icon name="code" size="sm" /> src/components/badge.tsx (Standard)
+          </a>
+          <a className="badge-page__source-link" href="https://github.com/annondeveloper/ui-kit/blob/main/src/lite/badge.tsx" target="_blank" rel="noopener noreferrer">
+            <Icon name="code" size="sm" /> src/lite/badge.tsx (Lite)
+          </a>
+        </div>
+      </section>
     </div>
   )
 }
