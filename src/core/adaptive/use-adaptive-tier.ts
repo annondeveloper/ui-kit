@@ -49,23 +49,33 @@ function detectTierFromConnection(conn: NetworkInfo): AdaptiveResult {
 
   const type = conn.effectiveType
   const downlink = conn.downlink ?? 10 // default to fast if unknown
+  const rtt = conn.rtt ?? 50 // default to fast if unknown
 
-  // Slow connections
+  // Only truly slow connections get lite
+  // slow-2g: ~50Kbps, 2g: ~70Kbps — these genuinely struggle with any JS
   if (type === 'slow-2g' || type === '2g') {
     return { tier: 'lite', motion: 0, confidence: 'high', reason: `Slow connection: ${type}` }
   }
 
+  // 3G with very low bandwidth — standard with reduced motion
+  if (type === '3g' && downlink < 0.5) {
+    return { tier: 'standard', motion: 1, confidence: 'medium', reason: `Slow 3G: ${downlink}Mbps` }
+  }
+
+  // 3G with decent bandwidth — standard with full motion
   if (type === '3g') {
-    return { tier: 'standard', motion: 1, confidence: 'medium', reason: '3G connection' }
+    return { tier: 'standard', motion: 2, confidence: 'medium', reason: `3G: ${downlink}Mbps` }
   }
 
-  // 4G — use downlink speed to distinguish standard vs premium
-  if (downlink >= 5) {
-    return { tier: 'premium', motion: 3, confidence: 'high', reason: `Fast 4G: ${downlink}Mbps` }
+  // 4G/WiFi — premium for anything reasonable
+  // Reality: premium effects add ~3KB per component. At 1Mbps that's 24ms.
+  // Even 0.5Mbps loads premium in <50ms. Only degrade if truly constrained.
+  if (downlink >= 1 || rtt < 100) {
+    return { tier: 'premium', motion: 3, confidence: 'high', reason: `Fast: ${downlink}Mbps, ${rtt}ms RTT` }
   }
 
-  if (downlink >= 1.5) {
-    return { tier: 'standard', motion: 2, confidence: 'medium', reason: `Moderate 4G: ${downlink}Mbps` }
+  if (downlink >= 0.4) {
+    return { tier: 'standard', motion: 2, confidence: 'medium', reason: `Moderate: ${downlink}Mbps` }
   }
 
   return { tier: 'standard', motion: 1, confidence: 'low', reason: `Slow 4G: ${downlink}Mbps` }
@@ -82,12 +92,14 @@ function detectTierFromTiming(): AdaptiveResult {
     return { tier: 'standard', motion: 2, confidence: 'low', reason: 'No navigation timing' }
   }
 
-  // Time to first byte (TTFB) is a good proxy for connection quality
+  // TTFB is a proxy for connection quality
+  // Most CDN-served sites have TTFB < 500ms even on 3G
+  // Only truly slow connections (satellite, congested networks) exceed 1s
   const ttfb = nav.responseStart - nav.requestStart
-  if (ttfb < 100) {
-    return { tier: 'premium', motion: 3, confidence: 'medium', reason: `Fast TTFB: ${Math.round(ttfb)}ms` }
+  if (ttfb < 800) {
+    return { tier: 'premium', motion: 3, confidence: 'medium', reason: `Good TTFB: ${Math.round(ttfb)}ms` }
   }
-  if (ttfb < 500) {
+  if (ttfb < 2000) {
     return { tier: 'standard', motion: 2, confidence: 'medium', reason: `Moderate TTFB: ${Math.round(ttfb)}ms` }
   }
 

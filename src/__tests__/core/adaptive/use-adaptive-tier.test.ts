@@ -55,9 +55,9 @@ describe('detectAdaptiveTier', () => {
     expect(result.tier).toBe('lite')
   })
 
-  it('returns standard on 3g', () => {
+  it('returns standard on slow 3g (<0.5Mbps)', () => {
     Object.defineProperty(navigator, 'connection', {
-      value: { effectiveType: '3g', downlink: 1.0 },
+      value: { effectiveType: '3g', downlink: 0.3 },
       configurable: true,
     })
     const result = detectAdaptiveTier()
@@ -65,7 +65,27 @@ describe('detectAdaptiveTier', () => {
     expect(result.motion).toBe(1)
   })
 
-  it('returns premium on fast 4g (>5Mbps)', () => {
+  it('returns standard on decent 3g (>0.5Mbps)', () => {
+    Object.defineProperty(navigator, 'connection', {
+      value: { effectiveType: '3g', downlink: 1.0 },
+      configurable: true,
+    })
+    const result = detectAdaptiveTier()
+    expect(result.tier).toBe('standard')
+    expect(result.motion).toBe(2)
+  })
+
+  it('returns premium on 4g with >= 1Mbps', () => {
+    Object.defineProperty(navigator, 'connection', {
+      value: { effectiveType: '4g', downlink: 1.0 },
+      configurable: true,
+    })
+    const result = detectAdaptiveTier()
+    expect(result.tier).toBe('premium')
+    expect(result.motion).toBe(3)
+  })
+
+  it('returns premium on fast 4g', () => {
     Object.defineProperty(navigator, 'connection', {
       value: { effectiveType: '4g', downlink: 10 },
       configurable: true,
@@ -75,19 +95,9 @@ describe('detectAdaptiveTier', () => {
     expect(result.motion).toBe(3)
   })
 
-  it('returns standard on moderate 4g (1.5-5Mbps)', () => {
+  it('returns standard on very slow 4g (<0.4Mbps)', () => {
     Object.defineProperty(navigator, 'connection', {
-      value: { effectiveType: '4g', downlink: 3 },
-      configurable: true,
-    })
-    const result = detectAdaptiveTier()
-    expect(result.tier).toBe('standard')
-    expect(result.motion).toBe(2)
-  })
-
-  it('returns standard on slow 4g (<1.5Mbps)', () => {
-    Object.defineProperty(navigator, 'connection', {
-      value: { effectiveType: '4g', downlink: 0.8 },
+      value: { effectiveType: '4g', downlink: 0.3, rtt: 500 },
       configurable: true,
     })
     const result = detectAdaptiveTier()
