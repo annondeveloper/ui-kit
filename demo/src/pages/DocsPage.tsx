@@ -8,6 +8,7 @@ import { useStyles } from '@ui/core/styles/use-styles'
 import { MarkdownPage } from '../components/MarkdownPage'
 
 // Import docs as raw strings
+import gettingStartedMd from '../../../docs/getting-started.md?raw'
 import migrationMd from '../../../docs/migration-v2.md?raw'
 import themingMd from '../../../docs/theming.md?raw'
 import formsMd from '../../../docs/forms.md?raw'
@@ -164,7 +165,7 @@ const styles = css`
 `
 
 const quickLinks: { id: string; icon: IconName; title: string; desc: string }[] = [
-  { id: 'overview', icon: 'zap', title: 'Getting Started', desc: 'Migration guide and quick setup for v2' },
+  { id: 'getting-started', icon: 'zap', title: 'Getting Started', desc: 'Installation, CSS setup, and first component' },
   { id: 'theming', icon: 'settings', title: 'Theming', desc: 'OKLCH color system and Aurora Fluid tokens' },
   { id: 'forms', icon: 'edit', title: 'Forms', desc: 'Zero-dependency form engine with validation' },
   { id: 'animation', icon: 'activity', title: 'Animation', desc: 'Physics-based spring animations and WAAPI' },
@@ -180,6 +181,7 @@ const newFeatures: { icon: IconName; label: string }[] = [
 ]
 
 const docTabs = [
+  { id: 'getting-started', label: 'Getting Started' },
   { id: 'overview', label: 'Overview' },
   { id: 'theming', label: 'Theming' },
   { id: 'forms', label: 'Forms' },
@@ -195,6 +197,7 @@ const docTabs = [
 ]
 
 const docs: Record<string, string> = {
+  'getting-started': gettingStartedMd,
   overview: migrationMd,
   theming: themingMd,
   forms: formsMd,
@@ -211,7 +214,7 @@ const docs: Record<string, string> = {
 
 export default function DocsPage() {
   const [searchParams] = useSearchParams()
-  const initialTab = searchParams.get('tab') || 'overview'
+  const initialTab = searchParams.get('tab') || 'getting-started'
   const [activeTab, setActiveTab] = useState(initialTab)
   useStyles('docs-page', styles)
 

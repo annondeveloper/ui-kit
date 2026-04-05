@@ -25,12 +25,18 @@ Browse all components with optional filters.
 | `category` | string? | Filter by category (e.g. "layout", "input") |
 | `tier` | string? | Filter by tier: "standard", "lite", or "premium" |
 
+Every response includes the CSS setup reminder and the full component list with tier/category metadata.
+
 ### 2. `get_component`
 Get full API documentation for a single component — props table, examples, accessibility notes, related components.
 
 | Parameter | Type | Description |
 |-----------|------|-------------|
 | `name` | string | Component name, e.g. "Button" or "Calendar" |
+
+**Fuzzy matching:** If the exact name isn't found, the server suggests similar names using substring matching and edit distance. For example, asking for "Buton" returns suggestions like "Button", "ButtonGroup".
+
+Every response includes the CSS setup note and the design best practices guide (layout patterns, spacing rules, color tokens, motion, accessibility).
 
 ### 3. `search_components`
 Natural language search across components by use-case or keyword.
@@ -62,6 +68,68 @@ Browse the built-in SVG icon set.
 | Parameter | Type | Description |
 |-----------|------|-------------|
 | `search` | string? | Filter icons by name or keyword |
+
+### 7. `get_started`
+Complete setup guide for new projects. Start here if using UI Kit for the first time.
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `framework` | "nextjs" \| "vite" \| "remix" \| "cra" \| "other" | Your framework (default: "nextjs") |
+
+Returns a step-by-step guide covering installation, CSS imports (with the correct entry file for your framework), UIProvider setup, first component example, weight tier overview, and theming. Also lists next-step tool recommendations.
+
+### 8. `get_page_template`
+Get a complete, working page scaffold with proper layout and spacing. Returns production-ready, copy-paste code.
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `template` | enum | Page type (see below) |
+| `tier` | "standard" \| "lite" \| "premium" | Component tier (default: "standard") |
+
+**7 templates:**
+
+| Template | Description |
+|----------|-------------|
+| `dashboard` | Stats overview + content sections with StatsGrid, Toolbar, ListLayout, CardGrid |
+| `settings` | Form sections with SectionHeader, Card, FormInput, ToggleSwitch, save actions |
+| `list` | Searchable, filterable list with Toolbar, SearchInput, Pagination |
+| `detail` | Single item view with breadcrumbs, CardGrid, PropertyList |
+| `empty` | Empty state page with EmptyState component and CTA |
+| `auth` | Centered login/signup form with Card and FormInput |
+| `landing` | Hero section + feature cards + CTA buttons |
+
+Each template includes:
+- CSS imports at the top (so the output works immediately)
+- UIProvider wrapper
+- Correct import path for the selected tier
+- Layout component reference table
+- CSS setup reminder
+
+## Design Guide in Responses
+
+The `get_component` tool appends a design best practices guide to every response, covering:
+
+- **Layout pattern** — always wrap pages with `<PageShell>`, use layout primitives
+- **Spacing rules** — use layout components instead of manual margins
+- **Responsive design** — all layout components are responsive by default
+- **Color & theme** — use semantic tokens (`var(--text-primary)`), never hardcoded hex
+- **Typography** — use PageHeader/SectionHeader for fluid sizing
+- **Motion** — components respect `prefers-reduced-motion` automatically
+- **Accessibility** — WCAG AA contrast, ARIA attributes, keyboard nav are built-in
+- **Common patterns** — dashboard, settings, list view, detail view component trees
+
+## CSS Setup Note
+
+Every tool that returns component code includes this reminder:
+
+> **Required CSS Setup** — Add these imports to your root layout:
+> ```tsx
+> import '@annondeveloper/ui-kit/css/theme.css'
+> import '@annondeveloper/ui-kit/css/all.css'
+> ```
+> Without these imports, components will render with correct HTML/ARIA but no visual styling.
+
+This appears in responses from `list_components`, `get_component`, `generate_snippet`, and `get_page_template`.
 
 ## Resource URIs
 

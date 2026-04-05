@@ -7,7 +7,7 @@
 
 # @annondeveloper/ui-kit v2
 
-> The first React component library built for AI agents. 147 zero-dependency components that AI assistants can discover, understand, and use via MCP.
+> The first React component library built for AI agents. 159 zero-dependency components that AI assistants can discover, understand, and use via MCP.
 
 ## How It Works
 
@@ -17,7 +17,17 @@
 npm install @annondeveloper/ui-kit
 ```
 
-**Step 2.** Connect your AI assistant (pick one)
+**Step 2.** Import CSS (required!)
+
+```tsx
+// Add to your root layout (app/layout.tsx, src/main.tsx, etc.)
+import '@annondeveloper/ui-kit/css/theme.css'
+import '@annondeveloper/ui-kit/css/all.css'
+```
+
+> **Without these imports, components render correct HTML but have no visual styling.**
+
+**Step 3.** Connect your AI assistant (pick one)
 
 ```bash
 # Zero setup — hosted MCP (works instantly, no install needed)
@@ -27,25 +37,41 @@ npm install @annondeveloper/ui-kit
 npx @annondeveloper/ui-kit mcp
 ```
 
-**Step 3.** Ask your AI to build
+**Step 4.** Ask your AI to build
 
 > "Build a dashboard with MetricCard, DataTable, and TimeSeriesChart using ui-kit"
 
 Your AI generates production code directly:
 
 ```tsx
-import { UIProvider, MetricCard, DataTable, TimeSeriesChart } from '@annondeveloper/ui-kit'
+import '@annondeveloper/ui-kit/css/theme.css'
+import '@annondeveloper/ui-kit/css/all.css'
+import {
+  UIProvider, PageShell, PageHeader, StatsGrid, MetricCard,
+  SectionHeader, CardGrid, Card, Toolbar, SearchInput, Button
+} from '@annondeveloper/ui-kit'
 
-function Dashboard({ metrics, tableData, series }) {
+function Dashboard() {
   return (
     <UIProvider>
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1rem' }}>
-        <MetricCard title="Requests" value="12.4K" trend="up" />
-        <MetricCard title="Latency" value="42ms" trend="down" />
-        <MetricCard title="Error Rate" value="0.12%" trend="down" />
-      </div>
-      <TimeSeriesChart series={series} height={300} />
-      <DataTable columns={columns} data={tableData} searchPlaceholder="Search..." />
+      <PageShell padding="lg" maxWidth="xl">
+        <PageHeader title="Dashboard" description="System overview" />
+        <StatsGrid columns={3}>
+          <MetricCard label="Requests" value="12.4K" trend={12} status="ok" />
+          <MetricCard label="Latency" value="42ms" trend={-5} status="ok" />
+          <MetricCard label="Errors" value="0.12%" status="critical" />
+        </StatsGrid>
+        <Toolbar justify="between">
+          <SearchInput placeholder="Search..." />
+          <Button variant="primary">Export</Button>
+        </Toolbar>
+        <SectionHeader title="Services" action={<Button variant="ghost" size="sm">View All</Button>} />
+        <CardGrid columns={3}>
+          <Card padding="md"><h3>API Gateway</h3><p>Healthy</p></Card>
+          <Card padding="md"><h3>Database</h3><p>Healthy</p></Card>
+          <Card padding="md"><h3>Cache</h3><p>Warning</p></Card>
+        </CardGrid>
+      </PageShell>
     </UIProvider>
   )
 }
@@ -53,16 +79,18 @@ function Dashboard({ metrics, tableData, series }) {
 
 ## MCP Server
 
-The built-in MCP server exposes 6 tools that give AI assistants structured access to the full component library:
+The built-in MCP server exposes 8 tools that give AI assistants structured access to the full component library:
 
 | Tool | What it does |
 |------|-------------|
-| `list_components` | Browse all 147 components with descriptions, filterable by category or tier |
-| `get_component` | Get full API reference for any component — props, types, defaults, code examples |
+| `list_components` | Browse all 159 components with descriptions, filterable by category or tier |
+| `get_component` | Get full API reference for any component — props, types, defaults, code examples, design guide |
 | `search_components` | Semantic search across components by use case (e.g., "data visualization", "form inputs") |
-| `get_theme` | Retrieve theme tokens, OKLCH color system details, and customization API |
 | `generate_snippet` | Generate working TSX code with correct imports for any component combination |
+| `get_theme` | Retrieve theme tokens, OKLCH color system details, and customization API |
 | `get_icons` | Browse 50+ built-in SVG icons with search and usage examples |
+| `get_started` | Complete setup guide for new projects — framework-aware (Next.js, Vite, Remix) |
+| `get_page_template` | Full page scaffolds: dashboard, settings, list, detail, empty, auth, landing |
 
 ### Hosted (zero setup — just add the URL)
 
