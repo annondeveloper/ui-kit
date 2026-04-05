@@ -25,8 +25,8 @@ const cardGridStyles = css`
       }
 
       /* Gap sizes */
-      :scope[data-gap="sm"] { gap: var(--space-sm, 0.5rem); }
-      :scope[data-gap="md"] { gap: var(--space-md, 1rem); }
+      :scope[data-gap="sm"] { gap: var(--space-sm, 0.75rem); }
+      :scope[data-gap="md"] { gap: var(--space-md, 1.25rem); }
       :scope[data-gap="lg"] { gap: var(--space-lg, 1.5rem); }
 
       /* Fixed column counts (when no --card-grid-min-child-width) */

@@ -20,6 +20,7 @@ const statsGridStyles = css`
       :scope {
         display: grid;
         inline-size: 100%;
+        margin-block-end: var(--space-lg, 1.5rem);
       }
 
       /* Gap sizes */

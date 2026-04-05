@@ -24,7 +24,8 @@ const toolbarStyles = css`
       :scope {
         display: flex;
         align-items: center;
-        padding-block: var(--space-sm, 0.5rem);
+        padding-block: var(--space-sm, 0.75rem);
+        margin-block-end: var(--space-md, 1rem);
       }
 
       /* Gap variants */

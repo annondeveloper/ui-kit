@@ -24,8 +24,15 @@ const sectionHeaderStyles = css`
         align-items: flex-start;
         justify-content: space-between;
         gap: var(--space-md, 1rem);
+        margin-block-start: var(--space-xl, 2rem);
+        margin-block-end: var(--space-sm, 0.75rem);
         padding-block-end: var(--space-md, 1rem);
         border-block-end: 1px solid var(--border-subtle, oklch(100% 0 0 / 0.06));
+      }
+
+      /* Remove top margin when first child of its parent */
+      :scope:first-child {
+        margin-block-start: 0;
       }
 
       .ui-section-header__left {

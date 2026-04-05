@@ -68,12 +68,12 @@
   --text-xl: clamp(1.25rem, 1rem + 0.8vw, 1.75rem);
   --text-2xl: clamp(1.5rem, 1.1rem + 1.3vw, 2.5rem);
 
-  /* Fluid spacing */
-  --space-xs: clamp(0.25rem, 0.2rem + 0.15vw, 0.375rem);
-  --space-sm: clamp(0.375rem, 0.3rem + 0.25vw, 0.625rem);
-  --space-md: clamp(0.5rem, 0.4rem + 0.4vw, 1rem);
-  --space-lg: clamp(0.75rem, 0.5rem + 0.8vw, 1.5rem);
-  --space-xl: clamp(1rem, 0.6rem + 1.3vw, 2.5rem);
+  /* Fluid spacing — based on 4px base unit (industry standard) */
+  --space-xs: clamp(0.25rem, 0.2rem + 0.15vw, 0.5rem);     /* 4–8px */
+  --space-sm: clamp(0.5rem, 0.4rem + 0.25vw, 0.75rem);      /* 8–12px */
+  --space-md: clamp(1rem, 0.8rem + 0.4vw, 1.25rem);          /* 16–20px */
+  --space-lg: clamp(1.5rem, 1.2rem + 0.8vw, 2rem);           /* 24–32px */
+  --space-xl: clamp(2rem, 1.5rem + 1.3vw, 3rem);             /* 32–48px */
 
   /* Icon sizes */
   --icon-sm: clamp(14px, 12px + 0.15vw, 16px);

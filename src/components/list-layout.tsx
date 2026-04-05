@@ -25,6 +25,11 @@ const listLayoutStyles = css`
         inline-size: 100%;
       }
 
+      /* Direct children get internal padding for breathing room */
+      :scope > * {
+        padding: var(--space-sm, 0.75rem) var(--space-md, 1rem);
+      }
+
       /* Gap sizes */
       :scope[data-gap="sm"] { gap: var(--space-sm, 0.5rem); }
       :scope[data-gap="md"] { gap: var(--space-md, 1rem); }

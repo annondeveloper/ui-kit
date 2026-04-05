@@ -55,9 +55,9 @@ const cardStyles = css`
 
       /* Padding */
       :scope[data-padding="none"] { padding: 0; }
-      :scope[data-padding="sm"] { padding: var(--space-sm, 0.5rem); }
-      :scope[data-padding="md"] { padding: var(--space-md, 1rem); }
-      :scope[data-padding="lg"] { padding: var(--space-lg, 1.5rem); }
+      :scope[data-padding="sm"] { padding: var(--space-sm, 0.75rem); }
+      :scope[data-padding="md"] { padding: var(--space-md, 1.25rem); }
+      :scope[data-padding="lg"] { padding: var(--space-lg, 1.75rem); }
 
       /* Variants */
       :scope[data-variant="default"] {

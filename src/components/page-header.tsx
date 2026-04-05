@@ -25,6 +25,7 @@ const pageHeaderStyles = css`
         display: flex;
         flex-direction: column;
         gap: var(--space-sm, 0.5rem);
+        margin-block-end: var(--space-lg, 1.5rem);
       }
 
       .ui-page-header__breadcrumbs {

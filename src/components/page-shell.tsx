@@ -38,12 +38,12 @@ const pageShellStyles = css`
         padding-block: clamp(0.5rem, 2vh, 1rem);
       }
       :scope[data-padding="md"] {
-        padding-inline: clamp(1rem, 4vw, 2rem);
-        padding-block: clamp(1rem, 3vh, 1.5rem);
+        padding-inline: clamp(1.5rem, 4vw, 2.5rem);
+        padding-block: clamp(1.5rem, 3vh, 2rem);
       }
       :scope[data-padding="lg"] {
-        padding-inline: clamp(1.5rem, 6vw, 3rem);
-        padding-block: clamp(1.5rem, 4vh, 2.5rem);
+        padding-inline: clamp(2rem, 6vw, 3.5rem);
+        padding-block: clamp(2rem, 4vh, 3rem);
       }
 
       /* Print */
