@@ -52,6 +52,49 @@ import '@annondeveloper/ui-kit/css/theme.css'
 import '@annondeveloper/ui-kit/css/all.css'
 ```
 
+### SSR / Server-Side Rendering
+
+The CSS imports above work out-of-the-box for SSR (Next.js, Remix, Astro, Vite SSR) — styles are bundled into your CSS output and included in the initial HTML, so there is **no flash of unstyled content (FOUC)**.
+
+For **dynamic theming during SSR** (e.g., generating a theme from a database-stored brand color), use the `StyleCollector`:
+
+```tsx
+// app/registry.tsx ('use client') — Next.js App Router
+import { useServerInsertedHTML } from 'next/navigation'
+import { StyleCollector, StyleProvider } from '@annondeveloper/ui-kit'
+import { useState } from 'react'
+
+export function StyleRegistry({ children }: { children: React.ReactNode }) {
+  const [collector] = useState(() => new StyleCollector())
+
+  useServerInsertedHTML(() => {
+    const css = collector.collect()
+    collector.clear()
+    return css ? <style data-ui-kit>{css}</style> : null
+  })
+
+  return <StyleProvider collector={collector}>{children}</StyleProvider>
+}
+```
+
+```tsx
+// app/layout.tsx
+import '@annondeveloper/ui-kit/css/theme.css'
+import { StyleRegistry } from './registry'
+
+export default function RootLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <html lang="en">
+      <body>
+        <StyleRegistry>{children}</StyleRegistry>
+      </body>
+    </html>
+  )
+}
+```
+
+> **Most projects don't need `StyleCollector`** — the static CSS imports handle everything. Only use it if you need server-side dynamic theme generation.
+
 ### Alternative: Per-component CSS
 
 If you only use a few components and want smaller bundles:

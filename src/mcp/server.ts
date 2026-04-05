@@ -327,6 +327,7 @@ import '@annondeveloper/ui-kit/css/theme.css'
 import '@annondeveloper/ui-kit/css/all.css'
 \`\`\`
 > Without CSS imports, components render correct HTML but have **no visual styling**.
+> These CSS imports are SSR-safe — they're bundled into your CSS output and included in the initial HTML, preventing any flash of unstyled content (FOUC).
 
 ## Step 3: Wrap with UIProvider
 \`\`\`tsx
