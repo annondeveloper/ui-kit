@@ -4,6 +4,8 @@ import { useState, useMemo, useCallback, useRef, useEffect } from 'react'
 import { css } from '@ui/core/styles/css-tag'
 import { useStyles } from '@ui/core/styles/use-styles'
 import { Card3D } from '@ui/domain/card-3d'
+import { Card3D as LiteCard3D } from '@ui/lite/card-3d'
+import { Card3D as PremiumCard3D } from '@ui/premium/card-3d'
 import { Button } from '@ui/components/button'
 import { Card } from '@ui/components/card'
 import { CopyBlock } from '@ui/domain/copy-block'
@@ -669,6 +671,22 @@ const pageStyles = css`
       }
       :scope ::-webkit-scrollbar-thumb:hover {
         background: var(--border-strong);
+      }
+
+      /* ── Source link ─────────────────────────────────── */
+
+      .card-3d-page__source-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        color: var(--text-secondary);
+        font-size: var(--text-sm, 0.875rem);
+        text-decoration: none;
+        font-weight: 500;
+      }
+      .card-3d-page__source-link:hover {
+        text-decoration: underline;
+        text-underline-offset: 0.2em;
       }
     }
   }
@@ -1356,12 +1374,12 @@ export default function Card3dPage() {
               import {'{'} Card3D {'}'} from '@annondeveloper/ui-kit/lite'
             </div>
             <div className="card-3d-page__tier-preview">
-              <Card3D motion={0}>
+              <LiteCard3D>
                 <div className="card-3d-page__demo-content" style={{ padding: '0.75rem', textAlign: 'center' }}>
                   <h3 style={{ fontSize: '0.75rem' }}>Lite</h3>
                   <p style={{ fontSize: '0.625rem' }}>CSS hover only</p>
                 </div>
-              </Card3D>
+              </LiteCard3D>
             </div>
             <div className="card-3d-page__size-breakdown">
               <div className="card-3d-page__size-row">
@@ -1428,12 +1446,12 @@ export default function Card3dPage() {
               import {'{'} Card3D {'}'} from '@annondeveloper/ui-kit/premium'
             </div>
             <div className="card-3d-page__tier-preview">
-              <Card3D maxTilt={15} perspective={800}>
+              <PremiumCard3D maxTilt={15} perspective={800}>
                 <div className="card-3d-page__demo-content" style={{ padding: '0.75rem', textAlign: 'center' }}>
                   <h3 style={{ fontSize: '0.75rem' }}>Premium</h3>
                   <p style={{ fontSize: '0.625rem' }}>Spring + parallax</p>
                 </div>
-              </Card3D>
+              </PremiumCard3D>
             </div>
             <div className="card-3d-page__size-breakdown">
               <div className="card-3d-page__size-row">
@@ -1546,6 +1564,45 @@ export default function Card3dPage() {
             </li>
           </ul>
         </Card>
+      </section>
+
+      {/* ── 10. Source ──────────────────────────────────── */}
+      <section className="card-3d-page__section" id="source">
+        <h2 className="card-3d-page__section-title">
+          <a href="#source">Source</a>
+        </h2>
+        <p className="card-3d-page__section-desc">
+          View the component source on GitHub.
+        </p>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+          <a
+            href="https://github.com/annondeveloper/ui-kit/blob/main/src/domain/card-3d.tsx"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="card-3d-page__source-link"
+          >
+            <Icon name="code" size="sm" />
+            src/domain/card-3d.tsx
+          </a>
+          <a
+            href="https://github.com/annondeveloper/ui-kit/blob/main/src/lite/card-3d.tsx"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="card-3d-page__source-link"
+          >
+            <Icon name="code" size="sm" />
+            src/lite/card-3d.tsx
+          </a>
+          <a
+            href="https://github.com/annondeveloper/ui-kit/blob/main/src/premium/card-3d.tsx"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="card-3d-page__source-link"
+          >
+            <Icon name="code" size="sm" />
+            src/premium/card-3d.tsx
+          </a>
+        </div>
       </section>
     </div>
   )

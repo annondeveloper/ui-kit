@@ -498,6 +498,20 @@ const pageStyles = css`
         padding-block-start: 0.5rem;
       }
 
+      .density-selector-page__size-breakdown {
+        display: flex;
+        flex-direction: column;
+        gap: 0.25rem;
+        font-size: 0.75rem;
+        color: var(--text-tertiary);
+      }
+
+      .density-selector-page__size-row {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+
       /* ── Code tabs ─────────────────────────────────── */
 
       .density-selector-page__code-tabs {
@@ -1253,6 +1267,13 @@ const [density, setDensity] = useState('comfortable')
             <div className="density-selector-page__tier-preview">
               <LiteDensitySelector defaultValue="comfortable" />
             </div>
+            <div className="density-selector-page__size-breakdown">
+              <div className="density-selector-page__size-row">
+                <span>Component: <strong style={{ color: 'var(--text-primary)' }}>0.4 KB</strong></span>
+                <span>+ Shared: <strong style={{ color: 'var(--text-primary)' }}>0.0 KB</strong></span>
+                <span>= <strong style={{ color: 'var(--brand)' }}>0.4 KB</strong> gzip</span>
+              </div>
+            </div>
           </div>
 
           {/* Standard */}
@@ -1277,6 +1298,13 @@ const [density, setDensity] = useState('comfortable')
             <div className="density-selector-page__tier-preview">
               <DensitySelector defaultValue="comfortable" />
             </div>
+            <div className="density-selector-page__size-breakdown">
+              <div className="density-selector-page__size-row">
+                <span>Component: <strong style={{ color: 'var(--text-primary)' }}>1.8 KB</strong></span>
+                <span>+ Shared: <strong style={{ color: 'var(--text-primary)' }}>0.9 KB</strong></span>
+                <span>= <strong style={{ color: 'var(--brand)' }}>2.7 KB</strong> gzip</span>
+              </div>
+            </div>
           </div>
 
           {/* Premium */}
@@ -1300,6 +1328,13 @@ const [density, setDensity] = useState('comfortable')
             </div>
             <div className="density-selector-page__tier-preview">
               <PremiumDensitySelector defaultValue="comfortable" />
+            </div>
+            <div className="density-selector-page__size-breakdown">
+              <div className="density-selector-page__size-row">
+                <span>Component: <strong style={{ color: 'var(--text-primary)' }}>2.5 KB</strong></span>
+                <span>+ Shared: <strong style={{ color: 'var(--text-primary)' }}>0.9 KB</strong></span>
+                <span>= <strong style={{ color: 'var(--brand)' }}>3.4 KB</strong> gzip</span>
+              </div>
             </div>
           </div>
         </div>

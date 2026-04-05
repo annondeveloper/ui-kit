@@ -5,11 +5,16 @@ import { css } from '@ui/core/styles/css-tag'
 import { useStyles } from '@ui/core/styles/use-styles'
 import { Popover } from '@ui/components/popover'
 import { Popover as LitePopover } from '@ui/lite/popover'
+import { Popover as PremiumPopover } from '@ui/premium/popover'
 import { Button } from '@ui/components/button'
 import { Card } from '@ui/components/card'
 import { CopyBlock } from '@ui/domain/copy-block'
 import { Tabs, TabPanel } from '@ui/components/tabs'
 import { Icon } from '@ui/core/icons/icon'
+import { generateTheme } from '@ui/core/tokens/generator'
+import { TOKEN_TO_CSS, type ThemeTokens } from '@ui/core/tokens/tokens'
+import { useTheme } from '@ui/core/tokens/theme-context'
+import { ColorInput } from '@ui/components/color-input'
 import { PropsTable, type PropDef } from '../../components/PropsTable'
 import { useTier, type Tier } from '../../App'
 
@@ -531,6 +536,36 @@ const pageStyles = css`
         text-underline-offset: 0.2em;
       }
 
+      /* ── Color picker ──────────────────────────────── */
+
+      .popover-page__color-presets {
+        display: flex;
+        gap: 0.25rem;
+        flex-wrap: wrap;
+      }
+
+      .popover-page__color-preset {
+        inline-size: 24px;
+        block-size: 24px;
+        border-radius: 50%;
+        border: 2px solid transparent;
+        cursor: pointer;
+        padding: 0;
+        transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1),
+                    border-color 0.15s,
+                    box-shadow 0.15s;
+        box-shadow: 0 1px 3px oklch(0% 0 0 / 0.2);
+      }
+      .popover-page__color-preset:hover {
+        transform: scale(1.2);
+        box-shadow: 0 2px 8px oklch(0% 0 0 / 0.3);
+      }
+      .popover-page__color-preset--active {
+        border-color: oklch(100% 0 0);
+        transform: scale(1.2);
+        box-shadow: 0 0 0 2px var(--bg-base), 0 0 0 4px oklch(100% 0 0 / 0.5);
+      }
+
       /* ── Popover demo content ───────────────────────── */
 
       .popover-page__popover-content {
@@ -1012,6 +1047,17 @@ function PlaygroundSection({ tier: tierProp }: { tier: Tier }) {
               <LitePopover open content={<PopoverDemoContent />}>
                 <Button>Lite Popover Trigger</Button>
               </LitePopover>
+            ) : tier === 'premium' ? (
+              <PremiumPopover
+                placement={placement}
+                arrow={arrow}
+                modal={modal}
+                offset={offset}
+                motion={motion}
+                content={<PopoverDemoContent />}
+              >
+                <Button>Open Premium Popover</Button>
+              </PremiumPopover>
             ) : (
               <Popover
                 placement={placement}
@@ -1101,12 +1147,47 @@ function PlaygroundSection({ tier: tierProp }: { tier: Tier }) {
   )
 }
 
+const COLOR_PRESETS = [
+  { hex: '#6366f1', name: 'Indigo' },
+  { hex: '#f97316', name: 'Orange' },
+  { hex: '#f43f5e', name: 'Rose' },
+  { hex: '#0ea5e9', name: 'Sky' },
+  { hex: '#10b981', name: 'Emerald' },
+  { hex: '#8b5cf6', name: 'Violet' },
+  { hex: '#d946ef', name: 'Fuchsia' },
+  { hex: '#f59e0b', name: 'Amber' },
+  { hex: '#06b6d4', name: 'Cyan' },
+  { hex: '#64748b', name: 'Slate' },
+]
+
 // ─── Main Page ────────────────────────────────────────────────────────────────
 
 export default function PopoverPage() {
   useStyles('popover-page', pageStyles)
 
   const { tier, setTier } = useTier()
+  const [brandColor, setBrandColor] = useState('#6366f1')
+  const { mode } = useTheme()
+
+  const themeTokens = useMemo(() => {
+    try { return generateTheme(brandColor, mode) } catch { return null }
+  }, [brandColor, mode])
+
+  const BRAND_ONLY_KEYS: (keyof ThemeTokens)[] = [
+    'brand', 'brandLight', 'brandDark', 'brandSubtle', 'brandGlow',
+    'borderGlow', 'aurora1', 'aurora2',
+  ]
+
+  const themeStyle = useMemo(() => {
+    if (!themeTokens || brandColor === '#6366f1') return undefined
+    const style: Record<string, string> = {}
+    for (const key of BRAND_ONLY_KEYS) {
+      const cssVar = TOKEN_TO_CSS[key]
+      const value = themeTokens[key]
+      if (cssVar && value) style[cssVar] = value
+    }
+    return style as React.CSSProperties
+  }, [themeTokens, brandColor])
 
   // Scroll reveal — JS fallback for browsers without animation-timeline
   useEffect(() => {
@@ -1141,7 +1222,7 @@ export default function PopoverPage() {
   }, [])
 
   return (
-    <div className="popover-page">
+    <div className="popover-page" style={themeStyle}>
       {/* ── 1. Hero Header ──────────────────────────────── */}
       <div className="popover-page__hero">
         <h1 className="popover-page__title">Popover</h1>
@@ -1369,9 +1450,9 @@ export default function PopoverPage() {
               import {'{'} Popover {'}'} from '@annondeveloper/ui-kit/premium'
             </div>
             <div className="popover-page__tier-preview">
-              <Popover content={<span style={{ fontSize: '0.75rem' }}>Preview content</span>}>
+              <PremiumPopover content={<span style={{ fontSize: '0.75rem' }}>Preview content</span>}>
                 <Button variant="primary" size="sm">Premium</Button>
-              </Popover>
+              </PremiumPopover>
             </div>
             <div className="popover-page__size-breakdown">
               <div className="popover-page__size-row">
@@ -1458,6 +1539,60 @@ export default function PopoverPage() {
             </li>
           </ul>
         </Card>
+      </section>
+
+      {/* ── Brand Color ───────────────────────────────── */}
+      <section className="popover-page__section" id="brand-color">
+        <h2 className="popover-page__section-title">
+          <a href="#brand-color">Brand Color</a>
+        </h2>
+        <p className="popover-page__section-desc">
+          Pick a brand color to see popover accents and panel glow update in real-time.
+        </p>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+          <ColorInput
+            name="brand-color"
+            value={brandColor}
+            onChange={setBrandColor}
+            size="sm"
+            swatches={['#6366f1','#f97316','#f43f5e','#0ea5e9','#10b981','#8b5cf6','#d946ef','#f59e0b','#06b6d4','#64748b']}
+          />
+          <div className="popover-page__color-presets">
+            {COLOR_PRESETS.map(p => (
+              <button
+                key={p.hex}
+                type="button"
+                className={`popover-page__color-preset${brandColor === p.hex ? ' popover-page__color-preset--active' : ''}`}
+                style={{ background: p.hex }}
+                onClick={() => setBrandColor(p.hex)}
+                title={p.name}
+                aria-label={`Set brand color to ${p.name}`}
+              />
+            ))}
+          </div>
+          {brandColor !== '#6366f1' && (
+            <Button size="xs" variant="ghost" onClick={() => setBrandColor('#6366f1')}>
+              <Icon name="refresh" size="sm" /> Reset to default
+            </Button>
+          )}
+        </div>
+      </section>
+
+      {/* ── Source ──────────────────────────────────────── */}
+      <section className="popover-page__section" id="source">
+        <h2 className="popover-page__section-title"><a href="#source">Source</a></h2>
+        <p className="popover-page__section-desc">View the full component source code on GitHub.</p>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+          <a className="popover-page__source-link" href="https://github.com/annondeveloper/ui-kit/blob/main/src/components/popover.tsx" target="_blank" rel="noopener noreferrer">
+            <Icon name="code" size="sm" /> src/components/popover.tsx (Standard)
+          </a>
+          <a className="popover-page__source-link" href="https://github.com/annondeveloper/ui-kit/blob/main/src/lite/popover.tsx" target="_blank" rel="noopener noreferrer">
+            <Icon name="code" size="sm" /> src/lite/popover.tsx (Lite)
+          </a>
+          <a className="popover-page__source-link" href="https://github.com/annondeveloper/ui-kit/blob/main/src/premium/popover.tsx" target="_blank" rel="noopener noreferrer">
+            <Icon name="code" size="sm" /> src/premium/popover.tsx (Premium)
+          </a>
+        </div>
       </section>
     </div>
   )

@@ -5,6 +5,7 @@ import { css } from '@ui/core/styles/css-tag'
 import { useStyles } from '@ui/core/styles/use-styles'
 import { OtpInput } from '@ui/components/otp-input'
 import { OtpInput as LiteOtpInput } from '@ui/lite/otp-input'
+import { OtpInput as PremiumOtpInput } from '@ui/premium/otp-input'
 import { Button } from '@ui/components/button'
 import { Card } from '@ui/components/card'
 import { CopyBlock } from '@ui/domain/copy-block'
@@ -455,6 +456,16 @@ const pageStyles = css`
         .otp-input-page__preview { padding: 3.5rem; }
       }
 
+      /* ── Source link ─────────────────────────────────── */
+
+      .otp-input-page__source-link {
+        color: var(--brand);
+        text-decoration: none;
+      }
+      .otp-input-page__source-link:hover {
+        text-decoration: underline;
+      }
+
       .otp-input-page__import-code,
       .otp-input-page code,
       pre { overflow-x: auto; scrollbar-width: thin; scrollbar-color: var(--border-default) transparent; max-inline-size: 100%; }
@@ -719,6 +730,18 @@ function PlaygroundSection({ tier: tierProp }: { tier: Tier }) {
                 onComplete={handleComplete}
                 error={errorText || undefined}
               />
+            ) : tier === 'premium' ? (
+              <PremiumOtpInput
+                length={length}
+                size={size}
+                type={type}
+                disabled={disabled}
+                error={errorText || undefined}
+                motion={motion}
+                value={otpValue}
+                onChange={setOtpValue}
+                onComplete={handleComplete}
+              />
             ) : (
               <OtpInput
                 length={length}
@@ -829,6 +852,16 @@ function VerificationFlowDemo({ tier }: { tier: Tier }) {
           onChange={(v) => { setOtp(v); setStatus('idle') }}
           onComplete={handleComplete}
           error={status === 'error' ? 'Invalid code. Try again.' : undefined}
+        />
+      ) : tier === 'premium' ? (
+        <PremiumOtpInput
+          length={6}
+          size="md"
+          value={otp}
+          onChange={(v) => { setOtp(v); setStatus('idle') }}
+          onComplete={handleComplete}
+          error={status === 'error' ? 'Invalid code. Try again.' : undefined}
+          aria-label="Verification code"
         />
       ) : (
         <OtpInput
@@ -954,6 +987,12 @@ export default function OtpInputPage() {
               <div className="otp-input-page__labeled-item"><LiteOtpInput length={4} /><span className="otp-input-page__item-label">4 digits</span></div>
               <div className="otp-input-page__labeled-item"><LiteOtpInput length={6} /><span className="otp-input-page__item-label">6 digits</span></div>
             </>
+          ) : tier === 'premium' ? (
+            <>
+              <div className="otp-input-page__labeled-item"><PremiumOtpInput length={4} size="sm" aria-label="4-digit code" /><span className="otp-input-page__item-label">4 digits</span></div>
+              <div className="otp-input-page__labeled-item"><PremiumOtpInput length={6} size="sm" aria-label="6-digit code" /><span className="otp-input-page__item-label">6 digits</span></div>
+              <div className="otp-input-page__labeled-item"><PremiumOtpInput length={8} size="sm" aria-label="8-digit code" /><span className="otp-input-page__item-label">8 digits</span></div>
+            </>
           ) : (
             <>
               <div className="otp-input-page__labeled-item"><OtpInput length={4} size="sm" aria-label="4-digit code" /><span className="otp-input-page__item-label">4 digits</span></div>
@@ -972,19 +1011,19 @@ export default function OtpInputPage() {
         </p>
         <div className="otp-input-page__states-grid">
           <div className="otp-input-page__state-cell">
-            {tier === 'lite' ? <LiteOtpInput length={4} /> : <OtpInput length={4} size="sm" aria-label="Default" />}
+            {tier === 'lite' ? <LiteOtpInput length={4} /> : tier === 'premium' ? <PremiumOtpInput length={4} size="sm" aria-label="Default" /> : <OtpInput length={4} size="sm" aria-label="Default" />}
             <span className="otp-input-page__state-label">Default</span>
           </div>
           <div className="otp-input-page__state-cell">
-            {tier === 'lite' ? <LiteOtpInput length={4} value="1234" /> : <OtpInput length={4} size="sm" value="1234" aria-label="Filled" />}
+            {tier === 'lite' ? <LiteOtpInput length={4} value="1234" /> : tier === 'premium' ? <PremiumOtpInput length={4} size="sm" value="1234" aria-label="Filled" /> : <OtpInput length={4} size="sm" value="1234" aria-label="Filled" />}
             <span className="otp-input-page__state-label">Filled</span>
           </div>
           <div className="otp-input-page__state-cell">
-            {tier === 'lite' ? <LiteOtpInput length={4} error="Invalid code" /> : <OtpInput length={4} size="sm" error="Invalid code" value="9999" aria-label="Error" />}
+            {tier === 'lite' ? <LiteOtpInput length={4} error="Invalid code" /> : tier === 'premium' ? <PremiumOtpInput length={4} size="sm" error="Invalid code" value="9999" aria-label="Error" /> : <OtpInput length={4} size="sm" error="Invalid code" value="9999" aria-label="Error" />}
             <span className="otp-input-page__state-label">Error</span>
           </div>
           <div className="otp-input-page__state-cell">
-            {tier === 'lite' ? <LiteOtpInput length={4} /> : <OtpInput length={4} size="sm" disabled aria-label="Disabled" />}
+            {tier === 'lite' ? <LiteOtpInput length={4} /> : tier === 'premium' ? <PremiumOtpInput length={4} size="sm" disabled aria-label="Disabled" /> : <OtpInput length={4} size="sm" disabled aria-label="Disabled" />}
             <span className="otp-input-page__state-label">Disabled</span>
           </div>
         </div>
@@ -1132,7 +1171,7 @@ export default function OtpInputPage() {
               import {'{'} OtpInput {'}'} from '@annondeveloper/ui-kit/premium'
             </div>
             <div className="otp-input-page__tier-preview">
-              <OtpInput length={4} size="sm" value="42" aria-label="Premium preview" />
+              <PremiumOtpInput length={4} size="sm" value="42" aria-label="Premium preview" />
             </div>
             <div className="otp-input-page__size-breakdown">
               <div className="otp-input-page__size-row">
@@ -1198,6 +1237,23 @@ export default function OtpInputPage() {
             </li>
           </ul>
         </Card>
+      </section>
+
+      {/* ── Source ──────────────────────────────────────── */}
+      <section className="otp-input-page__section" id="source">
+        <h2 className="otp-input-page__section-title"><a href="#source">Source</a></h2>
+        <p className="otp-input-page__section-desc">View the full component source code on GitHub.</p>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+          <a className="otp-input-page__source-link" href="https://github.com/annondeveloper/ui-kit/blob/main/src/components/otp-input.tsx" target="_blank" rel="noopener noreferrer">
+            src/components/otp-input.tsx (Standard)
+          </a>
+          <a className="otp-input-page__source-link" href="https://github.com/annondeveloper/ui-kit/blob/main/src/lite/otp-input.tsx" target="_blank" rel="noopener noreferrer">
+            src/lite/otp-input.tsx (Lite)
+          </a>
+          <a className="otp-input-page__source-link" href="https://github.com/annondeveloper/ui-kit/blob/main/src/premium/otp-input.tsx" target="_blank" rel="noopener noreferrer">
+            src/premium/otp-input.tsx (Premium)
+          </a>
+        </div>
       </section>
     </div>
   )

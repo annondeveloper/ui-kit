@@ -11,6 +11,7 @@ import { Card } from '@ui/components/card'
 import { CopyBlock } from '@ui/domain/copy-block'
 import { Tabs, TabPanel } from '@ui/components/tabs'
 import { Icon } from '@ui/core/icons/icon'
+import { ColorInput } from '@ui/components/color-input'
 import { PropsTable, type PropDef } from '../../components/PropsTable'
 import { useTier, type Tier } from '../../App'
 
@@ -456,6 +457,19 @@ const pageStyles = css`
         display: flex;
         justify-content: center;
         padding-block-start: 0.5rem;
+      }
+
+      .column-visibility-toggle-page__size-breakdown {
+        display: flex;
+        flex-direction: column;
+        gap: 0.25rem;
+        font-size: 0.75rem;
+        color: var(--text-tertiary);
+      }
+      .column-visibility-toggle-page__size-row {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
       }
 
       /* ── Code tabs ─────────────────────────────────── */
@@ -1157,6 +1171,7 @@ export default function ColumnVisibilityTogglePage() {
   useStyles('column-visibility-toggle-page', pageStyles)
 
   const { tier, setTier } = useTier()
+  const [brandColor, setBrandColor] = useState('#6366f1')
 
   // Scroll reveal for sections -- JS fallback for browsers without animation-timeline
   useEffect(() => {
@@ -1334,6 +1349,13 @@ export default function ColumnVisibilityTogglePage() {
             <div className="column-visibility-toggle-page__tier-preview">
               <LiteColumnVisibilityToggle columns={DEFAULT_COLUMNS.map(c => ({ ...c }))} onChange={() => {}} />
             </div>
+            <div className="column-visibility-toggle-page__size-breakdown">
+              <div className="column-visibility-toggle-page__size-row">
+                <span>Component: <strong style={{ color: 'var(--text-primary)' }}>0.5 KB</strong></span>
+                <span>+ Shared: <strong style={{ color: 'var(--text-primary)' }}>0.0 KB</strong></span>
+                <span>= <strong style={{ color: 'var(--brand)' }}>0.5 KB</strong> gzip</span>
+              </div>
+            </div>
           </div>
 
           {/* Standard */}
@@ -1358,6 +1380,13 @@ export default function ColumnVisibilityTogglePage() {
             <div className="column-visibility-toggle-page__tier-preview">
               <ColumnVisibilityToggle columns={DEFAULT_COLUMNS.map(c => ({ ...c }))} onChange={() => {}} />
             </div>
+            <div className="column-visibility-toggle-page__size-breakdown">
+              <div className="column-visibility-toggle-page__size-row">
+                <span>Component: <strong style={{ color: 'var(--text-primary)' }}>2.2 KB</strong></span>
+                <span>+ Shared: <strong style={{ color: 'var(--text-primary)' }}>0.9 KB</strong></span>
+                <span>= <strong style={{ color: 'var(--brand)' }}>3.1 KB</strong> gzip</span>
+              </div>
+            </div>
           </div>
 
           {/* Premium */}
@@ -1381,6 +1410,13 @@ export default function ColumnVisibilityTogglePage() {
             </div>
             <div className="column-visibility-toggle-page__tier-preview">
               <PremiumColumnVisibilityToggle columns={DEFAULT_COLUMNS.map(c => ({ ...c }))} onChange={() => {}} />
+            </div>
+            <div className="column-visibility-toggle-page__size-breakdown">
+              <div className="column-visibility-toggle-page__size-row">
+                <span>Component: <strong style={{ color: 'var(--text-primary)' }}>3.0 KB</strong></span>
+                <span>+ Shared: <strong style={{ color: 'var(--text-primary)' }}>0.9 KB</strong></span>
+                <span>= <strong style={{ color: 'var(--brand)' }}>3.9 KB</strong> gzip</span>
+              </div>
             </div>
           </div>
         </div>
@@ -1456,7 +1492,26 @@ export default function ColumnVisibilityTogglePage() {
         </Card>
       </section>
 
-      {/* ── 9. Source ────────────────────────────────── */}
+      {/* ── 9. Brand Color ─────────────────────────────── */}
+      <section className="column-visibility-toggle-page__section" id="brand-color">
+        <h2 className="column-visibility-toggle-page__section-title">
+          <a href="#brand-color">Brand Color</a>
+        </h2>
+        <p className="column-visibility-toggle-page__section-desc">
+          Pick a brand color to preview the component with your brand identity.
+        </p>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+          <ColorInput
+            name="brand-color"
+            value={brandColor}
+            onChange={setBrandColor}
+            size="sm"
+            swatches={['#6366f1','#f97316','#f43f5e','#0ea5e9','#10b981','#8b5cf6','#d946ef','#f59e0b','#06b6d4','#64748b']}
+          />
+        </div>
+      </section>
+
+      {/* ── 10. Source ────────────────────────────────── */}
       <section className="column-visibility-toggle-page__section" id="source">
         <h2 className="column-visibility-toggle-page__section-title">
           <a href="#source">Source</a>

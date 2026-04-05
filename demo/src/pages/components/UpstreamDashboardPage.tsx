@@ -4,12 +4,18 @@ import { useState, useMemo, useCallback, useEffect } from 'react'
 import { css } from '@ui/core/styles/css-tag'
 import { useStyles } from '@ui/core/styles/use-styles'
 import { UpstreamDashboard, type UpstreamLink } from '@ui/domain/upstream-dashboard'
+import { UpstreamDashboard as LiteUpstreamDashboard } from '@ui/lite/upstream-dashboard'
+import { UpstreamDashboard as PremiumUpstreamDashboard } from '@ui/premium/upstream-dashboard'
 import { Button } from '@ui/components/button'
 import { Card } from '@ui/components/card'
 import { CopyBlock } from '@ui/domain/copy-block'
 import { Tabs, TabPanel } from '@ui/components/tabs'
 import { Icon } from '@ui/core/icons/icon'
 import { useToast } from '@ui/domain/toast'
+import { ColorInput } from '@ui/components/color-input'
+import { generateTheme } from '@ui/core/tokens/generator'
+import { TOKEN_TO_CSS, type ThemeTokens } from '@ui/core/tokens/tokens'
+import { useTheme } from '@ui/core/tokens/theme-context'
 import { PropsTable, type PropDef } from '../../components/PropsTable'
 import { useTier, type Tier } from '../../App'
 
@@ -83,6 +89,19 @@ const IMPORT_STRINGS: Record<Tier, string> = {
   standard: "import { UpstreamDashboard } from '@annondeveloper/ui-kit'",
   premium: "import { UpstreamDashboard } from '@annondeveloper/ui-kit/premium'",
 }
+
+const BRAND_COLOR_PRESETS = [
+  { hex: '#6366f1', name: 'Indigo' },
+  { hex: '#f97316', name: 'Orange' },
+  { hex: '#f43f5e', name: 'Rose' },
+  { hex: '#0ea5e9', name: 'Sky' },
+  { hex: '#10b981', name: 'Emerald' },
+  { hex: '#8b5cf6', name: 'Violet' },
+  { hex: '#d946ef', name: 'Fuchsia' },
+  { hex: '#f59e0b', name: 'Amber' },
+  { hex: '#06b6d4', name: 'Cyan' },
+  { hex: '#64748b', name: 'Slate' },
+]
 
 // ─── Page Styles ─────────────────────────────────────────────────────────────
 
@@ -621,6 +640,36 @@ const pageStyles = css`
         text-underline-offset: 0.2em;
       }
 
+      /* ── Color picker ──────────────────────────────── */
+
+      .ud-page__color-presets {
+        display: flex;
+        gap: 0.25rem;
+        flex-wrap: wrap;
+      }
+
+      .ud-page__color-preset {
+        inline-size: 24px;
+        block-size: 24px;
+        border-radius: 50%;
+        border: 2px solid transparent;
+        cursor: pointer;
+        padding: 0;
+        transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1),
+                    border-color 0.15s,
+                    box-shadow 0.15s;
+        box-shadow: 0 1px 3px oklch(0% 0 0 / 0.2);
+      }
+      .ud-page__color-preset:hover {
+        transform: scale(1.2);
+        box-shadow: 0 2px 8px oklch(0% 0 0 / 0.3);
+      }
+      .ud-page__color-preset--active {
+        border-color: oklch(100% 0 0);
+        transform: scale(1.2);
+        box-shadow: 0 0 0 2px var(--bg-base), 0 0 0 4px oklch(100% 0 0 / 0.5);
+      }
+
       /* ── Scrollbar ─────────────────────────────────── */
 
       .ud-page__import-code,
@@ -1070,7 +1119,13 @@ function PlaygroundSection({ tier: tierProp }: { tier: Tier }) {
       <div className="ud-page__playground">
         <div className="ud-page__playground-preview">
           <div className="ud-page__playground-result">
-            <UpstreamDashboard {...dashProps as any} />
+            {tier === 'lite' ? (
+              <LiteUpstreamDashboard {...dashProps as any} />
+            ) : tier === 'premium' ? (
+              <PremiumUpstreamDashboard {...dashProps as any} />
+            ) : (
+              <UpstreamDashboard {...dashProps as any} />
+            )}
           </div>
 
           <div className="ud-page__code-tabs">
@@ -1157,6 +1212,32 @@ export default function UpstreamDashboardPage() {
   useStyles('ud-page', pageStyles)
 
   const { tier, setTier } = useTier()
+  const [brandColor, setBrandColor] = useState('#6366f1')
+  const { mode } = useTheme()
+
+  const BRAND_ONLY_KEYS: (keyof ThemeTokens)[] = [
+    'brand', 'brandLight', 'brandDark', 'brandSubtle', 'brandGlow',
+    'borderGlow', 'aurora1', 'aurora2',
+  ]
+
+  const themeTokens = useMemo(() => {
+    try {
+      return generateTheme(brandColor, mode)
+    } catch {
+      return null
+    }
+  }, [brandColor, mode])
+
+  const themeStyle = useMemo(() => {
+    if (!themeTokens || brandColor === '#6366f1') return undefined
+    const style: Record<string, string> = {}
+    for (const key of BRAND_ONLY_KEYS) {
+      const cssVar = TOKEN_TO_CSS[key]
+      const value = themeTokens[key]
+      if (cssVar && value) style[cssVar] = value
+    }
+    return style as React.CSSProperties
+  }, [themeTokens, brandColor])
 
   // Scroll reveal fallback for browsers without animation-timeline
   useEffect(() => {
@@ -1191,7 +1272,7 @@ export default function UpstreamDashboardPage() {
   }, [])
 
   return (
-    <div className="ud-page">
+    <div className="ud-page" style={themeStyle}>
       {/* ── 1. Hero Header ──────────────────────────────── */}
       <div className="ud-page__hero">
         <h1 className="ud-page__title">UpstreamDashboard</h1>
@@ -1583,19 +1664,59 @@ export default function UpstreamDashboardPage() {
         </Card>
       </section>
 
-      {/* ── 9. Source ────────────────────────────────── */}
-      <section className="ud-page__section" id="source">
+      {/* ── 9. Brand Color ───────────────────────────────── */}
+      <section className="ud-page__section" id="brand-color">
         <h2 className="ud-page__section-title">
-          <a href="#source">Source</a>
+          <a href="#brand-color">Brand Color</a>
         </h2>
-        <a
-          className="ud-page__source-link"
-          href="https://github.com/annondeveloper/ui-kit/blob/v2/src/domain/upstream-dashboard.tsx"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          View source on GitHub &rarr;
-        </a>
+        <p className="ud-page__section-desc">
+          Pick a brand color to see the page theme update in real-time. The aurora
+          gradients and accent colors derive automatically from your choice.
+        </p>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+          <ColorInput
+            name="brand-color"
+            value={brandColor}
+            onChange={setBrandColor}
+            size="sm"
+            swatches={['#6366f1','#f97316','#f43f5e','#0ea5e9','#10b981','#8b5cf6','#d946ef','#f59e0b','#06b6d4','#64748b']}
+          />
+          <div className="ud-page__color-presets">
+            {BRAND_COLOR_PRESETS.map(p => (
+              <button
+                key={p.hex}
+                type="button"
+                className={`ud-page__color-preset${brandColor === p.hex ? ' ud-page__color-preset--active' : ''}`}
+                style={{ background: p.hex }}
+                onClick={() => setBrandColor(p.hex)}
+                title={p.name}
+                aria-label={`Set brand color to ${p.name}`}
+              />
+            ))}
+          </div>
+          {brandColor !== '#6366f1' && (
+            <Button size="xs" variant="ghost" onClick={() => setBrandColor('#6366f1')}>
+              <Icon name="refresh" size="sm" /> Reset to default
+            </Button>
+          )}
+        </div>
+      </section>
+
+      {/* ── 10. Source ──────────────────────────────────────── */}
+      <section className="ud-page__section" id="source">
+        <h2 className="ud-page__section-title"><a href="#source">Source</a></h2>
+        <p className="ud-page__section-desc">View the full component source code on GitHub.</p>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+          <a className="ud-page__source-link" href="https://github.com/annondeveloper/ui-kit/blob/main/src/domain/upstream-dashboard.tsx" target="_blank" rel="noopener noreferrer">
+            <Icon name="code" size="sm" /> src/domain/upstream-dashboard.tsx (Standard)
+          </a>
+          <a className="ud-page__source-link" href="https://github.com/annondeveloper/ui-kit/blob/main/src/lite/upstream-dashboard.tsx" target="_blank" rel="noopener noreferrer">
+            <Icon name="code" size="sm" /> src/lite/upstream-dashboard.tsx (Lite)
+          </a>
+          <a className="ud-page__source-link" href="https://github.com/annondeveloper/ui-kit/blob/main/src/premium/upstream-dashboard.tsx" target="_blank" rel="noopener noreferrer">
+            <Icon name="code" size="sm" /> src/premium/upstream-dashboard.tsx (Premium)
+          </a>
+        </div>
       </section>
     </div>
   )

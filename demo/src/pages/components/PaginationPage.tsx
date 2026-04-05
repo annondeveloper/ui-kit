@@ -4,6 +4,7 @@ import { useState, useMemo, useRef, useEffect, useCallback } from 'react'
 import { css } from '@ui/core/styles/css-tag'
 import { useStyles } from '@ui/core/styles/use-styles'
 import { Pagination } from '@ui/components/pagination'
+import { Pagination as PremiumPagination } from '@ui/premium/pagination'
 import { Pagination as LitePagination } from '@ui/lite/pagination'
 import { Button } from '@ui/components/button'
 import { Card } from '@ui/components/card'
@@ -624,6 +625,22 @@ const pageStyles = css`
         }
       }
 
+      /* ── Source link ─────────────────────────────────── */
+
+      .pagination-page__source-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: var(--text-sm, 0.875rem);
+        color: var(--brand);
+        text-decoration: none;
+        font-weight: 500;
+      }
+      .pagination-page__source-link:hover {
+        text-decoration: underline;
+        text-underline-offset: 0.2em;
+      }
+
       /* ── Scrollbar + code blocks ──────────────────── */
 
       .pagination-page__import-code,
@@ -768,6 +785,7 @@ function generateReactCode(
   size: Size,
   showFirst: boolean,
   showPrevNext: boolean,
+  motion: number,
 ): string {
   const importStr = IMPORT_STRINGS[tier]
   const props: string[] = []
@@ -778,6 +796,7 @@ function generateReactCode(
   if (size !== 'md') props.push(`  size="${size}"`)
   if (showFirst) props.push('  showFirst')
   if (!showPrevNext) props.push('  showPrevNext={false}')
+  if (motion !== 3 && tier !== 'lite') props.push(`  motion={${motion}}`)
 
   return `${importStr}
 import { useState } from 'react'
@@ -933,14 +952,15 @@ function PlaygroundSection({ tier: tierProp }: { tier: Tier }) {
   const [size, setSize] = useState<Size>('md')
   const [showFirst, setShowFirst] = useState(false)
   const [showPrevNext, setShowPrevNext] = useState(true)
+  const [motion, setMotion] = useState<0 | 1 | 2 | 3>(3)
   const [copyStatus, setCopyStatus] = useState('')
   const [activeCodeTab, setActiveCodeTab] = useState('react')
 
   const handlePageChange = useCallback((p: number) => setPage(p), [])
 
   const reactCode = useMemo(
-    () => generateReactCode(tier, totalPages, siblingCount, size, showFirst, showPrevNext),
-    [tier, totalPages, siblingCount, size, showFirst, showPrevNext],
+    () => generateReactCode(tier, totalPages, siblingCount, size, showFirst, showPrevNext, motion),
+    [tier, totalPages, siblingCount, size, showFirst, showPrevNext, motion],
   )
 
   const htmlCode = useMemo(
@@ -1000,6 +1020,17 @@ function PlaygroundSection({ tier: tierProp }: { tier: Tier }) {
                 totalPages={totalPages}
                 onChange={handlePageChange}
               />
+            ) : tier === 'premium' ? (
+              <PremiumPagination
+                page={page}
+                totalPages={totalPages}
+                onChange={handlePageChange}
+                siblingCount={siblingCount}
+                size={size}
+                showFirst={showFirst}
+                showPrevNext={showPrevNext}
+                motion={motion}
+              />
             ) : (
               <Pagination
                 page={page}
@@ -1009,6 +1040,7 @@ function PlaygroundSection({ tier: tierProp }: { tier: Tier }) {
                 size={size}
                 showFirst={showFirst}
                 showPrevNext={showPrevNext}
+                motion={motion}
               />
             )}
           </div>
@@ -1096,6 +1128,16 @@ function PlaygroundSection({ tier: tierProp }: { tier: Tier }) {
 
           {tier !== 'lite' && (
             <OptionGroup label="Size" options={SIZES} value={size} onChange={setSize} prefix={P} />
+          )}
+
+          {tier !== 'lite' && (
+            <OptionGroup
+              label="Motion"
+              options={['0', '1', '2', '3'] as const}
+              value={String(motion) as '0' | '1' | '2' | '3'}
+              onChange={v => setMotion(Number(v) as 0 | 1 | 2 | 3)}
+              prefix={P}
+            />
           )}
 
           <div className={`${P}control-group`}>
@@ -1362,7 +1404,7 @@ export default function PaginationPage() {
               import {'{'} Pagination {'}'} from '@annondeveloper/ui-kit/premium'
             </div>
             <div className={`${P}tier-preview`}>
-              <Pagination page={3} totalPages={10} onChange={() => {}} showFirst />
+              <PremiumPagination page={3} totalPages={10} onChange={() => {}} showFirst />
             </div>
             <div className={`${P}size-breakdown`}>
               <div className={`${P}size-row`}>
@@ -1449,6 +1491,45 @@ export default function PaginationPage() {
             </li>
           </ul>
         </Card>
+      </section>
+
+      {/* ── 10. Source ──────────────────────────────────── */}
+      <section className={`${P}section`} id="source">
+        <h2 className={`${P}section-title`}>
+          <a href="#source">Source</a>
+        </h2>
+        <p className={`${P}section-desc`}>
+          View the component source on GitHub.
+        </p>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+          <a
+            href="https://github.com/annondeveloper/ui-kit/blob/main/src/components/pagination.tsx"
+            target="_blank"
+            rel="noopener noreferrer"
+            className={`${P}source-link`}
+          >
+            <Icon name="code" size="sm" />
+            src/components/pagination.tsx
+          </a>
+          <a
+            href="https://github.com/annondeveloper/ui-kit/blob/main/src/lite/pagination.tsx"
+            target="_blank"
+            rel="noopener noreferrer"
+            className={`${P}source-link`}
+          >
+            <Icon name="code" size="sm" />
+            src/lite/pagination.tsx
+          </a>
+          <a
+            href="https://github.com/annondeveloper/ui-kit/blob/main/src/premium/pagination.tsx"
+            target="_blank"
+            rel="noopener noreferrer"
+            className={`${P}source-link`}
+          >
+            <Icon name="code" size="sm" />
+            src/premium/pagination.tsx
+          </a>
+        </div>
       </section>
     </div>
   )

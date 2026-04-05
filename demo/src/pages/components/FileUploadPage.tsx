@@ -5,6 +5,7 @@ import { css } from '@ui/core/styles/css-tag'
 import { useStyles } from '@ui/core/styles/use-styles'
 import { FileUpload } from '@ui/components/file-upload'
 import { FileUpload as LiteFileUpload } from '@ui/lite/file-upload'
+import { FileUpload as PremiumFileUpload } from '@ui/premium/file-upload'
 import { Button } from '@ui/components/button'
 import { Card } from '@ui/components/card'
 import { CopyBlock } from '@ui/domain/copy-block'
@@ -550,6 +551,20 @@ const pageStyles = css`
         color: var(--text-primary);
       }
 
+      .file-upload-page__source-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: var(--text-sm, 0.875rem);
+        color: var(--brand);
+        text-decoration: none;
+        font-weight: 500;
+      }
+      .file-upload-page__source-link:hover {
+        text-decoration: underline;
+        text-underline-offset: 0.2em;
+      }
+
       /* ── Responsive ──────────────────────────────── */
 
       @media (max-width: 768px) {
@@ -1032,6 +1047,21 @@ function PlaygroundSection({ tier: tierProp }: { tier: Tier }) {
                 multiple={multiple}
                 disabled={disabled}
                 hint={ACCEPT_MAP[acceptType] ? `Accepts: ${ACCEPT_MAP[acceptType]}` : 'All file types accepted'}
+              />
+            ) : tier === 'premium' ? (
+              <PremiumFileUpload
+                name="playground-upload"
+                accept={ACCEPT_MAP[acceptType]}
+                multiple={multiple}
+                maxSize={MAX_SIZE_MAP[maxSizeOpt]}
+                maxFiles={multiple ? maxFiles : undefined}
+                disabled={disabled}
+                showPreview={showPreview}
+                motion={motion}
+                label="Upload files"
+                error={errorMsg}
+                onChange={handleFilesChange}
+                onError={handleError}
               />
             ) : (
               <FileUpload
@@ -1556,6 +1586,22 @@ export default function FileUploadPage() {
             </li>
           </ul>
         </Card>
+      </section>
+
+      {/* Source */}
+      <section className="file-upload-page__section" id="source">
+        <h2 className="file-upload-page__section-title">
+          <a href="#source">Source</a>
+        </h2>
+        <a
+          className="file-upload-page__source-link"
+          href="https://github.com/annondeveloper/ui-kit/blob/main/src/components/file-upload.tsx"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          <Icon name="code" size="sm" />
+          View source on GitHub
+        </a>
       </section>
     </div>
   )

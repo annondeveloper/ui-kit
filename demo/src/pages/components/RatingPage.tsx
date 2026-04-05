@@ -5,6 +5,7 @@ import { css } from '@ui/core/styles/css-tag'
 import { useStyles } from '@ui/core/styles/use-styles'
 import { Rating } from '@ui/components/rating'
 import { Rating as LiteRating } from '@ui/lite/rating'
+import { Rating as PremiumRating } from '@ui/premium/rating'
 import { Button } from '@ui/components/button'
 import { Card } from '@ui/components/card'
 import { CopyBlock } from '@ui/domain/copy-block'
@@ -348,6 +349,10 @@ const pageStyles = css`
       .rating-page__tier-import { font-family: 'SF Mono', 'Fira Code', 'JetBrains Mono', monospace; font-size: 0.625rem; color: oklch(from var(--brand) calc(l + 0.1) c h); background: var(--border-subtle); padding: 0.375rem 0.5rem; border-radius: var(--radius-sm); overflow-wrap: break-word; word-break: break-all; text-align: start; line-height: 1.4; }
       .rating-page__tier-preview { display: flex; justify-content: center; padding-block-start: 0.5rem; }
 
+      /* ── Size breakdown bar ─────────────────────────── */
+      .rating-page__size-breakdown { display: flex; flex-direction: column; gap: 0.25rem; font-size: 0.75rem; color: var(--text-tertiary); }
+      .rating-page__size-row { display: flex; align-items: center; gap: 0.5rem; }
+
       /* ── Color picker ──────────────────────────────── */
 
       .rating-page__color-presets { display: flex; gap: 0.25rem; flex-wrap: wrap; }
@@ -613,6 +618,7 @@ function PlaygroundSection({ tier: tierProp }: { tier: Tier }) {
   const [readOnly, setReadOnly] = useState(false)
   const [allowHalf, setAllowHalf] = useState(false)
   const [ratingValue, setRatingValue] = useState(3)
+  const [motion, setMotion] = useState<0 | 1 | 2 | 3>(3)
   const [copyStatus, setCopyStatus] = useState('')
   const [activeCodeTab, setActiveCodeTab] = useState('react')
 
@@ -659,6 +665,16 @@ function PlaygroundSection({ tier: tierProp }: { tier: Tier }) {
                 size={size as 'sm' | 'md' | 'lg'}
                 readOnly={readOnly}
               />
+            ) : tier === 'premium' ? (
+              <PremiumRating
+                value={ratingValue}
+                onChange={setRatingValue}
+                max={max}
+                size={size}
+                readOnly={readOnly}
+                allowHalf={allowHalf}
+                motion={motion}
+              />
             ) : (
               <Rating
                 value={ratingValue}
@@ -667,6 +683,7 @@ function PlaygroundSection({ tier: tierProp }: { tier: Tier }) {
                 size={size}
                 readOnly={readOnly}
                 allowHalf={allowHalf}
+                motion={motion}
               />
             )}
             <p style={{ fontSize: 'var(--text-sm)', color: 'var(--text-tertiary)', marginBlockStart: '0.75rem' }}>
@@ -693,6 +710,15 @@ function PlaygroundSection({ tier: tierProp }: { tier: Tier }) {
 
         <div className="rating-page__playground-controls">
           <OptionGroup label="Size" options={tier === 'lite' ? LITE_SIZES : SIZES} value={size as any} onChange={setSize as any} />
+
+          {tier !== 'lite' && (
+            <OptionGroup
+              label="Motion Level"
+              options={['0', '1', '2', '3'] as const}
+              value={String(motion) as '0' | '1' | '2' | '3'}
+              onChange={v => setMotion(Number(v) as 0 | 1 | 2 | 3)}
+            />
+          )}
 
           <div className="rating-page__control-group">
             <span className="rating-page__control-label">Max Stars</span>
@@ -876,6 +902,13 @@ export default function RatingPage() {
             <div className="rating-page__tier-preview">
               <LiteRating defaultValue={4} />
             </div>
+            <div className="rating-page__size-breakdown">
+              <div className="rating-page__size-row">
+                <span>Component: <strong style={{ color: 'var(--text-primary)' }}>0.4 KB</strong></span>
+                <span>+ Shared: <strong style={{ color: 'var(--text-primary)' }}>0.0 KB</strong></span>
+                <span>= <strong style={{ color: 'var(--brand)' }}>0.4 KB</strong> gzip</span>
+              </div>
+            </div>
           </div>
 
           <div
@@ -896,6 +929,13 @@ export default function RatingPage() {
             <div className="rating-page__tier-preview">
               <Rating defaultValue={3.5} allowHalf size="lg" />
             </div>
+            <div className="rating-page__size-breakdown">
+              <div className="rating-page__size-row">
+                <span>Component: <strong style={{ color: 'var(--text-primary)' }}>2.2 KB</strong></span>
+                <span>+ Shared: <strong style={{ color: 'var(--text-primary)' }}>0.9 KB</strong></span>
+                <span>= <strong style={{ color: 'var(--brand)' }}>3.1 KB</strong> gzip</span>
+              </div>
+            </div>
           </div>
 
           <div
@@ -913,7 +953,14 @@ export default function RatingPage() {
             </p>
             <div className="rating-page__tier-import">import {'{'} Rating {'}'} from '@annondeveloper/ui-kit/premium'</div>
             <div className="rating-page__tier-preview">
-              <Rating defaultValue={4} size="xl" />
+              <PremiumRating defaultValue={4} size="xl" />
+            </div>
+            <div className="rating-page__size-breakdown">
+              <div className="rating-page__size-row">
+                <span>Component: <strong style={{ color: 'var(--text-primary)' }}>3.5 KB</strong></span>
+                <span>+ Shared: <strong style={{ color: 'var(--text-primary)' }}>0.9 KB</strong></span>
+                <span>= <strong style={{ color: 'var(--brand)' }}>4.4 KB</strong> gzip</span>
+              </div>
             </div>
           </div>
         </div>
@@ -1007,10 +1054,10 @@ export default function RatingPage() {
         <h2 className="rating-page__section-title"><a href="#source">Source</a></h2>
         <p className="rating-page__section-desc">View the component source code on GitHub.</p>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-          <a className="rating-page__source-link" href="https://github.com/annondeveloper/ui-kit/blob/v2/src/components/rating.tsx" target="_blank" rel="noopener noreferrer">
+          <a className="rating-page__source-link" href="https://github.com/annondeveloper/ui-kit/blob/main/src/components/rating.tsx" target="_blank" rel="noopener noreferrer">
             <Icon name="code" size="sm" /> src/components/rating.tsx — Standard tier
           </a>
-          <a className="rating-page__source-link" href="https://github.com/annondeveloper/ui-kit/blob/v2/src/lite/rating.tsx" target="_blank" rel="noopener noreferrer">
+          <a className="rating-page__source-link" href="https://github.com/annondeveloper/ui-kit/blob/main/src/lite/rating.tsx" target="_blank" rel="noopener noreferrer">
             <Icon name="code" size="sm" /> src/lite/rating.tsx — Lite tier
           </a>
         </div>

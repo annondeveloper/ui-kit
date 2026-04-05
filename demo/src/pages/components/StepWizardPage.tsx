@@ -6,6 +6,8 @@ import { useStyles } from '@ui/core/styles/use-styles'
 import { Button } from '@ui/components/button'
 import { Card } from '@ui/components/card'
 import { StepWizard } from '@ui/domain/step-wizard'
+import { StepWizard as LiteStepWizard } from '@ui/lite/step-wizard'
+import { StepWizard as PremiumStepWizard } from '@ui/premium/step-wizard'
 import { CopyBlock } from '@ui/domain/copy-block'
 import { Tabs, TabPanel } from '@ui/components/tabs'
 import { Icon } from '@ui/core/icons/icon'
@@ -458,6 +460,38 @@ const pageStyles = css`
         display: flex;
         justify-content: center;
         padding-block-start: 0.5rem;
+      }
+
+      /* ── Size breakdown bar ─────────────────────────── */
+
+      .step-wizard-page__size-breakdown {
+        display: flex;
+        flex-direction: column;
+        gap: 0.25rem;
+        font-size: 0.75rem;
+        color: var(--text-tertiary);
+      }
+
+      .step-wizard-page__size-row {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+
+      /* ── Source link ─────────────────────────────────── */
+
+      .step-wizard-page__source-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: var(--text-sm, 0.875rem);
+        color: var(--brand);
+        text-decoration: none;
+        font-weight: 500;
+      }
+      .step-wizard-page__source-link:hover {
+        text-decoration: underline;
+        text-underline-offset: 0.2em;
       }
 
       /* ── A11y list ──────────────────────────────────── */
@@ -1265,7 +1299,14 @@ export default function StepWizardPage() {
               import {'{'} StepWizard {'}'} from '@annondeveloper/ui-kit/lite'
             </div>
             <div className="step-wizard-page__tier-preview">
-              <Button size="sm" variant="secondary" onClick={() => setTier('lite')}>Select Lite</Button>
+              <LiteStepWizard steps={[{ id: 's1', label: 'Start' }, { id: 's2', label: 'Review' }, { id: 's3', label: 'Done' }]} activeStep={1} />
+            </div>
+            <div className="step-wizard-page__size-breakdown">
+              <div className="step-wizard-page__size-row">
+                <span>Component: <strong style={{ color: 'var(--text-primary)' }}>0.3 KB</strong></span>
+                <span>+ Shared: <strong style={{ color: 'var(--text-primary)' }}>0.4 KB</strong></span>
+                <span>= <strong style={{ color: 'var(--brand)' }}>0.7 KB</strong> gzip</span>
+              </div>
             </div>
           </div>
 
@@ -1291,6 +1332,13 @@ export default function StepWizardPage() {
             <div className="step-wizard-page__tier-preview">
               <Button size="sm" variant="primary" onClick={() => setTier('standard')}>Select Standard</Button>
             </div>
+            <div className="step-wizard-page__size-breakdown">
+              <div className="step-wizard-page__size-row">
+                <span>Component: <strong style={{ color: 'var(--text-primary)' }}>3.2 KB</strong></span>
+                <span>+ Shared: <strong style={{ color: 'var(--text-primary)' }}>0.9 KB</strong></span>
+                <span>= <strong style={{ color: 'var(--brand)' }}>4.1 KB</strong> gzip</span>
+              </div>
+            </div>
           </div>
 
           {/* Premium */}
@@ -1313,7 +1361,14 @@ export default function StepWizardPage() {
               import {'{'} StepWizard {'}'} from '@annondeveloper/ui-kit/premium'
             </div>
             <div className="step-wizard-page__tier-preview">
-              <Button size="sm" variant="primary" onClick={() => setTier('premium')}>Select Premium</Button>
+              <PremiumStepWizard steps={[{ id: 'p1', label: 'Start' }, { id: 'p2', label: 'Review' }, { id: 'p3', label: 'Done' }]} activeStep={1} onChange={() => {}} />
+            </div>
+            <div className="step-wizard-page__size-breakdown">
+              <div className="step-wizard-page__size-row">
+                <span>Component: <strong style={{ color: 'var(--text-primary)' }}>2.0 KB</strong></span>
+                <span>+ Shared: <strong style={{ color: 'var(--text-primary)' }}>3.3 KB</strong></span>
+                <span>= <strong style={{ color: 'var(--brand)' }}>5.3 KB</strong> gzip</span>
+              </div>
             </div>
           </div>
         </div>
@@ -1399,6 +1454,23 @@ export default function StepWizardPage() {
             </li>
           </ul>
         </Card>
+      </section>
+
+      {/* ── Source ──────────────────────────────────────── */}
+      <section className="step-wizard-page__section" id="source">
+        <h2 className="step-wizard-page__section-title"><a href="#source">Source</a></h2>
+        <p className="step-wizard-page__section-desc">View the full component source code on GitHub.</p>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+          <a className="step-wizard-page__source-link" href="https://github.com/annondeveloper/ui-kit/blob/main/src/domain/step-wizard.tsx" target="_blank" rel="noopener noreferrer">
+            <Icon name="code" size="sm" /> src/domain/step-wizard.tsx (Standard)
+          </a>
+          <a className="step-wizard-page__source-link" href="https://github.com/annondeveloper/ui-kit/blob/main/src/lite/step-wizard.tsx" target="_blank" rel="noopener noreferrer">
+            <Icon name="code" size="sm" /> src/lite/step-wizard.tsx (Lite)
+          </a>
+          <a className="step-wizard-page__source-link" href="https://github.com/annondeveloper/ui-kit/blob/main/src/premium/step-wizard.tsx" target="_blank" rel="noopener noreferrer">
+            <Icon name="code" size="sm" /> src/premium/step-wizard.tsx (Premium)
+          </a>
+        </div>
       </section>
     </div>
   )

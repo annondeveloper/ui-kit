@@ -4,6 +4,8 @@ import { useState, useMemo, useCallback, useRef, useEffect } from 'react'
 import { css } from '@ui/core/styles/css-tag'
 import { useStyles } from '@ui/core/styles/use-styles'
 import { HeroHighlight, Highlight } from '@ui/domain/hero-highlight'
+import { HeroHighlight as LiteHeroHighlight, Highlight as LiteHighlight } from '@ui/lite/hero-highlight'
+import { HeroHighlight as PremiumHeroHighlight, Highlight as PremiumHighlight } from '@ui/premium/hero-highlight'
 import { Button } from '@ui/components/button'
 import { Card } from '@ui/components/card'
 import { CopyBlock } from '@ui/domain/copy-block'
@@ -646,6 +648,22 @@ const pageStyles = css`
       }
       :scope ::-webkit-scrollbar-thumb:hover {
         background: var(--border-strong);
+      }
+
+      /* ── Source link ─────────────────────────────────── */
+
+      .hero-highlight-page__source-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: var(--text-sm, 0.875rem);
+        color: var(--brand);
+        text-decoration: none;
+        font-weight: 500;
+      }
+      .hero-highlight-page__source-link:hover {
+        text-decoration: underline;
+        text-underline-offset: 0.2em;
       }
     }
   }
@@ -1316,10 +1334,7 @@ export default function HeroHighlightPage() {
               import {'{'} HeroHighlight, Highlight {'}'} from '@annondeveloper/ui-kit/lite'
             </div>
             <div className="hero-highlight-page__tier-preview">
-              <span style={{ fontSize: '0.875rem', fontWeight: 700, color: 'var(--text-primary)', position: 'relative', paddingInline: '0.15em' }}>
-                <span style={{ position: 'absolute', bottom: 0, left: 0, height: '40%', width: '100%', background: 'oklch(75% 0.15 270 / 0.25)', borderRadius: '2px', zIndex: -1 }} />
-                Lite Highlight
-              </span>
+              <LiteHighlight>Lite Highlight</LiteHighlight>
             </div>
             <div className="hero-highlight-page__size-breakdown">
               <div className="hero-highlight-page__size-row">
@@ -1381,7 +1396,7 @@ export default function HeroHighlightPage() {
               import {'{'} HeroHighlight, Highlight {'}'} from '@annondeveloper/ui-kit/premium'
             </div>
             <div className="hero-highlight-page__tier-preview">
-              <Highlight>Premium Highlight</Highlight>
+              <PremiumHighlight>Premium Highlight</PremiumHighlight>
             </div>
             <div className="hero-highlight-page__size-breakdown">
               <div className="hero-highlight-page__size-row">
@@ -1506,6 +1521,23 @@ export default function HeroHighlightPage() {
             </li>
           </ul>
         </Card>
+      </section>
+
+      {/* ── Source ──────────────────────────────────────── */}
+      <section className="hero-highlight-page__section" id="source">
+        <h2 className="hero-highlight-page__section-title"><a href="#source">Source</a></h2>
+        <p className="hero-highlight-page__section-desc">View the full component source code on GitHub.</p>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+          <a className="hero-highlight-page__source-link" href="https://github.com/annondeveloper/ui-kit/blob/main/src/domain/hero-highlight.tsx" target="_blank" rel="noopener noreferrer">
+            <Icon name="code" size="sm" /> src/domain/hero-highlight.tsx (Standard)
+          </a>
+          <a className="hero-highlight-page__source-link" href="https://github.com/annondeveloper/ui-kit/blob/main/src/lite/hero-highlight.tsx" target="_blank" rel="noopener noreferrer">
+            <Icon name="code" size="sm" /> src/lite/hero-highlight.tsx (Lite)
+          </a>
+          <a className="hero-highlight-page__source-link" href="https://github.com/annondeveloper/ui-kit/blob/main/src/premium/hero-highlight.tsx" target="_blank" rel="noopener noreferrer">
+            <Icon name="code" size="sm" /> src/premium/hero-highlight.tsx (Premium)
+          </a>
+        </div>
       </section>
     </div>
   )

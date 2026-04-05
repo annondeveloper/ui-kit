@@ -5,6 +5,7 @@ import { css } from '@ui/core/styles/css-tag'
 import { useStyles } from '@ui/core/styles/use-styles'
 import { ThresholdGauge } from '@ui/domain/threshold-gauge'
 import { ThresholdGauge as LiteThresholdGauge } from '@ui/lite/threshold-gauge'
+import { ThresholdGauge as PremiumThresholdGauge } from '@ui/premium/threshold-gauge'
 import { Button } from '@ui/components/button'
 import { Card } from '@ui/components/card'
 import { CopyBlock } from '@ui/domain/copy-block'
@@ -547,6 +548,22 @@ const pageStyles = css`
         scrollbar-color: var(--border-default) transparent;
         max-inline-size: 100%;
       }
+
+      /* ── Source link ─────────────────────────────────── */
+
+      .threshold-gauge-page__source-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: var(--text-sm, 0.875rem);
+        color: var(--brand);
+        text-decoration: none;
+        font-weight: 500;
+      }
+      .threshold-gauge-page__source-link:hover {
+        text-decoration: underline;
+        text-underline-offset: 0.2em;
+      }
     }
   }
 `
@@ -728,7 +745,7 @@ function PlaygroundSection({ tier: tierProp }: { tier: Tier }) {
   const [copyStatus, setCopyStatus] = useState('')
   const [activeCodeTab, setActiveCodeTab] = useState('react')
 
-  const GaugeComponent = tier === 'lite' ? LiteThresholdGauge : ThresholdGauge
+  const GaugeComponent = tier === 'lite' ? LiteThresholdGauge : tier === 'premium' ? PremiumThresholdGauge : ThresholdGauge
 
   const reactCode = useMemo(
     () => generateReactCode(tier, value, size, showValue, label, useThresholds, warningThreshold, criticalThreshold, motion),
@@ -925,7 +942,7 @@ export default function ThresholdGaugePage() {
     return () => observer.disconnect()
   }, [])
 
-  const GaugeComponent = tier === 'lite' ? LiteThresholdGauge : ThresholdGauge
+  const GaugeComponent = tier === 'lite' ? LiteThresholdGauge : tier === 'premium' ? PremiumThresholdGauge : ThresholdGauge
 
   return (
     <div className="threshold-gauge-page" ref={pageRef}>
@@ -1144,7 +1161,7 @@ export default function ThresholdGaugePage() {
               import {'{'} ThresholdGauge {'}'} from '@annondeveloper/ui-kit/premium'
             </div>
             <div className="threshold-gauge-page__tier-preview">
-              <ThresholdGauge value={72} thresholds={{ warning: 60, critical: 80 }} showValue label="CPU" />
+              <PremiumThresholdGauge value={72} thresholds={{ warning: 60, critical: 80 }} showValue label="CPU" />
             </div>
             <div className="threshold-gauge-page__size-breakdown">
               <div className="threshold-gauge-page__size-row">
@@ -1219,6 +1236,23 @@ export default function ThresholdGaugePage() {
             </li>
           </ul>
         </Card>
+      </section>
+
+      {/* ── Source ──────────────────────────────────────── */}
+      <section className="threshold-gauge-page__section" id="source">
+        <h2 className="threshold-gauge-page__section-title"><a href="#source">Source</a></h2>
+        <p className="threshold-gauge-page__section-desc">View the full component source code on GitHub.</p>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+          <a className="threshold-gauge-page__source-link" href="https://github.com/annondeveloper/ui-kit/blob/main/src/domain/threshold-gauge.tsx" target="_blank" rel="noopener noreferrer">
+            <Icon name="code" size="sm" /> src/domain/threshold-gauge.tsx (Standard)
+          </a>
+          <a className="threshold-gauge-page__source-link" href="https://github.com/annondeveloper/ui-kit/blob/main/src/lite/threshold-gauge.tsx" target="_blank" rel="noopener noreferrer">
+            <Icon name="code" size="sm" /> src/lite/threshold-gauge.tsx (Lite)
+          </a>
+          <a className="threshold-gauge-page__source-link" href="https://github.com/annondeveloper/ui-kit/blob/main/src/premium/threshold-gauge.tsx" target="_blank" rel="noopener noreferrer">
+            <Icon name="code" size="sm" /> src/premium/threshold-gauge.tsx (Premium)
+          </a>
+        </div>
       </section>
     </div>
   )

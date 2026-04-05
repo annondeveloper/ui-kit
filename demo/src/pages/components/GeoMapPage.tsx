@@ -4,6 +4,8 @@ import { useState, useMemo, useCallback, useRef, useEffect } from 'react'
 import { css } from '@ui/core/styles/css-tag'
 import { useStyles } from '@ui/core/styles/use-styles'
 import { GeoMap, type GeoPoint, type GeoConnection } from '@ui/domain/geo-map'
+import { GeoMap as LiteGeoMap } from '@ui/lite/geo-map'
+import { GeoMap as PremiumGeoMap } from '@ui/premium/geo-map'
 import { Button } from '@ui/components/button'
 import { Card } from '@ui/components/card'
 import { CopyBlock } from '@ui/domain/copy-block'
@@ -540,6 +542,22 @@ const pageStyles = css`
         .geo-map-page__hero { padding: 1.5rem 1rem; }
         .geo-map-page__title { font-size: 1.5rem; }
         .geo-map-page__preview { padding: 1rem; }
+      }
+
+      /* ── Source link ─────────────────────────────────── */
+
+      .geo-map-page__source-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: var(--text-sm, 0.875rem);
+        color: var(--brand);
+        text-decoration: none;
+        font-weight: 500;
+      }
+      .geo-map-page__source-link:hover {
+        text-decoration: underline;
+        text-underline-offset: 0.2em;
       }
 
       /* ── Scrollbar ──────────────────────────────── */
@@ -1258,11 +1276,10 @@ export default function GeoMapPage() {
               import {'{'} GeoMap {'}'} from '@annondeveloper/ui-kit/lite'
             </div>
             <div className="geo-map-page__tier-preview">
-              <GeoMap
+              <LiteGeoMap
                 points={MINIMAL_POINTS}
                 showLabels
                 height={120}
-                motion={0}
               />
             </div>
             <div className="geo-map-page__size-breakdown">
@@ -1331,7 +1348,7 @@ export default function GeoMapPage() {
               import {'{'} GeoMap {'}'} from '@annondeveloper/ui-kit/premium'
             </div>
             <div className="geo-map-page__tier-preview">
-              <GeoMap
+              <PremiumGeoMap
                 points={MINIMAL_POINTS}
                 connections={[{ from: 'a', to: 'b', status: 'ok' }]}
                 showLabels
@@ -1442,6 +1459,23 @@ export default function GeoMapPage() {
             </li>
           </ul>
         </Card>
+      </section>
+
+      {/* ── Source ──────────────────────────────────────── */}
+      <section className="geo-map-page__section" id="source">
+        <h2 className="geo-map-page__section-title"><a href="#source">Source</a></h2>
+        <p className="geo-map-page__section-desc">View the full component source code on GitHub.</p>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+          <a className="geo-map-page__source-link" href="https://github.com/annondeveloper/ui-kit/blob/main/src/domain/geo-map.tsx" target="_blank" rel="noopener noreferrer">
+            <Icon name="code" size="sm" /> src/domain/geo-map.tsx (Standard)
+          </a>
+          <a className="geo-map-page__source-link" href="https://github.com/annondeveloper/ui-kit/blob/main/src/lite/geo-map.tsx" target="_blank" rel="noopener noreferrer">
+            <Icon name="code" size="sm" /> src/lite/geo-map.tsx (Lite)
+          </a>
+          <a className="geo-map-page__source-link" href="https://github.com/annondeveloper/ui-kit/blob/main/src/premium/geo-map.tsx" target="_blank" rel="noopener noreferrer">
+            <Icon name="code" size="sm" /> src/premium/geo-map.tsx (Premium)
+          </a>
+        </div>
       </section>
     </div>
   )

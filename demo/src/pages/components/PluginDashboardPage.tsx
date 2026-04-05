@@ -22,8 +22,26 @@ import { Button } from '@ui/components/button'
 import { Card } from '@ui/components/card'
 import { CopyBlock } from '@ui/domain/copy-block'
 import { Icon } from '@ui/core/icons/icon'
+import { Tabs, TabPanel } from '@ui/components/tabs'
+import { ColorInput } from '@ui/components/color-input'
+import { generateTheme } from '@ui/core/tokens/generator'
+import { TOKEN_TO_CSS, type ThemeTokens } from '@ui/core/tokens/tokens'
+import { useTheme } from '@ui/core/tokens/theme-context'
 import { PropsTable, type PropDef } from '../../components/PropsTable'
 import { useTier, type Tier } from '../../App'
+
+const BRAND_COLOR_PRESETS = [
+  { hex: '#6366f1', name: 'Indigo' },
+  { hex: '#f97316', name: 'Orange' },
+  { hex: '#f43f5e', name: 'Rose' },
+  { hex: '#0ea5e9', name: 'Sky' },
+  { hex: '#10b981', name: 'Emerald' },
+  { hex: '#8b5cf6', name: 'Violet' },
+  { hex: '#d946ef', name: 'Fuchsia' },
+  { hex: '#f59e0b', name: 'Amber' },
+  { hex: '#06b6d4', name: 'Cyan' },
+  { hex: '#64748b', name: 'Slate' },
+]
 
 // ─── Sample Data ────────────────────────────────────────────────────────────
 
@@ -577,6 +595,68 @@ const pageStyles = css`
         gap: 1.5rem;
       }
 
+      /* ── Size breakdown ─────────────────────────── */
+
+      .plugin-dashboard-page__size-breakdown {
+        display: flex;
+        flex-direction: column;
+        gap: 0.25rem;
+        font-size: 0.75rem;
+        color: var(--text-tertiary);
+      }
+
+      .plugin-dashboard-page__size-row {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+
+      /* ── Source link ────────────────────────────────── */
+
+      .plugin-dashboard-page__source-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: var(--text-sm, 0.875rem);
+        color: var(--brand);
+        text-decoration: none;
+        font-weight: 500;
+      }
+      .plugin-dashboard-page__source-link:hover {
+        text-decoration: underline;
+        text-underline-offset: 0.2em;
+      }
+
+      /* ── Color picker ──────────────────────────────── */
+
+      .plugin-dashboard-page__color-presets {
+        display: flex;
+        gap: 0.25rem;
+        flex-wrap: wrap;
+      }
+
+      .plugin-dashboard-page__color-preset {
+        inline-size: 24px;
+        block-size: 24px;
+        border-radius: 50%;
+        border: 2px solid transparent;
+        cursor: pointer;
+        padding: 0;
+        transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1),
+                    border-color 0.15s,
+                    box-shadow 0.15s;
+        box-shadow: 0 1px 3px oklch(0% 0 0 / 0.2);
+      }
+      .plugin-dashboard-page__color-preset:hover {
+        transform: scale(1.2);
+        box-shadow: 0 2px 8px oklch(0% 0 0 / 0.3);
+      }
+      .plugin-dashboard-page__color-preset--active {
+        border-color: oklch(100% 0 0);
+        transform: scale(1.2);
+        box-shadow: 0 0 0 2px var(--bg-base), 0 0 0 4px oklch(100% 0 0 / 0.5);
+      }
+
       /* ── Responsive ──────────────────────────────── */
 
       @media (max-width: 768px) {
@@ -716,6 +796,178 @@ function generateReactCode(
   return `${importStr}\n${configImport}\n\nconst data = {\n  // ... your ${CONFIG_MAP[selectedConfig].config.name} metrics data\n}\n\n<PluginDashboard\n${props.join('\n')}\n/>`
 }
 
+function generateHtmlCode(
+  tier: Tier,
+  selectedConfig: ConfigChoice,
+): string {
+  const tierLabel = tier === 'lite' ? 'lite' : tier === 'premium' ? 'premium' : 'standard'
+  const cssPath = tier === 'lite'
+    ? '@annondeveloper/ui-kit/lite/styles.css'
+    : '@annondeveloper/ui-kit/css/components/plugin-dashboard.css'
+  const configName = selectedConfig.toUpperCase() + '_DASHBOARD'
+
+  return `<!-- PluginDashboard \u2014 @annondeveloper/ui-kit ${tierLabel} tier -->
+<link rel="stylesheet" href="https://unpkg.com/${cssPath}">
+
+<div class="ui-plugin-dashboard" data-config="${selectedConfig}">
+  <div class="ui-plugin-dashboard__header">
+    <h2>${CONFIG_MAP[selectedConfig].config.name} Dashboard</h2>
+  </div>
+  <div class="ui-plugin-dashboard__metrics">
+    <!-- Metric strip rendered here -->
+  </div>
+  <div class="ui-plugin-dashboard__widgets">
+    <!-- Widget grid rendered here -->
+  </div>
+</div>
+
+<script>
+  // Populate dashboard from JSON API
+  fetch('/api/${selectedConfig}/metrics')
+    .then(r => r.json())
+    .then(data => renderDashboard('${configName}', data))
+</script>`
+}
+
+function generateVueCode(
+  tier: Tier,
+  selectedConfig: ConfigChoice,
+  motion: number,
+  isLoading: boolean,
+): string {
+  const configName = selectedConfig.toUpperCase() + '_DASHBOARD'
+
+  if (tier === 'lite') {
+    return `<template>
+  <div class="ui-plugin-dashboard" data-config="${selectedConfig}">
+    <div v-for="metric in metrics" :key="metric.key" class="ui-plugin-dashboard__metric">
+      {{ metric.label }}: {{ data[metric.key] }}
+    </div>
+  </div>
+</template>
+
+<style>
+  @import '@annondeveloper/ui-kit/lite/styles.css';
+</style>`
+  }
+
+  const importPath = tier === 'premium' ? '@annondeveloper/ui-kit/premium' : '@annondeveloper/ui-kit'
+  const props: string[] = [`:config="${configName}"`, ':data="data"']
+  if (isLoading) props.push(':loading="true"')
+  if (motion !== 3) props.push(`:motion="${motion}"`)
+  props.push('@refresh="fetchData"')
+  props.push(':auto-refresh="30000"')
+
+  return `<template>
+  <PluginDashboard
+    ${props.join('\n    ')}
+  />
+</template>
+
+<script setup>
+import { PluginDashboard } from '${importPath}'
+import { ${configName} } from '@annondeveloper/ui-kit'
+import { ref, onMounted } from 'vue'
+
+const data = ref({})
+
+async function fetchData() {
+  const res = await fetch('/api/${selectedConfig}/metrics')
+  data.value = await res.json()
+}
+
+onMounted(fetchData)
+</script>`
+}
+
+function generateAngularCode(
+  tier: Tier,
+  selectedConfig: ConfigChoice,
+): string {
+  if (tier === 'lite') {
+    return `<!-- Angular \u2014 Lite tier (CSS-only) -->
+<div class="ui-plugin-dashboard" data-config="${selectedConfig}">
+  <div *ngFor="let metric of metrics" class="ui-plugin-dashboard__metric">
+    {{ metric.label }}: {{ data[metric.key] }}
+  </div>
+</div>
+
+/* In styles.css */
+@import '@annondeveloper/ui-kit/lite/styles.css';`
+  }
+
+  const importPath = tier === 'premium' ? '@annondeveloper/ui-kit/premium' : '@annondeveloper/ui-kit'
+  return `<!-- Angular \u2014 ${tier === 'premium' ? 'Premium' : 'Standard'} tier -->
+<!-- Use React wrapper or CSS-only approach -->
+<div
+  class="ui-plugin-dashboard"
+  data-config="${selectedConfig}"
+>
+  <div class="ui-plugin-dashboard__header">
+    <h2>{{ config.name }} Dashboard</h2>
+  </div>
+  <div class="ui-plugin-dashboard__metrics">
+    <div *ngFor="let metric of config.metrics" class="ui-plugin-dashboard__metric"
+      [attr.data-status]="getMetricStatus(metric, data)">
+      {{ metric.label }}: {{ formatValue(data[metric.key], metric.format) }}
+    </div>
+  </div>
+</div>
+
+/* Import component CSS */
+@import '${importPath}/css/components/plugin-dashboard.css';`
+}
+
+function generateSvelteCode(
+  tier: Tier,
+  selectedConfig: ConfigChoice,
+  motion: number,
+  isLoading: boolean,
+): string {
+  const configName = selectedConfig.toUpperCase() + '_DASHBOARD'
+
+  if (tier === 'lite') {
+    return `<!-- Svelte \u2014 Lite tier (CSS-only) -->
+<div class="ui-plugin-dashboard" data-config="${selectedConfig}">
+  {#each config.metrics as metric (metric.key)}
+    <div class="ui-plugin-dashboard__metric">
+      {metric.label}: {data[metric.key]}
+    </div>
+  {/each}
+</div>
+
+<style>
+  @import '@annondeveloper/ui-kit/lite/styles.css';
+</style>`
+  }
+
+  const importPath = tier === 'premium' ? '@annondeveloper/ui-kit/premium' : '@annondeveloper/ui-kit'
+  const props: string[] = [`config={${configName}}`, '{data}']
+  if (isLoading) props.push('loading')
+  if (motion !== 3) props.push(`motion={${motion}}`)
+  props.push('onRefresh={fetchData}')
+  props.push('autoRefresh={30000}')
+
+  return `<script>
+  import { PluginDashboard } from '${importPath}';
+  import { ${configName} } from '@annondeveloper/ui-kit';
+  import { onMount } from 'svelte';
+
+  let data = {};
+
+  async function fetchData() {
+    const res = await fetch('/api/${selectedConfig}/metrics');
+    data = await res.json();
+  }
+
+  onMount(fetchData);
+</script>
+
+<PluginDashboard
+  ${props.join('\n  ')}
+/>`
+}
+
 // ─── Playground Section ─────────────────────────────────────────────────────
 
 const WIDGET_TYPES = ['metric', 'chart', 'table', 'status', 'list', 'gauge', 'custom'] as const
@@ -754,6 +1006,47 @@ function PlaygroundSection({ tier: tierProp }: { tier: Tier }) {
     [tier, selectedConfig, motion, isLoading],
   )
 
+  const htmlCode = useMemo(
+    () => generateHtmlCode(tier, selectedConfig),
+    [tier, selectedConfig],
+  )
+
+  const vueCode = useMemo(
+    () => generateVueCode(tier, selectedConfig, motion, isLoading),
+    [tier, selectedConfig, motion, isLoading],
+  )
+
+  const angularCode = useMemo(
+    () => generateAngularCode(tier, selectedConfig),
+    [tier, selectedConfig],
+  )
+
+  const svelteCode = useMemo(
+    () => generateSvelteCode(tier, selectedConfig, motion, isLoading),
+    [tier, selectedConfig, motion, isLoading],
+  )
+
+  const [activeCodeTab, setActiveCodeTab] = useState('react')
+
+  const codeTabs = [
+    { id: 'react', label: 'React' },
+    { id: 'html', label: 'HTML+CSS' },
+    { id: 'vue', label: 'Vue' },
+    { id: 'angular', label: 'Angular' },
+    { id: 'svelte', label: 'Svelte' },
+  ]
+
+  const activeCode = useMemo(() => {
+    switch (activeCodeTab) {
+      case 'react': return reactCode
+      case 'html': return htmlCode
+      case 'vue': return vueCode
+      case 'angular': return angularCode
+      case 'svelte': return svelteCode
+      default: return reactCode
+    }
+  }, [activeCodeTab, reactCode, htmlCode, vueCode, angularCode, svelteCode])
+
   return (
     <section className="plugin-dashboard-page__section" id="playground">
       <h2 className="plugin-dashboard-page__section-title">
@@ -782,17 +1075,33 @@ function PlaygroundSection({ tier: tierProp }: { tier: Tier }) {
                 variant="secondary"
                 icon={<Icon name="copy" size="sm" />}
                 onClick={() => {
-                  navigator.clipboard?.writeText(reactCode).then(() => {
-                    setCopyStatus('Copied React!')
+                  navigator.clipboard?.writeText(activeCode).then(() => {
+                    setCopyStatus(`Copied ${codeTabs.find(t => t.id === activeCodeTab)?.label}!`)
                     setTimeout(() => setCopyStatus(''), 2000)
                   })
                 }}
               >
-                Copy React
+                Copy {codeTabs.find(t => t.id === activeCodeTab)?.label}
               </Button>
               {copyStatus && <span className="plugin-dashboard-page__export-status">{copyStatus}</span>}
             </div>
-            <CopyBlock code={reactCode} language="typescript" showLineNumbers />
+            <Tabs tabs={codeTabs} activeTab={activeCodeTab} onChange={setActiveCodeTab} size="sm" variant="pills">
+              <TabPanel tabId="react">
+                <CopyBlock code={reactCode} language="typescript" showLineNumbers />
+              </TabPanel>
+              <TabPanel tabId="html">
+                <CopyBlock code={htmlCode} language="html" showLineNumbers />
+              </TabPanel>
+              <TabPanel tabId="vue">
+                <CopyBlock code={vueCode} language="html" showLineNumbers />
+              </TabPanel>
+              <TabPanel tabId="angular">
+                <CopyBlock code={angularCode} language="html" showLineNumbers />
+              </TabPanel>
+              <TabPanel tabId="svelte">
+                <CopyBlock code={svelteCode} language="html" showLineNumbers />
+              </TabPanel>
+            </Tabs>
           </div>
         </div>
 
@@ -963,6 +1272,13 @@ export default function PluginDashboardPage() {
             <div className="plugin-dashboard-page__tier-import">
               import {'{'} PluginDashboard {'}'} from '@annondeveloper/ui-kit/lite'
             </div>
+            <div className="plugin-dashboard-page__size-breakdown">
+              <div className="plugin-dashboard-page__size-row">
+                <span>Component: <strong style={{ color: 'var(--text-primary)' }}>1.0 KB</strong></span>
+                <span>+ Shared: <strong style={{ color: 'var(--text-primary)' }}>0.5 KB</strong></span>
+                <span>= <strong style={{ color: 'var(--brand)' }}>1.5 KB</strong> gzip</span>
+              </div>
+            </div>
             <div className="plugin-dashboard-page__tier-preview">
               <LitePluginDashboard config={POSTGRES_DASHBOARD} data={samplePostgresData} />
             </div>
@@ -986,6 +1302,13 @@ export default function PluginDashboardPage() {
             <div className="plugin-dashboard-page__tier-import">
               import {'{'} PluginDashboard {'}'} from '@annondeveloper/ui-kit'
             </div>
+            <div className="plugin-dashboard-page__size-breakdown">
+              <div className="plugin-dashboard-page__size-row">
+                <span>Component: <strong style={{ color: 'var(--text-primary)' }}>4.8 KB</strong></span>
+                <span>+ Shared: <strong style={{ color: 'var(--text-primary)' }}>0.9 KB</strong></span>
+                <span>= <strong style={{ color: 'var(--brand)' }}>5.7 KB</strong> gzip</span>
+              </div>
+            </div>
             <div className="plugin-dashboard-page__tier-preview">
               <PluginDashboard config={POSTGRES_DASHBOARD} data={samplePostgresData} />
             </div>
@@ -1008,6 +1331,13 @@ export default function PluginDashboardPage() {
             </p>
             <div className="plugin-dashboard-page__tier-import">
               import {'{'} PluginDashboard {'}'} from '@annondeveloper/ui-kit/premium'
+            </div>
+            <div className="plugin-dashboard-page__size-breakdown">
+              <div className="plugin-dashboard-page__size-row">
+                <span>Component: <strong style={{ color: 'var(--text-primary)' }}>5.6 KB</strong></span>
+                <span>+ Shared: <strong style={{ color: 'var(--text-primary)' }}>1.2 KB</strong></span>
+                <span>= <strong style={{ color: 'var(--brand)' }}>6.8 KB</strong> gzip</span>
+              </div>
             </div>
             <div className="plugin-dashboard-page__tier-preview">
               <PremiumPluginDashboard config={POSTGRES_DASHBOARD} data={samplePostgresData} />
@@ -1103,7 +1433,45 @@ export default function PluginDashboardPage() {
         </div>
       </section>
 
-      {/* ── 6. Accessibility ──────────────────────────── */}
+      {/* ── 6. Brand Color ──────────────────────────── */}
+      <section className="plugin-dashboard-page__section" id="brand-color">
+        <h2 className="plugin-dashboard-page__section-title">
+          <a href="#brand-color">Brand Color</a>
+        </h2>
+        <p className="plugin-dashboard-page__section-desc">
+          Pick a brand color to see the page theme update in real-time. The aurora
+          gradients and accent colors derive automatically from your choice.
+        </p>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+          <ColorInput
+            name="brand-color"
+            value={brandColor}
+            onChange={setBrandColor}
+            size="sm"
+            swatches={['#6366f1','#f97316','#f43f5e','#0ea5e9','#10b981','#8b5cf6','#d946ef','#f59e0b','#06b6d4','#64748b']}
+          />
+          <div className="plugin-dashboard-page__color-presets">
+            {BRAND_COLOR_PRESETS.map(p => (
+              <button
+                key={p.hex}
+                type="button"
+                className={`plugin-dashboard-page__color-preset${brandColor === p.hex ? ' plugin-dashboard-page__color-preset--active' : ''}`}
+                style={{ background: p.hex }}
+                onClick={() => setBrandColor(p.hex)}
+                title={p.name}
+                aria-label={`Set brand color to ${p.name}`}
+              />
+            ))}
+          </div>
+          {brandColor !== '#6366f1' && (
+            <Button size="xs" variant="ghost" onClick={() => setBrandColor('#6366f1')}>
+              <Icon name="refresh" size="sm" /> Reset to default
+            </Button>
+          )}
+        </div>
+      </section>
+
+      {/* ── 7. Accessibility ──────────────────────────── */}
       <section className="plugin-dashboard-page__section" id="accessibility">
         <h2 className="plugin-dashboard-page__section-title">
           <a href="#accessibility">Accessibility</a>
@@ -1157,6 +1525,23 @@ export default function PluginDashboardPage() {
             </li>
           </ul>
         </Card>
+      </section>
+
+      {/* ── Source ──────────────────────────────────────── */}
+      <section className="plugin-dashboard-page__section" id="source">
+        <h2 className="plugin-dashboard-page__section-title"><a href="#source">Source</a></h2>
+        <p className="plugin-dashboard-page__section-desc">View the full component source code on GitHub.</p>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+          <a style={{ color: 'var(--brand)', textDecoration: 'none' }} href="https://github.com/annondeveloper/ui-kit/blob/main/src/domain/plugin-dashboard.tsx" target="_blank" rel="noopener noreferrer">
+            src/domain/plugin-dashboard.tsx (Standard)
+          </a>
+          <a style={{ color: 'var(--brand)', textDecoration: 'none' }} href="https://github.com/annondeveloper/ui-kit/blob/main/src/lite/plugin-dashboard.tsx" target="_blank" rel="noopener noreferrer">
+            src/lite/plugin-dashboard.tsx (Lite)
+          </a>
+          <a style={{ color: 'var(--brand)', textDecoration: 'none' }} href="https://github.com/annondeveloper/ui-kit/blob/main/src/premium/plugin-dashboard.tsx" target="_blank" rel="noopener noreferrer">
+            src/premium/plugin-dashboard.tsx (Premium)
+          </a>
+        </div>
       </section>
     </div>
   )

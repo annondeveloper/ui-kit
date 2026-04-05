@@ -5,11 +5,16 @@ import { css } from '@ui/core/styles/css-tag'
 import { useStyles } from '@ui/core/styles/use-styles'
 import { LiveFeed, type FeedItem } from '@ui/domain/live-feed'
 import { LiveFeed as LiteLiveFeed } from '@ui/lite/live-feed'
+import { LiveFeed as PremiumLiveFeed } from '@ui/premium/live-feed'
 import { Button } from '@ui/components/button'
 import { Card } from '@ui/components/card'
 import { CopyBlock } from '@ui/domain/copy-block'
 import { Tabs, TabPanel } from '@ui/components/tabs'
 import { Icon } from '@ui/core/icons/icon'
+import { generateTheme } from '@ui/core/tokens/generator'
+import { TOKEN_TO_CSS, type ThemeTokens } from '@ui/core/tokens/tokens'
+import { useTheme } from '@ui/core/tokens/theme-context'
+import { ColorInput } from '@ui/components/color-input'
 import { PropsTable, type PropDef } from '../../components/PropsTable'
 import { useTier, type Tier } from '../../App'
 
@@ -514,6 +519,22 @@ const pageStyles = css`
         letter-spacing: 0.03em;
       }
 
+      /* ── Source link ─────────────────────────────────── */
+
+      .live-feed-page__source-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        color: var(--brand, oklch(65% 0.2 270));
+        font-size: var(--text-sm, 0.875rem);
+        text-decoration: none;
+        font-weight: 500;
+      }
+      .live-feed-page__source-link:hover {
+        text-decoration: underline;
+        text-underline-offset: 0.2em;
+      }
+
       /* ── Responsive ──────────────────────────────── */
 
       @media (max-width: 768px) {
@@ -877,6 +898,16 @@ function PlaygroundSection({ tier: tierProp }: { tier: Tier }) {
                   items={liteItems}
                   maxHeight={height}
                 />
+              ) : tier === 'premium' ? (
+                <PremiumLiveFeed
+                  items={items}
+                  maxItems={maxItems}
+                  autoScroll={autoScroll}
+                  paused={paused}
+                  connectionStatus={connectionStatus}
+                  height={height}
+                  motion={motion}
+                />
               ) : (
                 <LiveFeed
                   items={items}
@@ -975,7 +1006,33 @@ export default function LiveFeedPage() {
   useStyles('live-feed-page', pageStyles)
 
   const { tier, setTier } = useTier()
+  const [brandColor, setBrandColor] = useState('#6366f1')
   const pageRef = useRef<HTMLDivElement>(null)
+  const { mode } = useTheme()
+
+  const themeTokens = useMemo(() => {
+    try {
+      return generateTheme(brandColor, mode)
+    } catch {
+      return null
+    }
+  }, [brandColor, mode])
+
+  const BRAND_ONLY_KEYS: (keyof ThemeTokens)[] = [
+    'brand', 'brandLight', 'brandDark', 'brandSubtle', 'brandGlow',
+    'bgElevated', 'borderDefault', 'borderSubtle',
+  ]
+
+  const themeStyle = useMemo(() => {
+    if (!themeTokens || brandColor === '#6366f1') return undefined
+    const style: Record<string, string> = {}
+    for (const key of BRAND_ONLY_KEYS) {
+      const cssVar = TOKEN_TO_CSS[key]
+      const value = themeTokens[key]
+      if (cssVar && value) style[cssVar] = value
+    }
+    return style as React.CSSProperties
+  }, [themeTokens, brandColor])
 
   useEffect(() => {
     const sections = document.querySelectorAll('.live-feed-page__section')
@@ -1289,6 +1346,48 @@ export default function LiveFeedPage() {
             </li>
           </ul>
         </Card>
+      </section>
+
+      {/* ── 12. Brand Color ────────────────────────────── */}
+      <section className="live-feed-page__section" id="brand-color">
+        <h2 className="live-feed-page__section-title">
+          <a href="#brand-color">Brand Color</a>
+        </h2>
+        <p className="live-feed-page__section-desc">
+          Pick a brand color to preview how LiveFeed adapts. The theme generator produces
+          derived colors (light, dark, subtle, glow) automatically from your choice.
+        </p>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+          <ColorInput
+            name="brand-color"
+            value={brandColor}
+            onChange={setBrandColor}
+            size="sm"
+            swatches={['#6366f1','#f97316','#f43f5e','#0ea5e9','#10b981','#8b5cf6','#d946ef','#f59e0b','#06b6d4','#64748b']}
+          />
+          {brandColor !== '#6366f1' && (
+            <Button size="xs" variant="ghost" onClick={() => setBrandColor('#6366f1')}>
+              <Icon name="refresh" size="sm" /> Reset to default
+            </Button>
+          )}
+        </div>
+      </section>
+
+      {/* ── 13. Source ─────────────────────────────────── */}
+      <section className="live-feed-page__section" id="source">
+        <h2 className="live-feed-page__section-title"><a href="#source">Source</a></h2>
+        <p className="live-feed-page__section-desc">View the full component source code on GitHub.</p>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+          <a className="live-feed-page__source-link" href="https://github.com/annondeveloper/ui-kit/blob/main/src/domain/live-feed.tsx" target="_blank" rel="noopener noreferrer">
+            <Icon name="code" size="sm" /> src/domain/live-feed.tsx (Standard)
+          </a>
+          <a className="live-feed-page__source-link" href="https://github.com/annondeveloper/ui-kit/blob/main/src/lite/live-feed.tsx" target="_blank" rel="noopener noreferrer">
+            <Icon name="code" size="sm" /> src/lite/live-feed.tsx (Lite)
+          </a>
+          <a className="live-feed-page__source-link" href="https://github.com/annondeveloper/ui-kit/blob/main/src/premium/live-feed.tsx" target="_blank" rel="noopener noreferrer">
+            <Icon name="code" size="sm" /> src/premium/live-feed.tsx (Premium)
+          </a>
+        </div>
       </section>
     </div>
   )

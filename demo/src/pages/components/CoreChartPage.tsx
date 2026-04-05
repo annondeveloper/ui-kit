@@ -469,6 +469,20 @@ const pageStyles = css`
         padding-block-start: 0.5rem;
       }
 
+      .core-chart-page__size-breakdown {
+        display: flex;
+        flex-direction: column;
+        gap: 0.25rem;
+        font-size: 0.75rem;
+        color: var(--text-tertiary);
+      }
+
+      .core-chart-page__size-row {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+
       /* ── Code tabs ─────────────────────────────────── */
 
       .core-chart-page__code-tabs {
@@ -1224,6 +1238,13 @@ export default function CoreChartPage() {
             <div className="core-chart-page__tier-preview">
               <LiteCoreChart cores={demoData8} />
             </div>
+            <div className="core-chart-page__size-breakdown">
+              <div className="core-chart-page__size-row">
+                <span>Component: <strong style={{ color: 'var(--text-primary)' }}>0.4 KB</strong></span>
+                <span>+ Shared: <strong style={{ color: 'var(--text-primary)' }}>0.0 KB</strong></span>
+                <span>= <strong style={{ color: 'var(--brand)' }}>0.4 KB</strong> gzip</span>
+              </div>
+            </div>
           </div>
 
           {/* Standard */}
@@ -1248,6 +1269,13 @@ export default function CoreChartPage() {
             <div className="core-chart-page__tier-preview">
               <CoreChart cores={demoData8} colorScale="green-red" showLabels size="md" />
             </div>
+            <div className="core-chart-page__size-breakdown">
+              <div className="core-chart-page__size-row">
+                <span>Component: <strong style={{ color: 'var(--text-primary)' }}>1.8 KB</strong></span>
+                <span>+ Shared: <strong style={{ color: 'var(--text-primary)' }}>0.9 KB</strong></span>
+                <span>= <strong style={{ color: 'var(--brand)' }}>2.7 KB</strong> gzip</span>
+              </div>
+            </div>
           </div>
 
           {/* Premium */}
@@ -1271,6 +1299,13 @@ export default function CoreChartPage() {
             </div>
             <div className="core-chart-page__tier-preview">
               <PremiumCoreChart cores={demoData8} colorScale="brand" showLabels size="md" />
+            </div>
+            <div className="core-chart-page__size-breakdown">
+              <div className="core-chart-page__size-row">
+                <span>Component: <strong style={{ color: 'var(--text-primary)' }}>2.5 KB</strong></span>
+                <span>+ Shared: <strong style={{ color: 'var(--text-primary)' }}>0.9 KB</strong></span>
+                <span>= <strong style={{ color: 'var(--brand)' }}>3.4 KB</strong> gzip</span>
+              </div>
             </div>
           </div>
         </div>

@@ -4,6 +4,8 @@ import { useState, useMemo, useCallback, useRef, useEffect } from 'react'
 import { css } from '@ui/core/styles/css-tag'
 import { useStyles } from '@ui/core/styles/use-styles'
 import { TextReveal } from '@ui/domain/text-reveal'
+import { TextReveal as LiteTextReveal } from '@ui/lite/text-reveal'
+import { TextReveal as PremiumTextReveal } from '@ui/premium/text-reveal'
 import { Button } from '@ui/components/button'
 import { Card } from '@ui/components/card'
 import { CopyBlock } from '@ui/domain/copy-block'
@@ -856,6 +858,8 @@ function PlaygroundSection({ tier: tierProp, brandColor }: { tier: Tier; brandCo
   const [copyStatus, setCopyStatus] = useState('')
   const [replayKey, setReplayKey] = useState(0)
 
+  const TextRevealComponent = tier === 'lite' ? LiteTextReveal : tier === 'premium' ? PremiumTextReveal : TextReveal
+
   const reactCode = useMemo(
     () => generateReactCode(tier, text, trigger, speed, motion),
     [tier, text, trigger, speed, motion],
@@ -915,7 +919,7 @@ function PlaygroundSection({ tier: tierProp, brandColor }: { tier: Tier; brandCo
         <div className="text-reveal-page__playground-preview">
           <div className="text-reveal-page__playground-result">
             <span style={{ fontSize: 'clamp(1.25rem, 3vw, 2rem)', fontWeight: 700, position: 'relative', maxInlineSize: '40ch', textAlign: 'center' }}>
-              <TextReveal
+              <TextRevealComponent
                 key={replayKey}
                 text={text}
                 trigger={trigger}
@@ -1222,7 +1226,7 @@ export default function TextRevealPage() {
             </div>
             <div className="text-reveal-page__tier-preview">
               <span style={{ fontSize: '0.875rem', fontWeight: 600, color: 'var(--text-primary)' }}>
-                Static text display
+                <LiteTextReveal text="Static text display" />
               </span>
             </div>
             <div className="text-reveal-page__size-breakdown">
@@ -1288,7 +1292,7 @@ export default function TextRevealPage() {
             </div>
             <div className="text-reveal-page__tier-preview">
               <span style={{ fontSize: '0.875rem', fontWeight: 600 }}>
-                <TextReveal text="Premium tier" trigger="mount" speed={25} />
+                <PremiumTextReveal text="Premium tier" trigger="mount" speed={25} />
               </span>
             </div>
             <div className="text-reveal-page__size-breakdown">
@@ -1452,7 +1456,7 @@ export default function TextRevealPage() {
         </p>
         <a
           className="text-reveal-page__source-link"
-          href="https://github.com/annondeveloper/ui-kit/blob/v2/src/domain/text-reveal.tsx"
+          href="https://github.com/annondeveloper/ui-kit/blob/main/src/domain/text-reveal.tsx"
           target="_blank"
           rel="noopener noreferrer"
         >

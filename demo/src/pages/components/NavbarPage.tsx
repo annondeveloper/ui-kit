@@ -4,6 +4,7 @@ import { useState, useMemo, useCallback, useRef, useEffect } from 'react'
 import { css } from '@ui/core/styles/css-tag'
 import { useStyles } from '@ui/core/styles/use-styles'
 import { Navbar } from '@ui/components/navbar'
+import { Navbar as PremiumNavbar } from '@ui/premium/navbar'
 import { Navbar as LiteNavbar } from '@ui/lite/navbar'
 import { Button } from '@ui/components/button'
 import { Card } from '@ui/components/card'
@@ -861,6 +862,7 @@ function generateReactCode(
   bordered: boolean,
   transparent: boolean,
   height: number,
+  motion: number,
 ): string {
   const importStr = IMPORT_STRINGS[tier]
   const props: string[] = []
@@ -868,6 +870,7 @@ function generateReactCode(
   if (!bordered) props.push('  bordered={false}')
   if (transparent) props.push('  transparent')
   if (height !== 56) props.push(`  height={${height}}`)
+  if (motion !== 3 && tier !== 'lite') props.push(`  motion={${motion}}`)
 
   const logoJsx = '  logo={<span style={{ fontWeight: 700 }}>MyApp</span>}'
   const actionsJsx = '  actions={<button>Sign In</button>}'
@@ -1012,13 +1015,14 @@ function PlaygroundSection({ tier: tierProp, brandColor }: { tier: Tier; brandCo
   const [bordered, setBordered] = useState(true)
   const [transparent, setTransparent] = useState(false)
   const [height, setHeight] = useState(56)
+  const [motion, setMotion] = useState<0 | 1 | 2 | 3>(3)
   const [copyStatus, setCopyStatus] = useState('')
 
-  const NavbarComponent = tier === 'lite' ? LiteNavbar : Navbar
+  const NavbarComponent = tier === 'premium' ? PremiumNavbar : tier === 'lite' ? LiteNavbar : Navbar
 
   const reactCode = useMemo(
-    () => generateReactCode(tier, sticky, bordered, transparent, height),
-    [tier, sticky, bordered, transparent, height],
+    () => generateReactCode(tier, sticky, bordered, transparent, height, motion),
+    [tier, sticky, bordered, transparent, height, motion],
   )
   const htmlCode = useMemo(
     () => generateHtmlCode(tier, sticky, bordered, transparent),
@@ -1075,6 +1079,7 @@ function PlaygroundSection({ tier: tierProp, brandColor }: { tier: Tier; brandCo
               bordered={bordered}
               transparent={transparent}
               height={height}
+              {...(tier !== 'lite' ? { motion } : {})}
               logo={<span style={{ fontWeight: 700, fontSize: '1rem' }}>MyApp</span>}
               actions={
                 <Button size="sm" variant="primary">
@@ -1153,6 +1158,15 @@ function PlaygroundSection({ tier: tierProp, brandColor }: { tier: Tier; brandCo
               ))}
             </div>
           </div>
+
+          {tier !== 'lite' && (
+            <OptionGroup
+              label="Motion"
+              options={['0', '1', '2', '3'] as const}
+              value={String(motion) as '0' | '1' | '2' | '3'}
+              onChange={v => setMotion(Number(v) as 0 | 1 | 2 | 3)}
+            />
+          )}
         </div>
       </div>
     </section>
@@ -1521,14 +1535,14 @@ export default function NavbarPage() {
               import {'{'} Navbar {'}'} from '@annondeveloper/ui-kit/premium'
             </div>
             <div className="navbar-page__tier-preview">
-              <Navbar
+              <PremiumNavbar
                 sticky={false}
                 bordered
                 logo={<span style={{ fontWeight: 700, fontSize: '0.75rem' }}>Premium</span>}
               >
                 <NavLink active>Home</NavLink>
                 <NavLink>About</NavLink>
-              </Navbar>
+              </PremiumNavbar>
             </div>
             <div className="navbar-page__size-breakdown">
               <div className="navbar-page__size-row">
@@ -1653,6 +1667,45 @@ export default function NavbarPage() {
             </li>
           </ul>
         </Card>
+      </section>
+
+      {/* ── 11. Source ──────────────────────────────────── */}
+      <section className="navbar-page__section" id="source">
+        <h2 className="navbar-page__section-title">
+          <a href="#source">Source</a>
+        </h2>
+        <p className="navbar-page__section-desc">
+          View the component source on GitHub.
+        </p>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+          <a
+            href="https://github.com/annondeveloper/ui-kit/blob/main/src/components/navbar.tsx"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="navbar-page__source-link"
+          >
+            <Icon name="code" size="sm" />
+            src/components/navbar.tsx
+          </a>
+          <a
+            href="https://github.com/annondeveloper/ui-kit/blob/main/src/lite/navbar.tsx"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="navbar-page__source-link"
+          >
+            <Icon name="code" size="sm" />
+            src/lite/navbar.tsx
+          </a>
+          <a
+            href="https://github.com/annondeveloper/ui-kit/blob/main/src/premium/navbar.tsx"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="navbar-page__source-link"
+          >
+            <Icon name="code" size="sm" />
+            src/premium/navbar.tsx
+          </a>
+        </div>
       </section>
     </div>
   )

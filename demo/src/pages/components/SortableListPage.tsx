@@ -6,6 +6,8 @@ import { useStyles } from '@ui/core/styles/use-styles'
 import { Button } from '@ui/components/button'
 import { Card } from '@ui/components/card'
 import { SortableList, type SortableItem } from '@ui/domain/sortable-list'
+import { SortableList as LiteSortableList } from '@ui/lite/sortable-list'
+import { SortableList as PremiumSortableList } from '@ui/premium/sortable-list'
 import { CopyBlock } from '@ui/domain/copy-block'
 import { Tabs, TabPanel } from '@ui/components/tabs'
 import { Icon } from '@ui/core/icons/icon'
@@ -421,6 +423,38 @@ const pageStyles = css`
         display: flex;
         justify-content: center;
         padding-block-start: 0.5rem;
+      }
+
+      /* ── Size breakdown bar ─────────────────────────── */
+
+      .sortable-list-page__size-breakdown {
+        display: flex;
+        flex-direction: column;
+        gap: 0.25rem;
+        font-size: 0.75rem;
+        color: var(--text-tertiary);
+      }
+
+      .sortable-list-page__size-row {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+
+      /* ── Source link ─────────────────────────────────── */
+
+      .sortable-list-page__source-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: var(--text-sm, 0.875rem);
+        color: var(--brand);
+        text-decoration: none;
+        font-weight: 500;
+      }
+      .sortable-list-page__source-link:hover {
+        text-decoration: underline;
+        text-underline-offset: 0.2em;
       }
 
       /* ── A11y list ──────────────────────────────────── */
@@ -1084,7 +1118,14 @@ export default function SortableListPage() {
               import {'{'} SortableList {'}'} from '@annondeveloper/ui-kit/lite'
             </div>
             <div className="sortable-list-page__tier-preview">
-              <Button size="sm" variant="secondary" onClick={() => setTier('lite')}>Select Lite</Button>
+              <LiteSortableList items={[{ id: 'l1', content: 'Item A' }, { id: 'l2', content: 'Item B' }]} />
+            </div>
+            <div className="sortable-list-page__size-breakdown">
+              <div className="sortable-list-page__size-row">
+                <span>Component: <strong style={{ color: 'var(--text-primary)' }}>0.2 KB</strong></span>
+                <span>+ Shared: <strong style={{ color: 'var(--text-primary)' }}>0.4 KB</strong></span>
+                <span>= <strong style={{ color: 'var(--brand)' }}>0.6 KB</strong> gzip</span>
+              </div>
             </div>
           </div>
 
@@ -1109,6 +1150,13 @@ export default function SortableListPage() {
             <div className="sortable-list-page__tier-preview">
               <Button size="sm" variant="primary" onClick={() => setTier('standard')}>Select Standard</Button>
             </div>
+            <div className="sortable-list-page__size-breakdown">
+              <div className="sortable-list-page__size-row">
+                <span>Component: <strong style={{ color: 'var(--text-primary)' }}>3.0 KB</strong></span>
+                <span>+ Shared: <strong style={{ color: 'var(--text-primary)' }}>0.9 KB</strong></span>
+                <span>= <strong style={{ color: 'var(--brand)' }}>3.9 KB</strong> gzip</span>
+              </div>
+            </div>
           </div>
 
           <div
@@ -1130,7 +1178,14 @@ export default function SortableListPage() {
               import {'{'} SortableList {'}'} from '@annondeveloper/ui-kit/premium'
             </div>
             <div className="sortable-list-page__tier-preview">
-              <Button size="sm" variant="primary" onClick={() => setTier('premium')}>Select Premium</Button>
+              <PremiumSortableList items={[{ id: 'p1', content: 'Item A' }, { id: 'p2', content: 'Item B' }]} onChange={() => {}} />
+            </div>
+            <div className="sortable-list-page__size-breakdown">
+              <div className="sortable-list-page__size-row">
+                <span>Component: <strong style={{ color: 'var(--text-primary)' }}>2.5 KB</strong></span>
+                <span>+ Shared: <strong style={{ color: 'var(--text-primary)' }}>3.3 KB</strong></span>
+                <span>= <strong style={{ color: 'var(--brand)' }}>5.8 KB</strong> gzip</span>
+              </div>
             </div>
           </div>
         </div>
@@ -1222,6 +1277,23 @@ export default function SortableListPage() {
             </li>
           </ul>
         </Card>
+      </section>
+
+      {/* ── Source ──────────────────────────────────────── */}
+      <section className="sortable-list-page__section" id="source">
+        <h2 className="sortable-list-page__section-title"><a href="#source">Source</a></h2>
+        <p className="sortable-list-page__section-desc">View the full component source code on GitHub.</p>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+          <a className="sortable-list-page__source-link" href="https://github.com/annondeveloper/ui-kit/blob/main/src/domain/sortable-list.tsx" target="_blank" rel="noopener noreferrer">
+            <Icon name="code" size="sm" /> src/domain/sortable-list.tsx (Standard)
+          </a>
+          <a className="sortable-list-page__source-link" href="https://github.com/annondeveloper/ui-kit/blob/main/src/lite/sortable-list.tsx" target="_blank" rel="noopener noreferrer">
+            <Icon name="code" size="sm" /> src/lite/sortable-list.tsx (Lite)
+          </a>
+          <a className="sortable-list-page__source-link" href="https://github.com/annondeveloper/ui-kit/blob/main/src/premium/sortable-list.tsx" target="_blank" rel="noopener noreferrer">
+            <Icon name="code" size="sm" /> src/premium/sortable-list.tsx (Premium)
+          </a>
+        </div>
       </section>
     </div>
   )

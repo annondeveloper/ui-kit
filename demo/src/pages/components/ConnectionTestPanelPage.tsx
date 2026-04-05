@@ -10,6 +10,7 @@ import { Button } from '@ui/components/button'
 import { CopyBlock } from '@ui/domain/copy-block'
 import { Tabs, TabPanel } from '@ui/components/tabs'
 import { Icon } from '@ui/core/icons/icon'
+import { ColorInput } from '@ui/components/color-input'
 import { PropsTable, type PropDef } from '../../components/PropsTable'
 import { useTier, type Tier } from '../../App'
 
@@ -429,6 +430,20 @@ const pageStyles = css`
         text-underline-offset: 0.2em;
       }
 
+      /* ── Size breakdown ────────────────────────────── */
+
+      .connection-test-panel-page__size-breakdown { display: flex; flex-direction: column; gap: 0.25rem; font-size: 0.75rem; color: var(--text-tertiary); }
+      .connection-test-panel-page__size-row { display: flex; align-items: center; gap: 0.5rem; }
+
+      /* ── Motion option group ────────────────────────── */
+
+      .connection-test-panel-page__control-row { display: flex; flex-direction: column; gap: 0.375rem; }
+      .connection-test-panel-page__control-row > label { font-size: var(--text-xs, 0.75rem); font-weight: 600; color: var(--text-tertiary); text-transform: uppercase; letter-spacing: 0.05em; }
+      .connection-test-panel-page__option-group { display: flex; flex-wrap: wrap; gap: 0.375rem; }
+      .connection-test-panel-page__option { font-size: var(--text-xs, 0.75rem); padding: 0.25rem 0.625rem; border: 1px solid var(--border-default); border-radius: var(--radius-sm); background: transparent; color: var(--text-secondary); cursor: pointer; font-family: inherit; font-weight: 500; transition: all 0.12s; line-height: 1.4; }
+      .connection-test-panel-page__option:hover { border-color: var(--border-strong); color: var(--text-primary); }
+      .connection-test-panel-page__option--active { background: var(--brand); color: oklch(100% 0 0); border-color: var(--brand); box-shadow: 0 0 0 3px var(--brand-subtle); }
+
       @media (max-width: 768px) {
         .connection-test-panel-page__hero { padding: 2rem 1.25rem; }
         .connection-test-panel-page__title { font-size: 1.75rem; }
@@ -589,6 +604,7 @@ function PlaygroundSection() {
   const { tier } = useTier()
   const [scenario, setScenario] = useState<Scenario>('mixed')
   const [size, setSize] = useState<Size>('md')
+  const [motion, setMotion] = useState<0 | 1 | 2 | 3>(3)
   const [title, setTitle] = useState('Connection Test')
   const [running, setRunning] = useState(false)
   const [copyStatus, setCopyStatus] = useState('')
@@ -635,6 +651,7 @@ function PlaygroundSection() {
               steps={steps}
               title={title}
               size={size}
+              motion={motion}
               running={isRunning}
               onRetry={() => console.log('retry')}
               onCancel={() => console.log('cancel')}
@@ -663,6 +680,16 @@ function PlaygroundSection() {
             <input type="text" className="connection-test-panel-page__text-input" value={title} onChange={e => setTitle(e.target.value)} />
           </div>
           <Toggle label="Running" checked={running} onChange={setRunning} />
+          <div className="connection-test-panel-page__control-row">
+            <label>Motion Level</label>
+            <div className="connection-test-panel-page__option-group">
+              {([0, 1, 2, 3] as const).map(m => (
+                <button key={m} type="button"
+                  className={`connection-test-panel-page__option${motion === m ? ' connection-test-panel-page__option--active' : ''}`}
+                  onClick={() => setMotion(m)}>{m}</button>
+              ))}
+            </div>
+          </div>
         </div>
       </div>
     </section>
@@ -674,6 +701,7 @@ function PlaygroundSection() {
 export default function ConnectionTestPanelPage() {
   useStyles('connection-test-panel-page', pageStyles)
   const { tier, setTier } = useTier()
+  const [brandColor, setBrandColor] = useState('#6366f1')
 
   const Component = tier === 'lite' ? LiteConnectionTestPanel : tier === 'premium' ? PremiumConnectionTestPanel : ConnectionTestPanel
   const importStr = IMPORT_STRINGS[tier]
@@ -698,7 +726,11 @@ export default function ConnectionTestPanelPage() {
         <h2 className="connection-test-panel-page__section-title"><a href="#tiers">Weight Tiers</a></h2>
         <p className="connection-test-panel-page__section-desc">Choose the tier that fits your bundle budget.</p>
         <div className="connection-test-panel-page__tiers">
-          {TIERS.map(t => (
+          {TIERS.map(t => {
+            const sizeKB = t.id === 'lite' ? '0.8' : t.id === 'standard' ? '2.5' : '4.0'
+            const sharedKB = t.id === 'lite' ? '0.0' : '0.9'
+            const totalKB = t.id === 'lite' ? '0.8' : t.id === 'standard' ? '3.4' : '4.9'
+            return (
             <div key={t.id} className={`connection-test-panel-page__tier-card${tier === t.id ? ' connection-test-panel-page__tier-card--active' : ''}`} onClick={() => setTier(t.id)}>
               <div className="connection-test-panel-page__tier-header">
                 <span className="connection-test-panel-page__tier-name">{t.label}</span>
@@ -710,8 +742,16 @@ export default function ConnectionTestPanelPage() {
                 {t.id === 'premium' && 'Running spinner, spring step entrance, pulse on failure.'}
               </p>
               <code className="connection-test-panel-page__tier-import">{IMPORT_STRINGS[t.id]}</code>
+              <div className="connection-test-panel-page__size-breakdown">
+                <div className="connection-test-panel-page__size-row">
+                  <span>Component: <strong style={{ color: 'var(--text-primary)' }}>{sizeKB} KB</strong></span>
+                  <span>+ Shared: <strong style={{ color: 'var(--text-primary)' }}>{sharedKB} KB</strong></span>
+                  <span>= <strong style={{ color: 'var(--brand)' }}>{totalKB} KB</strong> gzip</span>
+                </div>
+              </div>
             </div>
-          ))}
+            )
+          })}
         </div>
       </section>
 
@@ -843,6 +883,16 @@ export default function ConnectionTestPanelPage() {
           <li className="connection-test-panel-page__a11y-item"><Icon name="check" size="sm" className="connection-test-panel-page__a11y-icon" />Error messages linked to failed steps</li>
           <li className="connection-test-panel-page__a11y-item"><Icon name="check" size="sm" className="connection-test-panel-page__a11y-icon" />Respects prefers-reduced-motion for running spinner</li>
         </ul>
+      </section>
+
+      {/* ── Brand Color ───────────────────────────────── */}
+      <section className="connection-test-panel-page__section" id="brand-color">
+        <h2 className="connection-test-panel-page__section-title"><a href="#brand-color">Brand Color</a></h2>
+        <p className="connection-test-panel-page__section-desc">Pick a brand color to preview the component with your brand identity.</p>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+          <ColorInput name="brand-color" value={brandColor} onChange={setBrandColor} size="sm"
+            swatches={['#6366f1','#f97316','#f43f5e','#0ea5e9','#10b981','#8b5cf6','#d946ef','#f59e0b','#06b6d4','#64748b']} />
+        </div>
       </section>
 
       {/* Source */}

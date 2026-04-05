@@ -5,6 +5,7 @@ import { css } from '@ui/core/styles/css-tag'
 import { useStyles } from '@ui/core/styles/use-styles'
 import { FormInput } from '@ui/components/form-input'
 import { FormInput as LiteFormInput } from '@ui/lite/form-input'
+import { FormInput as PremiumFormInput } from '@ui/premium/form-input'
 import { Card } from '@ui/components/card'
 import { CopyBlock } from '@ui/domain/copy-block'
 import { Tabs, TabPanel } from '@ui/components/tabs'
@@ -608,6 +609,22 @@ const pageStyles = css`
         gap: 0.5rem;
       }
 
+      /* ── Source link ─────────────────────────────────── */
+
+      .form-input-page__source-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: var(--text-sm, 0.875rem);
+        color: var(--brand);
+        text-decoration: none;
+        font-weight: 500;
+      }
+      .form-input-page__source-link:hover {
+        text-decoration: underline;
+        text-underline-offset: 0.2em;
+      }
+
       /* ── Responsive ──────────────────────────────── */
 
       @media (max-width: 768px) {
@@ -935,8 +952,9 @@ function PlaygroundSection({ tier: tierProp, brandColor }: { tier: Tier; brandCo
   const [showIconEnd, setShowIconEnd] = useState(false)
   const [copyStatus, setCopyStatus] = useState('')
   const [activeCodeTab, setActiveCodeTab] = useState('react')
+  const [motion, setMotion] = useState<0 | 1 | 2 | 3>(3)
 
-  const InputComponent = tier === 'lite' ? LiteFormInput : FormInput
+  const InputComponent = tier === 'lite' ? LiteFormInput : tier === 'premium' ? PremiumFormInput : FormInput
 
   const reactCode = useMemo(
     () => generateReactCode(tier, inputType, size, variant, label, placeholder, error, description, disabled, showIcon, showIconEnd),
@@ -997,6 +1015,7 @@ function PlaygroundSection({ tier: tierProp, brandColor }: { tier: Tier; brandCo
     if (variant !== 'default') previewProps.variant = variant
     if (showIcon) previewProps.icon = <Icon name="user" size="sm" />
     if (showIconEnd) previewProps.iconEnd = <Icon name="check" size="sm" />
+    previewProps.motion = motion
   } else {
     if (error) previewProps.error = error
   }
@@ -1059,6 +1078,14 @@ function PlaygroundSection({ tier: tierProp, brandColor }: { tier: Tier; brandCo
           <OptionGroup label="Type" options={INPUT_TYPES} value={inputType} onChange={setInputType} />
           <OptionGroup label="Size" options={SIZES} value={size} onChange={setSize} />
           {tier !== 'lite' && <OptionGroup label="Variant" options={VARIANTS} value={variant} onChange={setVariant} />}
+          {tier !== 'lite' && (
+            <OptionGroup
+              label="Motion"
+              options={['0', '1', '2', '3'] as const}
+              value={String(motion) as '0' | '1' | '2' | '3'}
+              onChange={v => setMotion(Number(v) as 0 | 1 | 2 | 3)}
+            />
+          )}
 
           <div className="form-input-page__control-group">
             <span className="form-input-page__control-label">Toggles</span>
@@ -1162,7 +1189,7 @@ export default function FormInputPage() {
     return () => observer.disconnect()
   }, [])
 
-  const InputComponent = tier === 'lite' ? LiteFormInput : FormInput
+  const InputComponent = tier === 'lite' ? LiteFormInput : tier === 'premium' ? PremiumFormInput : FormInput
 
   return (
     <div className="form-input-page" ref={pageRef} style={themeStyle}>
@@ -1498,7 +1525,7 @@ export default function FormInputPage() {
             </div>
             <div className="form-input-page__tier-preview">
               <div style={{ inlineSize: '100%' }}>
-                <FormInput name="prem-preview" label="Premium Input" placeholder="Premium tier..." iconEnd={<Icon name="check" size="sm" />} />
+                <PremiumFormInput name="prem-preview" label="Premium Input" placeholder="Premium tier..." iconEnd={<Icon name="check" size="sm" />} />
               </div>
             </div>
             <div className="form-input-page__size-breakdown">
@@ -1617,6 +1644,23 @@ export default function FormInputPage() {
             </li>
           </ul>
         </Card>
+      </section>
+
+      {/* ── Source ──────────────────────────────────────── */}
+      <section className="form-input-page__section" id="source">
+        <h2 className="form-input-page__section-title"><a href="#source">Source</a></h2>
+        <p className="form-input-page__section-desc">View the full component source code on GitHub.</p>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+          <a className="form-input-page__source-link" href="https://github.com/annondeveloper/ui-kit/blob/main/src/components/form-input.tsx" target="_blank" rel="noopener noreferrer">
+            <Icon name="code" size="sm" /> src/components/form-input.tsx (Standard)
+          </a>
+          <a className="form-input-page__source-link" href="https://github.com/annondeveloper/ui-kit/blob/main/src/lite/form-input.tsx" target="_blank" rel="noopener noreferrer">
+            <Icon name="code" size="sm" /> src/lite/form-input.tsx (Lite)
+          </a>
+          <a className="form-input-page__source-link" href="https://github.com/annondeveloper/ui-kit/blob/main/src/premium/form-input.tsx" target="_blank" rel="noopener noreferrer">
+            <Icon name="code" size="sm" /> src/premium/form-input.tsx (Premium)
+          </a>
+        </div>
       </section>
     </div>
   )

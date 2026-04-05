@@ -5,6 +5,7 @@ import { css } from '@ui/core/styles/css-tag'
 import { useStyles } from '@ui/core/styles/use-styles'
 import { PortStatusGrid, type PortStatus } from '@ui/domain/port-status-grid'
 import { PortStatusGrid as LitePortStatusGrid } from '@ui/lite/port-status-grid'
+import { PortStatusGrid as PremiumPortStatusGrid } from '@ui/premium/port-status-grid'
 import { Button } from '@ui/components/button'
 import { Card } from '@ui/components/card'
 import { CopyBlock } from '@ui/domain/copy-block'
@@ -543,6 +544,16 @@ const pageStyles = css`
         .psg-page__preview { padding: 1rem; }
       }
 
+      /* ── Source link ─────────────────────────────────── */
+
+      .psg-page__source-link {
+        color: var(--brand);
+        text-decoration: none;
+      }
+      .psg-page__source-link:hover {
+        text-decoration: underline;
+      }
+
       /* ── Scrollbar ──────────────────────────────── */
 
       .psg-page__import-code,
@@ -851,7 +862,7 @@ function PlaygroundSection({ tier }: { tier: Tier }) {
     setClickLog(prev => [`Port ${port}${portData?.label ? ` (${portData.label})` : ''} clicked`, ...prev].slice(0, 10))
   }, [])
 
-  const PortComponent = tier === 'lite' ? LitePortStatusGrid : PortStatusGrid
+  const PortComponent = tier === 'lite' ? LitePortStatusGrid : tier === 'premium' ? PremiumPortStatusGrid : PortStatusGrid
 
   const reactCode = useMemo(
     () => generateReactCode(tier, columns, size, interactive, motion),
@@ -1302,7 +1313,7 @@ export default function PortStatusGridPage() {
               import {'{'} PortStatusGrid {'}'} from '@annondeveloper/ui-kit/premium'
             </div>
             <div className="psg-page__tier-preview">
-              <PortStatusGrid
+              <PremiumPortStatusGrid
                 ports={COMMON_PORTS.slice(0, 6)}
                 columns={6}
                 onPortClick={() => {}}
@@ -1400,6 +1411,23 @@ export default function PortStatusGridPage() {
             </li>
           </ul>
         </Card>
+      </section>
+
+      {/* ── Source ──────────────────────────────────────── */}
+      <section className="psg-page__section" id="source">
+        <h2 className="psg-page__section-title"><a href="#source">Source</a></h2>
+        <p className="psg-page__section-desc">View the full component source code on GitHub.</p>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+          <a className="psg-page__source-link" href="https://github.com/annondeveloper/ui-kit/blob/main/src/domain/port-status-grid.tsx" target="_blank" rel="noopener noreferrer">
+            src/domain/port-status-grid.tsx (Standard)
+          </a>
+          <a className="psg-page__source-link" href="https://github.com/annondeveloper/ui-kit/blob/main/src/lite/port-status-grid.tsx" target="_blank" rel="noopener noreferrer">
+            src/lite/port-status-grid.tsx (Lite)
+          </a>
+          <a className="psg-page__source-link" href="https://github.com/annondeveloper/ui-kit/blob/main/src/premium/port-status-grid.tsx" target="_blank" rel="noopener noreferrer">
+            src/premium/port-status-grid.tsx (Premium)
+          </a>
+        </div>
       </section>
     </div>
   )

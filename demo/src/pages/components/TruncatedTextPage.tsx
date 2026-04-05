@@ -5,6 +5,7 @@ import { css } from '@ui/core/styles/css-tag'
 import { useStyles } from '@ui/core/styles/use-styles'
 import { TruncatedText } from '@ui/domain/truncated-text'
 import { TruncatedText as LiteTruncatedText } from '@ui/lite/truncated-text'
+import { TruncatedText as PremiumTruncatedText } from '@ui/premium/truncated-text'
 import { Button } from '@ui/components/button'
 import { Card } from '@ui/components/card'
 import { CopyBlock } from '@ui/domain/copy-block'
@@ -887,9 +888,10 @@ function PlaygroundSection({ tier: tierProp, brandColor }: { tier: Tier; brandCo
   const [lines, setLines] = useState(2)
   const [expandable, setExpandable] = useState(true)
   const [showTooltip, setShowTooltip] = useState(true)
+  const [motion, setMotion] = useState<0 | 1 | 2 | 3>(3)
   const [copyStatus, setCopyStatus] = useState('')
 
-  const TextComponent = tier === 'lite' ? LiteTruncatedText : TruncatedText
+  const TextComponent = tier === 'lite' ? LiteTruncatedText : tier === 'premium' ? PremiumTruncatedText : TruncatedText
 
   const reactCode = useMemo(
     () => generateReactCode(tier, text, lines, expandable, showTooltip),
@@ -957,7 +959,7 @@ function PlaygroundSection({ tier: tierProp, brandColor }: { tier: Tier; brandCo
 
       <div className="truncated-text-page__playground">
         <div className="truncated-text-page__playground-preview">
-          <div className="truncated-text-page__playground-result">
+          <div className="truncated-text-page__playground-result" data-motion={motion} style={{ '--motion': motion } as React.CSSProperties}>
             <div style={{ maxInlineSize: '400px', position: 'relative', fontSize: '1rem', lineHeight: 1.6 }}>
               <TextComponent {...previewProps as any} />
             </div>
@@ -1006,6 +1008,13 @@ function PlaygroundSection({ tier: tierProp, brandColor }: { tier: Tier; brandCo
             options={['1', '2', '3', '4', '5'] as const}
             value={String(lines) as '1' | '2' | '3' | '4' | '5'}
             onChange={v => setLines(Number(v))}
+          />
+
+          <OptionGroup
+            label="Motion Level"
+            options={['0', '1', '2', '3'] as const}
+            value={String(motion) as '0' | '1' | '2' | '3'}
+            onChange={v => setMotion(Number(v) as 0 | 1 | 2 | 3)}
           />
 
           <div className="truncated-text-page__control-group">
@@ -1099,7 +1108,7 @@ export default function TruncatedTextPage() {
     return () => observer.disconnect()
   }, [])
 
-  const TextComponent = tier === 'lite' ? LiteTruncatedText : TruncatedText
+  const TextComponent = tier === 'lite' ? LiteTruncatedText : tier === 'premium' ? PremiumTruncatedText : TruncatedText
 
   return (
     <div className="truncated-text-page" ref={pageRef} style={themeStyle}>
@@ -1368,7 +1377,7 @@ export default function TruncatedTextPage() {
             </div>
             <div className="truncated-text-page__tier-preview">
               <div style={{ maxInlineSize: '180px', fontSize: '0.75rem', lineHeight: 1.4 }}>
-                <TruncatedText text={SAMPLE_SHORT} lines={1} expandable />
+                <PremiumTruncatedText text={SAMPLE_SHORT} lines={1} expandable />
               </div>
             </div>
             <div className="truncated-text-page__size-breakdown">
@@ -1494,7 +1503,7 @@ export default function TruncatedTextPage() {
         </p>
         <a
           className="truncated-text-page__source-link"
-          href="https://github.com/annondeveloper/ui-kit/blob/v2/src/domain/truncated-text.tsx"
+          href="https://github.com/annondeveloper/ui-kit/blob/main/src/domain/truncated-text.tsx"
           target="_blank"
           rel="noopener noreferrer"
         >

@@ -11,6 +11,7 @@ import { Card } from '@ui/components/card'
 import { CopyBlock } from '@ui/domain/copy-block'
 import { Tabs, TabPanel } from '@ui/components/tabs'
 import { Icon } from '@ui/core/icons/icon'
+import { ColorInput } from '@ui/components/color-input'
 import { PropsTable, type PropDef } from '../../components/PropsTable'
 import { useTier, type Tier } from '../../App'
 
@@ -367,6 +368,22 @@ const pageStyles = css`
         padding-block-start: 0.5rem;
       }
 
+      /* ── Size breakdown ────────────────────────────── */
+
+      .service-strip-page__size-breakdown {
+        display: flex;
+        flex-direction: column;
+        gap: 0.25rem;
+        font-size: 0.75rem;
+        color: var(--text-tertiary);
+      }
+
+      .service-strip-page__size-row {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+
       /* ── Code tabs ─────────────────────────────────── */
 
       .service-strip-page__code-tabs {
@@ -600,9 +617,12 @@ function generateHtmlCode(): string {
 
 // ─── Playground ──────────────────────────────────────────────────────────────
 
+const MOTION_LEVELS = ['0', '1', '2', '3'] as const
+
 function PlaygroundSection() {
   const { tier } = useTier()
   const [size, setSize] = useState<Size>('md')
+  const [motion, setMotion] = useState<0 | 1 | 2 | 3>(3)
   const [maxVisibleStr, setMaxVisibleStr] = useState('5')
   const [copyStatus, setCopyStatus] = useState('')
   const [activeCodeTab, setActiveCodeTab] = useState('react')
@@ -643,7 +663,7 @@ function PlaygroundSection() {
       <div className="service-strip-page__playground">
         <div className="service-strip-page__playground-preview">
           <div className="service-strip-page__playground-result">
-            <Component services={allServices} size={size} maxVisible={maxVisible} onServiceClick={svc => console.log(svc.name)} />
+            <Component services={allServices} size={size} maxVisible={maxVisible} motion={motion} onServiceClick={svc => console.log(svc.name)} />
           </div>
           <div className="service-strip-page__code-tabs">
             <div className="service-strip-page__export-row">
@@ -663,6 +683,7 @@ function PlaygroundSection() {
         <div className="service-strip-page__playground-controls">
           <OptionGroup label="Size" options={SIZES} value={size} onChange={setSize} />
           <OptionGroup label="Max Visible" options={MAX_VISIBLE_OPTIONS as readonly string[]} value={maxVisibleStr} onChange={setMaxVisibleStr} />
+          <OptionGroup label="Motion Level" options={MOTION_LEVELS as unknown as readonly string[]} value={String(motion)} onChange={v => setMotion(Number(v) as 0 | 1 | 2 | 3)} />
         </div>
       </div>
     </section>
@@ -675,6 +696,7 @@ export default function ServiceStripPage() {
   useStyles('service-strip-page', pageStyles)
   const { tier, setTier } = useTier()
 
+  const [brandColor, setBrandColor] = useState('#6366f1')
   const Component = tier === 'lite' ? LiteServiceStrip : tier === 'premium' ? PremiumServiceStrip : ServiceStrip
   const importStr = IMPORT_STRINGS[tier]
 
@@ -714,6 +736,13 @@ export default function ServiceStripPage() {
                 {t.id === 'lite' && <LiteServiceStrip services={allServices.slice(0, 4)} size="sm" />}
                 {t.id === 'standard' && <ServiceStrip services={allServices.slice(0, 4)} size="sm" />}
                 {t.id === 'premium' && <PremiumServiceStrip services={allServices.slice(0, 4)} size="sm" />}
+              </div>
+              <div className="service-strip-page__size-breakdown">
+                <div className="service-strip-page__size-row">
+                  <span>Component: <strong style={{ color: 'var(--text-primary)' }}>{t.id === 'lite' ? '0.6' : t.id === 'standard' ? '1.8' : '3.0'} KB</strong></span>
+                  <span>+ Shared: <strong style={{ color: 'var(--text-primary)' }}>{t.id === 'lite' ? '0.0' : '0.9'} KB</strong></span>
+                  <span>= <strong style={{ color: 'var(--brand)' }}>{t.id === 'lite' ? '0.6' : t.id === 'standard' ? '2.7' : '3.9'} KB</strong> gzip</span>
+                </div>
               </div>
             </div>
           ))}
@@ -820,6 +849,32 @@ export default function ServiceStripPage() {
             <p style={{ fontSize: '0.875rem', fontWeight: 600, color: 'var(--text-primary)', marginBlockEnd: '0.5rem' }}>Minimal Host</p>
             <Component services={[{ name: 'sshd', status: 'running' }, { name: 'systemd', status: 'running' }]} size="sm" />
           </div>
+        </div>
+      </section>
+
+      {/* Brand Color */}
+      <section className="service-strip-page__section" id="brand-color">
+        <h2 className="service-strip-page__section-title"><a href="#brand-color">Brand Color</a></h2>
+        <p className="service-strip-page__section-desc">
+          Pick a brand color to see ServiceStrip update in real-time. The theme generates
+          derived colors automatically from your choice.
+        </p>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+          <ColorInput
+            name="brand-color"
+            value={brandColor}
+            onChange={setBrandColor}
+            size="sm"
+            swatches={['#6366f1','#f97316','#f43f5e','#0ea5e9','#10b981','#8b5cf6','#d946ef','#f59e0b','#06b6d4','#64748b']}
+          />
+          <div className="service-strip-page__preview" style={brandColor !== '#6366f1' ? { '--brand': brandColor } as React.CSSProperties : undefined}>
+            <Component services={allServices.slice(0, 5)} />
+          </div>
+          {brandColor !== '#6366f1' && (
+            <Button size="xs" variant="ghost" onClick={() => setBrandColor('#6366f1')}>
+              <Icon name="refresh" size="sm" /> Reset to default
+            </Button>
+          )}
         </div>
       </section>
 

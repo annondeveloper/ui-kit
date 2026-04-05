@@ -4,6 +4,8 @@ import { useState, useMemo, useCallback, useRef, useEffect } from 'react'
 import { css } from '@ui/core/styles/css-tag'
 import { useStyles } from '@ui/core/styles/use-styles'
 import { TracingBeam } from '@ui/domain/tracing-beam'
+import { TracingBeam as LiteTracingBeam } from '@ui/lite/tracing-beam'
+import { TracingBeam as PremiumTracingBeam } from '@ui/premium/tracing-beam'
 import { Button } from '@ui/components/button'
 import { Card } from '@ui/components/card'
 import { CopyBlock } from '@ui/domain/copy-block'
@@ -593,6 +595,22 @@ const pageStyles = css`
         gap: 0.5rem;
       }
 
+      /* ── Source link ─────────────────────────────────── */
+
+      .tracing-beam-page__source-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: var(--text-sm, 0.875rem);
+        color: var(--brand);
+        text-decoration: none;
+        font-weight: 500;
+      }
+      .tracing-beam-page__source-link:hover {
+        text-decoration: underline;
+        text-underline-offset: 0.2em;
+      }
+
       /* ── Responsive ──────────────────────────────── */
 
       @media (max-width: 768px) {
@@ -963,12 +981,25 @@ function PlaygroundSection({ tier: tierProp, brandColor }: { tier: Tier; brandCo
       <div className="tracing-beam-page__playground">
         <div className="tracing-beam-page__playground-preview">
           <div className="tracing-beam-page__playground-result">
-            <TracingBeam
-              color={beamColor || undefined}
-              motion={motion}
-            >
-              <SampleContent steps={steps} />
-            </TracingBeam>
+            {tier === 'lite' ? (
+              <LiteTracingBeam>
+                <SampleContent steps={steps} />
+              </LiteTracingBeam>
+            ) : tier === 'premium' ? (
+              <PremiumTracingBeam
+                color={beamColor || undefined}
+                motion={motion}
+              >
+                <SampleContent steps={steps} />
+              </PremiumTracingBeam>
+            ) : (
+              <TracingBeam
+                color={beamColor || undefined}
+                motion={motion}
+              >
+                <SampleContent steps={steps} />
+              </TracingBeam>
+            )}
           </div>
 
           <div className="tracing-beam-page__code-tabs">
@@ -1291,11 +1322,11 @@ export default function TracingBeamPage() {
               import {'{'} TracingBeam {'}'} from '@annondeveloper/ui-kit/domain'
             </div>
             <div className="tracing-beam-page__tier-preview">
-              <TracingBeam motion={0}>
+              <LiteTracingBeam>
                 <div style={{ fontSize: 'var(--text-xs)', color: 'var(--text-tertiary)', lineHeight: 1.5 }}>
                   <p>Static beam preview</p>
                 </div>
-              </TracingBeam>
+              </LiteTracingBeam>
             </div>
             <div className="tracing-beam-page__size-breakdown">
               <div className="tracing-beam-page__size-row">
@@ -1361,11 +1392,11 @@ export default function TracingBeamPage() {
               import {'{'} TracingBeam {'}'} from '@annondeveloper/ui-kit/premium'
             </div>
             <div className="tracing-beam-page__tier-preview">
-              <TracingBeam>
+              <PremiumTracingBeam>
                 <div style={{ fontSize: 'var(--text-xs)', color: 'var(--text-tertiary)', lineHeight: 1.5 }}>
                   <p>Physics-smoothed beam</p>
                 </div>
-              </TracingBeam>
+              </PremiumTracingBeam>
             </div>
             <div className="tracing-beam-page__size-breakdown">
               <div className="tracing-beam-page__size-row">
@@ -1478,6 +1509,23 @@ export default function TracingBeamPage() {
             </li>
           </ul>
         </Card>
+      </section>
+
+      {/* ── Source ──────────────────────────────────────── */}
+      <section className="tracing-beam-page__section" id="source">
+        <h2 className="tracing-beam-page__section-title"><a href="#source">Source</a></h2>
+        <p className="tracing-beam-page__section-desc">View the full component source code on GitHub.</p>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+          <a className="tracing-beam-page__source-link" href="https://github.com/annondeveloper/ui-kit/blob/main/src/domain/tracing-beam.tsx" target="_blank" rel="noopener noreferrer">
+            <Icon name="code" size="sm" /> src/domain/tracing-beam.tsx (Standard)
+          </a>
+          <a className="tracing-beam-page__source-link" href="https://github.com/annondeveloper/ui-kit/blob/main/src/lite/tracing-beam.tsx" target="_blank" rel="noopener noreferrer">
+            <Icon name="code" size="sm" /> src/lite/tracing-beam.tsx (Lite)
+          </a>
+          <a className="tracing-beam-page__source-link" href="https://github.com/annondeveloper/ui-kit/blob/main/src/premium/tracing-beam.tsx" target="_blank" rel="noopener noreferrer">
+            <Icon name="code" size="sm" /> src/premium/tracing-beam.tsx (Premium)
+          </a>
+        </div>
       </section>
     </div>
   )

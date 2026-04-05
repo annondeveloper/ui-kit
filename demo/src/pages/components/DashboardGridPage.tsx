@@ -4,11 +4,17 @@ import { useState, useMemo, useRef, useEffect } from 'react'
 import { css } from '@ui/core/styles/css-tag'
 import { useStyles } from '@ui/core/styles/use-styles'
 import { DashboardGrid, type DashboardGroup } from '@ui/domain/dashboard-grid'
+import { DashboardGrid as LiteDashboardGrid } from '@ui/lite/dashboard-grid'
+import { DashboardGrid as PremiumDashboardGrid } from '@ui/premium/dashboard-grid'
 import { Button } from '@ui/components/button'
 import { Card } from '@ui/components/card'
 import { CopyBlock } from '@ui/domain/copy-block'
 import { Tabs, TabPanel } from '@ui/components/tabs'
 import { Icon } from '@ui/core/icons/icon'
+import { generateTheme } from '@ui/core/tokens/generator'
+import { TOKEN_TO_CSS, type ThemeTokens } from '@ui/core/tokens/tokens'
+import { useTheme } from '@ui/core/tokens/theme-context'
+import { ColorInput } from '@ui/components/color-input'
 import { PropsTable, type PropDef } from '../../components/PropsTable'
 import { useTier, type Tier } from '../../App'
 
@@ -556,6 +562,52 @@ const pageStyles = css`
         }
       }
 
+      /* ── Source link ─────────────────────────────────── */
+
+      .dashboard-grid-page__source-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: var(--text-sm, 0.875rem);
+        color: var(--brand);
+        text-decoration: none;
+        font-weight: 500;
+      }
+      .dashboard-grid-page__source-link:hover {
+        text-decoration: underline;
+        text-underline-offset: 0.2em;
+      }
+
+      /* ── Color picker ──────────────────────────────── */
+
+      .dashboard-grid-page__color-presets {
+        display: flex;
+        gap: 0.25rem;
+        flex-wrap: wrap;
+      }
+
+      .dashboard-grid-page__color-preset {
+        inline-size: 24px;
+        block-size: 24px;
+        border-radius: 50%;
+        border: 2px solid transparent;
+        cursor: pointer;
+        padding: 0;
+        transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1),
+                    border-color 0.15s,
+                    box-shadow 0.15s;
+        box-shadow: 0 1px 3px oklch(0% 0 0 / 0.2);
+      }
+      .dashboard-grid-page__color-preset:hover {
+        transform: scale(1.2);
+        box-shadow: 0 2px 8px oklch(0% 0 0 / 0.3);
+      }
+      .dashboard-grid-page__color-preset--active {
+        border-color: oklch(100% 0 0);
+        transform: scale(1.2);
+        box-shadow: 0 0 0 2px var(--bg-base), 0 0 0 4px oklch(100% 0 0 / 0.5);
+      }
+
       /* ── Scrollbar ──────────────────────────────────── */
 
       .dashboard-grid-page__import-code,
@@ -609,7 +661,24 @@ type Gap = 'sm' | 'md' | 'lg'
 const COLUMNS: Columns[] = ['auto', '1', '2', '3', '4']
 const GAPS: Gap[] = ['sm', 'md', 'lg']
 
-const IMPORT_STRING = "import { DashboardGrid } from '@annondeveloper/ui-kit'"
+const IMPORT_STRINGS: Record<Tier, string> = {
+  lite: "import { DashboardGrid } from '@annondeveloper/ui-kit/lite'",
+  standard: "import { DashboardGrid } from '@annondeveloper/ui-kit'",
+  premium: "import { DashboardGrid } from '@annondeveloper/ui-kit/premium'",
+}
+
+const COLOR_PRESETS = [
+  { hex: '#6366f1', name: 'Indigo' },
+  { hex: '#f97316', name: 'Orange' },
+  { hex: '#f43f5e', name: 'Rose' },
+  { hex: '#0ea5e9', name: 'Sky' },
+  { hex: '#10b981', name: 'Emerald' },
+  { hex: '#8b5cf6', name: 'Violet' },
+  { hex: '#d946ef', name: 'Fuchsia' },
+  { hex: '#f59e0b', name: 'Amber' },
+  { hex: '#06b6d4', name: 'Cyan' },
+  { hex: '#64748b', name: 'Slate' },
+]
 
 function CopyButton({ text }: { text: string }) {
   const [copied, setCopied] = useState(false)
@@ -900,6 +969,32 @@ export default function DashboardGridPage() {
 
   const { tier, setTier } = useTier()
   const pageRef = useRef<HTMLDivElement>(null)
+  const [brandColor, setBrandColor] = useState('#6366f1')
+  const { mode } = useTheme()
+
+  const themeTokens = useMemo(() => {
+    try {
+      return generateTheme(brandColor, mode)
+    } catch {
+      return null
+    }
+  }, [brandColor, mode])
+
+  const BRAND_ONLY_KEYS: (keyof ThemeTokens)[] = [
+    'brand', 'brandLight', 'brandDark', 'brandSubtle', 'brandGlow',
+    'borderGlow', 'aurora1', 'aurora2',
+  ]
+
+  const themeStyle = useMemo(() => {
+    if (!themeTokens || brandColor === '#6366f1') return undefined
+    const style: Record<string, string> = {}
+    for (const key of BRAND_ONLY_KEYS) {
+      const cssVar = TOKEN_TO_CSS[key]
+      const value = themeTokens[key]
+      if (cssVar && value) style[cssVar] = value
+    }
+    return style as React.CSSProperties
+  }, [themeTokens, brandColor])
 
   useEffect(() => {
     const sections = document.querySelectorAll('.dashboard-grid-page__section')
@@ -933,7 +1028,7 @@ export default function DashboardGridPage() {
   }, [])
 
   return (
-    <div className="dashboard-grid-page" ref={pageRef}>
+    <div className="dashboard-grid-page" ref={pageRef} style={themeStyle}>
       {/* ── 1. Hero Header ──────────────────────────────── */}
       <div className="dashboard-grid-page__hero">
         <h1 className="dashboard-grid-page__title">DashboardGrid</h1>
@@ -942,8 +1037,8 @@ export default function DashboardGridPage() {
           aggregations, and container-query responsive scaling. Ships as a domain component.
         </p>
         <div className="dashboard-grid-page__import-row">
-          <code className="dashboard-grid-page__import-code">{IMPORT_STRING}</code>
-          <CopyButton text={IMPORT_STRING} />
+          <code className="dashboard-grid-page__import-code">{IMPORT_STRINGS[tier]}</code>
+          <CopyButton text={IMPORT_STRINGS[tier]} />
         </div>
       </div>
 
@@ -1101,25 +1196,49 @@ export default function DashboardGridPage() {
           <a href="#tiers">Weight Tiers</a>
         </h2>
         <p className="dashboard-grid-page__section-desc">
-          DashboardGrid is a domain component available only at the standard tier.
-          No lite or premium variants exist.
+          Choose the right balance of features and bundle size for your dashboard grid.
         </p>
         <div className="dashboard-grid-page__tiers">
+          {/* Lite */}
           <div
-            className="dashboard-grid-page__tier-card"
-            style={{ opacity: 0.5, pointerEvents: 'none' }}
+            className={`dashboard-grid-page__tier-card${tier === 'lite' ? ' dashboard-grid-page__tier-card--active' : ''}`}
+            onClick={() => setTier('lite')}
+            role="button"
+            tabIndex={0}
+            onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setTier('lite') } }}
           >
             <div className="dashboard-grid-page__tier-header">
               <span className="dashboard-grid-page__tier-name">Lite</span>
-              <span className="dashboard-grid-page__tier-size">N/A</span>
+              <span className="dashboard-grid-page__tier-size">~0.5 KB</span>
             </div>
             <p className="dashboard-grid-page__tier-desc">
-              No lite tier for DashboardGrid. Use CSS Grid directly for a minimal approach.
+              CSS-only grid layout. No groups, no collapsible sections, no motion, no summary aggregation.
             </p>
+            <div className="dashboard-grid-page__tier-import">
+              import {'{'} DashboardGrid {'}'} from '@annondeveloper/ui-kit/lite'
+            </div>
+            <div className="dashboard-grid-page__tier-preview">
+              <LiteDashboardGrid columns={2} gap="sm">
+                <DemoCard title="Users" value="1,234" desc="Active" />
+                <DemoCard title="Revenue" value="$42.5K" desc="This month" />
+              </LiteDashboardGrid>
+            </div>
+            <div className="dashboard-grid-page__size-breakdown">
+              <div className="dashboard-grid-page__size-row">
+                <span>Component: <strong style={{ color: 'var(--text-primary)' }}>0.5 KB</strong></span>
+                <span>+ Shared: <strong style={{ color: 'var(--text-primary)' }}>3.7 KB</strong></span>
+                <span>= <strong style={{ color: 'var(--brand)' }}>4.2 KB</strong> gzip</span>
+              </div>
+            </div>
           </div>
 
+          {/* Standard */}
           <div
-            className={`dashboard-grid-page__tier-card dashboard-grid-page__tier-card--active`}
+            className={`dashboard-grid-page__tier-card${tier === 'standard' ? ' dashboard-grid-page__tier-card--active' : ''}`}
+            onClick={() => setTier('standard')}
+            role="button"
+            tabIndex={0}
+            onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setTier('standard') } }}
           >
             <div className="dashboard-grid-page__tier-header">
               <span className="dashboard-grid-page__tier-name">Standard</span>
@@ -1136,6 +1255,7 @@ export default function DashboardGridPage() {
               <div className="dashboard-grid-page__size-row">
                 <span>Component: <strong style={{ color: 'var(--text-primary)' }}>2.5 KB</strong></span>
                 <span>+ Shared: <strong style={{ color: 'var(--text-primary)' }}>0.9 KB</strong></span>
+                <span>= <strong style={{ color: 'var(--brand)' }}>3.4 KB</strong> gzip</span>
               </div>
             </div>
           </div>
@@ -1150,13 +1270,26 @@ export default function DashboardGridPage() {
           >
             <div className="dashboard-grid-page__tier-header">
               <span className="dashboard-grid-page__tier-name">Premium</span>
-              <span className="dashboard-grid-page__tier-size">~3-5 KB</span>
+              <span className="dashboard-grid-page__tier-size">~3.5 KB</span>
             </div>
             <p className="dashboard-grid-page__tier-desc">
               Glass morphism cells, aurora glow on drag, spring-snap positioning, and staggered entrance animation.
             </p>
             <div className="dashboard-grid-page__tier-import">
               import {'{'} DashboardGrid {'}'} from '@annondeveloper/ui-kit/premium'
+            </div>
+            <div className="dashboard-grid-page__tier-preview">
+              <PremiumDashboardGrid columns={2} gap="sm">
+                <DemoCard title="Users" value="1,234" desc="Active" />
+                <DemoCard title="Revenue" value="$42.5K" desc="This month" />
+              </PremiumDashboardGrid>
+            </div>
+            <div className="dashboard-grid-page__size-breakdown">
+              <div className="dashboard-grid-page__size-row">
+                <span>Component: <strong style={{ color: 'var(--text-primary)' }}>3.5 KB</strong></span>
+                <span>+ Shared: <strong style={{ color: 'var(--text-primary)' }}>3.3 KB</strong></span>
+                <span>= <strong style={{ color: 'var(--brand)' }}>6.8 KB</strong> gzip</span>
+              </div>
             </div>
           </div>
         </div>
@@ -1238,6 +1371,61 @@ export default function DashboardGridPage() {
             </li>
           </ul>
         </Card>
+      </section>
+
+      {/* ── Brand Color ───────────────────────────────── */}
+      <section className="dashboard-grid-page__section" id="brand-color">
+        <h2 className="dashboard-grid-page__section-title">
+          <a href="#brand-color">Brand Color</a>
+        </h2>
+        <p className="dashboard-grid-page__section-desc">
+          Pick a brand color to see the dashboard grid update in real-time. The theme generates
+          derived colors (light, dark, subtle, glow) automatically from your choice.
+        </p>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+          <ColorInput
+            name="brand-color"
+            value={brandColor}
+            onChange={setBrandColor}
+            size="sm"
+            swatches={['#6366f1','#f97316','#f43f5e','#0ea5e9','#10b981','#8b5cf6','#d946ef','#f59e0b','#06b6d4','#64748b']}
+          />
+          <div className="dashboard-grid-page__color-presets">
+            {COLOR_PRESETS.map(p => (
+              <button
+                key={p.hex}
+                type="button"
+                className={`dashboard-grid-page__color-preset${brandColor === p.hex ? ' dashboard-grid-page__color-preset--active' : ''}`}
+                style={{ background: p.hex }}
+                onClick={() => setBrandColor(p.hex)}
+                title={p.name}
+                aria-label={`Set brand color to ${p.name}`}
+              />
+            ))}
+          </div>
+          {brandColor !== '#6366f1' && (
+            <Button size="xs" variant="ghost" onClick={() => setBrandColor('#6366f1')}>
+              <Icon name="refresh" size="sm" /> Reset to default
+            </Button>
+          )}
+        </div>
+      </section>
+
+      {/* ── Source ──────────────────────────────────────── */}
+      <section className="dashboard-grid-page__section" id="source">
+        <h2 className="dashboard-grid-page__section-title"><a href="#source">Source</a></h2>
+        <p className="dashboard-grid-page__section-desc">View the full component source code on GitHub.</p>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+          <a className="dashboard-grid-page__source-link" href="https://github.com/annondeveloper/ui-kit/blob/main/src/domain/dashboard-grid.tsx" target="_blank" rel="noopener noreferrer">
+            <Icon name="code" size="sm" /> src/domain/dashboard-grid.tsx (Standard)
+          </a>
+          <a className="dashboard-grid-page__source-link" href="https://github.com/annondeveloper/ui-kit/blob/main/src/lite/dashboard-grid.tsx" target="_blank" rel="noopener noreferrer">
+            <Icon name="code" size="sm" /> src/lite/dashboard-grid.tsx (Lite)
+          </a>
+          <a className="dashboard-grid-page__source-link" href="https://github.com/annondeveloper/ui-kit/blob/main/src/premium/dashboard-grid.tsx" target="_blank" rel="noopener noreferrer">
+            <Icon name="code" size="sm" /> src/premium/dashboard-grid.tsx (Premium)
+          </a>
+        </div>
       </section>
     </div>
   )

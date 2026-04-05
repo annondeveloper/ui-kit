@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useCallback, useEffect } from 'react'
+import { useState, useMemo, useCallback, useEffect } from 'react'
 import { css } from '@ui/core/styles/css-tag'
 import { useStyles } from '@ui/core/styles/use-styles'
 import { SuccessCheckmark } from '@ui/components/success-checkmark'
@@ -9,7 +9,9 @@ import { SuccessCheckmark as PremiumSuccessCheckmark } from '@ui/premium/success
 import { Button } from '@ui/components/button'
 import { Card } from '@ui/components/card'
 import { CopyBlock } from '@ui/domain/copy-block'
+import { Tabs, TabPanel } from '@ui/components/tabs'
 import { Icon } from '@ui/core/icons/icon'
+import { ColorInput } from '@ui/components/color-input'
 import { PropsTable, type PropDef } from '../../components/PropsTable'
 import { useTier, type Tier } from '../../App'
 
@@ -423,6 +425,22 @@ const pageStyles = css`
         padding-block-start: 0.5rem;
       }
 
+      /* ── Size breakdown bar ─────────────────────────── */
+
+      .success-checkmark-page__size-breakdown {
+        display: flex;
+        flex-direction: column;
+        gap: 0.25rem;
+        font-size: 0.75rem;
+        color: var(--text-tertiary);
+      }
+
+      .success-checkmark-page__size-row {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+
       /* ── A11y list ──────────────────────────────────── */
 
       .success-checkmark-page__a11y-list {
@@ -634,6 +652,83 @@ function Toggle({
   )
 }
 
+// ─── Code Generators ─────────────────────────────────────────────────────────
+
+function generateReactCode(tier: Tier, size: Size, animated: boolean, motion: number): string {
+  const importStr = IMPORT_STRINGS[tier]
+  const props: string[] = []
+  if (size !== 'md') props.push(`  size="${size}"`)
+  if (!animated) props.push('  animated={false}')
+  if (motion !== 3 && tier !== 'lite') props.push(`  motion={${motion}}`)
+
+  const jsx = props.length === 0
+    ? '<SuccessCheckmark />'
+    : `<SuccessCheckmark\n${props.join('\n')}\n/>`
+
+  return `${importStr}\n\n${jsx}`
+}
+
+function generateHtmlCode(tier: Tier, size: Size): string {
+  const tierLabel = tier === 'lite' ? 'lite' : tier === 'premium' ? 'premium' : 'standard'
+  const cssImport = tier === 'lite'
+    ? `@import '@annondeveloper/ui-kit/lite/styles.css';`
+    : `@import '@annondeveloper/ui-kit/css/components/success-checkmark.css';`
+
+  return `<!-- SuccessCheckmark — @annondeveloper/ui-kit ${tierLabel} tier -->
+<link rel="stylesheet" href="https://unpkg.com/@annondeveloper/ui-kit/${tier === 'lite' ? 'lite/styles.css' : 'css/components/success-checkmark.css'}">
+
+<div class="ui-success-checkmark" data-size="${size}" role="img" aria-label="Success">
+  <svg viewBox="0 0 48 48" aria-hidden="true">
+    <circle cx="24" cy="24" r="22" fill="none" stroke="currentColor" stroke-width="2" />
+    <polyline points="14,24 22,32 34,16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" />
+  </svg>
+</div>
+
+<!-- Or import in your CSS: -->
+<!-- ${cssImport} -->`
+}
+
+function generateVueCode(tier: Tier, size: Size, animated: boolean): string {
+  if (tier === 'lite') {
+    return `<template>\n  <div class="ui-success-checkmark" data-size="${size}" role="img" aria-label="Success">\n    ✓\n  </div>\n</template>\n\n<style>\n@import '@annondeveloper/ui-kit/lite/styles.css';\n</style>`
+  }
+
+  const importPath = tier === 'premium' ? '@annondeveloper/ui-kit/premium' : '@annondeveloper/ui-kit'
+  const attrs: string[] = []
+  if (size !== 'md') attrs.push(`  size="${size}"`)
+  if (!animated) attrs.push('  :animated="false"')
+
+  const template = attrs.length === 0
+    ? '  <SuccessCheckmark />'
+    : `  <SuccessCheckmark\n  ${attrs.join('\n  ')}\n  />`
+
+  return `<template>\n${template}\n</template>\n\n<script setup>\nimport { SuccessCheckmark } from '${importPath}'\n</script>`
+}
+
+function generateAngularCode(tier: Tier, size: Size): string {
+  if (tier === 'lite') {
+    return `<!-- Angular — Lite tier (CSS-only) -->\n<div class="ui-success-checkmark" data-size="${size}" role="img" aria-label="Success">\n  ✓\n</div>\n\n/* In styles.css */\n@import '@annondeveloper/ui-kit/lite/styles.css';`
+  }
+  const importPath = tier === 'premium' ? '@annondeveloper/ui-kit/premium' : '@annondeveloper/ui-kit'
+  return `<!-- Angular — ${tier === 'premium' ? 'Premium' : 'Standard'} tier -->\n<!-- Use the React wrapper or CSS-only approach -->\n<div\n  class="ui-success-checkmark"\n  data-size="${size}"\n  role="img"\n  aria-label="Success"\n>\n  <svg viewBox="0 0 48 48" aria-hidden="true">...</svg>\n</div>\n\n/* Import component CSS */\n@import '${importPath}/css/components/success-checkmark.css';`
+}
+
+function generateSvelteCode(tier: Tier, size: Size, animated: boolean): string {
+  if (tier === 'lite') {
+    return `<!-- Svelte — Lite tier (CSS-only) -->\n<div class="ui-success-checkmark" data-size="${size}" role="img" aria-label="Success">\n  ✓\n</div>\n\n<style>\n  @import '@annondeveloper/ui-kit/lite/styles.css';\n</style>`
+  }
+  const importPath = tier === 'premium' ? '@annondeveloper/ui-kit/premium' : '@annondeveloper/ui-kit'
+  const attrs: string[] = []
+  if (size !== 'md') attrs.push(`  size="${size}"`)
+  if (!animated) attrs.push('  animated={false}')
+
+  const template = attrs.length === 0
+    ? '<SuccessCheckmark />'
+    : `<SuccessCheckmark\n${attrs.join('\n')}\n/>`
+
+  return `<script>\n  import { SuccessCheckmark } from '${importPath}';\n</script>\n\n${template}`
+}
+
 // ─── Playground Section ──────────────────────────────────────────────────────
 
 function PlaygroundSection({ tier: tierProp }: { tier: Tier }) {
@@ -654,19 +749,51 @@ function PlaygroundSection({ tier: tierProp }: { tier: Tier }) {
     setAnimKey(k => k + 1)
   }, [])
 
-  const reactCode = (() => {
-    const importStr = IMPORT_STRINGS[tier]
-    const props: string[] = []
-    if (size !== 'md') props.push(`  size="${size}"`)
-    if (!animated) props.push('  animated={false}')
-    if (motion !== 3 && tier !== 'lite') props.push(`  motion={${motion}}`)
+  const reactCode = useMemo(
+    () => generateReactCode(tier, size, animated, motion),
+    [tier, size, animated, motion],
+  )
 
-    const jsx = props.length === 0
-      ? '<SuccessCheckmark />'
-      : `<SuccessCheckmark\n${props.join('\n')}\n/>`
+  const htmlCssCode = useMemo(
+    () => generateHtmlCode(tier, size),
+    [tier, size],
+  )
 
-    return `${importStr}\n\n${jsx}`
-  })()
+  const vueCode = useMemo(
+    () => generateVueCode(tier, size, animated),
+    [tier, size, animated],
+  )
+
+  const angularCode = useMemo(
+    () => generateAngularCode(tier, size),
+    [tier, size],
+  )
+
+  const svelteCode = useMemo(
+    () => generateSvelteCode(tier, size, animated),
+    [tier, size, animated],
+  )
+
+  const [activeCodeTab, setActiveCodeTab] = useState('react')
+
+  const codeTabs = [
+    { id: 'react', label: 'React' },
+    { id: 'html', label: 'HTML+CSS' },
+    { id: 'vue', label: 'Vue' },
+    { id: 'angular', label: 'Angular' },
+    { id: 'svelte', label: 'Svelte' },
+  ]
+
+  const activeCode = useMemo(() => {
+    switch (activeCodeTab) {
+      case 'react': return reactCode
+      case 'html': return htmlCssCode
+      case 'vue': return vueCode
+      case 'angular': return angularCode
+      case 'svelte': return svelteCode
+      default: return reactCode
+    }
+  }, [activeCodeTab, reactCode, htmlCssCode, vueCode, angularCode, svelteCode])
 
   return (
     <section className="success-checkmark-page__section" id="playground">
@@ -694,7 +821,23 @@ function PlaygroundSection({ tier: tierProp }: { tier: Tier }) {
             </Button>
           </div>
 
-          <CopyBlock code={reactCode} language="typescript" showLineNumbers />
+          <Tabs tabs={codeTabs} activeTab={activeCodeTab} onChange={setActiveCodeTab} size="sm" variant="pills">
+            <TabPanel tabId="react">
+              <CopyBlock code={reactCode} language="typescript" showLineNumbers />
+            </TabPanel>
+            <TabPanel tabId="html">
+              <CopyBlock code={htmlCssCode} language="html" showLineNumbers />
+            </TabPanel>
+            <TabPanel tabId="vue">
+              <CopyBlock code={vueCode} language="html" showLineNumbers />
+            </TabPanel>
+            <TabPanel tabId="angular">
+              <CopyBlock code={angularCode} language="html" showLineNumbers />
+            </TabPanel>
+            <TabPanel tabId="svelte">
+              <CopyBlock code={svelteCode} language="html" showLineNumbers />
+            </TabPanel>
+          </Tabs>
         </div>
 
         <div className="success-checkmark-page__playground-controls">
@@ -731,6 +874,7 @@ export default function SuccessCheckmarkPage() {
   useStyles('success-checkmark-page', pageStyles)
 
   const { tier, setTier } = useTier()
+  const [brandColor, setBrandColor] = useState('#6366f1')
 
   const CheckmarkComponent = tier === 'lite'
     ? LiteSuccessCheckmark
@@ -936,6 +1080,13 @@ export default function SuccessCheckmarkPage() {
             <div className="success-checkmark-page__tier-preview">
               <LiteSuccessCheckmark size="md" />
             </div>
+            <div className="success-checkmark-page__size-breakdown">
+              <div className="success-checkmark-page__size-row">
+                <span>Component: <strong style={{ color: 'var(--text-primary)' }}>0.2 KB</strong></span>
+                <span>+ Shared: <strong style={{ color: 'var(--text-primary)' }}>0.1 KB</strong></span>
+                <span>= <strong style={{ color: 'var(--brand)' }}>0.3 KB</strong> gzip</span>
+              </div>
+            </div>
           </div>
 
           {/* Standard */}
@@ -959,6 +1110,13 @@ export default function SuccessCheckmarkPage() {
             </div>
             <div className="success-checkmark-page__tier-preview">
               <SuccessCheckmark size="md" animated={false} />
+            </div>
+            <div className="success-checkmark-page__size-breakdown">
+              <div className="success-checkmark-page__size-row">
+                <span>Component: <strong style={{ color: 'var(--text-primary)' }}>1.2 KB</strong></span>
+                <span>+ Shared: <strong style={{ color: 'var(--text-primary)' }}>0.3 KB</strong></span>
+                <span>= <strong style={{ color: 'var(--brand)' }}>1.5 KB</strong> gzip</span>
+              </div>
             </div>
           </div>
 
@@ -984,11 +1142,47 @@ export default function SuccessCheckmarkPage() {
             <div className="success-checkmark-page__tier-preview">
               <PremiumSuccessCheckmark size="md" animated={false} />
             </div>
+            <div className="success-checkmark-page__size-breakdown">
+              <div className="success-checkmark-page__size-row">
+                <span>Component: <strong style={{ color: 'var(--text-primary)' }}>1.8 KB</strong></span>
+                <span>+ Shared: <strong style={{ color: 'var(--text-primary)' }}>0.4 KB</strong></span>
+                <span>= <strong style={{ color: 'var(--brand)' }}>2.2 KB</strong> gzip</span>
+              </div>
+            </div>
           </div>
         </div>
       </section>
 
-      {/* ── 6. Props API ───────────────────────────────── */}
+      {/* ── 6. Brand Color ──────────────────────────────── */}
+      <section className="success-checkmark-page__section" id="brand-color">
+        <h2 className="success-checkmark-page__section-title">
+          <a href="#brand-color">Brand Color</a>
+        </h2>
+        <p className="success-checkmark-page__section-desc">
+          Pick a brand color to preview how SuccessCheckmark adapts via the <code>--status-ok</code> CSS custom property.
+        </p>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+          <ColorInput
+            name="brand-color"
+            value={brandColor}
+            onChange={setBrandColor}
+            size="sm"
+            swatches={['#6366f1','#f97316','#f43f5e','#0ea5e9','#10b981','#8b5cf6','#d946ef','#f59e0b','#06b6d4','#64748b']}
+          />
+          <div className="success-checkmark-page__preview" style={{ minBlockSize: 'auto', padding: '1.5rem' }}>
+            <div style={{ '--status-ok': brandColor } as React.CSSProperties}>
+              <CheckmarkComponent size="lg" animated={false} />
+            </div>
+          </div>
+          {brandColor !== '#6366f1' && (
+            <Button size="xs" variant="ghost" onClick={() => setBrandColor('#6366f1')}>
+              <Icon name="refresh" size="sm" /> Reset to default
+            </Button>
+          )}
+        </div>
+      </section>
+
+      {/* ── 7. Props API ───────────────────────────────── */}
       <section className="success-checkmark-page__section" id="props">
         <h2 className="success-checkmark-page__section-title">
           <a href="#props">Props API</a>

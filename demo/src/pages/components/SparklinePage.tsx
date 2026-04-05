@@ -5,11 +5,13 @@ import { css } from '@ui/core/styles/css-tag'
 import { useStyles } from '@ui/core/styles/use-styles'
 import { Sparkline } from '@ui/domain/sparkline'
 import { Sparkline as LiteSparkline } from '@ui/lite/sparkline'
+import { Sparkline as PremiumSparkline } from '@ui/premium/sparkline'
 import { Button } from '@ui/components/button'
 import { Card } from '@ui/components/card'
 import { CopyBlock } from '@ui/domain/copy-block'
 import { Tabs, TabPanel } from '@ui/components/tabs'
 import { Icon } from '@ui/core/icons/icon'
+import { ColorInput } from '@ui/components/color-input'
 import { PropsTable, type PropDef } from '../../components/PropsTable'
 import { useTier, type Tier } from '../../App'
 
@@ -886,7 +888,7 @@ function PlaygroundSection({ tier }: { tier: Tier }) {
     }
   }, [activeCodeTab, reactCode, htmlCode, vueCode, angularCode, svelteCode])
 
-  const SparkComponent = tier === 'lite' ? LiteSparkline : Sparkline
+  const SparkComponent = tier === 'premium' ? PremiumSparkline : tier === 'lite' ? LiteSparkline : Sparkline
 
   const sparkProps: Record<string, unknown> = {
     data: dataMap[dataset],
@@ -993,6 +995,7 @@ export default function SparklinePage() {
 
   const { tier, setTier } = useTier()
   const pageRef = useRef<HTMLDivElement>(null)
+  const [brandColor, setBrandColor] = useState('#6366f1')
 
   // Scroll reveal for sections — JS fallback for browsers without animation-timeline
   useEffect(() => {
@@ -1025,7 +1028,7 @@ export default function SparklinePage() {
     return () => observer.disconnect()
   }, [])
 
-  const SparkComponent = tier === 'lite' ? LiteSparkline : Sparkline
+  const SparkComponent = tier === 'premium' ? PremiumSparkline : tier === 'lite' ? LiteSparkline : Sparkline
 
   return (
     <div className="sparkline-page" ref={pageRef}>
@@ -1271,7 +1274,7 @@ export default function SparklinePage() {
               import {'{'} Sparkline {'}'} from '@annondeveloper/ui-kit/premium'
             </div>
             <div className="sparkline-page__tier-preview">
-              <Sparkline data={SAMPLE_DATA} height={32} width={160} showTooltip gradient />
+              <PremiumSparkline data={SAMPLE_DATA} height={32} width={160} showTooltip gradient />
             </div>
             <div className="sparkline-page__size-breakdown">
               <div className="sparkline-page__size-row">
@@ -1281,6 +1284,31 @@ export default function SparklinePage() {
               </div>
             </div>
           </div>
+        </div>
+      </section>
+
+      {/* ── 8b. Brand Color ──────────────────────────────── */}
+      <section className="sparkline-page__section" id="brand-color">
+        <h2 className="sparkline-page__section-title">
+          <a href="#brand-color">Brand Color</a>
+        </h2>
+        <p className="sparkline-page__section-desc">
+          Pick a brand color to see all sparklines update in real-time. The theme generates
+          derived colors (light, dark, subtle, glow) automatically from your choice.
+        </p>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+          <ColorInput
+            name="brand-color"
+            value={brandColor}
+            onChange={setBrandColor}
+            size="sm"
+            swatches={['#6366f1','#f97316','#f43f5e','#0ea5e9','#10b981','#8b5cf6','#d946ef','#f59e0b','#06b6d4','#64748b']}
+          />
+          {brandColor !== '#6366f1' && (
+            <Button size="xs" variant="ghost" onClick={() => setBrandColor('#6366f1')}>
+              <Icon name="refresh" size="sm" /> Reset to default
+            </Button>
+          )}
         </div>
       </section>
 
@@ -1340,6 +1368,23 @@ export default function SparklinePage() {
             </li>
           </ul>
         </Card>
+      </section>
+
+      {/* ── Source ──────────────────────────────────────── */}
+      <section className="sparkline-page__section" id="source">
+        <h2 className="sparkline-page__section-title"><a href="#source">Source</a></h2>
+        <p className="sparkline-page__section-desc">View the full component source code on GitHub.</p>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+          <a className="sparkline-page__source-link" href="https://github.com/annondeveloper/ui-kit/blob/main/src/domain/sparkline.tsx" target="_blank" rel="noopener noreferrer">
+            <Icon name="code" size="sm" /> src/domain/sparkline.tsx (Standard)
+          </a>
+          <a className="sparkline-page__source-link" href="https://github.com/annondeveloper/ui-kit/blob/main/src/lite/sparkline.tsx" target="_blank" rel="noopener noreferrer">
+            <Icon name="code" size="sm" /> src/lite/sparkline.tsx (Lite)
+          </a>
+          <a className="sparkline-page__source-link" href="https://github.com/annondeveloper/ui-kit/blob/main/src/premium/sparkline.tsx" target="_blank" rel="noopener noreferrer">
+            <Icon name="code" size="sm" /> src/premium/sparkline.tsx (Premium)
+          </a>
+        </div>
       </section>
     </div>
   )

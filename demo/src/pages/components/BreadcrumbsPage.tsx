@@ -5,6 +5,7 @@ import { css } from '@ui/core/styles/css-tag'
 import { useStyles } from '@ui/core/styles/use-styles'
 import { Breadcrumbs } from '@ui/components/breadcrumbs'
 import { Breadcrumbs as LiteBreadcrumbs } from '@ui/lite/breadcrumbs'
+import { Breadcrumbs as PremiumBreadcrumbs } from '@ui/premium/breadcrumbs'
 import { Button } from '@ui/components/button'
 import { Card } from '@ui/components/card'
 import { CopyBlock } from '@ui/domain/copy-block'
@@ -538,6 +539,22 @@ const pageStyles = css`
         gap: 0.5rem;
       }
 
+      /* ── Source link ──────────────────────────────── */
+
+      .breadcrumbs-page__source-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: var(--text-sm, 0.875rem);
+        color: var(--brand);
+        text-decoration: none;
+        font-weight: 500;
+      }
+      .breadcrumbs-page__source-link:hover {
+        text-decoration: underline;
+        text-underline-offset: 0.2em;
+      }
+
       /* ── Responsive ──────────────────────────────── */
 
       @media (max-width: 768px) {
@@ -952,6 +969,7 @@ function PlaygroundSection({ tier: tierProp }: { tier: Tier }) {
   const [separator, setSeparator] = useState<SeparatorType>('chevron')
   const [useMaxVisible, setUseMaxVisible] = useState(false)
   const [maxVisible, setMaxVisible] = useState(3)
+  const [motion, setMotion] = useState<0 | 1 | 2 | 3>(3)
   const [copyStatus, setCopyStatus] = useState('')
   const [activeCodeTab, setActiveCodeTab] = useState('react')
 
@@ -1022,6 +1040,12 @@ function PlaygroundSection({ tier: tierProp }: { tier: Tier }) {
                 items={liteItems}
                 separator={separatorNode}
               />
+            ) : tier === 'premium' ? (
+              <PremiumBreadcrumbs
+                items={items}
+                separator={separatorNode}
+                maxVisible={useMaxVisible ? maxVisible : undefined}
+              />
             ) : (
               <Breadcrumbs
                 items={items}
@@ -1085,6 +1109,15 @@ function PlaygroundSection({ tier: tierProp }: { tier: Tier }) {
           </div>
 
           <OptionGroup label="Separator" options={SEPARATORS} value={separator} onChange={setSeparator} />
+
+          {tier !== 'lite' && (
+            <OptionGroup
+              label="Motion Level"
+              options={['0', '1', '2', '3'] as const}
+              value={String(motion) as '0' | '1' | '2' | '3'}
+              onChange={v => setMotion(Number(v) as 0 | 1 | 2 | 3)}
+            />
+          )}
 
           {tier !== 'lite' && (
             <div className={`${P}control-group`}>
@@ -1154,8 +1187,7 @@ export default function BreadcrumbsPage() {
     return () => observer.disconnect()
   }, [])
 
-  // Premium tier available at @annondeveloper/ui-kit/premium
-  const BreadcrumbsComponent = tier === 'lite' ? LiteBreadcrumbs : Breadcrumbs
+  const BreadcrumbsComponent = tier === 'lite' ? LiteBreadcrumbs : tier === 'premium' ? PremiumBreadcrumbs : Breadcrumbs
 
   return (
     <div className="breadcrumbs-page" ref={pageRef}>
@@ -1407,7 +1439,7 @@ function MyPage() {
               import {'{'} Breadcrumbs {'}'} from '@annondeveloper/ui-kit/premium'
             </div>
             <div className={`${P}tier-preview`}>
-              <Breadcrumbs items={SAMPLE_ITEMS_SHORT} />
+              <PremiumBreadcrumbs items={SAMPLE_ITEMS_SHORT} />
             </div>
             <div className={`${P}size-breakdown`}>
               <div className={`${P}size-row`}>
@@ -1492,6 +1524,23 @@ function MyPage() {
             </li>
           </ul>
         </Card>
+      </section>
+
+      {/* ── Source ──────────────────────────────────────── */}
+      <section className={`${P}section`} id="source">
+        <h2 className={`${P}section-title`}><a href="#source">Source</a></h2>
+        <p className={`${P}section-desc`}>View the full component source code on GitHub.</p>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+          <a className="breadcrumbs-page__source-link" href="https://github.com/annondeveloper/ui-kit/blob/main/src/components/breadcrumbs.tsx" target="_blank" rel="noopener noreferrer">
+            <Icon name="code" size="sm" /> src/components/breadcrumbs.tsx (Standard)
+          </a>
+          <a className="breadcrumbs-page__source-link" href="https://github.com/annondeveloper/ui-kit/blob/main/src/lite/breadcrumbs.tsx" target="_blank" rel="noopener noreferrer">
+            <Icon name="code" size="sm" /> src/lite/breadcrumbs.tsx (Lite)
+          </a>
+          <a className="breadcrumbs-page__source-link" href="https://github.com/annondeveloper/ui-kit/blob/main/src/premium/breadcrumbs.tsx" target="_blank" rel="noopener noreferrer">
+            <Icon name="code" size="sm" /> src/premium/breadcrumbs.tsx (Premium)
+          </a>
+        </div>
       </section>
     </div>
   )

@@ -5,6 +5,7 @@ import { css } from '@ui/core/styles/css-tag'
 import { useStyles } from '@ui/core/styles/use-styles'
 import { DiffViewer } from '@ui/domain/diff-viewer'
 import { DiffViewer as LiteDiffViewer } from '@ui/lite/diff-viewer'
+import { DiffViewer as PremiumDiffViewer } from '@ui/premium/diff-viewer'
 import { Button } from '@ui/components/button'
 import { Card } from '@ui/components/card'
 import { CopyBlock } from '@ui/domain/copy-block'
@@ -470,6 +471,22 @@ const pageStyles = css`
         color: var(--text-primary);
       }
 
+      /* ── Source link ─────────────────────────────────── */
+
+      .diff-viewer-page__source-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: var(--text-sm, 0.875rem);
+        color: var(--brand);
+        text-decoration: none;
+        font-weight: 500;
+      }
+      .diff-viewer-page__source-link:hover {
+        text-decoration: underline;
+        text-underline-offset: 0.2em;
+      }
+
       /* ── Responsive ──────────────────────────────── */
 
       @media (max-width: 768px) {
@@ -816,6 +833,9 @@ function PlaygroundSection({ tier }: { tier: Tier }) {
   const [foldThreshold, setFoldThreshold] = useState(3)
   const [copyStatus, setCopyStatus] = useState('')
   const [activeCodeTab, setActiveCodeTab] = useState('react')
+  const [motion, setMotion] = useState<0 | 1 | 2 | 3>(3)
+
+  const DiffComponent = tier === 'lite' ? LiteDiffViewer : tier === 'premium' ? PremiumDiffViewer : DiffViewer
 
   const current = DIFF_SAMPLES[sample]
 
@@ -865,7 +885,7 @@ function PlaygroundSection({ tier }: { tier: Tier }) {
                   newTitle={current.newTitle}
                 />
               ) : (
-                <DiffViewer
+                <DiffComponent
                   oldValue={current.old}
                   newValue={current.new}
                   oldTitle={current.oldTitle}
@@ -874,6 +894,7 @@ function PlaygroundSection({ tier }: { tier: Tier }) {
                   showLineNumbers={showLineNumbers}
                   foldUnchanged={foldUnchanged}
                   foldThreshold={foldThreshold}
+                  motion={motion}
                 />
               )}
             </div>
@@ -911,6 +932,12 @@ function PlaygroundSection({ tier }: { tier: Tier }) {
 
           {tier !== 'lite' && (
             <>
+              <OptionGroup
+                label="Motion"
+                options={['0', '1', '2', '3'] as const}
+                value={String(motion) as '0' | '1' | '2' | '3'}
+                onChange={v => setMotion(Number(v) as 0 | 1 | 2 | 3)}
+              />
               <OptionGroup label="Mode" options={['unified', 'side-by-side'] as const} value={mode} onChange={setMode} />
               <OptionGroup
                 label="Fold Threshold"
@@ -1229,7 +1256,7 @@ export default function DiffViewerPage() {
               import {'{'} DiffViewer {'}'} from '@annondeveloper/ui-kit/premium'
             </div>
             <div className="diff-viewer-page__tier-preview" style={{ maxHeight: '120px', overflow: 'hidden' }}>
-              <DiffViewer oldValue="const x = 1;" newValue="const x: number = 1;" oldTitle="Old" newTitle="New" />
+              <PremiumDiffViewer oldValue="const x = 1;" newValue="const x: number = 1;" oldTitle="Old" newTitle="New" />
             </div>
             <div className="diff-viewer-page__size-breakdown">
               <div className="diff-viewer-page__size-row">
@@ -1304,6 +1331,23 @@ export default function DiffViewerPage() {
             </li>
           </ul>
         </Card>
+      </section>
+
+      {/* ── Source ──────────────────────────────────────── */}
+      <section className="diff-viewer-page__section" id="source">
+        <h2 className="diff-viewer-page__section-title"><a href="#source">Source</a></h2>
+        <p className="diff-viewer-page__section-desc">View the full component source code on GitHub.</p>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+          <a className="diff-viewer-page__source-link" href="https://github.com/annondeveloper/ui-kit/blob/main/src/domain/diff-viewer.tsx" target="_blank" rel="noopener noreferrer">
+            <Icon name="code" size="sm" /> src/domain/diff-viewer.tsx (Standard)
+          </a>
+          <a className="diff-viewer-page__source-link" href="https://github.com/annondeveloper/ui-kit/blob/main/src/lite/diff-viewer.tsx" target="_blank" rel="noopener noreferrer">
+            <Icon name="code" size="sm" /> src/lite/diff-viewer.tsx (Lite)
+          </a>
+          <a className="diff-viewer-page__source-link" href="https://github.com/annondeveloper/ui-kit/blob/main/src/premium/diff-viewer.tsx" target="_blank" rel="noopener noreferrer">
+            <Icon name="code" size="sm" /> src/premium/diff-viewer.tsx (Premium)
+          </a>
+        </div>
       </section>
     </div>
   )

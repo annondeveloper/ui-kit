@@ -10,6 +10,7 @@ import { Button } from '@ui/components/button'
 import { CopyBlock } from '@ui/domain/copy-block'
 import { Tabs, TabPanel } from '@ui/components/tabs'
 import { Icon } from '@ui/core/icons/icon'
+import { ColorInput } from '@ui/components/color-input'
 import { PropsTable, type PropDef } from '../../components/PropsTable'
 import { useTier, type Tier } from '../../App'
 
@@ -647,6 +648,7 @@ function PlaygroundSection() {
   const [name, setName] = useState('prod-web-01')
   const [status, setStatus] = useState<Status>('ok')
   const [size, setSize] = useState<Size>('md')
+  const [motion, setMotion] = useState<0 | 1 | 2 | 3>(3)
   const [compact, setCompact] = useState(false)
   const [showMetrics, setShowMetrics] = useState(true)
   const [showTags, setShowTags] = useState(true)
@@ -693,6 +695,7 @@ function PlaygroundSection() {
               type="Virtual Machine"
               status={status}
               size={size}
+              motion={motion}
               compact={compact}
               metrics={showMetrics ? sampleMetrics : undefined}
               tags={showTags ? sampleTags : undefined}
@@ -721,6 +724,21 @@ function PlaygroundSection() {
           </div>
           <OptionGroup label="Status" options={STATUSES} value={status} onChange={setStatus} />
           <OptionGroup label="Size" options={SIZES} value={size} onChange={setSize} />
+          <div className="entity-card-page__control-group">
+            <span className="entity-card-page__control-label">Motion Level</span>
+            <div className="entity-card-page__control-options">
+              {([0, 1, 2, 3] as const).map(m => (
+                <button
+                  key={m}
+                  type="button"
+                  className={`entity-card-page__option-btn${motion === m ? ' entity-card-page__option-btn--active' : ''}`}
+                  onClick={() => setMotion(m)}
+                >
+                  {m}
+                </button>
+              ))}
+            </div>
+          </div>
           <Toggle label="Compact" checked={compact} onChange={setCompact} />
           <Toggle label="Show Metrics" checked={showMetrics} onChange={setShowMetrics} />
           <Toggle label="Show Tags" checked={showTags} onChange={setShowTags} />
@@ -735,6 +753,7 @@ function PlaygroundSection() {
 export default function EntityCardPage() {
   useStyles('entity-card-page', pageStyles)
   const { tier, setTier } = useTier()
+  const [brandColor, setBrandColor] = useState('#6366f1')
 
   const Component = tier === 'lite' ? LiteEntityCard : tier === 'premium' ? PremiumEntityCard : EntityCard
   const importStr = IMPORT_STRINGS[tier]
@@ -904,6 +923,25 @@ export default function EntityCardPage() {
           <li className="entity-card-page__a11y-item"><Icon name="check" size="sm" className="entity-card-page__a11y-icon" />Action buttons meet 44px minimum touch target</li>
           <li className="entity-card-page__a11y-item"><Icon name="check" size="sm" className="entity-card-page__a11y-icon" />Respects prefers-reduced-motion</li>
         </ul>
+      </section>
+
+      {/* ── Brand Color ───────────────────────────────── */}
+      <section className="entity-card-page__section" id="brand-color">
+        <h2 className="entity-card-page__section-title">
+          <a href="#brand-color">Brand Color</a>
+        </h2>
+        <p className="entity-card-page__section-desc">
+          Pick a brand color to preview the component with your brand identity.
+        </p>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+          <ColorInput
+            name="brand-color"
+            value={brandColor}
+            onChange={setBrandColor}
+            size="sm"
+            swatches={['#6366f1','#f97316','#f43f5e','#0ea5e9','#10b981','#8b5cf6','#d946ef','#f59e0b','#06b6d4','#64748b']}
+          />
+        </div>
       </section>
 
       {/* Source */}

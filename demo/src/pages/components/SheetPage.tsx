@@ -5,11 +5,16 @@ import { css } from '@ui/core/styles/css-tag'
 import { useStyles } from '@ui/core/styles/use-styles'
 import { Sheet } from '@ui/components/sheet'
 import { Sheet as LiteSheet } from '@ui/lite/sheet'
+import { Sheet as PremiumSheet } from '@ui/premium/sheet'
 import { Button } from '@ui/components/button'
 import { Card } from '@ui/components/card'
 import { CopyBlock } from '@ui/domain/copy-block'
 import { Tabs, TabPanel } from '@ui/components/tabs'
 import { Icon } from '@ui/core/icons/icon'
+import { generateTheme } from '@ui/core/tokens/generator'
+import { TOKEN_TO_CSS, type ThemeTokens } from '@ui/core/tokens/tokens'
+import { useTheme } from '@ui/core/tokens/theme-context'
+import { ColorInput } from '@ui/components/color-input'
 import { PropsTable, type PropDef } from '../../components/PropsTable'
 import { useTier, type Tier } from '../../App'
 
@@ -625,6 +630,19 @@ const IMPORT_STRINGS: Record<Tier, string> = {
   premium: "import { Sheet } from '@annondeveloper/ui-kit/premium'",
 }
 
+const COLOR_PRESETS = [
+  { hex: '#6366f1', name: 'Indigo' },
+  { hex: '#f97316', name: 'Orange' },
+  { hex: '#f43f5e', name: 'Rose' },
+  { hex: '#0ea5e9', name: 'Sky' },
+  { hex: '#10b981', name: 'Emerald' },
+  { hex: '#8b5cf6', name: 'Violet' },
+  { hex: '#d946ef', name: 'Fuchsia' },
+  { hex: '#f59e0b', name: 'Amber' },
+  { hex: '#06b6d4', name: 'Cyan' },
+  { hex: '#64748b', name: 'Slate' },
+]
+
 function CopyButton({ text }: { text: string }) {
   const [copied, setCopied] = useState(false)
   return (
@@ -1042,6 +1060,19 @@ function PlaygroundSection({ tier: tierProp }: { tier: Tier }) {
               >
                 <SheetDemoContent />
               </LiteSheet>
+            ) : tier === 'premium' ? (
+              <PremiumSheet
+                open={sheetOpen}
+                onClose={() => setSheetOpen(false)}
+                side={side}
+                size={size}
+                title={showTitle ? 'Sheet Title' : undefined}
+                description={showTitle ? 'Configure your settings below.' : undefined}
+                showClose={showClose}
+                motion={motion}
+              >
+                <SheetDemoContent />
+              </PremiumSheet>
             ) : (
               <Sheet
                 open={sheetOpen}
@@ -1138,6 +1169,28 @@ export default function SheetPage() {
   const { tier, setTier } = useTier()
   const [demoSheetSide, setDemoSheetSide] = useState<Side | null>(null)
   const [demoSheetSize, setDemoSheetSize] = useState<Size | null>(null)
+  const [brandColor, setBrandColor] = useState('#6366f1')
+  const { mode } = useTheme()
+
+  const BRAND_ONLY_KEYS: (keyof ThemeTokens)[] = [
+    'brand', 'brandLight', 'brandDark', 'brandSubtle', 'brandGlow',
+    'borderGlow', 'aurora1', 'aurora2',
+  ]
+
+  const themeTokens = useMemo(() => {
+    try { return generateTheme(brandColor, mode) } catch { return null }
+  }, [brandColor, mode])
+
+  const themeStyle = useMemo(() => {
+    if (!themeTokens || brandColor === '#6366f1') return undefined
+    const style: Record<string, string> = {}
+    for (const key of BRAND_ONLY_KEYS) {
+      const cssVar = TOKEN_TO_CSS[key]
+      const value = themeTokens[key]
+      if (cssVar && value) style[cssVar] = value
+    }
+    return style as React.CSSProperties
+  }, [themeTokens, brandColor])
 
   // Scroll reveal — JS fallback
   useEffect(() => {
@@ -1172,7 +1225,7 @@ export default function SheetPage() {
   }, [])
 
   return (
-    <div className="sheet-page">
+    <div className="sheet-page" style={themeStyle}>
       {/* ── 1. Hero Header ──────────────────────────────── */}
       <div className="sheet-page__hero">
         <h1 className="sheet-page__title">Sheet</h1>
@@ -1432,6 +1485,9 @@ export default function SheetPage() {
               import {'{'} Sheet {'}'} from '@annondeveloper/ui-kit/premium'
             </div>
             <div className="sheet-page__tier-preview">
+              <PremiumSheet open={false} onClose={() => {}} side="right" motion={3}>
+                <span>Premium Sheet</span>
+              </PremiumSheet>
               <Button variant="primary" size="sm">Premium Sheet</Button>
             </div>
             <div className="sheet-page__size-breakdown">
@@ -1513,6 +1569,60 @@ export default function SheetPage() {
             </li>
           </ul>
         </Card>
+      </section>
+
+      {/* ── Brand Color ───────────────────────────────── */}
+      <section className="sheet-page__section" id="brand-color">
+        <h2 className="sheet-page__section-title">
+          <a href="#brand-color">Brand Color</a>
+        </h2>
+        <p className="sheet-page__section-desc">
+          Pick a brand color to see the page accents update in real-time.
+        </p>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+          <ColorInput
+            name="brand-color"
+            value={brandColor}
+            onChange={setBrandColor}
+            size="sm"
+            swatches={COLOR_PRESETS.map(p => p.hex)}
+          />
+          <div className="sheet-page__color-presets">
+            {COLOR_PRESETS.map(p => (
+              <button
+                key={p.hex}
+                type="button"
+                className={`sheet-page__color-preset${brandColor === p.hex ? ' sheet-page__color-preset--active' : ''}`}
+                style={{ background: p.hex }}
+                onClick={() => setBrandColor(p.hex)}
+                title={p.name}
+                aria-label={`Set brand color to ${p.name}`}
+              />
+            ))}
+          </div>
+          {brandColor !== '#6366f1' && (
+            <Button size="xs" variant="ghost" onClick={() => setBrandColor('#6366f1')}>
+              <Icon name="refresh" size="sm" /> Reset to default
+            </Button>
+          )}
+        </div>
+      </section>
+
+      {/* ── Source ─────────────────────────────────────── */}
+      <section className="sheet-page__section" id="source">
+        <h2 className="sheet-page__section-title"><a href="#source">Source</a></h2>
+        <p className="sheet-page__section-desc">View the full component source code on GitHub.</p>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+          <a className="sheet-page__source-link" href="https://github.com/annondeveloper/ui-kit/blob/main/src/components/sheet.tsx" target="_blank" rel="noopener noreferrer">
+            src/components/sheet.tsx (Standard)
+          </a>
+          <a className="sheet-page__source-link" href="https://github.com/annondeveloper/ui-kit/blob/main/src/lite/sheet.tsx" target="_blank" rel="noopener noreferrer">
+            src/lite/sheet.tsx (Lite)
+          </a>
+          <a className="sheet-page__source-link" href="https://github.com/annondeveloper/ui-kit/blob/main/src/premium/sheet.tsx" target="_blank" rel="noopener noreferrer">
+            src/premium/sheet.tsx (Premium)
+          </a>
+        </div>
       </section>
     </div>
   )

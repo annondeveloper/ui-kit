@@ -5,6 +5,7 @@ import { css } from '@ui/core/styles/css-tag'
 import { useStyles } from '@ui/core/styles/use-styles'
 import { StreamingText } from '@ui/domain/streaming-text'
 import { StreamingText as LiteStreamingText } from '@ui/lite/streaming-text'
+import { StreamingText as PremiumStreamingText } from '@ui/premium/streaming-text'
 import { Button } from '@ui/components/button'
 import { Card } from '@ui/components/card'
 import { CopyBlock } from '@ui/domain/copy-block'
@@ -613,6 +614,22 @@ const pageStyles = css`
       :scope ::-webkit-scrollbar-track { background: transparent; }
       :scope ::-webkit-scrollbar-thumb { background: var(--border-default); border-radius: 2px; }
       :scope ::-webkit-scrollbar-thumb:hover { background: var(--border-strong); }
+
+      /* ── Source link ─────────────────────────────────── */
+
+      .streaming-text-page__source-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: var(--text-sm, 0.875rem);
+        color: var(--brand);
+        text-decoration: none;
+        font-weight: 500;
+      }
+      .streaming-text-page__source-link:hover {
+        text-decoration: underline;
+        text-underline-offset: 0.2em;
+      }
     }
   }
 `
@@ -878,6 +895,15 @@ function PlaygroundSection({ tier: tierProp, brandColor }: { tier: Tier; brandCo
           <div className="streaming-text-page__playground-result">
             {tier === 'lite' ? (
               <LiteStreamingText text={sim.text || 'Press "Start Streaming" to begin...'} style={{ position: 'relative', zIndex: 1 }} />
+            ) : tier === 'premium' ? (
+              <PremiumStreamingText
+                text={sim.text || 'Press "Start Streaming" to begin...'}
+                streaming={sim.streaming}
+                showCursor={showCursor}
+                speed={speed}
+                motion={motion}
+                style={{ position: 'relative', zIndex: 1 }}
+              />
             ) : (
               <StreamingText
                 text={sim.text || 'Press "Start Streaming" to begin...'}
@@ -1246,7 +1272,7 @@ export default function StreamingTextPage() {
               import {'{'} StreamingText {'}'} from '@annondeveloper/ui-kit/premium'
             </div>
             <div className="streaming-text-page__tier-preview">
-              <StreamingText text="Premium streaming..." streaming showCursor style={{ fontSize: '0.875rem' }} />
+              <PremiumStreamingText text="Premium streaming..." streaming showCursor style={{ fontSize: '0.875rem' }} />
             </div>
             <div className="streaming-text-page__size-breakdown">
               <div className="streaming-text-page__size-row">
@@ -1357,6 +1383,23 @@ export default function StreamingTextPage() {
             </li>
           </ul>
         </Card>
+      </section>
+
+      {/* ── Source ──────────────────────────────────────── */}
+      <section className="streaming-text-page__section" id="source">
+        <h2 className="streaming-text-page__section-title"><a href="#source">Source</a></h2>
+        <p className="streaming-text-page__section-desc">View the full component source code on GitHub.</p>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+          <a className="streaming-text-page__source-link" href="https://github.com/annondeveloper/ui-kit/blob/main/src/domain/streaming-text.tsx" target="_blank" rel="noopener noreferrer">
+            <Icon name="code" size="sm" /> src/domain/streaming-text.tsx (Standard)
+          </a>
+          <a className="streaming-text-page__source-link" href="https://github.com/annondeveloper/ui-kit/blob/main/src/lite/streaming-text.tsx" target="_blank" rel="noopener noreferrer">
+            <Icon name="code" size="sm" /> src/lite/streaming-text.tsx (Lite)
+          </a>
+          <a className="streaming-text-page__source-link" href="https://github.com/annondeveloper/ui-kit/blob/main/src/premium/streaming-text.tsx" target="_blank" rel="noopener noreferrer">
+            <Icon name="code" size="sm" /> src/premium/streaming-text.tsx (Premium)
+          </a>
+        </div>
       </section>
     </div>
   )

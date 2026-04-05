@@ -5,6 +5,7 @@ import { css } from '@ui/core/styles/css-tag'
 import { useStyles } from '@ui/core/styles/use-styles'
 import { Slider } from '@ui/components/slider'
 import { Slider as LiteSlider } from '@ui/lite/slider'
+import { Slider as PremiumSlider } from '@ui/premium/slider'
 import { Button } from '@ui/components/button'
 import { Card } from '@ui/components/card'
 import { CopyBlock } from '@ui/domain/copy-block'
@@ -477,6 +478,22 @@ const pageStyles = css`
         display: flex;
         justify-content: center;
         padding-block-start: 0.5rem;
+      }
+
+      /* ── Size breakdown bar ─────────────────────────── */
+
+      .slider-page__size-breakdown {
+        display: flex;
+        flex-direction: column;
+        gap: 0.25rem;
+        font-size: 0.75rem;
+        color: var(--text-tertiary);
+      }
+
+      .slider-page__size-row {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
       }
 
       /* ── Color picker ──────────────────────────────── */
@@ -954,6 +971,7 @@ function PlaygroundSection({ tier: tierProp, brandColor }: { tier: Tier; brandCo
   const [showValue, setShowValue] = useState(true)
   const [showTicks, setShowTicks] = useState(false)
   const [disabled, setDisabled] = useState(false)
+  const [motion, setMotion] = useState<0 | 1 | 2 | 3>(3)
   const [copyStatus, setCopyStatus] = useState('')
   const [activeCodeTab, setActiveCodeTab] = useState('react')
 
@@ -1009,6 +1027,21 @@ function PlaygroundSection({ tier: tierProp, brandColor }: { tier: Tier; brandCo
                 onChange={e => setSliderValue(Number((e.target as HTMLInputElement).value))}
                 style={{ inlineSize: '100%' }}
               />
+            ) : tier === 'premium' ? (
+              <PremiumSlider
+                label={sliderLabel || undefined}
+                showValue={showValue}
+                showTicks={showTicks}
+                min={min}
+                max={max}
+                step={step}
+                value={sliderValue}
+                onChange={setSliderValue}
+                size={size}
+                disabled={disabled}
+                motion={motion}
+                style={{ inlineSize: '100%' }}
+              />
             ) : (
               <Slider
                 label={sliderLabel || undefined}
@@ -1021,6 +1054,7 @@ function PlaygroundSection({ tier: tierProp, brandColor }: { tier: Tier; brandCo
                 onChange={setSliderValue}
                 size={size}
                 disabled={disabled}
+                motion={motion}
                 style={{ inlineSize: '100%' }}
               />
             )}
@@ -1066,6 +1100,15 @@ function PlaygroundSection({ tier: tierProp, brandColor }: { tier: Tier; brandCo
         <div className="slider-page__playground-controls">
           {tier !== 'lite' && (
             <OptionGroup label="Size" options={SIZES} value={size} onChange={setSize} />
+          )}
+
+          {tier !== 'lite' && (
+            <OptionGroup
+              label="Motion Level"
+              options={['0', '1', '2', '3'] as const}
+              value={String(motion) as '0' | '1' | '2' | '3'}
+              onChange={v => setMotion(Number(v) as 0 | 1 | 2 | 3)}
+            />
           )}
 
           <div className="slider-page__control-group">
@@ -1320,6 +1363,13 @@ export default function SliderPage() {
                 <LiteSlider label="Lite" showValue defaultValue={60} />
               </div>
             </div>
+            <div className="slider-page__size-breakdown">
+              <div className="slider-page__size-row">
+                <span>Component: <strong style={{ color: 'var(--text-primary)' }}>0.2 KB</strong></span>
+                <span>+ Shared: <strong style={{ color: 'var(--text-primary)' }}>0.0 KB</strong></span>
+                <span>= <strong style={{ color: 'var(--brand)' }}>0.2 KB</strong> gzip</span>
+              </div>
+            </div>
           </div>
 
           {/* Standard */}
@@ -1346,6 +1396,13 @@ export default function SliderPage() {
                 <Slider label="Standard" showValue showTicks min={0} max={10} step={1} defaultValue={7} />
               </div>
             </div>
+            <div className="slider-page__size-breakdown">
+              <div className="slider-page__size-row">
+                <span>Component: <strong style={{ color: 'var(--text-primary)' }}>1.8 KB</strong></span>
+                <span>+ Shared: <strong style={{ color: 'var(--text-primary)' }}>0.9 KB</strong></span>
+                <span>= <strong style={{ color: 'var(--brand)' }}>2.7 KB</strong> gzip</span>
+              </div>
+            </div>
           </div>
 
           {/* Premium */}
@@ -1368,7 +1425,14 @@ export default function SliderPage() {
             </div>
             <div className="slider-page__tier-preview">
               <div style={{ inlineSize: '100%' }}>
-                <Slider label="Premium" showValue size="lg" defaultValue={85} />
+                <PremiumSlider label="Premium" showValue size="lg" defaultValue={85} />
+              </div>
+            </div>
+            <div className="slider-page__size-breakdown">
+              <div className="slider-page__size-row">
+                <span>Component: <strong style={{ color: 'var(--text-primary)' }}>3.2 KB</strong></span>
+                <span>+ Shared: <strong style={{ color: 'var(--text-primary)' }}>0.9 KB</strong></span>
+                <span>= <strong style={{ color: 'var(--brand)' }}>4.1 KB</strong> gzip</span>
               </div>
             </div>
           </div>
@@ -1505,7 +1569,7 @@ export default function SliderPage() {
         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
           <a
             className="slider-page__source-link"
-            href="https://github.com/annondeveloper/ui-kit/blob/v2/src/components/slider.tsx"
+            href="https://github.com/annondeveloper/ui-kit/blob/main/src/components/slider.tsx"
             target="_blank"
             rel="noopener noreferrer"
           >
@@ -1514,7 +1578,7 @@ export default function SliderPage() {
           </a>
           <a
             className="slider-page__source-link"
-            href="https://github.com/annondeveloper/ui-kit/blob/v2/src/lite/slider.tsx"
+            href="https://github.com/annondeveloper/ui-kit/blob/main/src/lite/slider.tsx"
             target="_blank"
             rel="noopener noreferrer"
           >

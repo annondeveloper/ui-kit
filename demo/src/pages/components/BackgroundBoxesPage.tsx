@@ -4,6 +4,8 @@ import { useState, useMemo, useCallback, useRef, useEffect } from 'react'
 import { css } from '@ui/core/styles/css-tag'
 import { useStyles } from '@ui/core/styles/use-styles'
 import { BackgroundBoxes } from '@ui/domain/background-boxes'
+import { BackgroundBoxes as LiteBackgroundBoxes } from '@ui/lite/background-boxes'
+import { BackgroundBoxes as PremiumBackgroundBoxes } from '@ui/premium/background-boxes'
 import { Button } from '@ui/components/button'
 import { Card } from '@ui/components/card'
 import { CopyBlock } from '@ui/domain/copy-block'
@@ -657,6 +659,22 @@ const pageStyles = css`
       :scope ::-webkit-scrollbar-thumb:hover {
         background: var(--border-strong);
       }
+
+      /* ── Source link ─────────────────────────────────── */
+
+      .background-boxes-page__source-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        color: var(--text-secondary);
+        font-size: var(--text-sm, 0.875rem);
+        text-decoration: none;
+        font-weight: 500;
+      }
+      .background-boxes-page__source-link:hover {
+        text-decoration: underline;
+        text-underline-offset: 0.2em;
+      }
     }
   }
 `
@@ -1204,7 +1222,7 @@ export default function BackgroundBoxesPage() {
               import {'{'} BackgroundBoxes {'}'} from '@annondeveloper/ui-kit/domain'
             </div>
             <div className="background-boxes-page__tier-preview">
-              <BackgroundBoxes rows={6} cols={6} motion={0} style={{ width: '100%', height: '100%', minHeight: 80 }} />
+              <LiteBackgroundBoxes rows={6} cols={6} style={{ width: '100%', height: '100%', minHeight: 80 }} />
             </div>
             <div className="background-boxes-page__size-breakdown">
               <div className="background-boxes-page__size-row">
@@ -1266,7 +1284,7 @@ export default function BackgroundBoxesPage() {
               import {'{'} BackgroundBoxes {'}'} from '@annondeveloper/ui-kit/premium'
             </div>
             <div className="background-boxes-page__tier-preview">
-              <BackgroundBoxes rows={6} cols={6} style={{ width: '100%', height: '100%', minHeight: 80 }} />
+              <PremiumBackgroundBoxes rows={6} cols={6} style={{ width: '100%', height: '100%', minHeight: 80 }} />
             </div>
             <div className="background-boxes-page__size-breakdown">
               <div className="background-boxes-page__size-row">
@@ -1379,6 +1397,45 @@ export default function BackgroundBoxesPage() {
             </li>
           </ul>
         </Card>
+      </section>
+
+      {/* ── 10. Source ──────────────────────────────────── */}
+      <section className="background-boxes-page__section" id="source">
+        <h2 className="background-boxes-page__section-title">
+          <a href="#source">Source</a>
+        </h2>
+        <p className="background-boxes-page__section-desc">
+          View the component source on GitHub.
+        </p>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+          <a
+            href="https://github.com/annondeveloper/ui-kit/blob/main/src/domain/background-boxes.tsx"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="background-boxes-page__source-link"
+          >
+            <Icon name="code" size="sm" />
+            src/domain/background-boxes.tsx
+          </a>
+          <a
+            href="https://github.com/annondeveloper/ui-kit/blob/main/src/lite/background-boxes.tsx"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="background-boxes-page__source-link"
+          >
+            <Icon name="code" size="sm" />
+            src/lite/background-boxes.tsx
+          </a>
+          <a
+            href="https://github.com/annondeveloper/ui-kit/blob/main/src/premium/background-boxes.tsx"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="background-boxes-page__source-link"
+          >
+            <Icon name="code" size="sm" />
+            src/premium/background-boxes.tsx
+          </a>
+        </div>
       </section>
     </div>
   )

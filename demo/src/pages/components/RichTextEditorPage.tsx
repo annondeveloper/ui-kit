@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo, useCallback } from 'react'
 import { css } from '@ui/core/styles/css-tag'
 import { useStyles } from '@ui/core/styles/use-styles'
 import { RichTextEditor } from '@ui/domain/rich-text-editor'
@@ -9,6 +9,8 @@ import { RichTextEditor as PremiumRichTextEditor } from '@ui/premium/rich-text-e
 import { CopyBlock } from '@ui/domain/copy-block'
 import { PropsTable, type PropDef } from '../../components/PropsTable'
 import { useTier } from '../../App'
+
+type Tier = 'lite' | 'standard' | 'premium'
 
 // ─── Props ───────────────────────────────────────────────────────────────────
 
@@ -269,14 +271,533 @@ const pageStyles = css`
         overflow: hidden;
       }
 
+      /* ── Playground ─────────────────────────────────── */
+
+      .rte-page__playground {
+        display: grid;
+        grid-template-columns: 280px 1fr;
+        gap: 1.5rem;
+      }
+
+      .rte-page__playground-controls {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+      }
+
+      .rte-page__playground-preview {
+        min-width: 0;
+      }
+
+      .rte-page__playground-result {
+        position: relative;
+        padding: 1.5rem;
+        border-radius: var(--radius-md);
+        background: var(--bg-base);
+        overflow: visible;
+      }
+
+      .rte-page__playground-result::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background-image: radial-gradient(oklch(100% 0 0 / 0.03) 1px, transparent 1px);
+        background-size: 24px 24px;
+        pointer-events: none;
+        border-radius: inherit;
+      }
+
+      .rte-page__control-group {
+        display: flex;
+        flex-direction: column;
+        gap: 0.375rem;
+      }
+
+      .rte-page__control-label {
+        font-size: var(--text-xs, 0.75rem);
+        font-weight: 600;
+        color: var(--text-tertiary);
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+      }
+
+      .rte-page__control-row {
+        display: flex;
+        gap: 0.375rem;
+        flex-wrap: wrap;
+      }
+
+      .rte-page__control-btn {
+        font-size: var(--text-xs, 0.75rem);
+        padding: 0.25rem 0.625rem;
+        border-radius: var(--radius-sm);
+        border: 1px solid var(--border-subtle);
+        background: var(--bg-surface);
+        color: var(--text-secondary);
+        cursor: pointer;
+        transition: all 0.15s;
+      }
+      .rte-page__control-btn:hover { border-color: var(--border-default); color: var(--text-primary); }
+      .rte-page__control-btn--active {
+        background: var(--brand, oklch(65% 0.2 270));
+        color: white;
+        border-color: var(--brand, oklch(65% 0.2 270));
+      }
+
+      /* ── Code Tabs ─────────────────────────────────── */
+
+      .rte-page__code-tabs {
+        display: flex;
+        gap: 0;
+        border-block-end: 1px solid var(--border-subtle);
+        margin-block-end: 0;
+      }
+
+      .rte-page__code-tab {
+        font-size: var(--text-xs, 0.75rem);
+        font-weight: 600;
+        padding: 0.5rem 1rem;
+        border: none;
+        background: transparent;
+        color: var(--text-tertiary);
+        cursor: pointer;
+        border-block-end: 2px solid transparent;
+        transition: color 0.15s, border-color 0.15s;
+      }
+      .rte-page__code-tab:hover { color: var(--text-primary); }
+      .rte-page__code-tab--active {
+        color: var(--brand, oklch(65% 0.2 270));
+        border-block-end-color: var(--brand, oklch(65% 0.2 270));
+      }
+
+      .rte-page__code-block {
+        background: oklch(0% 0 0 / 0.2);
+        border: 1px solid var(--border-subtle);
+        border-block-start: none;
+        border-radius: 0 0 var(--radius-md) var(--radius-md);
+        padding: 1rem;
+        font-family: 'SF Mono', 'Fira Code', 'JetBrains Mono', monospace;
+        font-size: var(--text-xs, 0.75rem);
+        color: var(--text-secondary);
+        overflow-x: auto;
+        white-space: pre;
+        line-height: 1.6;
+      }
+
+      /* ── Accessibility Section ─────────────────────── */
+
+      .rte-page__a11y-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+      }
+
+      .rte-page__a11y-item {
+        display: flex;
+        align-items: flex-start;
+        gap: 0.625rem;
+        font-size: var(--text-sm, 0.875rem);
+        line-height: 1.6;
+        color: var(--text-secondary);
+      }
+
+      .rte-page__a11y-icon {
+        flex-shrink: 0;
+        color: oklch(72% 0.19 155);
+        margin-block-start: 0.15rem;
+      }
+
+      .rte-page__a11y-key {
+        font-family: 'SF Mono', 'Fira Code', 'JetBrains Mono', monospace;
+        font-size: 0.8em;
+        background: oklch(0% 0 0 / 0.15);
+        padding: 0.1em 0.4em;
+        border-radius: var(--radius-sm);
+        border: 1px solid var(--border-subtle);
+      }
+
       @container (max-width: 640px) {
         .rte-page__tiers { grid-template-columns: 1fr; }
+        .rte-page__playground { grid-template-columns: 1fr; }
       }
     }
   }
 `
 
 const IMPORT_STR = "import { RichTextEditor } from '@ui/domain/rich-text-editor'"
+
+// ─── Code Generation ────────────────────────────────────────────────────────
+
+function generateReactCode(tier: Tier, size: string, disabled: boolean, readOnly: boolean, motion: number): string {
+  const importPath = tier === 'lite'
+    ? "@annondeveloper/ui-kit/lite"
+    : tier === 'premium'
+    ? "@annondeveloper/ui-kit/premium"
+    : "@annondeveloper/ui-kit"
+
+  const props: string[] = ['  label="Post content"', '  placeholder="Write something..."']
+  if (size !== 'md') props.push(`  size="${size}"`)
+  if (disabled) props.push('  disabled')
+  if (readOnly) props.push('  readOnly')
+  if (motion !== 3 && tier !== 'lite') props.push(`  motion={${motion}}`)
+  props.push('  onChange={(html) => console.log(html)}')
+
+  return `import { RichTextEditor } from '${importPath}'
+
+<RichTextEditor
+${props.join('\n')}
+/>`
+}
+
+function generateHtmlCode(tier: Tier, size: string, disabled: boolean, readOnly: boolean): string {
+  const disabledAttr = disabled ? ' contenteditable="false" aria-disabled="true"' : ''
+  const readOnlyAttr = readOnly ? ' contenteditable="false"' : ''
+  const sizeClass = size !== 'md' ? ` ui-rich-text-editor--${size}` : ''
+
+  if (tier === 'lite') {
+    return `<!-- RichTextEditor -- @annondeveloper/ui-kit lite tier -->
+<link rel="stylesheet" href="https://unpkg.com/@annondeveloper/ui-kit/lite/styles.css">
+
+<div class="ui-lite-rich-text-editor${sizeClass}">
+  <label class="ui-lite-rich-text-editor__label">Post content</label>
+  <div class="ui-lite-rich-text-editor__toolbar">
+    <button type="button" aria-label="Bold"><b>B</b></button>
+    <button type="button" aria-label="Italic"><i>I</i></button>
+    <button type="button" aria-label="Underline"><u>U</u></button>
+  </div>
+  <div class="ui-lite-rich-text-editor__content"
+       contenteditable="true"${disabledAttr}${readOnlyAttr}
+       role="textbox"
+       aria-multiline="true"
+       aria-label="Post content"
+       data-placeholder="Write something...">
+  </div>
+</div>`
+  }
+
+  return `<!-- RichTextEditor -- @annondeveloper/ui-kit standard tier -->
+<link rel="stylesheet" href="https://unpkg.com/@annondeveloper/ui-kit/css/components/rich-text-editor.css">
+
+<div class="ui-rich-text-editor${sizeClass}">
+  <label class="ui-rich-text-editor__label">Post content</label>
+  <div class="ui-rich-text-editor__toolbar" role="toolbar" aria-label="Formatting">
+    <button type="button" aria-label="Bold" aria-pressed="false"><b>B</b></button>
+    <button type="button" aria-label="Italic" aria-pressed="false"><i>I</i></button>
+    <button type="button" aria-label="Underline" aria-pressed="false"><u>U</u></button>
+    <button type="button" aria-label="Link">Link</button>
+  </div>
+  <div class="ui-rich-text-editor__content"
+       contenteditable="${disabled ? 'false' : 'true'}"${disabledAttr}${readOnlyAttr}
+       role="textbox"
+       aria-multiline="true"
+       aria-label="Post content"
+       data-placeholder="Write something..."
+       style="min-block-size: 120px;">
+  </div>
+</div>`
+}
+
+function generateVueCode(tier: Tier, size: string): string {
+  const importPath = tier === 'lite' ? '@annondeveloper/ui-kit/lite/styles.css'
+    : '@annondeveloper/ui-kit/css/components/rich-text-editor.css'
+  const sizeClass = size !== 'md' ? ` ui-rich-text-editor--${size}` : ''
+
+  return `<template>
+  <div class="ui-rich-text-editor${sizeClass}">
+    <label class="ui-rich-text-editor__label">Post content</label>
+    <div class="ui-rich-text-editor__toolbar" role="toolbar" aria-label="Formatting">
+      <button @click="format('bold')" :aria-pressed="isBold">B</button>
+      <button @click="format('italic')" :aria-pressed="isItalic">I</button>
+      <button @click="format('underline')" :aria-pressed="isUnderline">U</button>
+    </div>
+    <div
+      ref="editor"
+      class="ui-rich-text-editor__content"
+      contenteditable="true"
+      role="textbox"
+      aria-multiline="true"
+      aria-label="Post content"
+      @input="onInput"
+    />
+  </div>
+</template>
+
+<script setup lang="ts">
+import { ref } from 'vue'
+
+const editor = ref<HTMLElement>()
+const html = ref('')
+const isBold = ref(false)
+const isItalic = ref(false)
+const isUnderline = ref(false)
+
+function format(cmd: string) {
+  document.queryCommandSupported(cmd) && document.queryCommandValue(cmd)
+  editor.value?.focus()
+}
+
+function onInput() {
+  html.value = editor.value?.innerHTML ?? ''
+}
+</script>
+
+<style>
+@import '${importPath}';
+</style>`
+}
+
+function generateAngularCode(tier: Tier, size: string): string {
+  const sizeClass = size !== 'md' ? ` ui-rich-text-editor--${size}` : ''
+  const cssPath = tier === 'lite' ? '@annondeveloper/ui-kit/lite/styles.css'
+    : '@annondeveloper/ui-kit/css/components/rich-text-editor.css'
+
+  return `// Angular tier: ${tier} -- Angular CSS import: ${cssPath}
+import { Component } from '@angular/core';
+
+@Component({
+  selector: 'app-rich-text-editor',
+  standalone: true,
+  template: \`
+    <div class="ui-rich-text-editor${sizeClass}">
+      <label class="ui-rich-text-editor__label">Post content</label>
+      <div class="ui-rich-text-editor__toolbar" role="toolbar" aria-label="Formatting">
+        <button (click)="format('bold')" [attr.aria-pressed]="isBold">B</button>
+        <button (click)="format('italic')" [attr.aria-pressed]="isItalic">I</button>
+        <button (click)="format('underline')" [attr.aria-pressed]="isUnderline">U</button>
+      </div>
+      <div
+        class="ui-rich-text-editor__content"
+        contenteditable="true"
+        role="textbox"
+        aria-multiline="true"
+        aria-label="Post content"
+        (input)="onInput()">
+      </div>
+    </div>
+  \`,
+  styleUrls: ['${cssPath}']
+})
+export class RichTextEditorComponent {
+  isBold = false;
+  isItalic = false;
+  isUnderline = false;
+  html = '';
+
+  format(command: string) {
+    document.queryCommandSupported(command);
+  }
+
+  onInput() {
+    const el = document.querySelector('.ui-rich-text-editor__content');
+    this.html = el?.innerHTML ?? '';
+  }
+}`
+}
+
+function generateSvelteCode(tier: Tier, size: string): string {
+  const sizeClass = size !== 'md' ? ` ui-rich-text-editor--${size}` : ''
+  const cssImport = tier === 'lite'
+    ? "@annondeveloper/ui-kit/lite/styles.css"
+    : "@annondeveloper/ui-kit/css/components/rich-text-editor.css"
+
+  return `<!-- Svelte tier: ${tier} -- Svelte import -->
+<script lang="ts">
+  let html = $state('')
+  let editor: HTMLElement
+
+  function format(command: string) {
+    document.queryCommandSupported(command)
+    editor?.focus()
+  }
+
+  function onInput() {
+    html = editor?.innerHTML ?? ''
+  }
+</script>
+
+<div class="ui-rich-text-editor${sizeClass}">
+  <label class="ui-rich-text-editor__label">Post content</label>
+  <div class="ui-rich-text-editor__toolbar" role="toolbar" aria-label="Formatting">
+    <button onclick={() => format('bold')}>B</button>
+    <button onclick={() => format('italic')}>I</button>
+    <button onclick={() => format('underline')}>U</button>
+  </div>
+  <div
+    bind:this={editor}
+    class="ui-rich-text-editor__content"
+    contenteditable="true"
+    role="textbox"
+    aria-multiline="true"
+    aria-label="Post content"
+    oninput={onInput}
+  />
+</div>
+
+<style>
+  @import '${cssImport}';
+</style>`
+}
+
+// ─── Playground Component ───────────────────────────────────────────────────
+
+function PlaygroundSection({ tier: tierProp }: { tier: Tier }) {
+  const { tier: contextTier } = useTier()
+  const tier = (tierProp ?? contextTier) as Tier
+  const [size, setSize] = useState<'sm' | 'md' | 'lg'>('md')
+  const [motion, setMotion] = useState<0 | 1 | 2 | 3>(3)
+  const [disabled, setDisabled] = useState(false)
+  const [readOnly, setReadOnly] = useState(false)
+  const [activeCodeTab, setActiveCodeTab] = useState('react')
+
+  const ActiveRTE = tier === 'lite' ? LiteRichTextEditor : tier === 'premium' ? PremiumRichTextEditor : RichTextEditor
+
+  const reactCode = useMemo(
+    () => generateReactCode(tier, size, disabled, readOnly, motion),
+    [tier, size, disabled, readOnly, motion],
+  )
+  const htmlCode = useMemo(
+    () => generateHtmlCode(tier, size, disabled, readOnly),
+    [tier, size, disabled, readOnly],
+  )
+  const vueCode = useMemo(
+    () => generateVueCode(tier, size),
+    [tier, size],
+  )
+  const angularCode = useMemo(
+    () => generateAngularCode(tier, size),
+    [tier, size],
+  )
+  const svelteCode = useMemo(
+    () => generateSvelteCode(tier, size),
+    [tier, size],
+  )
+
+  const codeTabs = [
+    { id: 'react', label: 'React' },
+    { id: 'html', label: 'HTML+CSS' },
+    { id: 'vue', label: 'Vue' },
+    { id: 'angular', label: 'Angular' },
+    { id: 'svelte', label: 'Svelte' },
+  ]
+
+  const activeCode = useMemo(() => {
+    switch (activeCodeTab) {
+      case 'react': return reactCode
+      case 'html': return htmlCode
+      case 'vue': return vueCode
+      case 'angular': return angularCode
+      case 'svelte': return svelteCode
+      default: return reactCode
+    }
+  }, [activeCodeTab, reactCode, htmlCode, vueCode, angularCode, svelteCode])
+
+  const handleCopy = useCallback(() => {
+    navigator.clipboard?.writeText(activeCode)
+  }, [activeCode])
+
+  return (
+    <section className="rte-page__section" id="playground">
+      <h2 className="rte-page__section-title">
+        <a href="#playground">Playground</a>
+      </h2>
+      <p className="rte-page__section-desc">
+        Tweak every prop and see the result in real-time. The generated code updates as you change settings.
+      </p>
+
+      <div className="rte-page__playground">
+        {/* Controls */}
+        <div className="rte-page__playground-controls">
+          <div className="rte-page__control-group">
+            <span className="rte-page__control-label">Size</span>
+            <div className="rte-page__control-row">
+              {(['sm', 'md', 'lg'] as const).map(s => (
+                <button
+                  key={s}
+                  className={`rte-page__control-btn${size === s ? ' rte-page__control-btn--active' : ''}`}
+                  onClick={() => setSize(s)}
+                >
+                  {s}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div className="rte-page__control-group">
+            <span className="rte-page__control-label">Motion Level</span>
+            <div className="rte-page__control-row">
+              {([0, 1, 2, 3] as const).map(m => (
+                <button
+                  key={m}
+                  className={`rte-page__control-btn${motion === m ? ' rte-page__control-btn--active' : ''}`}
+                  onClick={() => setMotion(m)}
+                >
+                  {m}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div className="rte-page__control-group">
+            <span className="rte-page__control-label">State</span>
+            <div className="rte-page__control-row">
+              <label style={{ display: 'flex', alignItems: 'center', gap: '0.375rem', fontSize: 'var(--text-xs, 0.75rem)', color: 'var(--text-secondary)', cursor: 'pointer' }}>
+                <input type="checkbox" checked={disabled} onChange={e => { setDisabled(e.target.checked); if (e.target.checked) setReadOnly(false) }} style={{ accentColor: 'var(--brand)' }} />
+                Disabled
+              </label>
+              <label style={{ display: 'flex', alignItems: 'center', gap: '0.375rem', fontSize: 'var(--text-xs, 0.75rem)', color: 'var(--text-secondary)', cursor: 'pointer' }}>
+                <input type="checkbox" checked={readOnly} onChange={e => { setReadOnly(e.target.checked); if (e.target.checked) setDisabled(false) }} style={{ accentColor: 'var(--brand)' }} />
+                Read-only
+              </label>
+            </div>
+          </div>
+        </div>
+
+        {/* Preview */}
+        <div className="rte-page__playground-preview">
+          <div className="rte-page__playground-result">
+            <ActiveRTE
+              key={`${tier}-${size}-${disabled}-${readOnly}`}
+              defaultValue="<p>Try <strong>bold</strong>, <em>italic</em>, and <a href='#'>links</a>.</p>"
+              label="Post content"
+              placeholder="Write something..."
+              size={size}
+              disabled={disabled}
+              readOnly={readOnly}
+              {...(tier !== 'lite' ? { motion } : {})}
+              minHeight="120px"
+            />
+          </div>
+        </div>
+      </div>
+
+      {/* Code output */}
+      <div style={{ marginBlockStart: '1.5rem' }}>
+        <div className="rte-page__code-tabs">
+          {codeTabs.map(tab => (
+            <button
+              key={tab.id}
+              className={`rte-page__code-tab${activeCodeTab === tab.id ? ' rte-page__code-tab--active' : ''}`}
+              onClick={() => setActiveCodeTab(tab.id)}
+            >
+              {tab.label}
+            </button>
+          ))}
+          <button
+            className="rte-page__code-tab"
+            style={{ marginInlineStart: 'auto' }}
+            onClick={handleCopy}
+          >
+            Copy
+          </button>
+        </div>
+        <div className="rte-page__code-block">{activeCode}</div>
+      </div>
+    </section>
+  )
+}
 
 // ─── Component ───────────────────────────────────────────────────────────────
 
@@ -393,6 +914,72 @@ export default function RichTextEditorPage() {
         </div>
       </section>
 
+      {/* ── 4. Playground ────────────────────────────── */}
+      <PlaygroundSection tier={tier} />
+
+      {/* ── 5. Accessibility ──────────────────────────── */}
+      <section className="rte-page__section" id="accessibility">
+        <h2 className="rte-page__section-title">
+          <a href="#accessibility">Accessibility</a>
+        </h2>
+        <p className="rte-page__section-desc">
+          The RichTextEditor follows WAI-ARIA authoring practices for rich text editing regions
+          with comprehensive keyboard support and screen reader compatibility.
+        </p>
+        <div style={{ background: 'var(--bg-surface)', border: '1px solid var(--border-subtle)', borderRadius: 'var(--radius-md)', padding: '1.5rem' }}>
+          <ul className="rte-page__a11y-list">
+            <li className="rte-page__a11y-item">
+              <span className="rte-page__a11y-icon">&#10003;</span>
+              <span>
+                <strong>ARIA role:</strong> The editing area uses <code className="rte-page__a11y-key">role="textbox"</code> with <code className="rte-page__a11y-key">aria-multiline="true"</code> for proper screen reader announcement.
+              </span>
+            </li>
+            <li className="rte-page__a11y-item">
+              <span className="rte-page__a11y-icon">&#10003;</span>
+              <span>
+                <strong>Keyboard shortcuts:</strong> <code className="rte-page__a11y-key">Ctrl+B</code> for bold, <code className="rte-page__a11y-key">Ctrl+I</code> for italic, <code className="rte-page__a11y-key">Ctrl+K</code> for link insertion, and <code className="rte-page__a11y-key">Ctrl+U</code> for underline.
+              </span>
+            </li>
+            <li className="rte-page__a11y-item">
+              <span className="rte-page__a11y-icon">&#10003;</span>
+              <span>
+                <strong>Toolbar navigation:</strong> The toolbar uses <code className="rte-page__a11y-key">role="toolbar"</code> with arrow key roving tabindex for efficient navigation.
+              </span>
+            </li>
+            <li className="rte-page__a11y-item">
+              <span className="rte-page__a11y-icon">&#10003;</span>
+              <span>
+                <strong>Label association:</strong> The <code className="rte-page__a11y-key">label</code> prop renders a visible label connected via <code className="rte-page__a11y-key">aria-labelledby</code>.
+              </span>
+            </li>
+            <li className="rte-page__a11y-item">
+              <span className="rte-page__a11y-icon">&#10003;</span>
+              <span>
+                <strong>Error announcements:</strong> Validation errors are linked via <code className="rte-page__a11y-key">aria-describedby</code> and announced to screen readers with <code className="rte-page__a11y-key">aria-invalid="true"</code>.
+              </span>
+            </li>
+            <li className="rte-page__a11y-item">
+              <span className="rte-page__a11y-icon">&#10003;</span>
+              <span>
+                <strong>Focus management:</strong> Visible focus ring with brand-colored outline via <code className="rte-page__a11y-key">:focus-visible</code>. Focus returns to the editor after toolbar interactions.
+              </span>
+            </li>
+            <li className="rte-page__a11y-item">
+              <span className="rte-page__a11y-icon">&#10003;</span>
+              <span>
+                <strong>Motion:</strong> Respects <code className="rte-page__a11y-key">prefers-reduced-motion</code>. Motion level 0 disables all transitions and animations.
+              </span>
+            </li>
+            <li className="rte-page__a11y-item">
+              <span className="rte-page__a11y-icon">&#10003;</span>
+              <span>
+                <strong>High contrast:</strong> Supports <code className="rte-page__a11y-key">forced-colors: active</code> with system color borders and visible toolbar button outlines.
+              </span>
+            </li>
+          </ul>
+        </div>
+      </section>
+
       {/* ── Tiers ─────────────────────────────────────── */}
       <section className="rte-page__section" id="tiers">
         <h2 className="rte-page__section-title"><a href="#tiers">Weight Tiers</a></h2>
@@ -409,7 +996,7 @@ export default function RichTextEditorPage() {
           <div className={`rte-page__tier-card${tier === 'lite' ? ' rte-page__tier-card--active' : ''}`} onClick={() => setTier('lite')} role="button" tabIndex={0} onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setTier('lite') } }}>
             <div className="rte-page__tier-header">
               <span className="rte-page__tier-name">Lite</span>
-              <span className="rte-page__tier-size">~0.8 KB</span>
+              <span className="rte-page__tier-size">~0.8 KB gzip</span>
             </div>
             <p className="rte-page__tier-desc">
               Basic contentEditable with bold, italic, and underline toolbar buttons. Supports
@@ -431,7 +1018,7 @@ export default function RichTextEditorPage() {
           <div className={`rte-page__tier-card${tier === 'standard' ? ' rte-page__tier-card--active' : ''}`} onClick={() => setTier('standard')} role="button" tabIndex={0} onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setTier('standard') } }}>
             <div className="rte-page__tier-header">
               <span className="rte-page__tier-name">Standard</span>
-              <span className="rte-page__tier-size">~4.8 KB</span>
+              <span className="rte-page__tier-size">~4.8 KB gzip</span>
             </div>
             <p className="rte-page__tier-desc">
               Full configurable toolbar with 11 actions, keyboard shortcuts (Ctrl+B/I/K), HTML
@@ -453,7 +1040,7 @@ export default function RichTextEditorPage() {
           <div className={`rte-page__tier-card${tier === 'premium' ? ' rte-page__tier-card--active' : ''}`} onClick={() => setTier('premium')} role="button" tabIndex={0} onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setTier('premium') } }}>
             <div className="rte-page__tier-header">
               <span className="rte-page__tier-name">Premium</span>
-              <span className="rte-page__tier-size">~5.2 KB</span>
+              <span className="rte-page__tier-size">~5.2 KB gzip</span>
             </div>
             <p className="rte-page__tier-desc">
               Wraps Standard with aurora glow on focus, spring-scale animation on toolbar buttons,
@@ -470,6 +1057,40 @@ export default function RichTextEditorPage() {
               />
             </div>
           </div>
+        </div>
+      </section>
+
+      {/* ── Source ────────────────────────────────────── */}
+      <section className="rte-page__section" id="source">
+        <h2 className="rte-page__section-title"><a href="#source">Source</a></h2>
+        <p className="rte-page__section-desc">
+          View the component source code on GitHub.
+        </p>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+          <a
+            href="https://github.com/annondeveloper/ui-kit/blob/main/src/domain/rich-text-editor.tsx"
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{ color: 'var(--brand, oklch(65% 0.2 270))', fontSize: 'var(--text-sm, 0.875rem)' }}
+          >
+            src/domain/rich-text-editor.tsx — Standard tier
+          </a>
+          <a
+            href="https://github.com/annondeveloper/ui-kit/blob/main/src/lite/rich-text-editor.tsx"
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{ color: 'var(--brand, oklch(65% 0.2 270))', fontSize: 'var(--text-sm, 0.875rem)' }}
+          >
+            src/lite/rich-text-editor.tsx — Lite tier
+          </a>
+          <a
+            href="https://github.com/annondeveloper/ui-kit/blob/main/src/premium/rich-text-editor.tsx"
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{ color: 'var(--brand, oklch(65% 0.2 270))', fontSize: 'var(--text-sm, 0.875rem)' }}
+          >
+            src/premium/rich-text-editor.tsx — Premium tier
+          </a>
         </div>
       </section>
 

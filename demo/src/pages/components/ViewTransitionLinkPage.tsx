@@ -4,6 +4,8 @@ import { useState, useMemo, useCallback, useRef, useEffect } from 'react'
 import { css } from '@ui/core/styles/css-tag'
 import { useStyles } from '@ui/core/styles/use-styles'
 import { ViewTransitionLink } from '@ui/domain/view-transition-link'
+import { ViewTransitionLink as LiteViewTransitionLink } from '@ui/lite/view-transition-link'
+import { ViewTransitionLink as PremiumViewTransitionLink } from '@ui/premium/view-transition-link'
 import { Button } from '@ui/components/button'
 import { Card } from '@ui/components/card'
 import { CopyBlock } from '@ui/domain/copy-block'
@@ -551,6 +553,54 @@ const pageStyles = css`
         color: var(--text-primary);
       }
 
+      /* ── Source link ─────────────────────────────────── */
+
+      .view-transition-link-page__source-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: var(--text-sm, 0.875rem);
+        color: var(--brand, oklch(65% 0.2 270));
+        text-decoration: none;
+        font-weight: 500;
+      }
+      .view-transition-link-page__source-link:hover {
+        text-decoration: underline;
+        text-underline-offset: 0.2em;
+      }
+
+      /* ── Option buttons ──────────────────────────────── */
+
+      .view-transition-link-page__control-options {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.375rem;
+      }
+
+      .view-transition-link-page__option-btn {
+        font-size: var(--text-xs, 0.75rem);
+        padding: 0.25rem 0.625rem;
+        border: 1px solid var(--border-default);
+        border-radius: var(--radius-sm);
+        background: transparent;
+        color: var(--text-secondary);
+        cursor: pointer;
+        font-family: inherit;
+        font-weight: 500;
+        transition: all 0.12s;
+        line-height: 1.4;
+      }
+      .view-transition-link-page__option-btn:hover {
+        border-color: var(--border-strong);
+        color: var(--text-primary);
+      }
+      .view-transition-link-page__option-btn--active {
+        background: var(--brand);
+        color: oklch(100% 0 0);
+        border-color: var(--brand);
+        box-shadow: 0 0 0 3px var(--brand-subtle);
+      }
+
       /* ── Responsive ──────────────────────────────── */
 
       @media (max-width: 768px) {
@@ -814,6 +864,7 @@ function PlaygroundSection({ tier: tierProp }: { tier: Tier }) {
   const [transitionName, setTransitionName] = useState('hero-image')
   const [linkText, setLinkText] = useState('Navigate to Details')
   const [href, setHref] = useState('#playground')
+  const [motion, setMotion] = useState<0 | 1 | 2 | 3>(3)
   const [copyStatus, setCopyStatus] = useState('')
   const [activeCodeTab, setActiveCodeTab] = useState('react')
 
@@ -853,16 +904,35 @@ function PlaygroundSection({ tier: tierProp }: { tier: Tier }) {
 
       <div className="view-transition-link-page__playground">
         <div className="view-transition-link-page__playground-preview">
-          <div className="view-transition-link-page__playground-result">
+          <div className="view-transition-link-page__playground-result" data-motion={motion}>
             <div style={{ position: 'relative', zIndex: 1, textAlign: 'center' }}>
-              <ViewTransitionLink
-                href={href}
-                transitionName={transitionName || undefined}
-                onClick={(e) => e.preventDefault()}
-                className="view-transition-link-page__demo-link"
-              >
-                {linkText}
-              </ViewTransitionLink>
+              {tier === 'premium' ? (
+                <PremiumViewTransitionLink
+                  href={href}
+                  transitionName={transitionName || undefined}
+                  onClick={(e) => e.preventDefault()}
+                  className="view-transition-link-page__demo-link"
+                >
+                  {linkText}
+                </PremiumViewTransitionLink>
+              ) : tier === 'lite' ? (
+                <LiteViewTransitionLink
+                  href={href}
+                  onClick={(e: any) => e.preventDefault()}
+                  className="view-transition-link-page__demo-link"
+                >
+                  {linkText}
+                </LiteViewTransitionLink>
+              ) : (
+                <ViewTransitionLink
+                  href={href}
+                  transitionName={transitionName || undefined}
+                  onClick={(e) => e.preventDefault()}
+                  className="view-transition-link-page__demo-link"
+                >
+                  {linkText}
+                </ViewTransitionLink>
+              )}
               <p style={{ fontSize: 'var(--text-xs)', color: 'var(--text-tertiary)', marginBlockStart: '0.75rem' }}>
                 Click is prevented in this demo. In production, the link triggers a view transition.
               </p>
@@ -897,6 +967,23 @@ function PlaygroundSection({ tier: tierProp }: { tier: Tier }) {
         </div>
 
         <div className="view-transition-link-page__playground-controls">
+          {tier !== 'lite' && (
+            <div className="view-transition-link-page__control-group">
+              <span className="view-transition-link-page__control-label">Motion</span>
+              <div className="view-transition-link-page__control-options">
+                {(['0', '1', '2', '3'] as const).map(opt => (
+                  <button
+                    key={opt}
+                    type="button"
+                    className={`view-transition-link-page__option-btn${opt === String(motion) ? ' view-transition-link-page__option-btn--active' : ''}`}
+                    onClick={() => setMotion(Number(opt) as 0 | 1 | 2 | 3)}
+                  >
+                    {opt}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
           <div className="view-transition-link-page__control-group">
             <span className="view-transition-link-page__control-label">Link Text</span>
             <input
@@ -1151,7 +1238,9 @@ export default function ViewTransitionLinkPage() {
               import {'{'} ViewTransitionLink {'}'} from '@annondeveloper/ui-kit/lite'
             </div>
             <div className="view-transition-link-page__tier-preview">
-              <span style={{ fontSize: 'var(--text-xs)', color: 'var(--text-tertiary)' }}>CSS-only styling</span>
+              <LiteViewTransitionLink href="#tiers" onClick={(e: any) => e.preventDefault()} style={{ color: 'var(--brand)', fontWeight: 600 }}>
+                Lite link (CSS-only)
+              </LiteViewTransitionLink>
             </div>
             <div className="view-transition-link-page__size-breakdown">
               <div className="view-transition-link-page__size-row">
@@ -1182,7 +1271,9 @@ export default function ViewTransitionLinkPage() {
               import {'{'} ViewTransitionLink {'}'} from '@annondeveloper/ui-kit'
             </div>
             <div className="view-transition-link-page__tier-preview">
-              <span style={{ fontSize: 'var(--text-xs)', color: 'var(--text-tertiary)' }}>Auto view transitions</span>
+              <ViewTransitionLink href="#tiers" onClick={(e) => e.preventDefault()} className="view-transition-link-page__demo-link">
+                Standard link
+              </ViewTransitionLink>
             </div>
             <div className="view-transition-link-page__size-breakdown">
               <div className="view-transition-link-page__size-row">
@@ -1213,7 +1304,9 @@ export default function ViewTransitionLinkPage() {
               import {'{'} ViewTransitionLink {'}'} from '@annondeveloper/ui-kit/premium'
             </div>
             <div className="view-transition-link-page__tier-preview">
-              <span style={{ fontSize: 'var(--text-xs)', color: 'var(--text-tertiary)' }}>Prefetch + morph + custom CSS</span>
+              <PremiumViewTransitionLink href="#tiers" onClick={(e) => e.preventDefault()} className="view-transition-link-page__demo-link">
+                Premium link (glow + spring)
+              </PremiumViewTransitionLink>
             </div>
             <div className="view-transition-link-page__size-breakdown">
               <div className="view-transition-link-page__size-row">
@@ -1288,6 +1381,23 @@ export default function ViewTransitionLinkPage() {
             </li>
           </ul>
         </Card>
+      </section>
+
+      {/* ── 10. Source ────────────────────────────────── */}
+      <section className="view-transition-link-page__section" id="source">
+        <h2 className="view-transition-link-page__section-title"><a href="#source">Source</a></h2>
+        <p className="view-transition-link-page__section-desc">View the full component source code on GitHub.</p>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+          <a className="view-transition-link-page__source-link" href="https://github.com/annondeveloper/ui-kit/blob/main/src/domain/view-transition-link.tsx" target="_blank" rel="noopener noreferrer">
+            <Icon name="code" size="sm" /> src/domain/view-transition-link.tsx (Standard)
+          </a>
+          <a className="view-transition-link-page__source-link" href="https://github.com/annondeveloper/ui-kit/blob/main/src/lite/view-transition-link.tsx" target="_blank" rel="noopener noreferrer">
+            <Icon name="code" size="sm" /> src/lite/view-transition-link.tsx (Lite)
+          </a>
+          <a className="view-transition-link-page__source-link" href="https://github.com/annondeveloper/ui-kit/blob/main/src/premium/view-transition-link.tsx" target="_blank" rel="noopener noreferrer">
+            <Icon name="code" size="sm" /> src/premium/view-transition-link.tsx (Premium)
+          </a>
+        </div>
       </section>
     </div>
   )

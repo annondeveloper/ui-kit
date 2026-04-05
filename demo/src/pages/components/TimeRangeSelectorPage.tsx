@@ -4,6 +4,8 @@ import { useState, useMemo, useCallback, useRef, useEffect } from 'react'
 import { css } from '@ui/core/styles/css-tag'
 import { useStyles } from '@ui/core/styles/use-styles'
 import { TimeRangeSelector } from '@ui/domain/time-range-selector'
+import { TimeRangeSelector as LiteTimeRangeSelector } from '@ui/lite/time-range-selector'
+import { TimeRangeSelector as PremiumTimeRangeSelector } from '@ui/premium/time-range-selector'
 import { Button } from '@ui/components/button'
 import { Card } from '@ui/components/card'
 import { CopyBlock } from '@ui/domain/copy-block'
@@ -489,6 +491,22 @@ const pageStyles = css`
         color: var(--text-primary);
       }
 
+      /* ── Source link ─────────────────────────────────── */
+
+      .time-range-selector-page__source-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: var(--text-sm, 0.875rem);
+        color: var(--brand);
+        text-decoration: none;
+        font-weight: 500;
+      }
+      .time-range-selector-page__source-link:hover {
+        text-decoration: underline;
+        text-underline-offset: 0.2em;
+      }
+
       /* ── Responsive ──────────────────────────────── */
 
       @media (max-width: 768px) {
@@ -835,12 +853,26 @@ function PlaygroundSection({ tier: tierProp }: { tier: Tier }) {
       <div className="time-range-selector-page__playground">
         <div className="time-range-selector-page__playground-preview">
           <div className="time-range-selector-page__playground-result">
-            <TimeRangeSelector
-              value={range}
-              onChange={setRange}
-              showCustom={showCustom}
-              motion={tier !== 'lite' ? motion : undefined}
-            />
+            {tier === 'lite' ? (
+              <LiteTimeRangeSelector
+                value={range}
+                onChange={setRange}
+              />
+            ) : tier === 'premium' ? (
+              <PremiumTimeRangeSelector
+                value={range}
+                onChange={setRange}
+                showCustom={showCustom}
+                motion={motion}
+              />
+            ) : (
+              <TimeRangeSelector
+                value={range}
+                onChange={setRange}
+                showCustom={showCustom}
+                motion={motion}
+              />
+            )}
             <div className="time-range-selector-page__selected-display">
               {formatRange(range)}
             </div>
@@ -1086,7 +1118,7 @@ export default function TimeRangeSelectorPage() {
               import {'{'} TimeRangeSelector {'}'} from '@annondeveloper/ui-kit/lite'
             </div>
             <div className="time-range-selector-page__tier-preview">
-              <span style={{ fontSize: 'var(--text-xs)', color: 'var(--text-tertiary)' }}>Static preset buttons</span>
+              <LiteTimeRangeSelector />
             </div>
             <div className="time-range-selector-page__size-breakdown">
               <div className="time-range-selector-page__size-row">
@@ -1147,7 +1179,7 @@ export default function TimeRangeSelectorPage() {
               import {'{'} TimeRangeSelector {'}'} from '@annondeveloper/ui-kit/premium'
             </div>
             <div className="time-range-selector-page__tier-preview">
-              <span style={{ fontSize: 'var(--text-xs)', color: 'var(--text-tertiary)' }}>Sliding indicator + auto-refresh</span>
+              <PremiumTimeRangeSelector />
             </div>
             <div className="time-range-selector-page__size-breakdown">
               <div className="time-range-selector-page__size-row">
@@ -1235,6 +1267,23 @@ export default function TimeRangeSelectorPage() {
             </li>
           </ul>
         </Card>
+      </section>
+
+      {/* ── Source ──────────────────────────────────────── */}
+      <section className="time-range-selector-page__section" id="source">
+        <h2 className="time-range-selector-page__section-title"><a href="#source">Source</a></h2>
+        <p className="time-range-selector-page__section-desc">View the full component source code on GitHub.</p>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+          <a className="time-range-selector-page__source-link" href="https://github.com/annondeveloper/ui-kit/blob/main/src/domain/time-range-selector.tsx" target="_blank" rel="noopener noreferrer">
+            <Icon name="code" size="sm" /> src/domain/time-range-selector.tsx (Standard)
+          </a>
+          <a className="time-range-selector-page__source-link" href="https://github.com/annondeveloper/ui-kit/blob/main/src/lite/time-range-selector.tsx" target="_blank" rel="noopener noreferrer">
+            <Icon name="code" size="sm" /> src/lite/time-range-selector.tsx (Lite)
+          </a>
+          <a className="time-range-selector-page__source-link" href="https://github.com/annondeveloper/ui-kit/blob/main/src/premium/time-range-selector.tsx" target="_blank" rel="noopener noreferrer">
+            <Icon name="code" size="sm" /> src/premium/time-range-selector.tsx (Premium)
+          </a>
+        </div>
       </section>
     </div>
   )

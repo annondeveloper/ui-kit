@@ -5,6 +5,7 @@ import { css } from '@ui/core/styles/css-tag'
 import { useStyles } from '@ui/core/styles/use-styles'
 import { CopyBlock } from '@ui/domain/copy-block'
 import { CopyBlock as LiteCopyBlock } from '@ui/lite/copy-block'
+import { CopyBlock as PremiumCopyBlock } from '@ui/premium/copy-block'
 import { Button } from '@ui/components/button'
 import { Card } from '@ui/components/card'
 import { Tabs, TabPanel } from '@ui/components/tabs'
@@ -505,6 +506,22 @@ const pageStyles = css`
         color: var(--text-primary);
       }
 
+      /* ── Source link ─────────────────────────────────── */
+
+      .copy-block-page__source-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: var(--text-sm, 0.875rem);
+        color: var(--brand);
+        text-decoration: none;
+        font-weight: 500;
+      }
+      .copy-block-page__source-link:hover {
+        text-decoration: underline;
+        text-underline-offset: 0.2em;
+      }
+
       /* ── Responsive ──────────────────────────────── */
 
       @media (max-width: 768px) {
@@ -866,6 +883,7 @@ function PlaygroundSection({ tier }: { tier: Tier }) {
   const [showHighlight, setShowHighlight] = useState(false)
   const [maxHeight, setMaxHeight] = useState('')
   const [title, setTitle] = useState('Example')
+  const [motion, setMotion] = useState<0 | 1 | 2 | 3>(3)
   const [copyStatus, setCopyStatus] = useState('')
   const [activeCodeTab, setActiveCodeTab] = useState('react')
 
@@ -912,6 +930,16 @@ function PlaygroundSection({ tier }: { tier: Tier }) {
           <div className="copy-block-page__playground-result" style={{ position: 'relative', zIndex: 1 }}>
             {tier === 'lite' ? (
               <LiteCopyBlock code={sampleCode} language={language} showLineNumbers={showLineNumbers} />
+            ) : tier === 'premium' ? (
+              <PremiumCopyBlock
+                code={sampleCode}
+                language={language}
+                showLineNumbers={showLineNumbers}
+                highlight={highlight.length > 0 ? highlight : undefined}
+                maxHeight={maxHeight || undefined}
+                title={title || undefined}
+                motion={motion}
+              />
             ) : (
               <CopyBlock
                 code={sampleCode}
@@ -920,6 +948,7 @@ function PlaygroundSection({ tier }: { tier: Tier }) {
                 highlight={highlight.length > 0 ? highlight : undefined}
                 maxHeight={maxHeight || undefined}
                 title={title || undefined}
+                motion={motion}
               />
             )}
           </div>
@@ -958,6 +987,16 @@ function PlaygroundSection({ tier }: { tier: Tier }) {
             value={language}
             onChange={setLanguage}
           />
+
+          {tier !== 'lite' && (
+            <OptionGroup
+              label="Motion Level"
+              options={['0', '1', '2', '3'] as const}
+              value={String(motion) as '0' | '1' | '2' | '3'}
+              onChange={v => setMotion(Number(v) as 0 | 1 | 2 | 3)}
+            />
+          )}
+
           <div className="copy-block-page__control-group">
             <span className="copy-block-page__control-label">Toggles</span>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.375rem' }}>
@@ -1263,7 +1302,7 @@ export default function CopyBlockPage() {
               import {'{'} CopyBlock {'}'} from '@annondeveloper/ui-kit/premium'
             </div>
             <div className="copy-block-page__tier-preview">
-              <CopyBlock code="const x = 42" language="typescript" title="example.ts" />
+              <PremiumCopyBlock code="const x = 42" language="typescript" title="example.ts" />
             </div>
             <div className="copy-block-page__size-breakdown">
               <div className="copy-block-page__size-row">
@@ -1289,7 +1328,24 @@ export default function CopyBlockPage() {
         </Card>
       </section>
 
-      {/* ── 10. Accessibility ──────────────────────────── */}
+      {/* ── 10. Source ──────────────────────────────────── */}
+      <section className="copy-block-page__section" id="source">
+        <h2 className="copy-block-page__section-title"><a href="#source">Source</a></h2>
+        <p className="copy-block-page__section-desc">View the full component source code on GitHub.</p>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+          <a className="copy-block-page__source-link" href="https://github.com/annondeveloper/ui-kit/blob/main/src/domain/copy-block.tsx" target="_blank" rel="noopener noreferrer">
+            <Icon name="code" size="sm" /> src/domain/copy-block.tsx (Standard)
+          </a>
+          <a className="copy-block-page__source-link" href="https://github.com/annondeveloper/ui-kit/blob/main/src/lite/copy-block.tsx" target="_blank" rel="noopener noreferrer">
+            <Icon name="code" size="sm" /> src/lite/copy-block.tsx (Lite)
+          </a>
+          <a className="copy-block-page__source-link" href="https://github.com/annondeveloper/ui-kit/blob/main/src/premium/copy-block.tsx" target="_blank" rel="noopener noreferrer">
+            <Icon name="code" size="sm" /> src/premium/copy-block.tsx (Premium)
+          </a>
+        </div>
+      </section>
+
+      {/* ── 11. Accessibility ──────────────────────────── */}
       <section className="copy-block-page__section" id="accessibility">
         <h2 className="copy-block-page__section-title">
           <a href="#accessibility">Accessibility</a>

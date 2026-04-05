@@ -5,6 +5,7 @@ import { css } from '@ui/core/styles/css-tag'
 import { useStyles } from '@ui/core/styles/use-styles'
 import { Link } from '@ui/components/link'
 import { Link as LiteLink } from '@ui/lite/link'
+import { Link as PremiumLink } from '@ui/premium/link'
 import { Button } from '@ui/components/button'
 import { Card } from '@ui/components/card'
 import { CopyBlock } from '@ui/domain/copy-block'
@@ -569,6 +570,22 @@ const pageStyles = css`
         gap: 0.5rem;
       }
 
+      /* ── Source link ─────────────────────────────────── */
+
+      .link-page__source-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: var(--text-sm, 0.875rem);
+        color: var(--brand);
+        text-decoration: none;
+        font-weight: 500;
+      }
+      .link-page__source-link:hover {
+        text-decoration: underline;
+        text-underline-offset: 0.2em;
+      }
+
       /* ── Responsive ──────────────────────────────── */
 
       @media (max-width: 768px) {
@@ -853,9 +870,10 @@ function PlaygroundSection({ tier: tierProp }: { tier: Tier }) {
   const [external, setExternal] = useState(false)
   const [size, setSize] = useState<Size>('md')
   const [label, setLabel] = useState('Click this link')
+  const [motion, setMotion] = useState<0 | 1 | 2 | 3>(3)
   const [copyStatus, setCopyStatus] = useState('')
 
-  const LinkComponent = tier === 'lite' ? LiteLink : Link
+  const LinkComponent = tier === 'lite' ? LiteLink : tier === 'premium' ? PremiumLink : Link
 
   const reactCode = useMemo(
     () => generateReactCode(tier, variant, underline, external, size, label),
@@ -916,6 +934,7 @@ function PlaygroundSection({ tier: tierProp }: { tier: Tier }) {
               underline={underline}
               external={external}
               size={size}
+              motion={tier !== 'lite' ? motion : undefined}
               onClick={e => e.preventDefault()}
             >
               {label}
@@ -964,6 +983,15 @@ function PlaygroundSection({ tier: tierProp }: { tier: Tier }) {
           <OptionGroup label="Underline" options={UNDERLINES} value={underline} onChange={setUnderline} />
           <OptionGroup label="Size" options={SIZES} value={size} onChange={setSize} />
 
+          {tier !== 'lite' && (
+            <OptionGroup
+              label="Motion"
+              options={['0', '1', '2', '3'] as const}
+              value={String(motion) as '0' | '1' | '2' | '3'}
+              onChange={v => setMotion(Number(v) as 0 | 1 | 2 | 3)}
+            />
+          )}
+
           <div className="link-page__control-group">
             <span className="link-page__control-label">Toggles</span>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.375rem' }}>
@@ -995,7 +1023,7 @@ export default function LinkPage() {
   const { tier, setTier } = useTier()
   const pageRef = useRef<HTMLDivElement>(null)
 
-  const LinkComponent = tier === 'lite' ? LiteLink : Link
+  const LinkComponent = tier === 'lite' ? LiteLink : tier === 'premium' ? PremiumLink : Link
 
   // Scroll reveal for sections -- JS fallback
   useEffect(() => {
@@ -1271,7 +1299,7 @@ export default function LinkPage() {
               import {'{'} Link {'}'} from '@annondeveloper/ui-kit/premium'
             </div>
             <div className="link-page__tier-preview">
-              <Link href="#" variant="brand" onClick={e => e.preventDefault()}>Standard</Link>
+              <PremiumLink href="#" variant="brand" onClick={e => e.preventDefault()}>Premium</PremiumLink>
             </div>
             <div className="link-page__size-breakdown">
               <div className="link-page__size-row">
@@ -1352,6 +1380,23 @@ export default function LinkPage() {
             </li>
           </ul>
         </Card>
+      </section>
+
+      {/* ── 11. Source ──────────────────────────────────── */}
+      <section className="link-page__section" id="source">
+        <h2 className="link-page__section-title"><a href="#source">Source</a></h2>
+        <p className="link-page__section-desc">View the full component source code on GitHub.</p>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+          <a className="link-page__source-link" href="https://github.com/annondeveloper/ui-kit/blob/main/src/components/link.tsx" target="_blank" rel="noopener noreferrer">
+            <Icon name="code" size="sm" /> src/components/link.tsx (Standard)
+          </a>
+          <a className="link-page__source-link" href="https://github.com/annondeveloper/ui-kit/blob/main/src/lite/link.tsx" target="_blank" rel="noopener noreferrer">
+            <Icon name="code" size="sm" /> src/lite/link.tsx (Lite)
+          </a>
+          <a className="link-page__source-link" href="https://github.com/annondeveloper/ui-kit/blob/main/src/premium/link.tsx" target="_blank" rel="noopener noreferrer">
+            <Icon name="code" size="sm" /> src/premium/link.tsx (Premium)
+          </a>
+        </div>
       </section>
     </div>
   )

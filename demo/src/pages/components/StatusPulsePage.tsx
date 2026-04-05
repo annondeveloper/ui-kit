@@ -5,6 +5,7 @@ import { css } from '@ui/core/styles/css-tag'
 import { useStyles } from '@ui/core/styles/use-styles'
 import { StatusPulse } from '@ui/components/status-pulse'
 import { StatusPulse as LiteStatusPulse } from '@ui/lite/status-pulse'
+import { StatusPulse as PremiumStatusPulse } from '@ui/premium/status-pulse'
 import { Button } from '@ui/components/button'
 import { Card } from '@ui/components/card'
 import { CopyBlock } from '@ui/domain/copy-block'
@@ -596,6 +597,22 @@ const pageStyles = css`
         box-shadow: 0 0 0 2px var(--bg-base), 0 0 0 4px oklch(100% 0 0 / 0.5);
       }
 
+      /* ── Source link ─────────────────────────────────── */
+
+      .status-pulse-page__source-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: var(--text-sm, 0.875rem);
+        color: var(--brand);
+        text-decoration: none;
+        font-weight: 500;
+      }
+      .status-pulse-page__source-link:hover {
+        text-decoration: underline;
+        text-underline-offset: 0.2em;
+      }
+
       /* ── Responsive ──────────────────────────────── */
 
       @media (max-width: 768px) {
@@ -835,7 +852,7 @@ function PlaygroundSection({ tier: tierProp }: { tier: Tier }) {
   const [copyStatus, setCopyStatus] = useState('')
   const [activeCodeTab, setActiveCodeTab] = useState('react')
 
-  const PulseComponent = tier === 'lite' ? LiteStatusPulse : StatusPulse
+  const PulseComponent = tier === 'lite' ? LiteStatusPulse : tier === 'premium' ? PremiumStatusPulse : StatusPulse
 
   const reactCode = useMemo(
     () => generateReactCode(tier, status, size, label, motion),
@@ -1000,7 +1017,7 @@ export default function StatusPulsePage() {
     return () => observer.disconnect()
   }, [])
 
-  const PulseComponent = tier === 'lite' ? LiteStatusPulse : StatusPulse
+  const PulseComponent = tier === 'lite' ? LiteStatusPulse : tier === 'premium' ? PremiumStatusPulse : StatusPulse
 
   return (
     <div className="status-pulse-page" style={themeStyle}>
@@ -1262,8 +1279,8 @@ export default function StatusPulsePage() {
               import {'{'} StatusPulse {'}'} from '@annondeveloper/ui-kit/premium'
             </div>
             <div className="status-pulse-page__tier-preview">
-              <StatusPulse status="ok" label="OK" size="lg" />
-              <StatusPulse status="info" label="Info" size="lg" />
+              <PremiumStatusPulse status="ok" label="OK" size="lg" />
+              <PremiumStatusPulse status="info" label="Info" size="lg" />
             </div>
             <div className="status-pulse-page__size-breakdown">
               <div className="status-pulse-page__size-row">
@@ -1376,6 +1393,23 @@ export default function StatusPulsePage() {
             </li>
           </ul>
         </Card>
+      </section>
+
+      {/* ── Source ──────────────────────────────────────── */}
+      <section className="status-pulse-page__section" id="source">
+        <h2 className="status-pulse-page__section-title"><a href="#source">Source</a></h2>
+        <p className="status-pulse-page__section-desc">View the full component source code on GitHub.</p>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+          <a className="status-pulse-page__source-link" href="https://github.com/annondeveloper/ui-kit/blob/main/src/components/status-pulse.tsx" target="_blank" rel="noopener noreferrer">
+            <Icon name="code" size="sm" /> src/components/status-pulse.tsx (Standard)
+          </a>
+          <a className="status-pulse-page__source-link" href="https://github.com/annondeveloper/ui-kit/blob/main/src/lite/status-pulse.tsx" target="_blank" rel="noopener noreferrer">
+            <Icon name="code" size="sm" /> src/lite/status-pulse.tsx (Lite)
+          </a>
+          <a className="status-pulse-page__source-link" href="https://github.com/annondeveloper/ui-kit/blob/main/src/premium/status-pulse.tsx" target="_blank" rel="noopener noreferrer">
+            <Icon name="code" size="sm" /> src/premium/status-pulse.tsx (Premium)
+          </a>
+        </div>
       </section>
     </div>
   )

@@ -4,11 +4,17 @@ import { useState, useMemo, useCallback, useRef, useEffect } from 'react'
 import { css } from '@ui/core/styles/css-tag'
 import { useStyles } from '@ui/core/styles/use-styles'
 import { BackgroundBeams } from '@ui/domain/background-beams'
+import { BackgroundBeams as LiteBackgroundBeams } from '@ui/lite/background-beams'
+import { BackgroundBeams as PremiumBackgroundBeams } from '@ui/premium/background-beams'
 import { Button } from '@ui/components/button'
 import { Card } from '@ui/components/card'
 import { CopyBlock } from '@ui/domain/copy-block'
 import { Tabs, TabPanel } from '@ui/components/tabs'
 import { Icon } from '@ui/core/icons/icon'
+import { generateTheme } from '@ui/core/tokens/generator'
+import { TOKEN_TO_CSS, type ThemeTokens } from '@ui/core/tokens/tokens'
+import { useTheme } from '@ui/core/tokens/theme-context'
+import { ColorInput } from '@ui/components/color-input'
 import { PropsTable, type PropDef } from '../../components/PropsTable'
 import { useTier, type Tier } from '../../App'
 
@@ -623,9 +629,70 @@ const pageStyles = css`
       :scope ::-webkit-scrollbar-thumb:hover {
         background: var(--border-strong);
       }
+
+      /* ── Source link ─────────────────────────────────── */
+
+      .bgbeams-page__source-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: var(--text-sm, 0.875rem);
+        color: var(--brand);
+        text-decoration: none;
+        font-weight: 500;
+      }
+      .bgbeams-page__source-link:hover {
+        text-decoration: underline;
+        text-underline-offset: 0.2em;
+      }
+
+      /* ── Color presets ──────────────────────────────── */
+
+      .bgbeams-page__color-presets {
+        display: flex;
+        gap: 0.25rem;
+        flex-wrap: wrap;
+      }
+
+      .bgbeams-page__color-preset {
+        inline-size: 24px;
+        block-size: 24px;
+        border-radius: 50%;
+        border: 2px solid transparent;
+        cursor: pointer;
+        padding: 0;
+        transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1),
+                    border-color 0.15s,
+                    box-shadow 0.15s;
+        box-shadow: 0 1px 3px oklch(0% 0 0 / 0.2);
+      }
+      .bgbeams-page__color-preset:hover {
+        transform: scale(1.2);
+        box-shadow: 0 2px 8px oklch(0% 0 0 / 0.3);
+      }
+      .bgbeams-page__color-preset--active {
+        border-color: oklch(100% 0 0);
+        transform: scale(1.2);
+        box-shadow: 0 0 0 2px var(--bg-base), 0 0 0 4px oklch(100% 0 0 / 0.5);
+      }
     }
   }
 `
+
+// ─── Brand Color Presets ─────────────────────────────────────────────────────
+
+const BRAND_COLOR_PRESETS = [
+  { hex: '#6366f1', name: 'Indigo' },
+  { hex: '#f97316', name: 'Orange' },
+  { hex: '#f43f5e', name: 'Rose' },
+  { hex: '#0ea5e9', name: 'Sky' },
+  { hex: '#10b981', name: 'Emerald' },
+  { hex: '#8b5cf6', name: 'Violet' },
+  { hex: '#d946ef', name: 'Fuchsia' },
+  { hex: '#f59e0b', name: 'Amber' },
+  { hex: '#06b6d4', name: 'Cyan' },
+  { hex: '#64748b', name: 'Slate' },
+]
 
 // ─── Props Data ───────────────────────────────────────────────────────────────
 
@@ -903,13 +970,15 @@ function generateSvelteCode(
 
 // ─── Playground Section ───────────────────────────────────────────────────────
 
-function PlaygroundSection({ tier: tierProp }: { tier: Tier }) {
+function PlaygroundSection({ tier: tierProp, brandColor }: { tier: Tier; brandColor: string }) {
   const { tier: contextTier } = useTier()
   const tier = tierProp ?? contextTier
   const [count, setCount] = useState<BeamCount>(6)
   const [motion, setMotion] = useState<MotionLevel>(3)
   const [color, setColor] = useState('')
   const [copyStatus, setCopyStatus] = useState('')
+
+  const BeamsComponent = tier === 'lite' ? LiteBackgroundBeams : tier === 'premium' ? PremiumBackgroundBeams : BackgroundBeams
 
   const reactCode = useMemo(
     () => generateReactCode(tier, count, color, motion),
@@ -965,7 +1034,7 @@ function PlaygroundSection({ tier: tierProp }: { tier: Tier }) {
       <div className="bgbeams-page__playground">
         <div className="bgbeams-page__playground-preview">
           <div className="bgbeams-page__playground-result">
-            <BackgroundBeams
+            <BeamsComponent
               count={count}
               motion={motion}
               color={color || undefined}
@@ -979,7 +1048,7 @@ function PlaygroundSection({ tier: tierProp }: { tier: Tier }) {
                   {count} beams with motion level {motion}
                 </p>
               </div>
-            </BackgroundBeams>
+            </BeamsComponent>
           </div>
 
           <div className="bgbeams-page__code-tabs">
@@ -1071,6 +1140,33 @@ export default function BackgroundBeamsPage() {
   useStyles('bgbeams-page', pageStyles)
 
   const { tier, setTier } = useTier()
+  const [brandColor, setBrandColor] = useState('#6366f1')
+  const pageRef = useRef<HTMLDivElement>(null)
+  const { mode } = useTheme()
+
+  const themeTokens = useMemo(() => {
+    try {
+      return generateTheme(brandColor, mode)
+    } catch {
+      return null
+    }
+  }, [brandColor, mode])
+
+  const BRAND_ONLY_KEYS: (keyof ThemeTokens)[] = [
+    'brand', 'brandLight', 'brandDark', 'brandSubtle', 'brandGlow',
+    'borderGlow', 'aurora1', 'aurora2',
+  ]
+
+  const themeStyle = useMemo(() => {
+    if (!themeTokens || brandColor === '#6366f1') return undefined
+    const style: Record<string, string> = {}
+    for (const key of BRAND_ONLY_KEYS) {
+      const cssVar = TOKEN_TO_CSS[key]
+      const value = themeTokens[key]
+      if (cssVar && value) style[cssVar] = value
+    }
+    return style as React.CSSProperties
+  }, [themeTokens, brandColor])
 
   // Scroll reveal for sections — JS fallback for browsers without animation-timeline
   useEffect(() => {
@@ -1105,7 +1201,7 @@ export default function BackgroundBeamsPage() {
   }, [])
 
   return (
-    <div className="bgbeams-page">
+    <div className="bgbeams-page" ref={pageRef} style={themeStyle}>
       {/* ── 1. Hero Header ──────────────────────────────── */}
       <div className="bgbeams-page__hero">
         <h1 className="bgbeams-page__title">BackgroundBeams</h1>
@@ -1121,7 +1217,7 @@ export default function BackgroundBeamsPage() {
       </div>
 
       {/* ── 2. Live Playground ──────────────────────────── */}
-      <PlaygroundSection tier={tier} />
+      <PlaygroundSection tier={tier} brandColor={brandColor} />
 
       {/* ── 3. Beam Count Gallery ─────────────────────────── */}
       <section className="bgbeams-page__section" id="beam-counts">
@@ -1338,7 +1434,7 @@ export default function BackgroundBeamsPage() {
                 background: 'var(--bg-base)',
                 position: 'relative',
               }}>
-                <BackgroundBeams count={3} motion={2} />
+                <LiteBackgroundBeams count={3} motion={2} />
               </div>
             </div>
             <div className="bgbeams-page__size-breakdown">
@@ -1420,7 +1516,7 @@ export default function BackgroundBeamsPage() {
                 background: 'var(--bg-base)',
                 position: 'relative',
               }}>
-                <BackgroundBeams count={10} motion={3} color="oklch(70% 0.2 280 / 0.4)" />
+                <PremiumBackgroundBeams count={10} motion={3} color="oklch(70% 0.2 280 / 0.4)" />
               </div>
             </div>
             <div className="bgbeams-page__size-breakdown">
@@ -1496,6 +1592,61 @@ export default function BackgroundBeamsPage() {
             </li>
           </ul>
         </Card>
+      </section>
+
+      {/* ── 11. Brand Color ─────────────────────────────── */}
+      <section className="bgbeams-page__section" id="brand-color">
+        <h2 className="bgbeams-page__section-title">
+          <a href="#brand-color">Brand Color</a>
+        </h2>
+        <p className="bgbeams-page__section-desc">
+          Pick a brand color to see the background beams update in real-time. The theme generates
+          derived colors automatically from your choice.
+        </p>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+          <ColorInput
+            name="brand-color"
+            value={brandColor}
+            onChange={setBrandColor}
+            size="sm"
+            swatches={['#6366f1','#f97316','#f43f5e','#0ea5e9','#10b981','#8b5cf6','#d946ef','#f59e0b','#06b6d4','#64748b']}
+          />
+          <div className="bgbeams-page__color-presets">
+            {BRAND_COLOR_PRESETS.map(p => (
+              <button
+                key={p.hex}
+                type="button"
+                className={`bgbeams-page__color-preset${brandColor === p.hex ? ' bgbeams-page__color-preset--active' : ''}`}
+                style={{ background: p.hex }}
+                onClick={() => setBrandColor(p.hex)}
+                title={p.name}
+                aria-label={`Set brand color to ${p.name}`}
+              />
+            ))}
+          </div>
+          {brandColor !== '#6366f1' && (
+            <Button size="xs" variant="ghost" onClick={() => setBrandColor('#6366f1')}>
+              <Icon name="refresh" size="sm" /> Reset to default
+            </Button>
+          )}
+        </div>
+      </section>
+
+      {/* ── 12. Source ──────────────────────────────────── */}
+      <section className="bgbeams-page__section" id="source">
+        <h2 className="bgbeams-page__section-title"><a href="#source">Source</a></h2>
+        <p className="bgbeams-page__section-desc">View the full component source code on GitHub.</p>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+          <a className="bgbeams-page__source-link" href="https://github.com/annondeveloper/ui-kit/blob/main/src/domain/background-beams.tsx" target="_blank" rel="noopener noreferrer">
+            <Icon name="code" size="sm" /> src/domain/background-beams.tsx (Standard)
+          </a>
+          <a className="bgbeams-page__source-link" href="https://github.com/annondeveloper/ui-kit/blob/main/src/lite/background-beams.tsx" target="_blank" rel="noopener noreferrer">
+            <Icon name="code" size="sm" /> src/lite/background-beams.tsx (Lite)
+          </a>
+          <a className="bgbeams-page__source-link" href="https://github.com/annondeveloper/ui-kit/blob/main/src/premium/background-beams.tsx" target="_blank" rel="noopener noreferrer">
+            <Icon name="code" size="sm" /> src/premium/background-beams.tsx (Premium)
+          </a>
+        </div>
       </section>
     </div>
   )

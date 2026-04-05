@@ -11,6 +11,7 @@ import { CopyBlock } from '@ui/domain/copy-block'
 import { Tabs, TabPanel } from '@ui/components/tabs'
 import { Icon } from '@ui/core/icons/icon'
 import { Button } from '@ui/components/button'
+import { ColorInput } from '@ui/components/color-input'
 import { PropsTable, type PropDef } from '../../components/PropsTable'
 import { useTier, type Tier } from '../../App'
 
@@ -483,6 +484,19 @@ const pageStyles = css`
         padding-block-start: 0.5rem;
       }
 
+      .ring-chart-page__size-breakdown {
+        display: flex;
+        flex-direction: column;
+        gap: 0.25rem;
+        font-size: 0.75rem;
+        color: var(--text-tertiary);
+      }
+      .ring-chart-page__size-row {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+
       /* ── Code tabs ─────────────────────────────────── */
 
       .ring-chart-page__code-tabs {
@@ -856,6 +870,7 @@ function PlaygroundSection({ tier: tierProp }: { tier: Tier }) {
   const svelteCode = useMemo(() => generateSvelteCode(tier, value, size, color, showValue), [tier, value, size, color, showValue])
 
   const [activeCodeTab, setActiveCodeTab] = useState('react')
+  const [brandColor, setBrandColor] = useState('#6366f1')
   const codeTabs = [
     { id: 'react', label: 'React' },
     { id: 'html', label: 'HTML+CSS' },
@@ -1222,6 +1237,13 @@ export default function RingChartPage() {
             <div className="ring-chart-page__tier-preview">
               <LiteRingChart value={72} showValue />
             </div>
+            <div className="ring-chart-page__size-breakdown">
+              <div className="ring-chart-page__size-row">
+                <span>Component: <strong style={{ color: 'var(--text-primary)' }}>0.5 KB</strong></span>
+                <span>+ Shared: <strong style={{ color: 'var(--text-primary)' }}>0.0 KB</strong></span>
+                <span>= <strong style={{ color: 'var(--brand)' }}>0.5 KB</strong> gzip</span>
+              </div>
+            </div>
           </div>
 
           {/* Standard */}
@@ -1246,6 +1268,13 @@ export default function RingChartPage() {
             <div className="ring-chart-page__tier-preview">
               <RingChart value={72} showValue size="md" />
             </div>
+            <div className="ring-chart-page__size-breakdown">
+              <div className="ring-chart-page__size-row">
+                <span>Component: <strong style={{ color: 'var(--text-primary)' }}>1.5 KB</strong></span>
+                <span>+ Shared: <strong style={{ color: 'var(--text-primary)' }}>0.9 KB</strong></span>
+                <span>= <strong style={{ color: 'var(--brand)' }}>2.4 KB</strong> gzip</span>
+              </div>
+            </div>
           </div>
 
           {/* Premium */}
@@ -1269,6 +1298,13 @@ export default function RingChartPage() {
             </div>
             <div className="ring-chart-page__tier-preview">
               <PremiumRingChart value={72} showValue size="md" color="oklch(65% 0.2 270)" />
+            </div>
+            <div className="ring-chart-page__size-breakdown">
+              <div className="ring-chart-page__size-row">
+                <span>Component: <strong style={{ color: 'var(--text-primary)' }}>2.2 KB</strong></span>
+                <span>+ Shared: <strong style={{ color: 'var(--text-primary)' }}>0.9 KB</strong></span>
+                <span>= <strong style={{ color: 'var(--brand)' }}>3.1 KB</strong> gzip</span>
+              </div>
             </div>
           </div>
         </div>
@@ -1330,6 +1366,25 @@ export default function RingChartPage() {
             </li>
           </ul>
         </Card>
+      </section>
+
+      {/* ── Brand Color ───────────────────────────────── */}
+      <section className="ring-chart-page__section" id="brand-color">
+        <h2 className="ring-chart-page__section-title">
+          <a href="#brand-color">Brand Color</a>
+        </h2>
+        <p className="ring-chart-page__section-desc">
+          Pick a brand color to preview the component with your brand identity.
+        </p>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+          <ColorInput
+            name="brand-color"
+            value={brandColor}
+            onChange={setBrandColor}
+            size="sm"
+            swatches={['#6366f1','#f97316','#f43f5e','#0ea5e9','#10b981','#8b5cf6','#d946ef','#f59e0b','#06b6d4','#64748b']}
+          />
+        </div>
       </section>
 
       {/* ── 11. Source ─────────────────────────────────── */}

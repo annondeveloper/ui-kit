@@ -11,6 +11,7 @@ import { Card } from '@ui/components/card'
 import { CopyBlock } from '@ui/domain/copy-block'
 import { Tabs, TabPanel } from '@ui/components/tabs'
 import { Icon } from '@ui/core/icons/icon'
+import { ColorInput } from '@ui/components/color-input'
 import { PropsTable, type PropDef } from '../../components/PropsTable'
 import { useTier, type Tier } from '../../App'
 
@@ -389,6 +390,36 @@ const pageStyles = css`
         display: flex; justify-content: center; padding-block-start: 0.5rem;
       }
 
+      .vlan-bus-bar-page__size-breakdown {
+        display: flex;
+        flex-direction: column;
+        gap: 0.25rem;
+        font-size: 0.75rem;
+        color: var(--text-tertiary);
+      }
+
+      .vlan-bus-bar-page__size-row {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+
+      /* ── Source link ─────────────────────────────────── */
+
+      .vlan-bus-bar-page__source-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: var(--text-sm, 0.875rem);
+        color: var(--brand);
+        text-decoration: none;
+        font-weight: 500;
+      }
+      .vlan-bus-bar-page__source-link:hover {
+        text-decoration: underline;
+        text-underline-offset: 0.2em;
+      }
+
       /* ── Code tabs ─────────────────────────────────── */
 
       .vlan-bus-bar-page__code-tabs { margin-block-start: 1rem; }
@@ -595,6 +626,129 @@ function generateReactCode(tier: Tier, size: Size, showLabels: boolean, showPort
   return `${importStr}\n\n${vlansDef}\n\n<VlanBusBar\n${props.join('\n')}\n/>`
 }
 
+function generateHtmlCode(tier: Tier, size: Size, showLabels: boolean, showPortNumbers: boolean): string {
+  const cssImport = tier === 'lite'
+    ? `@import '@annondeveloper/ui-kit/lite/styles.css';`
+    : `@import '@annondeveloper/ui-kit/css/components/vlan-bus-bar.css';`
+
+  return `<!-- VlanBusBar — @annondeveloper/ui-kit ${tier} tier -->
+<link rel="stylesheet" href="https://unpkg.com/@annondeveloper/ui-kit/css/components/vlan-bus-bar.css">
+
+<div class="ui-vlan-bus-bar" data-size="${size}"${!showLabels ? ' data-show-labels="false"' : ''}${showPortNumbers ? ' data-show-port-numbers="true"' : ''}
+     role="img" aria-label="VLAN bus bar diagram showing 5 VLANs across 24 ports">
+  <!-- SVG content rendered by the component -->
+</div>
+
+<!-- Or import in your CSS: -->
+<!-- ${cssImport} -->`
+}
+
+function generateVueCode(tier: Tier, size: Size, showLabels: boolean, showPortNumbers: boolean): string {
+  const importPath = tier === 'lite'
+    ? '@annondeveloper/ui-kit/lite'
+    : tier === 'premium'
+    ? '@annondeveloper/ui-kit/premium'
+    : '@annondeveloper/ui-kit'
+
+  const attrs: string[] = ['  :vlans="vlans"', '  :total-ports="24"']
+  if (size !== 'md') attrs.push(`  size="${size}"`)
+  if (!showLabels) attrs.push('  :show-labels="false"')
+  if (showPortNumbers) attrs.push('  show-port-numbers')
+  attrs.push('  @vlan-click="onVlanClick"')
+
+  return `<template>
+  <VlanBusBar
+${attrs.join('\n')}
+  />
+</template>
+
+<script setup>
+import { VlanBusBar } from '${importPath}'
+import { ref } from 'vue'
+
+const vlans = ref([
+  { id: 1, name: 'Management', ports: [1, 2, 3, 4], tagged: false },
+  { id: 100, name: 'Production', ports: [1, 2, 5, 6, 7, 8, 9, 10], tagged: true },
+  { id: 200, name: 'Development', ports: [3, 4, 11, 12, 13, 14], tagged: true },
+  { id: 300, name: 'DMZ', ports: [15, 16], tagged: true },
+  { id: 999, name: 'Native', ports: [17, 18, 19, 20, 21, 22, 23, 24], tagged: false },
+])
+
+function onVlanClick(vlan) {
+  console.log('Clicked VLAN:', vlan.name)
+}
+</script>`
+}
+
+function generateAngularCode(tier: Tier, size: Size, showLabels: boolean, showPortNumbers: boolean): string {
+  const importPath = tier === 'lite'
+    ? '@annondeveloper/ui-kit/lite'
+    : tier === 'premium'
+    ? '@annondeveloper/ui-kit/premium'
+    : '@annondeveloper/ui-kit'
+
+  const cssImport = `@import '${importPath}/css/components/vlan-bus-bar.css';`
+  const attrs: string[] = ['  class="ui-vlan-bus-bar"', `  data-size="${size}"`]
+  if (!showLabels) attrs.push('  data-show-labels="false"')
+  if (showPortNumbers) attrs.push('  data-show-port-numbers="true"')
+
+  return `<!-- Angular — ${tier === 'lite' ? 'Lite' : tier === 'premium' ? 'Premium' : 'Standard'} tier -->
+<ui-vlan-bus-bar
+${attrs.join('\n')}
+  [vlans]="vlans"
+  [totalPorts]="24"
+  (vlanClick)="onVlanClick($event)"
+/>
+
+/* In styles.css */
+${cssImport}
+
+// In component.ts
+import { Component } from '@angular/core';
+
+@Component({ selector: 'app-vlan-bus-bar', templateUrl: './vlan-bus-bar.component.html' })
+export class VlanBusBarComponent {
+  vlans = [
+    { id: 1, name: 'Management', ports: [1, 2, 3, 4], tagged: false },
+    { id: 100, name: 'Production', ports: [1, 2, 5, 6, 7, 8, 9, 10], tagged: true },
+    { id: 200, name: 'Development', ports: [3, 4, 11, 12, 13, 14], tagged: true },
+    { id: 300, name: 'DMZ', ports: [15, 16], tagged: true },
+    { id: 999, name: 'Native', ports: [17, 18, 19, 20, 21, 22, 23, 24], tagged: false },
+  ];
+  onVlanClick(vlan: any) { console.log('Clicked VLAN:', vlan.name); }
+}`
+}
+
+function generateSvelteCode(tier: Tier, size: Size, showLabels: boolean, showPortNumbers: boolean): string {
+  const importPath = tier === 'lite'
+    ? '@annondeveloper/ui-kit/lite'
+    : tier === 'premium'
+    ? '@annondeveloper/ui-kit/premium'
+    : '@annondeveloper/ui-kit'
+
+  const attrs: string[] = ['  {vlans}', '  totalPorts={24}']
+  if (size !== 'md') attrs.push(`  size="${size}"`)
+  if (!showLabels) attrs.push('  showLabels={false}')
+  if (showPortNumbers) attrs.push('  showPortNumbers')
+  attrs.push('  on:vlanClick={(e) => console.log(e.detail.name)}')
+
+  return `<script>
+  import { VlanBusBar } from '${importPath}';
+
+  const vlans = [
+    { id: 1, name: 'Management', ports: [1, 2, 3, 4], tagged: false },
+    { id: 100, name: 'Production', ports: [1, 2, 5, 6, 7, 8, 9, 10], tagged: true },
+    { id: 200, name: 'Development', ports: [3, 4, 11, 12, 13, 14], tagged: true },
+    { id: 300, name: 'DMZ', ports: [15, 16], tagged: true },
+    { id: 999, name: 'Native', ports: [17, 18, 19, 20, 21, 22, 23, 24], tagged: false },
+  ];
+</script>
+
+<VlanBusBar
+${attrs.join('\n')}
+/>`
+}
+
 // ─── Playground Section ──────────────────────────────────────────────────────
 
 type ColorScheme = 'auto' | 'categorical' | 'sequential'
@@ -626,19 +780,45 @@ function PlaygroundSection({ tier: tierProp }: { tier: Tier }) {
     [tier, size, showLabels, showPortNumbers],
   )
 
+  const htmlCode = useMemo(
+    () => generateHtmlCode(tier, size, showLabels, showPortNumbers),
+    [tier, size, showLabels, showPortNumbers],
+  )
+
+  const vueCode = useMemo(
+    () => generateVueCode(tier, size, showLabels, showPortNumbers),
+    [tier, size, showLabels, showPortNumbers],
+  )
+
+  const angularCode = useMemo(
+    () => generateAngularCode(tier, size, showLabels, showPortNumbers),
+    [tier, size, showLabels, showPortNumbers],
+  )
+
+  const svelteCode = useMemo(
+    () => generateSvelteCode(tier, size, showLabels, showPortNumbers),
+    [tier, size, showLabels, showPortNumbers],
+  )
+
   const [activeCodeTab, setActiveCodeTab] = useState('react')
   const codeTabs = [
     { id: 'react', label: 'React' },
     { id: 'html', label: 'HTML+CSS' },
+    { id: 'vue', label: 'Vue' },
+    { id: 'angular', label: 'Angular' },
+    { id: 'svelte', label: 'Svelte' },
   ]
 
-  const activeCode = activeCodeTab === 'react' ? reactCode : `<!-- VlanBusBar — use the React component for full interactivity -->
-<link rel="stylesheet" href="https://unpkg.com/@annondeveloper/ui-kit/css/components/vlan-bus-bar.css">
-
-<div class="ui-vlan-bus-bar" data-size="${size}" role="img"
-     aria-label="VLAN bus bar diagram">
-  <!-- SVG content rendered by the component -->
-</div>`
+  const activeCode = useMemo(() => {
+    switch (activeCodeTab) {
+      case 'react': return reactCode
+      case 'html': return htmlCode
+      case 'vue': return vueCode
+      case 'angular': return angularCode
+      case 'svelte': return svelteCode
+      default: return reactCode
+    }
+  }, [activeCodeTab, reactCode, htmlCode, vueCode, angularCode, svelteCode])
 
   const parsedHighlightPorts = useMemo(() => {
     if (!highlightPort.trim()) return undefined
@@ -704,7 +884,16 @@ function PlaygroundSection({ tier: tierProp }: { tier: Tier }) {
                 <CopyBlock code={reactCode} language="typescript" showLineNumbers />
               </TabPanel>
               <TabPanel tabId="html">
-                <CopyBlock code={activeCode} language="html" showLineNumbers />
+                <CopyBlock code={htmlCode} language="html" showLineNumbers />
+              </TabPanel>
+              <TabPanel tabId="vue">
+                <CopyBlock code={vueCode} language="html" showLineNumbers />
+              </TabPanel>
+              <TabPanel tabId="angular">
+                <CopyBlock code={angularCode} language="html" showLineNumbers />
+              </TabPanel>
+              <TabPanel tabId="svelte">
+                <CopyBlock code={svelteCode} language="html" showLineNumbers />
               </TabPanel>
             </Tabs>
           </div>
@@ -889,6 +1078,7 @@ export default function VlanBusBarPage() {
   useStyles('vlan-bus-bar-page', pageStyles)
 
   const { tier, setTier } = useTier()
+  const [brandColor, setBrandColor] = useState('#6366f1')
 
   // Scroll reveal for sections — JS fallback
   useEffect(() => {
@@ -974,6 +1164,13 @@ export default function VlanBusBarPage() {
             <div className="vlan-bus-bar-page__tier-preview">
               <LiteVlanBusBar vlans={smallVlans} totalPorts={8} />
             </div>
+            <div className="vlan-bus-bar-page__size-breakdown">
+              <div className="vlan-bus-bar-page__size-row">
+                <span>JS: <strong style={{ color: 'var(--text-primary)' }}>0.4 KB</strong></span>
+                <span>+ CSS: <strong style={{ color: 'var(--text-primary)' }}>0.1 KB</strong></span>
+                <span>= <strong style={{ color: 'var(--brand)' }}>0.5 KB</strong> gzip</span>
+              </div>
+            </div>
           </div>
 
           {/* Standard */}
@@ -998,6 +1195,13 @@ export default function VlanBusBarPage() {
             <div className="vlan-bus-bar-page__tier-preview">
               <VlanBusBar vlans={smallVlans} totalPorts={8} size="sm" />
             </div>
+            <div className="vlan-bus-bar-page__size-breakdown">
+              <div className="vlan-bus-bar-page__size-row">
+                <span>JS: <strong style={{ color: 'var(--text-primary)' }}>2.4 KB</strong></span>
+                <span>+ CSS: <strong style={{ color: 'var(--text-primary)' }}>0.6 KB</strong></span>
+                <span>= <strong style={{ color: 'var(--brand)' }}>3.0 KB</strong> gzip</span>
+              </div>
+            </div>
           </div>
 
           {/* Premium */}
@@ -1021,6 +1225,13 @@ export default function VlanBusBarPage() {
             </div>
             <div className="vlan-bus-bar-page__tier-preview">
               <PremiumVlanBusBar vlans={smallVlans} totalPorts={8} size="sm" />
+            </div>
+            <div className="vlan-bus-bar-page__size-breakdown">
+              <div className="vlan-bus-bar-page__size-row">
+                <span>JS: <strong style={{ color: 'var(--text-primary)' }}>3.2 KB</strong></span>
+                <span>+ CSS: <strong style={{ color: 'var(--text-primary)' }}>0.8 KB</strong></span>
+                <span>= <strong style={{ color: 'var(--brand)' }}>4.0 KB</strong> gzip</span>
+              </div>
             </div>
           </div>
         </div>
@@ -1095,6 +1306,48 @@ export default function VlanBusBarPage() {
             </li>
           </ul>
         </Card>
+      </section>
+
+      {/* ── 6. Brand Color ────────────────────────────── */}
+      <section className="vlan-bus-bar-page__section" id="brand-color">
+        <h2 className="vlan-bus-bar-page__section-title">
+          <a href="#brand-color">Brand Color</a>
+        </h2>
+        <p className="vlan-bus-bar-page__section-desc">
+          Pick a brand color to see the VLAN bus bar adapt. Segment colors use auto-generated OKLCH hues,
+          but the brand accent influences the overall page styling.
+        </p>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+          <ColorInput
+            name="brand-color"
+            value={brandColor}
+            onChange={setBrandColor}
+            size="sm"
+            swatches={['#6366f1','#f97316','#f43f5e','#0ea5e9','#10b981','#8b5cf6','#d946ef','#f59e0b','#06b6d4','#64748b']}
+          />
+          {brandColor !== '#6366f1' && (
+            <Button size="xs" variant="ghost" onClick={() => setBrandColor('#6366f1')}>
+              <Icon name="refresh" size="sm" /> Reset to default
+            </Button>
+          )}
+        </div>
+      </section>
+
+      {/* ── 7. Source ─────────────────────────────────── */}
+      <section className="vlan-bus-bar-page__section" id="source">
+        <h2 className="vlan-bus-bar-page__section-title"><a href="#source">Source</a></h2>
+        <p className="vlan-bus-bar-page__section-desc">View the full component source code on GitHub.</p>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+          <a className="vlan-bus-bar-page__source-link" href="https://github.com/annondeveloper/ui-kit/blob/main/src/domain/vlan-bus-bar.tsx" target="_blank" rel="noopener noreferrer">
+            src/domain/vlan-bus-bar.tsx (Standard)
+          </a>
+          <a className="vlan-bus-bar-page__source-link" href="https://github.com/annondeveloper/ui-kit/blob/main/src/lite/vlan-bus-bar.tsx" target="_blank" rel="noopener noreferrer">
+            src/lite/vlan-bus-bar.tsx (Lite)
+          </a>
+          <a className="vlan-bus-bar-page__source-link" href="https://github.com/annondeveloper/ui-kit/blob/main/src/premium/vlan-bus-bar.tsx" target="_blank" rel="noopener noreferrer">
+            src/premium/vlan-bus-bar.tsx (Premium)
+          </a>
+        </div>
       </section>
     </div>
   )

@@ -5,11 +5,16 @@ import { css } from '@ui/core/styles/css-tag'
 import { useStyles } from '@ui/core/styles/use-styles'
 import { EmptyState } from '@ui/domain/empty-state'
 import { EmptyState as LiteEmptyState } from '@ui/lite/empty-state'
+import { EmptyState as PremiumEmptyState } from '@ui/premium/empty-state'
 import { Button } from '@ui/components/button'
 import { Card } from '@ui/components/card'
 import { CopyBlock } from '@ui/domain/copy-block'
 import { Tabs, TabPanel } from '@ui/components/tabs'
 import { Icon } from '@ui/core/icons/icon'
+import { generateTheme } from '@ui/core/tokens/generator'
+import { TOKEN_TO_CSS, type ThemeTokens } from '@ui/core/tokens/tokens'
+import { useTheme } from '@ui/core/tokens/theme-context'
+import { ColorInput } from '@ui/components/color-input'
 import { PropsTable, type PropDef } from '../../components/PropsTable'
 import { useTier, type Tier } from '../../App'
 
@@ -553,6 +558,22 @@ const pageStyles = css`
         color: var(--text-primary);
       }
 
+      /* ── Source link ─────────────────────────────────── */
+
+      .empty-state-page__source-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        color: var(--brand, oklch(65% 0.2 270));
+        font-size: var(--text-sm, 0.875rem);
+        text-decoration: none;
+        font-weight: 500;
+      }
+      .empty-state-page__source-link:hover {
+        text-decoration: underline;
+        text-underline-offset: 0.2em;
+      }
+
       /* ── Responsive ──────────────────────────────── */
 
       @media (max-width: 768px) {
@@ -842,7 +863,7 @@ function PlaygroundSection({ tier }: { tier: Tier }) {
     }
   }, [activeCodeTab, reactCode, htmlCode, vueCode, angularCode, svelteCode])
 
-  const EmptyComponent = tier === 'lite' ? LiteEmptyState : EmptyState
+  const EmptyComponent = tier === 'lite' ? LiteEmptyState : tier === 'premium' ? PremiumEmptyState : EmptyState
 
   const emptyProps: Record<string, unknown> = {
     title: titleText,
@@ -941,7 +962,33 @@ export default function EmptyStatePage() {
   useStyles('empty-state-page', pageStyles)
 
   const { tier, setTier } = useTier()
+  const [brandColor, setBrandColor] = useState('#6366f1')
   const pageRef = useRef<HTMLDivElement>(null)
+  const { mode } = useTheme()
+
+  const themeTokens = useMemo(() => {
+    try {
+      return generateTheme(brandColor, mode)
+    } catch {
+      return null
+    }
+  }, [brandColor, mode])
+
+  const BRAND_ONLY_KEYS: (keyof ThemeTokens)[] = [
+    'brand', 'brandLight', 'brandDark', 'brandSubtle', 'brandGlow',
+    'bgElevated', 'borderDefault', 'borderSubtle',
+  ]
+
+  const themeStyle = useMemo(() => {
+    if (!themeTokens || brandColor === '#6366f1') return undefined
+    const style: Record<string, string> = {}
+    for (const key of BRAND_ONLY_KEYS) {
+      const cssVar = TOKEN_TO_CSS[key]
+      const value = themeTokens[key]
+      if (cssVar && value) style[cssVar] = value
+    }
+    return style as React.CSSProperties
+  }, [themeTokens, brandColor])
 
   // Scroll reveal — JS fallback
   useEffect(() => {
@@ -974,7 +1021,7 @@ export default function EmptyStatePage() {
     return () => observer.disconnect()
   }, [])
 
-  const EmptyComponent = tier === 'lite' ? LiteEmptyState : EmptyState
+  const EmptyComponent = tier === 'lite' ? LiteEmptyState : tier === 'premium' ? PremiumEmptyState : EmptyState
 
   return (
     <div className="empty-state-page" ref={pageRef}>
@@ -1228,7 +1275,7 @@ export default function EmptyStatePage() {
               import {'{'} EmptyState {'}'} from '@annondeveloper/ui-kit/premium'
             </div>
             <div className="empty-state-page__tier-preview">
-              <EmptyState icon={<Icon name="inbox" size="sm" />} title="Empty" description="Nothing here" size="sm" />
+              <PremiumEmptyState icon={<Icon name="inbox" size="sm" />} title="Empty" description="Nothing here" size="sm" />
             </div>
             <div className="empty-state-page__size-breakdown">
               <div className="empty-state-page__size-row">
@@ -1296,6 +1343,48 @@ export default function EmptyStatePage() {
             </li>
           </ul>
         </Card>
+      </section>
+
+      {/* ── 10. Brand Color ─────────────────────────────── */}
+      <section className="empty-state-page__section" id="brand-color">
+        <h2 className="empty-state-page__section-title">
+          <a href="#brand-color">Brand Color</a>
+        </h2>
+        <p className="empty-state-page__section-desc">
+          Pick a brand color to preview how EmptyState adapts. The theme generator produces
+          derived colors (light, dark, subtle, glow) automatically from your choice.
+        </p>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+          <ColorInput
+            name="brand-color"
+            value={brandColor}
+            onChange={setBrandColor}
+            size="sm"
+            swatches={['#6366f1','#f97316','#f43f5e','#0ea5e9','#10b981','#8b5cf6','#d946ef','#f59e0b','#06b6d4','#64748b']}
+          />
+          {brandColor !== '#6366f1' && (
+            <Button size="xs" variant="ghost" onClick={() => setBrandColor('#6366f1')}>
+              <Icon name="refresh" size="sm" /> Reset to default
+            </Button>
+          )}
+        </div>
+      </section>
+
+      {/* ── 11. Source ──────────────────────────────────── */}
+      <section className="empty-state-page__section" id="source">
+        <h2 className="empty-state-page__section-title"><a href="#source">Source</a></h2>
+        <p className="empty-state-page__section-desc">View the full component source code on GitHub.</p>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+          <a className="empty-state-page__source-link" href="https://github.com/annondeveloper/ui-kit/blob/main/src/domain/empty-state.tsx" target="_blank" rel="noopener noreferrer">
+            <Icon name="code" size="sm" /> src/domain/empty-state.tsx (Standard)
+          </a>
+          <a className="empty-state-page__source-link" href="https://github.com/annondeveloper/ui-kit/blob/main/src/lite/empty-state.tsx" target="_blank" rel="noopener noreferrer">
+            <Icon name="code" size="sm" /> src/lite/empty-state.tsx (Lite)
+          </a>
+          <a className="empty-state-page__source-link" href="https://github.com/annondeveloper/ui-kit/blob/main/src/premium/empty-state.tsx" target="_blank" rel="noopener noreferrer">
+            <Icon name="code" size="sm" /> src/premium/empty-state.tsx (Premium)
+          </a>
+        </div>
       </section>
     </div>
   )

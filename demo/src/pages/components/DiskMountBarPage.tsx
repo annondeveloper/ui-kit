@@ -11,6 +11,7 @@ import { Card } from '@ui/components/card'
 import { CopyBlock } from '@ui/domain/copy-block'
 import { Tabs, TabPanel } from '@ui/components/tabs'
 import { Icon } from '@ui/core/icons/icon'
+import { ColorInput } from '@ui/components/color-input'
 import { PropsTable, type PropDef } from '../../components/PropsTable'
 import { useTier, type Tier } from '../../App'
 
@@ -349,6 +350,20 @@ const pageStyles = css`
         padding-block-start: 0.5rem;
       }
 
+      .disk-mount-bar-page__size-breakdown {
+        display: flex;
+        flex-direction: column;
+        gap: 0.25rem;
+        font-size: 0.75rem;
+        color: var(--text-tertiary);
+      }
+
+      .disk-mount-bar-page__size-row {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+
       /* ── Code tabs ─────────────────────────────────── */
 
       .disk-mount-bar-page__code-tabs {
@@ -548,6 +563,7 @@ function PlaygroundSection() {
   const [size, setSize] = useState<Size>('md')
   const [maxVisibleStr, setMaxVisibleStr] = useState('3')
   const [showFree, setShowFree] = useState(false)
+  const [motion, setMotion] = useState<0 | 1 | 2 | 3>(3)
   const [copyStatus, setCopyStatus] = useState('')
   const [activeCodeTab, setActiveCodeTab] = useState('react')
 
@@ -587,7 +603,7 @@ function PlaygroundSection() {
       <div className="disk-mount-bar-page__playground">
         <div className="disk-mount-bar-page__playground-preview">
           <div className="disk-mount-bar-page__playground-result">
-            <Component mounts={sampleMounts} size={size} maxVisible={maxVisible} showFree={showFree} />
+            <Component mounts={sampleMounts} size={size} maxVisible={maxVisible} showFree={showFree} motion={motion} />
           </div>
           <div className="disk-mount-bar-page__code-tabs">
             <div className="disk-mount-bar-page__export-row">
@@ -607,6 +623,14 @@ function PlaygroundSection() {
         <div className="disk-mount-bar-page__playground-controls">
           <OptionGroup label="Size" options={SIZES} value={size} onChange={setSize} />
           <OptionGroup label="Max Visible" options={MAX_VISIBLE_OPTIONS as readonly string[]} value={maxVisibleStr} onChange={setMaxVisibleStr} />
+          {tier !== 'lite' && (
+            <OptionGroup
+              label="Motion Level"
+              options={['0', '1', '2', '3'] as const}
+              value={String(motion) as '0' | '1' | '2' | '3'}
+              onChange={v => setMotion(Number(v) as 0 | 1 | 2 | 3)}
+            />
+          )}
           <Toggle label="Show Free Space" checked={showFree} onChange={setShowFree} />
         </div>
       </div>
@@ -619,6 +643,7 @@ function PlaygroundSection() {
 export default function DiskMountBarPage() {
   useStyles('disk-mount-bar-page', pageStyles)
   const { tier, setTier } = useTier()
+  const [brandColor, setBrandColor] = useState('#6366f1')
 
   const Component = tier === 'lite' ? LiteDiskMountBar : tier === 'premium' ? PremiumDiskMountBar : DiskMountBar
   const importStr = IMPORT_STRINGS[tier]
@@ -659,6 +684,13 @@ export default function DiskMountBarPage() {
                 {t.id === 'lite' && <LiteDiskMountBar mounts={sampleMounts.slice(0, 2)} size="sm" />}
                 {t.id === 'standard' && <DiskMountBar mounts={sampleMounts.slice(0, 2)} size="sm" />}
                 {t.id === 'premium' && <PremiumDiskMountBar mounts={sampleMounts.slice(0, 2)} size="sm" />}
+              </div>
+              <div className="disk-mount-bar-page__size-breakdown">
+                <div className="disk-mount-bar-page__size-row">
+                  <span>Component: <strong style={{ color: 'var(--text-primary)' }}>{t.id === 'lite' ? '0.7' : t.id === 'standard' ? '2.0' : '3.5'} KB</strong></span>
+                  <span>+ Shared: <strong style={{ color: 'var(--text-primary)' }}>{t.id === 'lite' ? '0.0' : '0.9'} KB</strong></span>
+                  <span>= <strong style={{ color: 'var(--brand)' }}>{t.id === 'lite' ? '0.7' : t.id === 'standard' ? '2.9' : '4.4'} KB</strong> gzip</span>
+                </div>
               </div>
             </div>
           ))}
@@ -803,6 +835,32 @@ export default function DiskMountBarPage() {
           <li className="disk-mount-bar-page__a11y-item"><Icon name="check" size="sm" className="disk-mount-bar-page__a11y-icon" />Critical thresholds conveyed through text, not color alone</li>
           <li className="disk-mount-bar-page__a11y-item"><Icon name="check" size="sm" className="disk-mount-bar-page__a11y-icon" />Respects prefers-reduced-motion for bar fill animations</li>
         </ul>
+      </section>
+
+      {/* Brand Color */}
+      <section className="disk-mount-bar-page__section" id="brand-color">
+        <h2 className="disk-mount-bar-page__section-title"><a href="#brand-color">Brand Color</a></h2>
+        <p className="disk-mount-bar-page__section-desc">
+          Pick a brand color to see the component update in real-time. Derived colors
+          (light, dark, subtle, glow) are generated automatically from your choice.
+        </p>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+          <ColorInput
+            name="brand-color"
+            value={brandColor}
+            onChange={setBrandColor}
+            size="sm"
+            swatches={['#6366f1','#f97316','#f43f5e','#0ea5e9','#10b981','#8b5cf6','#d946ef','#f59e0b','#06b6d4','#64748b']}
+          />
+          {brandColor !== '#6366f1' && (
+            <Button size="xs" variant="ghost" onClick={() => setBrandColor('#6366f1')}>
+              <Icon name="refresh" size="sm" /> Reset to default
+            </Button>
+          )}
+          <div className="disk-mount-bar-page__preview" style={{ '--brand': brandColor } as React.CSSProperties}>
+            <Component mounts={sampleMounts.slice(0, 3)} size="md" showFree />
+          </div>
+        </div>
       </section>
 
       {/* Source */}

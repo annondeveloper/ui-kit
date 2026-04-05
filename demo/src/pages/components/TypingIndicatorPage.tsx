@@ -5,6 +5,7 @@ import { css } from '@ui/core/styles/css-tag'
 import { useStyles } from '@ui/core/styles/use-styles'
 import { TypingIndicator } from '@ui/domain/typing-indicator'
 import { TypingIndicator as LiteTypingIndicator } from '@ui/lite/typing-indicator'
+import { TypingIndicator as PremiumTypingIndicator } from '@ui/premium/typing-indicator'
 import { Button } from '@ui/components/button'
 import { Card } from '@ui/components/card'
 import { CopyBlock } from '@ui/domain/copy-block'
@@ -578,6 +579,22 @@ const pageStyles = css`
         flex-shrink: 0;
       }
 
+      /* ── Source link ──────────────────────────────── */
+
+      .typing-indicator-page__source-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: var(--text-sm, 0.875rem);
+        color: var(--brand);
+        text-decoration: none;
+        font-weight: 500;
+      }
+      .typing-indicator-page__source-link:hover {
+        text-decoration: underline;
+        text-underline-offset: 0.2em;
+      }
+
       /* ── Responsive ──────────────────────────────── */
 
       @media (max-width: 768px) {
@@ -842,6 +859,8 @@ function PlaygroundSection({ tier: tierProp, brandColor }: { tier: Tier; brandCo
           <div className="typing-indicator-page__playground-result">
             {tier === 'lite' ? (
               <LiteTypingIndicator avatar={avatar} label={label} />
+            ) : tier === 'premium' ? (
+              <PremiumTypingIndicator size={size} avatar={avatar} label={label} motion={motion} />
             ) : (
               <TypingIndicator size={size} avatar={avatar} label={label} motion={motion} />
             )}
@@ -1211,7 +1230,7 @@ export default function TypingIndicatorPage() {
               import {'{'} TypingIndicator {'}'} from '@annondeveloper/ui-kit/premium'
             </div>
             <div className="typing-indicator-page__tier-preview">
-              <TypingIndicator />
+              <PremiumTypingIndicator />
             </div>
             <div className="typing-indicator-page__size-breakdown">
               <div className="typing-indicator-page__size-row">
@@ -1322,6 +1341,23 @@ export default function TypingIndicatorPage() {
             </li>
           </ul>
         </Card>
+      </section>
+
+      {/* ── Source ─────────────────────────────────────── */}
+      <section className="typing-indicator-page__section" id="source">
+        <h2 className="typing-indicator-page__section-title"><a href="#source">Source</a></h2>
+        <p className="typing-indicator-page__section-desc">View the full component source code on GitHub.</p>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+          <a className="typing-indicator-page__source-link" href="https://github.com/annondeveloper/ui-kit/blob/main/src/domain/typing-indicator.tsx" target="_blank" rel="noopener noreferrer">
+            src/domain/typing-indicator.tsx (Standard)
+          </a>
+          <a className="typing-indicator-page__source-link" href="https://github.com/annondeveloper/ui-kit/blob/main/src/lite/typing-indicator.tsx" target="_blank" rel="noopener noreferrer">
+            src/lite/typing-indicator.tsx (Lite)
+          </a>
+          <a className="typing-indicator-page__source-link" href="https://github.com/annondeveloper/ui-kit/blob/main/src/premium/typing-indicator.tsx" target="_blank" rel="noopener noreferrer">
+            src/premium/typing-indicator.tsx (Premium)
+          </a>
+        </div>
       </section>
     </div>
   )

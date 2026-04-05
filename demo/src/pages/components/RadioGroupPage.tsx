@@ -5,6 +5,7 @@ import { css } from '@ui/core/styles/css-tag'
 import { useStyles } from '@ui/core/styles/use-styles'
 import { RadioGroup } from '@ui/components/radio-group'
 import { RadioGroup as LiteRadioGroup } from '@ui/lite/radio-group'
+import { RadioGroup as PremiumRadioGroup } from '@ui/premium/radio-group'
 import { Button } from '@ui/components/button'
 import { Card } from '@ui/components/card'
 import { CopyBlock } from '@ui/domain/copy-block'
@@ -499,6 +500,22 @@ const pageStyles = css`
         padding-block-start: 0.5rem;
       }
 
+      /* ── Size breakdown bar ─────────────────────────── */
+
+      .radio-group-page__size-breakdown {
+        display: flex;
+        flex-direction: column;
+        gap: 0.25rem;
+        font-size: 0.75rem;
+        color: var(--text-tertiary);
+      }
+
+      .radio-group-page__size-row {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+
       /* ── Color picker ──────────────────────────────── */
 
       .radio-group-page__color-presets {
@@ -946,8 +963,11 @@ function PlaygroundSection({ tier: tierProp }: { tier: Tier }) {
   const [disabled, setDisabled] = useState(false)
   const [error, setError] = useState('')
   const [selected, setSelected] = useState('react')
+  const [motion, setMotion] = useState<0 | 1 | 2 | 3>(3)
   const [copyStatus, setCopyStatus] = useState('')
   const [activeCodeTab, setActiveCodeTab] = useState('react')
+
+  const RadioGroupComponent = tier === 'lite' ? LiteRadioGroup : tier === 'premium' ? PremiumRadioGroup : RadioGroup
 
   const reactCode = useMemo(() => generateReactCode(tier, size, orientation, error, disabled), [tier, size, orientation, error, disabled])
   const htmlCode = useMemo(() => generateHtmlCode(tier, orientation, disabled), [tier, orientation, disabled])
@@ -995,6 +1015,18 @@ function PlaygroundSection({ tier: tierProp }: { tier: Tier }) {
                 onChange={setSelected}
                 orientation={orientation}
               />
+            ) : tier === 'premium' ? (
+              <PremiumRadioGroup
+                name="pg-framework-premium"
+                label="Favorite Framework"
+                options={SAMPLE_OPTIONS}
+                value={selected}
+                onChange={setSelected}
+                size={size}
+                orientation={orientation}
+                error={error || undefined}
+                motion={motion}
+              />
             ) : (
               <RadioGroup
                 name="pg-framework"
@@ -1005,6 +1037,7 @@ function PlaygroundSection({ tier: tierProp }: { tier: Tier }) {
                 size={size}
                 orientation={orientation}
                 error={error || undefined}
+                motion={motion}
               />
             )}
           </div>
@@ -1041,6 +1074,15 @@ function PlaygroundSection({ tier: tierProp }: { tier: Tier }) {
             <OptionGroup label="Size" options={SIZES} value={size} onChange={setSize} />
           )}
           <OptionGroup label="Orientation" options={ORIENTATIONS} value={orientation} onChange={setOrientation} />
+
+          {tier !== 'lite' && (
+            <OptionGroup
+              label="Motion Level"
+              options={['0', '1', '2', '3'] as const}
+              value={String(motion) as '0' | '1' | '2' | '3'}
+              onChange={v => setMotion(Number(v) as 0 | 1 | 2 | 3)}
+            />
+          )}
 
           <div className="radio-group-page__control-group">
             <span className="radio-group-page__control-label">Toggles</span>
@@ -1356,6 +1398,13 @@ export default function RadioGroupPage() {
                 value="a"
               />
             </div>
+            <div className="radio-group-page__size-breakdown">
+              <div className="radio-group-page__size-row">
+                <span>Component: <strong style={{ color: 'var(--text-primary)' }}>0.3 KB</strong></span>
+                <span>+ Shared: <strong style={{ color: 'var(--text-primary)' }}>0.0 KB</strong></span>
+                <span>= <strong style={{ color: 'var(--brand)' }}>0.3 KB</strong> gzip</span>
+              </div>
+            </div>
           </div>
 
           <div
@@ -1384,6 +1433,13 @@ export default function RadioGroupPage() {
                 value="a"
               />
             </div>
+            <div className="radio-group-page__size-breakdown">
+              <div className="radio-group-page__size-row">
+                <span>Component: <strong style={{ color: 'var(--text-primary)' }}>2.0 KB</strong></span>
+                <span>+ Shared: <strong style={{ color: 'var(--text-primary)' }}>0.9 KB</strong></span>
+                <span>= <strong style={{ color: 'var(--brand)' }}>2.9 KB</strong> gzip</span>
+              </div>
+            </div>
           </div>
 
           <div
@@ -1404,13 +1460,20 @@ export default function RadioGroupPage() {
               import {'{'} RadioGroup {'}'} from '@annondeveloper/ui-kit/premium'
             </div>
             <div className="radio-group-page__tier-preview">
-              <RadioGroup
+              <PremiumRadioGroup
                 name="tier-premium"
                 label="Choice"
                 options={[{ value: 'a', label: 'Alpha' }, { value: 'b', label: 'Beta' }]}
                 value="a"
                 size="lg"
               />
+            </div>
+            <div className="radio-group-page__size-breakdown">
+              <div className="radio-group-page__size-row">
+                <span>Component: <strong style={{ color: 'var(--text-primary)' }}>3.2 KB</strong></span>
+                <span>+ Shared: <strong style={{ color: 'var(--text-primary)' }}>0.9 KB</strong></span>
+                <span>= <strong style={{ color: 'var(--brand)' }}>4.1 KB</strong> gzip</span>
+              </div>
             </div>
           </div>
         </div>
@@ -1562,7 +1625,7 @@ export default function RadioGroupPage() {
         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
           <a
             className="radio-group-page__source-link"
-            href="https://github.com/annondeveloper/ui-kit/blob/v2/src/components/radio-group.tsx"
+            href="https://github.com/annondeveloper/ui-kit/blob/main/src/components/radio-group.tsx"
             target="_blank"
             rel="noopener noreferrer"
           >
@@ -1571,7 +1634,7 @@ export default function RadioGroupPage() {
           </a>
           <a
             className="radio-group-page__source-link"
-            href="https://github.com/annondeveloper/ui-kit/blob/v2/src/lite/radio-group.tsx"
+            href="https://github.com/annondeveloper/ui-kit/blob/main/src/lite/radio-group.tsx"
             target="_blank"
             rel="noopener noreferrer"
           >

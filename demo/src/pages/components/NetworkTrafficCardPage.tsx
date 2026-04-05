@@ -4,11 +4,17 @@ import { useState, useMemo, useCallback, useRef, useEffect } from 'react'
 import { css } from '@ui/core/styles/css-tag'
 import { useStyles } from '@ui/core/styles/use-styles'
 import { NetworkTrafficCard, formatBitRate } from '@ui/domain/network-traffic-card'
+import { NetworkTrafficCard as LiteNetworkTrafficCard } from '@ui/lite/network-traffic-card'
+import { NetworkTrafficCard as PremiumNetworkTrafficCard } from '@ui/premium/network-traffic-card'
 import { Button } from '@ui/components/button'
 import { Card } from '@ui/components/card'
 import { CopyBlock } from '@ui/domain/copy-block'
 import { Tabs, TabPanel } from '@ui/components/tabs'
 import { Icon } from '@ui/core/icons/icon'
+import { generateTheme } from '@ui/core/tokens/generator'
+import { TOKEN_TO_CSS, type ThemeTokens } from '@ui/core/tokens/tokens'
+import { useTheme } from '@ui/core/tokens/theme-context'
+import { ColorInput } from '@ui/components/color-input'
 import { PropsTable, type PropDef } from '../../components/PropsTable'
 import { useTier, type Tier } from '../../App'
 
@@ -556,6 +562,52 @@ const pageStyles = css`
         .ntc-page__preview { padding: 1rem; }
       }
 
+      /* ── Source link ─────────────────────────────────── */
+
+      .ntc-page__source-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: var(--text-sm, 0.875rem);
+        color: var(--brand);
+        text-decoration: none;
+        font-weight: 500;
+      }
+      .ntc-page__source-link:hover {
+        text-decoration: underline;
+        text-underline-offset: 0.2em;
+      }
+
+      /* ── Color picker ──────────────────────────────── */
+
+      .ntc-page__color-presets {
+        display: flex;
+        gap: 0.25rem;
+        flex-wrap: wrap;
+      }
+
+      .ntc-page__color-preset {
+        inline-size: 24px;
+        block-size: 24px;
+        border-radius: 50%;
+        border: 2px solid transparent;
+        cursor: pointer;
+        padding: 0;
+        transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1),
+                    border-color 0.15s,
+                    box-shadow 0.15s;
+        box-shadow: 0 1px 3px oklch(0% 0 0 / 0.2);
+      }
+      .ntc-page__color-preset:hover {
+        transform: scale(1.2);
+        box-shadow: 0 2px 8px oklch(0% 0 0 / 0.3);
+      }
+      .ntc-page__color-preset--active {
+        border-color: oklch(100% 0 0);
+        transform: scale(1.2);
+        box-shadow: 0 0 0 2px var(--bg-base), 0 0 0 4px oklch(100% 0 0 / 0.5);
+      }
+
       /* ── Scrollbar ──────────────────────────────── */
 
       .ntc-page__import-code,
@@ -595,6 +647,19 @@ type Status = 'ok' | 'warning' | 'critical' | 'unknown'
 const STATUSES: Status[] = ['ok', 'warning', 'critical', 'unknown']
 
 const SAMPLE_TREND = [120, 150, 130, 180, 200, 190, 220, 250, 230, 260, 240, 280, 310, 290, 320]
+
+const COLOR_PRESETS = [
+  { hex: '#6366f1', name: 'Indigo' },
+  { hex: '#f97316', name: 'Orange' },
+  { hex: '#f43f5e', name: 'Rose' },
+  { hex: '#0ea5e9', name: 'Sky' },
+  { hex: '#10b981', name: 'Emerald' },
+  { hex: '#8b5cf6', name: 'Violet' },
+  { hex: '#d946ef', name: 'Fuchsia' },
+  { hex: '#f59e0b', name: 'Amber' },
+  { hex: '#06b6d4', name: 'Cyan' },
+  { hex: '#64748b', name: 'Slate' },
+]
 
 const IMPORT_STRINGS: Record<Tier, string> = {
   lite: "import { NetworkTrafficCard } from '@annondeveloper/ui-kit/lite'",
@@ -995,6 +1060,32 @@ export default function NetworkTrafficCardPage() {
   useStyles('ntc-page', pageStyles)
 
   const { tier, setTier } = useTier()
+  const [brandColor, setBrandColor] = useState('#6366f1')
+  const { mode } = useTheme()
+
+  const themeTokens = useMemo(() => {
+    try {
+      return generateTheme(brandColor, mode)
+    } catch {
+      return null
+    }
+  }, [brandColor, mode])
+
+  const BRAND_ONLY_KEYS: (keyof ThemeTokens)[] = [
+    'brand', 'brandLight', 'brandDark', 'brandSubtle', 'brandGlow',
+    'borderGlow', 'aurora1', 'aurora2',
+  ]
+
+  const themeStyle = useMemo(() => {
+    if (!themeTokens || brandColor === '#6366f1') return undefined
+    const style: Record<string, string> = {}
+    for (const key of BRAND_ONLY_KEYS) {
+      const cssVar = TOKEN_TO_CSS[key]
+      const value = themeTokens[key]
+      if (cssVar && value) style[cssVar] = value
+    }
+    return style as React.CSSProperties
+  }, [themeTokens, brandColor])
 
   // Scroll reveal fallback
   useEffect(() => {
@@ -1028,7 +1119,7 @@ export default function NetworkTrafficCardPage() {
   }, [])
 
   return (
-    <div className="ntc-page">
+    <div className="ntc-page" style={themeStyle}>
       {/* ── 1. Hero Header ──────────────────────────────── */}
       <div className="ntc-page__hero">
         <h1 className="ntc-page__title">NetworkTrafficCard</h1>
@@ -1271,11 +1362,10 @@ formatBitRate(100)       // "800 bps"`}
               import {'{'} NetworkTrafficCard {'}'} from '@annondeveloper/ui-kit/lite'
             </div>
             <div className="ntc-page__tier-preview">
-              <NetworkTrafficCard
+              <LiteNetworkTrafficCard
                 title="eth0"
                 traffic={{ inbound: 125000000, outbound: 87500000 }}
                 status="ok"
-                motion={0}
               />
             </div>
             <div className="ntc-page__size-breakdown">
@@ -1344,7 +1434,7 @@ formatBitRate(100)       // "800 bps"`}
               import {'{'} NetworkTrafficCard {'}'} from '@annondeveloper/ui-kit/premium'
             </div>
             <div className="ntc-page__tier-preview">
-              <NetworkTrafficCard
+              <PremiumNetworkTrafficCard
                 title="eth0"
                 vendor="Cisco"
                 location="US-East"
@@ -1452,6 +1542,61 @@ formatBitRate(100)       // "800 bps"`}
             </li>
           </ul>
         </Card>
+      </section>
+
+      {/* ── Brand Color ───────────────────────────────── */}
+      <section className="ntc-page__section" id="brand-color">
+        <h2 className="ntc-page__section-title">
+          <a href="#brand-color">Brand Color</a>
+        </h2>
+        <p className="ntc-page__section-desc">
+          Pick a brand color to see the traffic card update in real-time. The theme generates
+          derived colors (light, dark, subtle, glow) automatically from your choice.
+        </p>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+          <ColorInput
+            name="brand-color"
+            value={brandColor}
+            onChange={setBrandColor}
+            size="sm"
+            swatches={['#6366f1','#f97316','#f43f5e','#0ea5e9','#10b981','#8b5cf6','#d946ef','#f59e0b','#06b6d4','#64748b']}
+          />
+          <div className="ntc-page__color-presets">
+            {COLOR_PRESETS.map(p => (
+              <button
+                key={p.hex}
+                type="button"
+                className={`ntc-page__color-preset${brandColor === p.hex ? ' ntc-page__color-preset--active' : ''}`}
+                style={{ background: p.hex }}
+                onClick={() => setBrandColor(p.hex)}
+                title={p.name}
+                aria-label={`Set brand color to ${p.name}`}
+              />
+            ))}
+          </div>
+          {brandColor !== '#6366f1' && (
+            <Button size="xs" variant="ghost" onClick={() => setBrandColor('#6366f1')}>
+              <Icon name="refresh" size="sm" /> Reset to default
+            </Button>
+          )}
+        </div>
+      </section>
+
+      {/* ── Source ──────────────────────────────────────── */}
+      <section className="ntc-page__section" id="source">
+        <h2 className="ntc-page__section-title"><a href="#source">Source</a></h2>
+        <p className="ntc-page__section-desc">View the full component source code on GitHub.</p>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+          <a className="ntc-page__source-link" href="https://github.com/annondeveloper/ui-kit/blob/main/src/domain/network-traffic-card.tsx" target="_blank" rel="noopener noreferrer">
+            <Icon name="code" size="sm" /> src/domain/network-traffic-card.tsx (Standard)
+          </a>
+          <a className="ntc-page__source-link" href="https://github.com/annondeveloper/ui-kit/blob/main/src/lite/network-traffic-card.tsx" target="_blank" rel="noopener noreferrer">
+            <Icon name="code" size="sm" /> src/lite/network-traffic-card.tsx (Lite)
+          </a>
+          <a className="ntc-page__source-link" href="https://github.com/annondeveloper/ui-kit/blob/main/src/premium/network-traffic-card.tsx" target="_blank" rel="noopener noreferrer">
+            <Icon name="code" size="sm" /> src/premium/network-traffic-card.tsx (Premium)
+          </a>
+        </div>
       </section>
     </div>
   )

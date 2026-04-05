@@ -5,6 +5,7 @@ import { css } from '@ui/core/styles/css-tag'
 import { useStyles } from '@ui/core/styles/use-styles'
 import { HeatmapCalendar, type HeatmapData } from '@ui/domain/heatmap-calendar'
 import { HeatmapCalendar as LiteHeatmapCalendar } from '@ui/lite/heatmap-calendar'
+import { HeatmapCalendar as PremiumHeatmapCalendar } from '@ui/premium/heatmap-calendar'
 import { Button } from '@ui/components/button'
 import { Card } from '@ui/components/card'
 import { CopyBlock } from '@ui/domain/copy-block'
@@ -391,6 +392,22 @@ const pageStyles = css`
       .heatmap-calendar-page__a11y-icon { color: var(--brand); flex-shrink: 0; margin-block-start: 0.125rem; }
       .heatmap-calendar-page__a11y-key { font-family: 'SF Mono', 'Fira Code', 'JetBrains Mono', monospace; font-size: var(--text-xs, 0.75rem); background: var(--border-subtle); padding: 0.125rem 0.375rem; border-radius: var(--radius-sm); border: 1px solid var(--border-subtle); color: var(--text-primary); }
 
+      /* ── Source link ─────────────────────────────────── */
+
+      .heatmap-calendar-page__source-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: var(--text-sm, 0.875rem);
+        color: var(--brand);
+        text-decoration: none;
+        font-weight: 500;
+      }
+      .heatmap-calendar-page__source-link:hover {
+        text-decoration: underline;
+        text-underline-offset: 0.2em;
+      }
+
       /* ── Responsive ──────────────────────────────── */
 
       @media (max-width: 768px) {
@@ -643,6 +660,7 @@ function PlaygroundSection({ tier }: { tier: Tier }) {
   const [showTooltip, setShowTooltip] = useState(false)
   const [hasClickHandler, setHasClickHandler] = useState(false)
   const [intensity, setIntensity] = useState<'low' | 'medium' | 'high'>('medium')
+  const [motion, setMotion] = useState<0 | 1 | 2 | 3>(3)
   const [copyStatus, setCopyStatus] = useState('')
   const [activeCodeTab, setActiveCodeTab] = useState('react')
   const [clickedDate, setClickedDate] = useState<string | null>(null)
@@ -693,12 +711,21 @@ function PlaygroundSection({ tier }: { tier: Tier }) {
             <div style={{ position: 'relative', zIndex: 1 }}>
               {tier === 'lite' ? (
                 <LiteHeatmapCalendar data={data} colorScale={colors} />
+              ) : tier === 'premium' ? (
+                <PremiumHeatmapCalendar
+                  data={data}
+                  colorScale={colors}
+                  showTooltip={showTooltip}
+                  onDateClick={hasClickHandler ? handleDateClick : undefined}
+                  motion={motion}
+                />
               ) : (
                 <HeatmapCalendar
                   data={data}
                   colorScale={colors}
                   showTooltip={showTooltip}
                   onDateClick={hasClickHandler ? handleDateClick : undefined}
+                  motion={motion}
                 />
               )}
               {clickedDate && <div style={{ marginBlockStart: '0.5rem', fontSize: 'var(--text-xs)', color: 'var(--text-tertiary)' }}>Clicked: {clickedDate}</div>}
@@ -726,6 +753,14 @@ function PlaygroundSection({ tier }: { tier: Tier }) {
         <div className="heatmap-calendar-page__playground-controls">
           <OptionGroup label="Color Theme" options={['green', 'brand', 'amber', 'red', 'blue'] as const} value={colorTheme} onChange={setColorTheme} />
           <OptionGroup label="Intensity" options={['low', 'medium', 'high'] as const} value={intensity} onChange={setIntensity} />
+          {tier !== 'lite' && (
+            <OptionGroup
+              label="Motion"
+              options={['0', '1', '2', '3'] as const}
+              value={String(motion) as '0' | '1' | '2' | '3'}
+              onChange={v => setMotion(Number(v) as 0 | 1 | 2 | 3)}
+            />
+          )}
           {tier !== 'lite' && (
             <div className="heatmap-calendar-page__control-group">
               <span className="heatmap-calendar-page__control-label">Toggles</span>
@@ -1002,7 +1037,7 @@ export default function HeatmapCalendarPage() {
               import {'{'} HeatmapCalendar {'}'} from '@annondeveloper/ui-kit/premium'
             </div>
             <div className="heatmap-calendar-page__tier-preview">
-              <HeatmapCalendar data={quarterData.slice(0, 60)} showTooltip />
+              <PremiumHeatmapCalendar data={quarterData.slice(0, 60)} showTooltip />
             </div>
             <div className="heatmap-calendar-page__size-breakdown">
               <div className="heatmap-calendar-page__size-row">
@@ -1072,6 +1107,23 @@ export default function HeatmapCalendarPage() {
             </li>
           </ul>
         </Card>
+      </section>
+
+      {/* ── 11. Source ──────────────────────────────────── */}
+      <section className="heatmap-calendar-page__section" id="source">
+        <h2 className="heatmap-calendar-page__section-title"><a href="#source">Source</a></h2>
+        <p className="heatmap-calendar-page__section-desc">View the full component source code on GitHub.</p>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+          <a className="heatmap-calendar-page__source-link" href="https://github.com/annondeveloper/ui-kit/blob/main/src/domain/heatmap-calendar.tsx" target="_blank" rel="noopener noreferrer">
+            <Icon name="code" size="sm" /> src/domain/heatmap-calendar.tsx (Standard)
+          </a>
+          <a className="heatmap-calendar-page__source-link" href="https://github.com/annondeveloper/ui-kit/blob/main/src/lite/heatmap-calendar.tsx" target="_blank" rel="noopener noreferrer">
+            <Icon name="code" size="sm" /> src/lite/heatmap-calendar.tsx (Lite)
+          </a>
+          <a className="heatmap-calendar-page__source-link" href="https://github.com/annondeveloper/ui-kit/blob/main/src/premium/heatmap-calendar.tsx" target="_blank" rel="noopener noreferrer">
+            <Icon name="code" size="sm" /> src/premium/heatmap-calendar.tsx (Premium)
+          </a>
+        </div>
       </section>
     </div>
   )

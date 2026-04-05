@@ -4,6 +4,8 @@ import { useState, useMemo, useCallback, useRef, useEffect } from 'react'
 import { css } from '@ui/core/styles/css-tag'
 import { useStyles } from '@ui/core/styles/use-styles'
 import { OrbitingCircles } from '@ui/domain/orbiting-circles'
+import { OrbitingCircles as LiteOrbitingCircles } from '@ui/lite/orbiting-circles'
+import { OrbitingCircles as PremiumOrbitingCircles } from '@ui/premium/orbiting-circles'
 import { Button } from '@ui/components/button'
 import { Card } from '@ui/components/card'
 import { CopyBlock } from '@ui/domain/copy-block'
@@ -655,6 +657,22 @@ const pageStyles = css`
       :scope ::-webkit-scrollbar-thumb:hover {
         background: var(--border-strong);
       }
+
+      /* ── Source link ─────────────────────────────────── */
+
+      .orbiting-circles-page__source-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: var(--text-sm, 0.875rem);
+        color: var(--brand);
+        text-decoration: none;
+        font-weight: 500;
+      }
+      .orbiting-circles-page__source-link:hover {
+        text-decoration: underline;
+        text-underline-offset: 0.2em;
+      }
     }
   }
 `
@@ -918,16 +936,37 @@ function PlaygroundSection({ tier: tierProp, brandColor }: { tier: Tier; brandCo
       <div className="orbiting-circles-page__playground">
         <div className="orbiting-circles-page__playground-preview">
           <div className="orbiting-circles-page__playground-result">
-            <OrbitingCircles
-              radius={radius}
-              duration={duration}
-              reverse={reverse}
-              motion={motion}
-            >
-              {icons.map(name => (
-                <OrbitIcon key={name} name={name} />
-              ))}
-            </OrbitingCircles>
+            {tier === 'lite' ? (
+              <LiteOrbitingCircles
+                radius={radius}
+              >
+                {icons.map(name => (
+                  <OrbitIcon key={name} name={name} />
+                ))}
+              </LiteOrbitingCircles>
+            ) : tier === 'premium' ? (
+              <PremiumOrbitingCircles
+                radius={radius}
+                duration={duration}
+                reverse={reverse}
+                motion={motion}
+              >
+                {icons.map(name => (
+                  <OrbitIcon key={name} name={name} />
+                ))}
+              </PremiumOrbitingCircles>
+            ) : (
+              <OrbitingCircles
+                radius={radius}
+                duration={duration}
+                reverse={reverse}
+                motion={motion}
+              >
+                {icons.map(name => (
+                  <OrbitIcon key={name} name={name} />
+                ))}
+              </OrbitingCircles>
+            )}
           </div>
 
           <div className="orbiting-circles-page__code-tabs">
@@ -1270,11 +1309,11 @@ export default function OrbitingCirclesPage() {
               import {'{'} OrbitingCircles {'}'} from '@annondeveloper/ui-kit/domain'
             </div>
             <div className="orbiting-circles-page__tier-preview">
-              <OrbitingCircles radius={40} duration={10} motion={0}>
+              <LiteOrbitingCircles radius={40}>
                 <OrbitIcon name="zap" />
                 <OrbitIcon name="star" />
                 <OrbitIcon name="heart" />
-              </OrbitingCircles>
+              </LiteOrbitingCircles>
             </div>
             <div className="orbiting-circles-page__size-breakdown">
               <div className="orbiting-circles-page__size-row">
@@ -1340,11 +1379,11 @@ export default function OrbitingCirclesPage() {
               import {'{'} OrbitingCircles {'}'} from '@annondeveloper/ui-kit/premium'
             </div>
             <div className="orbiting-circles-page__tier-preview">
-              <OrbitingCircles radius={40} duration={10}>
+              <PremiumOrbitingCircles radius={40} duration={10}>
                 <OrbitIcon name="zap" />
                 <OrbitIcon name="star" />
                 <OrbitIcon name="heart" />
-              </OrbitingCircles>
+              </PremiumOrbitingCircles>
             </div>
             <div className="orbiting-circles-page__size-breakdown">
               <div className="orbiting-circles-page__size-row">
@@ -1451,6 +1490,23 @@ export default function OrbitingCirclesPage() {
             </li>
           </ul>
         </Card>
+      </section>
+
+      {/* ── Source ──────────────────────────────────────── */}
+      <section className="orbiting-circles-page__section" id="source">
+        <h2 className="orbiting-circles-page__section-title"><a href="#source">Source</a></h2>
+        <p className="orbiting-circles-page__section-desc">View the full component source code on GitHub.</p>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+          <a className="orbiting-circles-page__source-link" href="https://github.com/annondeveloper/ui-kit/blob/main/src/domain/orbiting-circles.tsx" target="_blank" rel="noopener noreferrer">
+            <Icon name="code" size="sm" /> src/domain/orbiting-circles.tsx (Standard)
+          </a>
+          <a className="orbiting-circles-page__source-link" href="https://github.com/annondeveloper/ui-kit/blob/main/src/lite/orbiting-circles.tsx" target="_blank" rel="noopener noreferrer">
+            <Icon name="code" size="sm" /> src/lite/orbiting-circles.tsx (Lite)
+          </a>
+          <a className="orbiting-circles-page__source-link" href="https://github.com/annondeveloper/ui-kit/blob/main/src/premium/orbiting-circles.tsx" target="_blank" rel="noopener noreferrer">
+            <Icon name="code" size="sm" /> src/premium/orbiting-circles.tsx (Premium)
+          </a>
+        </div>
       </section>
     </div>
   )

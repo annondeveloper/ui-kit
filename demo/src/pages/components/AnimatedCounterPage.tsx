@@ -5,6 +5,7 @@ import { css } from '@ui/core/styles/css-tag'
 import { useStyles } from '@ui/core/styles/use-styles'
 import { AnimatedCounter } from '@ui/components/animated-counter'
 import { AnimatedCounter as LiteAnimatedCounter } from '@ui/lite/animated-counter'
+import { AnimatedCounter as PremiumAnimatedCounter } from '@ui/premium/animated-counter'
 import { Button } from '@ui/components/button'
 import { Card } from '@ui/components/card'
 import { CopyBlock } from '@ui/domain/copy-block'
@@ -661,6 +662,9 @@ const pageStyles = css`
       :scope ::-webkit-scrollbar-track { background: transparent; }
       :scope ::-webkit-scrollbar-thumb { background: var(--border-default); border-radius: 2px; }
       :scope ::-webkit-scrollbar-thumb:hover { background: var(--border-strong); }
+
+      .animated-counter-page__source-link { color: var(--brand); text-decoration: none; }
+      .animated-counter-page__source-link:hover { text-decoration: underline; }
     }
   }
 `
@@ -891,7 +895,7 @@ function PlaygroundSection({ tier: tierProp }: { tier: Tier }) {
   const [copyStatus, setCopyStatus] = useState('')
   const [activeCodeTab, setActiveCodeTab] = useState('react')
 
-  const CounterComponent = tier === 'lite' ? LiteAnimatedCounter : AnimatedCounter
+  const CounterComponent = tier === 'lite' ? LiteAnimatedCounter : tier === 'premium' ? PremiumAnimatedCounter : AnimatedCounter
   const formatFn = FORMAT_FNS[formatStyle]
 
   const reactCode = useMemo(
@@ -1108,7 +1112,7 @@ export default function AnimatedCounterPage() {
     return () => observer.disconnect()
   }, [])
 
-  const CounterComponent = tier === 'lite' ? LiteAnimatedCounter : AnimatedCounter
+  const CounterComponent = tier === 'lite' ? LiteAnimatedCounter : tier === 'premium' ? PremiumAnimatedCounter : AnimatedCounter
 
   const currencyFormat = useCallback(
     (v: number) => new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(Math.round(v)),
@@ -1361,7 +1365,7 @@ export default function AnimatedCounterPage() {
               import {'{'} AnimatedCounter {'}'} from '@annondeveloper/ui-kit/premium'
             </div>
             <div className="animated-counter-page__tier-preview">
-              <AnimatedCounter value={99942} format={currencyFormat} />
+              <PremiumAnimatedCounter value={99942} format={currencyFormat} />
             </div>
             <div className="animated-counter-page__size-breakdown">
               <div className="animated-counter-page__size-row">
@@ -1473,6 +1477,23 @@ export default function AnimatedCounterPage() {
             </li>
           </ul>
         </Card>
+      </section>
+
+      {/* ── Source ──────────────────────────────────────── */}
+      <section className="animated-counter-page__section" id="source">
+        <h2 className="animated-counter-page__section-title"><a href="#source">Source</a></h2>
+        <p className="animated-counter-page__section-desc">View the full component source code on GitHub.</p>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+          <a className="animated-counter-page__source-link" href="https://github.com/annondeveloper/ui-kit/blob/main/src/components/animated-counter.tsx" target="_blank" rel="noopener noreferrer">
+            src/components/animated-counter.tsx (Standard)
+          </a>
+          <a className="animated-counter-page__source-link" href="https://github.com/annondeveloper/ui-kit/blob/main/src/lite/animated-counter.tsx" target="_blank" rel="noopener noreferrer">
+            src/lite/animated-counter.tsx (Lite)
+          </a>
+          <a className="animated-counter-page__source-link" href="https://github.com/annondeveloper/ui-kit/blob/main/src/premium/animated-counter.tsx" target="_blank" rel="noopener noreferrer">
+            src/premium/animated-counter.tsx (Premium)
+          </a>
+        </div>
       </section>
     </div>
   )

@@ -5,11 +5,16 @@ import { css } from '@ui/core/styles/css-tag'
 import { useStyles } from '@ui/core/styles/use-styles'
 import { Skeleton } from '@ui/components/skeleton'
 import { Skeleton as LiteSkeleton } from '@ui/lite/skeleton'
+import { Skeleton as PremiumSkeleton } from '@ui/premium/skeleton'
 import { Button } from '@ui/components/button'
 import { Card } from '@ui/components/card'
 import { CopyBlock } from '@ui/domain/copy-block'
 import { Tabs, TabPanel } from '@ui/components/tabs'
 import { Icon } from '@ui/core/icons/icon'
+import { generateTheme } from '@ui/core/tokens/generator'
+import { TOKEN_TO_CSS, type ThemeTokens } from '@ui/core/tokens/tokens'
+import { useTheme } from '@ui/core/tokens/theme-context'
+import { ColorInput } from '@ui/components/color-input'
 import { PropsTable, type PropDef } from '../../components/PropsTable'
 import { useTier, type Tier } from '../../App'
 
@@ -557,6 +562,22 @@ const pageStyles = css`
         gap: 0.5rem;
       }
 
+      /* ── Source link ─────────────────────────────────── */
+
+      .skeleton-page__source-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: var(--text-sm, 0.875rem);
+        color: var(--brand);
+        text-decoration: none;
+        font-weight: 500;
+      }
+      .skeleton-page__source-link:hover {
+        text-decoration: underline;
+        text-underline-offset: 0.2em;
+      }
+
       /* ── Responsive ──────────────────────────────── */
 
       @media (max-width: 768px) {
@@ -907,6 +928,7 @@ function PlaygroundSection({ tier: tierProp }: { tier: Tier }) {
   const [width, setWidth] = useState('200px')
   const [height, setHeight] = useState('40px')
   const [animate, setAnimate] = useState(true)
+  const [motion, setMotion] = useState<0 | 1 | 2 | 3>(3)
   const [lines, setLines] = useState(0)
   const [copyStatus, setCopyStatus] = useState('')
   const [activeCodeTab, setActiveCodeTab] = useState('react')
@@ -975,12 +997,31 @@ function PlaygroundSection({ tier: tierProp }: { tier: Tier }) {
                 width={width || undefined}
                 height={height || undefined}
               />
+            ) : tier === 'premium' ? (
+              showLines ? (
+                <PremiumSkeleton
+                  variant="text"
+                  lines={lines}
+                  width={width || undefined}
+                  animate={animate}
+                  motion={motion}
+                />
+              ) : (
+                <PremiumSkeleton
+                  variant={variant}
+                  width={width || undefined}
+                  height={height || undefined}
+                  animate={animate}
+                  motion={motion}
+                />
+              )
             ) : showLines ? (
               <Skeleton
                 variant="text"
                 lines={lines}
                 width={width || undefined}
                 animate={animate}
+                motion={motion}
               />
             ) : (
               <Skeleton
@@ -988,6 +1029,7 @@ function PlaygroundSection({ tier: tierProp }: { tier: Tier }) {
                 width={width || undefined}
                 height={height || undefined}
                 animate={animate}
+                motion={motion}
               />
             )}
           </div>
@@ -1031,6 +1073,15 @@ function PlaygroundSection({ tier: tierProp }: { tier: Tier }) {
 
         <div className={`${P}playground-controls`}>
           <OptionGroup label="Variant" options={VARIANTS} value={variant} onChange={setVariant} />
+
+          {tier !== 'lite' && (
+            <OptionGroup
+              label="Motion"
+              options={['0', '1', '2', '3'] as const}
+              value={String(motion) as '0' | '1' | '2' | '3'}
+              onChange={v => setMotion(Number(v) as 0 | 1 | 2 | 3)}
+            />
+          )}
 
           <div className={`${P}control-group`}>
             <span className={`${P}control-label`}>Width</span>
@@ -1089,7 +1140,33 @@ export default function SkeletonPage() {
   useStyles('skeleton-page', pageStyles)
 
   const { tier, setTier } = useTier()
+  const [brandColor, setBrandColor] = useState('#6366f1')
   const pageRef = useRef<HTMLDivElement>(null)
+  const { mode } = useTheme()
+
+  const themeTokens = useMemo(() => {
+    try {
+      return generateTheme(brandColor, mode)
+    } catch {
+      return null
+    }
+  }, [brandColor, mode])
+
+  const BRAND_ONLY_KEYS: (keyof ThemeTokens)[] = [
+    'brand', 'brandLight', 'brandDark', 'brandSubtle', 'brandGlow',
+    'borderGlow', 'aurora1', 'aurora2',
+  ]
+
+  const themeStyle = useMemo(() => {
+    if (!themeTokens || brandColor === '#6366f1') return undefined
+    const style: Record<string, string> = {}
+    for (const key of BRAND_ONLY_KEYS) {
+      const cssVar = TOKEN_TO_CSS[key]
+      const value = themeTokens[key]
+      if (cssVar && value) style[cssVar] = value
+    }
+    return style as React.CSSProperties
+  }, [themeTokens, brandColor])
 
   // Scroll reveal JS fallback
   useEffect(() => {
@@ -1123,11 +1200,10 @@ export default function SkeletonPage() {
     return () => observer.disconnect()
   }, [])
 
-  // Premium tier available at @annondeveloper/ui-kit/premium
-  const SkeletonComponent = tier === 'lite' ? LiteSkeleton : Skeleton
+  const SkeletonComponent = tier === 'lite' ? LiteSkeleton : tier === 'premium' ? PremiumSkeleton : Skeleton
 
   return (
-    <div className="skeleton-page" ref={pageRef}>
+    <div className="skeleton-page" ref={pageRef} style={themeStyle}>
       {/* ── 1. Hero Header ──────────────────────────────── */}
       <div className={`${P}hero`}>
         <h1 className={`${P}title`}>Skeleton</h1>
@@ -1470,7 +1546,7 @@ export default function SkeletonPage() {
               import {'{'} Skeleton {'}'} from '@annondeveloper/ui-kit/premium'
             </div>
             <div className={`${P}tier-preview`}>
-              <Skeleton variant="rectangular" width={120} height={40} />
+              <PremiumSkeleton variant="rectangular" width={120} height={40} />
             </div>
             <div className={`${P}size-breakdown`}>
               <div className={`${P}size-row`}>
@@ -1545,6 +1621,48 @@ export default function SkeletonPage() {
             </li>
           </ul>
         </Card>
+      </section>
+
+      {/* ── Brand Color ───────────────────────────────── */}
+      <section className={`${P}section`} id="brand-color">
+        <h2 className={`${P}section-title`}>
+          <a href="#brand-color">Brand Color</a>
+        </h2>
+        <p className={`${P}section-desc`}>
+          Pick a brand color to see the component update in real-time. The theme generates
+          derived colors (light, dark, subtle, glow) automatically from your choice.
+        </p>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+          <ColorInput
+            name="brand-color"
+            value={brandColor}
+            onChange={setBrandColor}
+            size="sm"
+            swatches={['#6366f1','#f97316','#f43f5e','#0ea5e9','#10b981','#8b5cf6','#d946ef','#f59e0b','#06b6d4','#64748b']}
+          />
+          {brandColor !== '#6366f1' && (
+            <Button size="xs" variant="ghost" onClick={() => setBrandColor('#6366f1')}>
+              <Icon name="refresh" size="sm" /> Reset to default
+            </Button>
+          )}
+        </div>
+      </section>
+
+      {/* ── Source ──────────────────────────────────────── */}
+      <section className={`${P}section`} id="source">
+        <h2 className={`${P}section-title`}><a href="#source">Source</a></h2>
+        <p className={`${P}section-desc`}>View the full component source code on GitHub.</p>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+          <a className={`${P}source-link`} href="https://github.com/annondeveloper/ui-kit/blob/main/src/components/skeleton.tsx" target="_blank" rel="noopener noreferrer">
+            <Icon name="code" size="sm" /> src/components/skeleton.tsx (Standard)
+          </a>
+          <a className={`${P}source-link`} href="https://github.com/annondeveloper/ui-kit/blob/main/src/lite/skeleton.tsx" target="_blank" rel="noopener noreferrer">
+            <Icon name="code" size="sm" /> src/lite/skeleton.tsx (Lite)
+          </a>
+          <a className={`${P}source-link`} href="https://github.com/annondeveloper/ui-kit/blob/main/src/premium/skeleton.tsx" target="_blank" rel="noopener noreferrer">
+            <Icon name="code" size="sm" /> src/premium/skeleton.tsx (Premium)
+          </a>
+        </div>
       </section>
     </div>
   )

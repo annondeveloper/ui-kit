@@ -5,11 +5,16 @@ import { css } from '@ui/core/styles/css-tag'
 import { useStyles } from '@ui/core/styles/use-styles'
 import { LogViewer, type LogLine } from '@ui/domain/log-viewer'
 import { LogViewer as LiteLogViewer } from '@ui/lite/log-viewer'
+import { LogViewer as PremiumLogViewer } from '@ui/premium/log-viewer'
 import { Button } from '@ui/components/button'
 import { Card } from '@ui/components/card'
 import { CopyBlock } from '@ui/domain/copy-block'
 import { Tabs, TabPanel } from '@ui/components/tabs'
 import { Icon } from '@ui/core/icons/icon'
+import { generateTheme } from '@ui/core/tokens/generator'
+import { TOKEN_TO_CSS, type ThemeTokens } from '@ui/core/tokens/tokens'
+import { useTheme } from '@ui/core/tokens/theme-context'
+import { ColorInput } from '@ui/components/color-input'
 import { PropsTable, type PropDef } from '../../components/PropsTable'
 import { useTier, type Tier } from '../../App'
 
@@ -491,6 +496,22 @@ const pageStyles = css`
         color: var(--text-primary);
       }
 
+      /* ── Source link ─────────────────────────────────── */
+
+      .log-viewer-page__source-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: var(--text-sm, 0.875rem);
+        color: var(--brand);
+        text-decoration: none;
+        font-weight: 500;
+      }
+      .log-viewer-page__source-link:hover {
+        text-decoration: underline;
+        text-underline-offset: 0.2em;
+      }
+
       /* ── Responsive ──────────────────────────────── */
 
       @media (max-width: 768px) {
@@ -801,6 +822,7 @@ function PlaygroundSection({ tier }: { tier: Tier }) {
   const [wrap, setWrap] = useState(false)
   const [search, setSearch] = useState('')
   const [height] = useState('300px')
+  const [motion, setMotion] = useState<0 | 1 | 2 | 3>(3)
   const [copyStatus, setCopyStatus] = useState('')
   const [activeCodeTab, setActiveCodeTab] = useState('react')
   const [lines, setLines] = useState<LogLine[]>(SAMPLE_LINES)
@@ -862,6 +884,17 @@ function PlaygroundSection({ tier }: { tier: Tier }) {
           <div className="log-viewer-page__playground-result">
             {tier === 'lite' ? (
               <LiteLogViewer lines={lines} maxHeight={height} />
+            ) : tier === 'premium' ? (
+              <PremiumLogViewer
+                lines={lines}
+                height={height}
+                showTimestamp={showTimestamp}
+                showLevel={showLevel}
+                autoTail={autoTail}
+                wrap={wrap}
+                search={search || undefined}
+                motion={motion}
+              />
             ) : (
               <LogViewer
                 lines={lines}
@@ -871,6 +904,7 @@ function PlaygroundSection({ tier }: { tier: Tier }) {
                 autoTail={autoTail}
                 wrap={wrap}
                 search={search || undefined}
+                motion={motion}
               />
             )}
           </div>
@@ -913,6 +947,14 @@ function PlaygroundSection({ tier }: { tier: Tier }) {
 
         <div className="log-viewer-page__playground-controls">
           {tier !== 'lite' && (
+            <OptionGroup
+              label="Motion"
+              options={['0', '1', '2', '3'] as const}
+              value={String(motion) as '0' | '1' | '2' | '3'}
+              onChange={v => setMotion(Number(v) as 0 | 1 | 2 | 3)}
+            />
+          )}
+          {tier !== 'lite' && (
             <>
               <div className="log-viewer-page__control-group">
                 <span className="log-viewer-page__control-label">Toggles</span>
@@ -953,7 +995,33 @@ export default function LogViewerPage() {
   useStyles('log-viewer-page', pageStyles)
 
   const { tier, setTier } = useTier()
+  const [brandColor, setBrandColor] = useState('#6366f1')
   const pageRef = useRef<HTMLDivElement>(null)
+  const { mode } = useTheme()
+
+  const themeTokens = useMemo(() => {
+    try {
+      return generateTheme(brandColor, mode)
+    } catch {
+      return null
+    }
+  }, [brandColor, mode])
+
+  const BRAND_ONLY_KEYS: (keyof ThemeTokens)[] = [
+    'brand', 'brandLight', 'brandDark', 'brandSubtle', 'brandGlow',
+    'borderGlow', 'aurora1', 'aurora2',
+  ]
+
+  const themeStyle = useMemo(() => {
+    if (!themeTokens || brandColor === '#6366f1') return undefined
+    const style: Record<string, string> = {}
+    for (const key of BRAND_ONLY_KEYS) {
+      const cssVar = TOKEN_TO_CSS[key]
+      const value = themeTokens[key]
+      if (cssVar && value) style[cssVar] = value
+    }
+    return style as React.CSSProperties
+  }, [themeTokens, brandColor])
 
   // Scroll reveal — JS fallback
   useEffect(() => {
@@ -987,7 +1055,7 @@ export default function LogViewerPage() {
   }, [])
 
   return (
-    <div className="log-viewer-page" ref={pageRef}>
+    <div className="log-viewer-page" ref={pageRef} style={themeStyle}>
       {/* ── 1. Hero Header ──────────────────────────────── */}
       <div className="log-viewer-page__hero">
         <h1 className="log-viewer-page__title">LogViewer</h1>
@@ -1227,7 +1295,7 @@ export default function LogViewerPage() {
               import {'{'} LogViewer {'}'} from '@annondeveloper/ui-kit/premium'
             </div>
             <div className="log-viewer-page__tier-preview">
-              <LogViewer lines={SHORT_LINES} showLevel showTimestamp height="100px" />
+              <PremiumLogViewer lines={SHORT_LINES} showLevel showTimestamp height="100px" />
             </div>
             <div className="log-viewer-page__size-breakdown">
               <div className="log-viewer-page__size-row">
@@ -1314,6 +1382,48 @@ export default function LogViewerPage() {
             </li>
           </ul>
         </Card>
+      </section>
+
+      {/* ��─ Brand Color ───────────���───────────────────── */}
+      <section className="log-viewer-page__section" id="brand-color">
+        <h2 className="log-viewer-page__section-title">
+          <a href="#brand-color">Brand Color</a>
+        </h2>
+        <p className="log-viewer-page__section-desc">
+          Pick a brand color to see the component update in real-time. The theme generates
+          derived colors (light, dark, subtle, glow) automatically from your choice.
+        </p>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+          <ColorInput
+            name="brand-color"
+            value={brandColor}
+            onChange={setBrandColor}
+            size="sm"
+            swatches={['#6366f1','#f97316','#f43f5e','#0ea5e9','#10b981','#8b5cf6','#d946ef','#f59e0b','#06b6d4','#64748b']}
+          />
+          {brandColor !== '#6366f1' && (
+            <Button size="xs" variant="ghost" onClick={() => setBrandColor('#6366f1')}>
+              <Icon name="refresh" size="sm" /> Reset to default
+            </Button>
+          )}
+        </div>
+      </section>
+
+      {/* ── Source ─────────���────────────────────────────── */}
+      <section className="log-viewer-page__section" id="source">
+        <h2 className="log-viewer-page__section-title"><a href="#source">Source</a></h2>
+        <p className="log-viewer-page__section-desc">View the full component source code on GitHub.</p>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+          <a className="log-viewer-page__source-link" href="https://github.com/annondeveloper/ui-kit/blob/main/src/domain/log-viewer.tsx" target="_blank" rel="noopener noreferrer">
+            <Icon name="code" size="sm" /> src/domain/log-viewer.tsx (Standard)
+          </a>
+          <a className="log-viewer-page__source-link" href="https://github.com/annondeveloper/ui-kit/blob/main/src/lite/log-viewer.tsx" target="_blank" rel="noopener noreferrer">
+            <Icon name="code" size="sm" /> src/lite/log-viewer.tsx (Lite)
+          </a>
+          <a className="log-viewer-page__source-link" href="https://github.com/annondeveloper/ui-kit/blob/main/src/premium/log-viewer.tsx" target="_blank" rel="noopener noreferrer">
+            <Icon name="code" size="sm" /> src/premium/log-viewer.tsx (Premium)
+          </a>
+        </div>
       </section>
     </div>
   )

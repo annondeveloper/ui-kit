@@ -4,11 +4,17 @@ import { useState, useMemo, useCallback, useRef, useEffect } from 'react'
 import { css } from '@ui/core/styles/css-tag'
 import { useStyles } from '@ui/core/styles/use-styles'
 import { WavyBackground } from '@ui/domain/wavy-background'
+import { WavyBackground as LiteWavyBackground } from '@ui/lite/wavy-background'
+import { WavyBackground as PremiumWavyBackground } from '@ui/premium/wavy-background'
 import { Button } from '@ui/components/button'
 import { Card } from '@ui/components/card'
 import { CopyBlock } from '@ui/domain/copy-block'
 import { Tabs, TabPanel } from '@ui/components/tabs'
 import { Icon } from '@ui/core/icons/icon'
+import { ColorInput } from '@ui/components/color-input'
+import { generateTheme } from '@ui/core/tokens/generator'
+import { TOKEN_TO_CSS, type ThemeTokens } from '@ui/core/tokens/tokens'
+import { useTheme } from '@ui/core/tokens/theme-context'
 import { PropsTable, type PropDef } from '../../components/PropsTable'
 import { useTier, type Tier } from '../../App'
 
@@ -556,7 +562,53 @@ const pageStyles = css`
         .wavy-page__preview { padding: 3.5rem; }
       }
 
-      /* ── Scrollbar ──────────────────────────────────── */
+      /* ── Source link ───���───────────────────────��──────── */
+
+      .wavy-page__source-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: var(--text-sm, 0.875rem);
+        color: var(--brand);
+        text-decoration: none;
+        font-weight: 500;
+      }
+      .wavy-page__source-link:hover {
+        text-decoration: underline;
+        text-underline-offset: 0.2em;
+      }
+
+      /* ── Color picker ──────────────────────────────── */
+
+      .wavy-page__color-presets {
+        display: flex;
+        gap: 0.25rem;
+        flex-wrap: wrap;
+      }
+
+      .wavy-page__color-preset {
+        inline-size: 24px;
+        block-size: 24px;
+        border-radius: 50%;
+        border: 2px solid transparent;
+        cursor: pointer;
+        padding: 0;
+        transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1),
+                    border-color 0.15s,
+                    box-shadow 0.15s;
+        box-shadow: 0 1px 3px oklch(0% 0 0 / 0.2);
+      }
+      .wavy-page__color-preset:hover {
+        transform: scale(1.2);
+        box-shadow: 0 2px 8px oklch(0% 0 0 / 0.3);
+      }
+      .wavy-page__color-preset--active {
+        border-color: oklch(100% 0 0);
+        transform: scale(1.2);
+        box-shadow: 0 0 0 2px var(--bg-base), 0 0 0 4px oklch(100% 0 0 / 0.5);
+      }
+
+      /* ── Scrollbar ──────────────────────────────���───── */
 
       .wavy-page__import-code,
       .wavy-page code,
@@ -615,6 +667,19 @@ const IMPORT_STRINGS: Record<Tier, string> = {
   standard: "import { WavyBackground } from '@annondeveloper/ui-kit'",
   premium: "import { WavyBackground } from '@annondeveloper/ui-kit/premium'",
 }
+
+const BRAND_COLOR_PRESETS = [
+  { hex: '#6366f1', name: 'Indigo' },
+  { hex: '#f97316', name: 'Orange' },
+  { hex: '#f43f5e', name: 'Rose' },
+  { hex: '#0ea5e9', name: 'Sky' },
+  { hex: '#10b981', name: 'Emerald' },
+  { hex: '#8b5cf6', name: 'Violet' },
+  { hex: '#d946ef', name: 'Fuchsia' },
+  { hex: '#f59e0b', name: 'Amber' },
+  { hex: '#06b6d4', name: 'Cyan' },
+  { hex: '#64748b', name: 'Slate' },
+]
 
 function CopyButton({ text }: { text: string }) {
   const [copied, setCopied] = useState(false)
@@ -882,22 +947,58 @@ function PlaygroundSection({ tier: tierProp }: { tier: Tier }) {
       <div className="wavy-page__playground">
         <div className="wavy-page__playground-preview">
           <div className="wavy-page__playground-result">
-            <WavyBackground
-              waveCount={waveCount}
-              speed={speed}
-              motion={motion}
-              color={color || undefined}
-              style={{ position: 'absolute', inset: 0, borderRadius: 'inherit' }}
-            >
-              <div style={{ padding: '3rem 2rem', textAlign: 'center', position: 'relative', zIndex: 1 }}>
-                <h3 style={{ fontSize: '1.25rem', fontWeight: 700, color: 'var(--text-primary)', margin: '0 0 0.5rem' }}>
-                  Wavy Background
-                </h3>
-                <p style={{ color: 'var(--text-secondary)', fontSize: '0.875rem' }}>
-                  {waveCount} waves at {speed}s speed
-                </p>
-              </div>
-            </WavyBackground>
+            {tier === 'lite' ? (
+              <LiteWavyBackground
+                waveCount={waveCount}
+                speed={speed}
+                motion={motion}
+                color={color || undefined}
+                style={{ position: 'absolute', inset: 0, borderRadius: 'inherit' }}
+              >
+                <div style={{ padding: '3rem 2rem', textAlign: 'center', position: 'relative', zIndex: 1 }}>
+                  <h3 style={{ fontSize: '1.25rem', fontWeight: 700, color: 'var(--text-primary)', margin: '0 0 0.5rem' }}>
+                    Lite Tier
+                  </h3>
+                  <p style={{ color: 'var(--text-secondary)', fontSize: '0.875rem' }}>
+                    {waveCount} waves at {speed}s speed
+                  </p>
+                </div>
+              </LiteWavyBackground>
+            ) : tier === 'premium' ? (
+              <PremiumWavyBackground
+                waveCount={waveCount}
+                speed={speed}
+                motion={motion}
+                color={color || undefined}
+                style={{ position: 'absolute', inset: 0, borderRadius: 'inherit' }}
+              >
+                <div style={{ padding: '3rem 2rem', textAlign: 'center', position: 'relative', zIndex: 1 }}>
+                  <h3 style={{ fontSize: '1.25rem', fontWeight: 700, color: 'var(--text-primary)', margin: '0 0 0.5rem' }}>
+                    Premium Tier
+                  </h3>
+                  <p style={{ color: 'var(--text-secondary)', fontSize: '0.875rem' }}>
+                    {waveCount} waves at {speed}s speed
+                  </p>
+                </div>
+              </PremiumWavyBackground>
+            ) : (
+              <WavyBackground
+                waveCount={waveCount}
+                speed={speed}
+                motion={motion}
+                color={color || undefined}
+                style={{ position: 'absolute', inset: 0, borderRadius: 'inherit' }}
+              >
+                <div style={{ padding: '3rem 2rem', textAlign: 'center', position: 'relative', zIndex: 1 }}>
+                  <h3 style={{ fontSize: '1.25rem', fontWeight: 700, color: 'var(--text-primary)', margin: '0 0 0.5rem' }}>
+                    Wavy Background
+                  </h3>
+                  <p style={{ color: 'var(--text-secondary)', fontSize: '0.875rem' }}>
+                    {waveCount} waves at {speed}s speed
+                  </p>
+                </div>
+              </WavyBackground>
+            )}
           </div>
 
           <div className="wavy-page__code-tabs">
@@ -1005,6 +1106,32 @@ export default function WavyBackgroundPage() {
   useStyles('wavy-page', pageStyles)
 
   const { tier, setTier } = useTier()
+  const [brandColor, setBrandColor] = useState('#6366f1')
+  const { mode } = useTheme()
+
+  const BRAND_ONLY_KEYS: (keyof ThemeTokens)[] = [
+    'brand', 'brandLight', 'brandDark', 'brandSubtle', 'brandGlow',
+    'borderGlow', 'aurora1', 'aurora2',
+  ]
+
+  const themeTokens = useMemo(() => {
+    try {
+      return generateTheme(brandColor, mode)
+    } catch {
+      return null
+    }
+  }, [brandColor, mode])
+
+  const themeStyle = useMemo(() => {
+    if (!themeTokens || brandColor === '#6366f1') return undefined
+    const style: Record<string, string> = {}
+    for (const key of BRAND_ONLY_KEYS) {
+      const cssVar = TOKEN_TO_CSS[key]
+      const value = themeTokens[key]
+      if (cssVar && value) style[cssVar] = value
+    }
+    return style as React.CSSProperties
+  }, [themeTokens, brandColor])
 
   // Scroll reveal JS fallback
   useEffect(() => {
@@ -1038,7 +1165,7 @@ export default function WavyBackgroundPage() {
   }, [])
 
   return (
-    <div className="wavy-page">
+    <div className="wavy-page" style={themeStyle}>
       {/* ── 1. Hero Header ──────────────────────────────── */}
       <div className="wavy-page__hero">
         <h1 className="wavy-page__title">WavyBackground</h1>
@@ -1257,7 +1384,7 @@ export default function WavyBackgroundPage() {
                 background: 'var(--bg-base)',
                 position: 'relative',
               }}>
-                <WavyBackground waveCount={3} speed={10} motion={2} />
+                <LiteWavyBackground waveCount={3} speed={10} motion={2} />
               </div>
             </div>
             <div className="wavy-page__size-breakdown">
@@ -1328,7 +1455,7 @@ export default function WavyBackgroundPage() {
               depth-of-field blur on distant waves, and entrance stagger animation.
             </p>
             <div className="wavy-page__tier-import">
-              import {'{'} WavyBackground {'}'} from '@annondeveloper/ui-kit'
+              import {'{'} WavyBackground {'}'} from '@annondeveloper/ui-kit/premium'
             </div>
             <div className="wavy-page__tier-preview">
               <div style={{
@@ -1339,7 +1466,7 @@ export default function WavyBackgroundPage() {
                 background: 'var(--bg-base)',
                 position: 'relative',
               }}>
-                <WavyBackground waveCount={7} speed={8} motion={3} color="oklch(65% 0.15 210)" />
+                <PremiumWavyBackground waveCount={7} speed={8} motion={3} color="oklch(65% 0.15 210)" />
               </div>
             </div>
             <div className="wavy-page__size-breakdown">
@@ -1421,6 +1548,61 @@ export default function WavyBackgroundPage() {
             </li>
           </ul>
         </Card>
+      </section>
+
+      {/* ── 11. Brand Color ───────────────────────────────── */}
+      <section className="wavy-page__section" id="brand-color">
+        <h2 className="wavy-page__section-title">
+          <a href="#brand-color">Brand Color</a>
+        </h2>
+        <p className="wavy-page__section-desc">
+          Pick a brand color to see the page theme update in real-time. The aurora
+          gradients and accent colors derive automatically from your choice.
+        </p>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+          <ColorInput
+            name="brand-color"
+            value={brandColor}
+            onChange={setBrandColor}
+            size="sm"
+            swatches={['#6366f1','#f97316','#f43f5e','#0ea5e9','#10b981','#8b5cf6','#d946ef','#f59e0b','#06b6d4','#64748b']}
+          />
+          <div className="wavy-page__color-presets">
+            {BRAND_COLOR_PRESETS.map(p => (
+              <button
+                key={p.hex}
+                type="button"
+                className={`wavy-page__color-preset${brandColor === p.hex ? ' wavy-page__color-preset--active' : ''}`}
+                style={{ background: p.hex }}
+                onClick={() => setBrandColor(p.hex)}
+                title={p.name}
+                aria-label={`Set brand color to ${p.name}`}
+              />
+            ))}
+          </div>
+          {brandColor !== '#6366f1' && (
+            <Button size="xs" variant="ghost" onClick={() => setBrandColor('#6366f1')}>
+              <Icon name="refresh" size="sm" /> Reset to default
+            </Button>
+          )}
+        </div>
+      </section>
+
+      {/* ── 12. Source ──────────────────────────────────────── */}
+      <section className="wavy-page__section" id="source">
+        <h2 className="wavy-page__section-title"><a href="#source">Source</a></h2>
+        <p className="wavy-page__section-desc">View the full component source code on GitHub.</p>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+          <a className="wavy-page__source-link" href="https://github.com/annondeveloper/ui-kit/blob/main/src/domain/wavy-background.tsx" target="_blank" rel="noopener noreferrer">
+            <Icon name="code" size="sm" /> src/domain/wavy-background.tsx (Standard)
+          </a>
+          <a className="wavy-page__source-link" href="https://github.com/annondeveloper/ui-kit/blob/main/src/lite/wavy-background.tsx" target="_blank" rel="noopener noreferrer">
+            <Icon name="code" size="sm" /> src/lite/wavy-background.tsx (Lite)
+          </a>
+          <a className="wavy-page__source-link" href="https://github.com/annondeveloper/ui-kit/blob/main/src/premium/wavy-background.tsx" target="_blank" rel="noopener noreferrer">
+            <Icon name="code" size="sm" /> src/premium/wavy-background.tsx (Premium)
+          </a>
+        </div>
       </section>
     </div>
   )

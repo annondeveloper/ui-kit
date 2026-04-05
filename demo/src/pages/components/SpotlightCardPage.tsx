@@ -4,6 +4,8 @@ import { useState, useMemo, useCallback, useRef, useEffect } from 'react'
 import { css } from '@ui/core/styles/css-tag'
 import { useStyles } from '@ui/core/styles/use-styles'
 import { SpotlightCard } from '@ui/domain/spotlight-card'
+import { SpotlightCard as LiteSpotlightCard } from '@ui/lite/spotlight-card'
+import { SpotlightCard as PremiumSpotlightCard } from '@ui/premium/spotlight-card'
 import { Button } from '@ui/components/button'
 import { Card } from '@ui/components/card'
 import { CopyBlock } from '@ui/domain/copy-block'
@@ -661,6 +663,22 @@ const pageStyles = css`
       :scope ::-webkit-scrollbar-thumb:hover {
         background: var(--border-strong);
       }
+
+      /* ── Source link ─────────────────────────────────── */
+
+      .spotlight-card-page__source-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: var(--text-sm, 0.875rem);
+        color: var(--brand);
+        text-decoration: none;
+        font-weight: 500;
+      }
+      .spotlight-card-page__source-link:hover {
+        text-decoration: underline;
+        text-underline-offset: 0.2em;
+      }
     }
   }
 `
@@ -895,6 +913,8 @@ function PlaygroundSection({ tier: tierProp, brandColor }: { tier: Tier; brandCo
 
   const [activeCodeTab, setActiveCodeTab] = useState('react')
 
+  const SpotlightCardComponent = tier === 'lite' ? LiteSpotlightCard : tier === 'premium' ? PremiumSpotlightCard : SpotlightCard
+
   const codeTabs = [
     { id: 'react', label: 'React' },
     { id: 'html', label: 'HTML+CSS' },
@@ -926,7 +946,7 @@ function PlaygroundSection({ tier: tierProp, brandColor }: { tier: Tier; brandCo
       <div className="spotlight-card-page__playground">
         <div className="spotlight-card-page__playground-preview">
           <div className="spotlight-card-page__playground-result">
-            <SpotlightCard
+            <SpotlightCardComponent
               spotlightColor={spotlightColor}
               motion={motion}
               style={{ maxInlineSize: '340px', inlineSize: '100%' }}
@@ -935,7 +955,7 @@ function PlaygroundSection({ tier: tierProp, brandColor }: { tier: Tier; brandCo
                 <h3>Interactive Card</h3>
                 <p>Move your cursor over this card to see the wide spotlight beam illuminate the surface beneath your pointer.</p>
               </div>
-            </SpotlightCard>
+            </SpotlightCardComponent>
           </div>
 
           <div className="spotlight-card-page__code-tabs">
@@ -1266,12 +1286,12 @@ export default function SpotlightCardPage() {
               import {'{'} SpotlightCard {'}'} from '@annondeveloper/ui-kit/lite'
             </div>
             <div className="spotlight-card-page__tier-preview">
-              <SpotlightCard motion={0} style={{ inlineSize: '140px' }}>
+              <LiteSpotlightCard style={{ inlineSize: '140px' }}>
                 <div className="spotlight-card-page__demo-content">
                   <h3 style={{ fontSize: '0.75rem' }}>Lite</h3>
                   <p style={{ fontSize: '0.625rem' }}>Static hover</p>
                 </div>
-              </SpotlightCard>
+              </LiteSpotlightCard>
             </div>
             <div className="spotlight-card-page__size-breakdown">
               <div className="spotlight-card-page__size-row">
@@ -1338,12 +1358,12 @@ export default function SpotlightCardPage() {
               import {'{'} SpotlightCard {'}'} from '@annondeveloper/ui-kit/premium'
             </div>
             <div className="spotlight-card-page__tier-preview">
-              <SpotlightCard spotlightColor="oklch(75% 0.15 270 / 0.25)" style={{ inlineSize: '140px' }}>
+              <PremiumSpotlightCard spotlightColor="oklch(75% 0.15 270 / 0.25)" style={{ inlineSize: '140px' }}>
                 <div className="spotlight-card-page__demo-content">
                   <h3 style={{ fontSize: '0.75rem' }}>Premium</h3>
                   <p style={{ fontSize: '0.625rem' }}>Multi-layer</p>
                 </div>
-              </SpotlightCard>
+              </PremiumSpotlightCard>
             </div>
             <div className="spotlight-card-page__size-breakdown">
               <div className="spotlight-card-page__size-row">
@@ -1462,6 +1482,23 @@ export default function SpotlightCardPage() {
             </li>
           </ul>
         </Card>
+      </section>
+
+      {/* ── Source ──────────────────────────────────────── */}
+      <section className="spotlight-card-page__section" id="source">
+        <h2 className="spotlight-card-page__section-title"><a href="#source">Source</a></h2>
+        <p className="spotlight-card-page__section-desc">View the full component source code on GitHub.</p>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+          <a className="spotlight-card-page__source-link" href="https://github.com/annondeveloper/ui-kit/blob/main/src/domain/spotlight-card.tsx" target="_blank" rel="noopener noreferrer">
+            <Icon name="code" size="sm" /> src/domain/spotlight-card.tsx (Standard)
+          </a>
+          <a className="spotlight-card-page__source-link" href="https://github.com/annondeveloper/ui-kit/blob/main/src/lite/spotlight-card.tsx" target="_blank" rel="noopener noreferrer">
+            <Icon name="code" size="sm" /> src/lite/spotlight-card.tsx (Lite)
+          </a>
+          <a className="spotlight-card-page__source-link" href="https://github.com/annondeveloper/ui-kit/blob/main/src/premium/spotlight-card.tsx" target="_blank" rel="noopener noreferrer">
+            <Icon name="code" size="sm" /> src/premium/spotlight-card.tsx (Premium)
+          </a>
+        </div>
       </section>
     </div>
   )

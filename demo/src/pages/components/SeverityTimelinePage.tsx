@@ -5,11 +5,16 @@ import { css } from '@ui/core/styles/css-tag'
 import { useStyles } from '@ui/core/styles/use-styles'
 import { SeverityTimeline, type TimelineEvent } from '@ui/domain/severity-timeline'
 import { SeverityTimeline as LiteSeverityTimeline } from '@ui/lite/severity-timeline'
+import { SeverityTimeline as PremiumSeverityTimeline } from '@ui/premium/severity-timeline'
 import { Button } from '@ui/components/button'
 import { Card } from '@ui/components/card'
 import { CopyBlock } from '@ui/domain/copy-block'
 import { Tabs, TabPanel } from '@ui/components/tabs'
 import { Icon } from '@ui/core/icons/icon'
+import { generateTheme } from '@ui/core/tokens/generator'
+import { TOKEN_TO_CSS, type ThemeTokens } from '@ui/core/tokens/tokens'
+import { useTheme } from '@ui/core/tokens/theme-context'
+import { ColorInput } from '@ui/components/color-input'
 import { PropsTable, type PropDef } from '../../components/PropsTable'
 import { useTier, type Tier } from '../../App'
 
@@ -607,6 +612,19 @@ const IMPORT_STRINGS: Record<Tier, string> = {
   premium: "import { SeverityTimeline } from '@annondeveloper/ui-kit/premium'",
 }
 
+const COLOR_PRESETS = [
+  { hex: '#6366f1', name: 'Indigo' },
+  { hex: '#f97316', name: 'Orange' },
+  { hex: '#f43f5e', name: 'Rose' },
+  { hex: '#0ea5e9', name: 'Sky' },
+  { hex: '#10b981', name: 'Emerald' },
+  { hex: '#8b5cf6', name: 'Violet' },
+  { hex: '#d946ef', name: 'Fuchsia' },
+  { hex: '#f59e0b', name: 'Amber' },
+  { hex: '#06b6d4', name: 'Cyan' },
+  { hex: '#64748b', name: 'Slate' },
+]
+
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
 function CopyButton({ text }: { text: string }) {
@@ -922,6 +940,15 @@ function PlaygroundSection({ tier }: { tier: Tier }) {
                 events={LITE_EVENTS}
                 style={{ width: '100%', position: 'relative', zIndex: 1 }}
               />
+            ) : tier === 'premium' ? (
+              <PremiumSeverityTimeline
+                events={SAMPLE_EVENTS}
+                orientation={orientation}
+                expandable={expandable}
+                maxVisible={effectiveMaxVisible}
+                motion={motion}
+                style={{ width: '100%', position: 'relative', zIndex: 1 }}
+              />
             ) : (
               <SeverityTimeline
                 events={SAMPLE_EVENTS}
@@ -1020,6 +1047,28 @@ export default function SeverityTimelinePage() {
   useStyles('stl-page', pageStyles)
 
   const { tier, setTier } = useTier()
+  const [brandColor, setBrandColor] = useState('#6366f1')
+  const { mode } = useTheme()
+
+  const BRAND_ONLY_KEYS: (keyof ThemeTokens)[] = [
+    'brand', 'brandLight', 'brandDark', 'brandSubtle', 'brandGlow',
+    'borderGlow', 'aurora1', 'aurora2',
+  ]
+
+  const themeTokens = useMemo(() => {
+    try { return generateTheme(brandColor, mode) } catch { return null }
+  }, [brandColor, mode])
+
+  const themeStyle = useMemo(() => {
+    if (!themeTokens || brandColor === '#6366f1') return undefined
+    const style: Record<string, string> = {}
+    for (const key of BRAND_ONLY_KEYS) {
+      const cssVar = TOKEN_TO_CSS[key]
+      const value = themeTokens[key]
+      if (cssVar && value) style[cssVar] = value
+    }
+    return style as React.CSSProperties
+  }, [themeTokens, brandColor])
 
   // Scroll reveal fallback
   useEffect(() => {
@@ -1053,7 +1102,7 @@ export default function SeverityTimelinePage() {
   }, [])
 
   return (
-    <div className="stl-page">
+    <div className="stl-page" style={themeStyle}>
       {/* ── 1. Hero Header ──────────────────────────────── */}
       <div className="stl-page__hero">
         <h1 className="stl-page__title">SeverityTimeline</h1>
@@ -1288,7 +1337,7 @@ export default function SeverityTimelinePage() {
               import {'{'} SeverityTimeline {'}'} from '@annondeveloper/ui-kit/premium'
             </div>
             <div className="stl-page__tier-preview">
-              <SeverityTimeline
+              <PremiumSeverityTimeline
                 events={SEVERITY_EVENTS.slice(0, 2)}
                 motion={3}
               />
@@ -1385,6 +1434,60 @@ export default function SeverityTimelinePage() {
             </li>
           </ul>
         </Card>
+      </section>
+
+      {/* ── Brand Color ───────────────────────────────── */}
+      <section className="stl-page__section" id="brand-color">
+        <h2 className="stl-page__section-title">
+          <a href="#brand-color">Brand Color</a>
+        </h2>
+        <p className="stl-page__section-desc">
+          Pick a brand color to see the page accents update in real-time.
+        </p>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+          <ColorInput
+            name="brand-color"
+            value={brandColor}
+            onChange={setBrandColor}
+            size="sm"
+            swatches={COLOR_PRESETS.map(p => p.hex)}
+          />
+          <div className="stl-page__color-presets">
+            {COLOR_PRESETS.map(p => (
+              <button
+                key={p.hex}
+                type="button"
+                className={`stl-page__color-preset${brandColor === p.hex ? ' stl-page__color-preset--active' : ''}`}
+                style={{ background: p.hex }}
+                onClick={() => setBrandColor(p.hex)}
+                title={p.name}
+                aria-label={`Set brand color to ${p.name}`}
+              />
+            ))}
+          </div>
+          {brandColor !== '#6366f1' && (
+            <Button size="xs" variant="ghost" onClick={() => setBrandColor('#6366f1')}>
+              <Icon name="refresh" size="sm" /> Reset to default
+            </Button>
+          )}
+        </div>
+      </section>
+
+      {/* ── Source ─────────────────────────────────────── */}
+      <section className="stl-page__section" id="source">
+        <h2 className="stl-page__section-title"><a href="#source">Source</a></h2>
+        <p className="stl-page__section-desc">View the full component source code on GitHub.</p>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+          <a className="stl-page__source-link" href="https://github.com/annondeveloper/ui-kit/blob/main/src/domain/severity-timeline.tsx" target="_blank" rel="noopener noreferrer">
+            src/domain/severity-timeline.tsx (Standard)
+          </a>
+          <a className="stl-page__source-link" href="https://github.com/annondeveloper/ui-kit/blob/main/src/lite/severity-timeline.tsx" target="_blank" rel="noopener noreferrer">
+            src/lite/severity-timeline.tsx (Lite)
+          </a>
+          <a className="stl-page__source-link" href="https://github.com/annondeveloper/ui-kit/blob/main/src/premium/severity-timeline.tsx" target="_blank" rel="noopener noreferrer">
+            src/premium/severity-timeline.tsx (Premium)
+          </a>
+        </div>
       </section>
     </div>
   )

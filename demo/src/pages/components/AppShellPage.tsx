@@ -5,6 +5,7 @@ import { css } from '@ui/core/styles/css-tag'
 import { useStyles } from '@ui/core/styles/use-styles'
 import { AppShell } from '@ui/components/app-shell'
 import { AppShell as LiteAppShell } from '@ui/lite/app-shell'
+import { AppShell as PremiumAppShell } from '@ui/premium/app-shell'
 import { Button } from '@ui/components/button'
 import { Card } from '@ui/components/card'
 import { CopyBlock } from '@ui/domain/copy-block'
@@ -575,6 +576,22 @@ const pageStyles = css`
         gap: 0.5rem;
       }
 
+      /* ── Source link ──────────────────────────────── */
+
+      .app-shell-page__source-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: var(--text-sm, 0.875rem);
+        color: var(--brand);
+        text-decoration: none;
+        font-weight: 500;
+      }
+      .app-shell-page__source-link:hover {
+        text-decoration: underline;
+        text-underline-offset: 0.2em;
+      }
+
       /* ── Responsive ──────────────────────────────── */
 
       @media (max-width: 768px) {
@@ -900,6 +917,7 @@ function PlaygroundSection({ tier: tierProp }: { tier: Tier }) {
   const [showFooter, setShowFooter] = useState(true)
   const [sidebarPosition, setSidebarPosition] = useState<SidebarPos>('left')
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
+  const [motion, setMotion] = useState<0 | 1 | 2 | 3>(3)
   const [copyStatus, setCopyStatus] = useState('')
   const [activeCodeTab, setActiveCodeTab] = useState('react')
 
@@ -1013,6 +1031,15 @@ function PlaygroundSection({ tier: tierProp }: { tier: Tier }) {
             value={sidebarPosition}
             onChange={setSidebarPosition}
           />
+
+          {tier !== 'lite' && (
+            <OptionGroup
+              label="Motion Level"
+              options={['0', '1', '2', '3'] as const}
+              value={String(motion) as '0' | '1' | '2' | '3'}
+              onChange={v => setMotion(Number(v) as 0 | 1 | 2 | 3)}
+            />
+          )}
 
           <div className="app-shell-page__control-group">
             <span className="app-shell-page__control-label">Slots</span>
@@ -1181,7 +1208,7 @@ export default function AppShellPage() {
         </h2>
         <p className="app-shell-page__section-desc">
           A live instance of the actual AppShell component rendered in a constrained container.
-          This uses the {tier === 'lite' ? 'Lite' : 'Standard'} tier component.
+          This uses the {tier === 'lite' ? 'Lite' : tier === 'premium' ? 'Premium' : 'Standard'} tier component.
         </p>
         <div className="app-shell-page__preview" style={{ padding: 0, overflow: 'hidden' }}>
           {tier === 'lite' ? (
@@ -1210,6 +1237,46 @@ export default function AppShellPage() {
                 <div style={{ color: 'var(--text-secondary)' }}>Lite tier: minimal CSS-only layout, no JS interactivity.</div>
               </div>
             </LiteAppShell>
+          ) : tier === 'premium' ? (
+            <PremiumAppShell
+              navbar={
+                <nav style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.5rem 0.75rem', background: 'var(--bg-elevated)', borderBlockEnd: '1px solid var(--border-subtle)' }}>
+                  <Icon name="zap" size={14} />
+                  <span style={{ fontWeight: 600, fontSize: '0.8125rem' }}>Premium Shell</span>
+                </nav>
+              }
+              sidebar={
+                <aside style={{ inlineSize: '120px', padding: '0.5rem', background: 'var(--bg-surface)', borderInlineEnd: '1px solid var(--border-subtle)', fontSize: '0.6875rem' }}>
+                  <div style={{ padding: '0.25rem 0.5rem', background: 'var(--brand-subtle)', borderRadius: 'var(--radius-sm)', color: 'var(--brand)', fontWeight: 600, marginBlockEnd: '0.25rem' }}>Dashboard</div>
+                  <div style={{ padding: '0.25rem 0.5rem', color: 'var(--text-secondary)' }}>Analytics</div>
+                  <div style={{ padding: '0.25rem 0.5rem', color: 'var(--text-secondary)' }}>Settings</div>
+                </aside>
+              }
+              footer={
+                <footer style={{ padding: '0.375rem 0.75rem', background: 'var(--bg-elevated)', borderBlockStart: '1px solid var(--border-subtle)', fontSize: '0.5625rem', color: 'var(--text-tertiary)', textAlign: 'center' }}>
+                  Premium tier footer &mdash; aurora glow + spring animations
+                </footer>
+              }
+              sidebarPosition="left"
+              style={{ minBlockSize: '220px' }}
+            >
+              <div style={{ padding: '1rem', fontSize: '0.8125rem' }}>
+                <div style={{ fontWeight: 600, marginBlockEnd: '0.5rem', color: 'var(--text-primary)' }}>Main Content</div>
+                <div style={{ color: 'var(--text-secondary)', marginBlockEnd: '0.75rem' }}>
+                  Premium tier: glass morphism, aurora glow effects, spring sidebar collapse.
+                </div>
+                <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+                  <Card variant="default" padding="sm" style={{ flex: '1 1 120px', fontSize: '0.6875rem' }}>
+                    <div style={{ fontWeight: 600 }}>Users</div>
+                    <div style={{ color: 'var(--text-tertiary)' }}>1,234</div>
+                  </Card>
+                  <Card variant="default" padding="sm" style={{ flex: '1 1 120px', fontSize: '0.6875rem' }}>
+                    <div style={{ fontWeight: 600 }}>Revenue</div>
+                    <div style={{ color: 'var(--text-tertiary)' }}>$42.5K</div>
+                  </Card>
+                </div>
+              </div>
+            </PremiumAppShell>
           ) : (
             <AppShell
               navbar={
@@ -1425,6 +1492,23 @@ export default function AppShellPage() {
             </li>
           </ul>
         </Card>
+      </section>
+
+      {/* ── Source ──────────────────────────────────────── */}
+      <section className="app-shell-page__section" id="source">
+        <h2 className="app-shell-page__section-title"><a href="#source">Source</a></h2>
+        <p className="app-shell-page__section-desc">View the full component source code on GitHub.</p>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+          <a className="app-shell-page__source-link" href="https://github.com/annondeveloper/ui-kit/blob/main/src/components/app-shell.tsx" target="_blank" rel="noopener noreferrer">
+            <Icon name="code" size="sm" /> src/components/app-shell.tsx (Standard)
+          </a>
+          <a className="app-shell-page__source-link" href="https://github.com/annondeveloper/ui-kit/blob/main/src/lite/app-shell.tsx" target="_blank" rel="noopener noreferrer">
+            <Icon name="code" size="sm" /> src/lite/app-shell.tsx (Lite)
+          </a>
+          <a className="app-shell-page__source-link" href="https://github.com/annondeveloper/ui-kit/blob/main/src/premium/app-shell.tsx" target="_blank" rel="noopener noreferrer">
+            <Icon name="code" size="sm" /> src/premium/app-shell.tsx (Premium)
+          </a>
+        </div>
       </section>
     </div>
   )

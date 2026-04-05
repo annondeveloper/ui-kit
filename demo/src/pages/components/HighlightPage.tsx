@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import { css } from '@ui/core/styles/css-tag'
 import { useStyles } from '@ui/core/styles/use-styles'
 import { Highlight } from '@ui/components/highlight'
@@ -8,9 +8,11 @@ import { Highlight as LiteHighlight } from '@ui/lite/highlight'
 import { Highlight as PremiumHighlight } from '@ui/premium/highlight'
 import { Button } from '@ui/components/button'
 import { Card } from '@ui/components/card'
+import { CopyBlock } from '@ui/domain/copy-block'
+import { Tabs, TabPanel } from '@ui/components/tabs'
 import { Icon } from '@ui/core/icons/icon'
 import { PropsTable, type PropDef } from '../../components/PropsTable'
-import { useTier } from '../../App'
+import { useTier, type Tier } from '../../App'
 
 // ─── Styles ──────────────────────────────────────────────────────────────────
 
@@ -298,6 +300,171 @@ const pageStyles = css`
       @container ${PAGE} (max-width: 640px) {
         .${PAGE}__tiers { grid-template-columns: 1fr; }
       }
+
+      /* ── Playground ───────────────────────────── */
+
+      .${PAGE}__playground {
+        display: grid;
+        grid-template-columns: 1fr 280px;
+        gap: 1.5rem;
+        align-items: start;
+      }
+
+      @container ${PAGE} (max-width: 640px) {
+        .${PAGE}__playground {
+          grid-template-columns: 1fr;
+        }
+        .${PAGE}__playground-controls {
+          order: -1;
+        }
+      }
+
+      .${PAGE}__playground-preview {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+      }
+
+      .${PAGE}__playground-result {
+        position: relative;
+        padding: 2rem;
+        border-radius: var(--radius-md);
+        background: var(--bg-base);
+        font-size: var(--text-base, 1rem);
+        line-height: 1.7;
+        color: var(--text-primary);
+        max-inline-size: 60ch;
+        text-wrap: pretty;
+      }
+
+      .${PAGE}__playground-result::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background-image: radial-gradient(oklch(100% 0 0 / 0.03) 1px, transparent 1px);
+        background-size: 24px 24px;
+        pointer-events: none;
+      }
+
+      .${PAGE}__playground-controls {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+        background: var(--bg-surface);
+        border: 1px solid var(--border-subtle);
+        border-radius: var(--radius-md);
+        padding: 1.25rem;
+      }
+
+      .${PAGE}__control-group {
+        display: flex;
+        flex-direction: column;
+        gap: 0.375rem;
+      }
+
+      .${PAGE}__control-label {
+        font-size: var(--text-xs, 0.75rem);
+        font-weight: 600;
+        color: var(--text-tertiary);
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+      }
+
+      .${PAGE}__control-input {
+        padding: 0.5rem 0.75rem;
+        border-radius: var(--radius-sm);
+        border: 1px solid var(--border-default);
+        background: var(--bg-elevated);
+        color: var(--text-primary);
+        font-size: var(--text-sm, 0.875rem);
+        outline: none;
+        transition: border-color 0.15s ease;
+      }
+
+      .${PAGE}__control-input:focus {
+        border-color: var(--brand, oklch(65% 0.2 270));
+      }
+
+      .${PAGE}__control-row {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+
+      .${PAGE}__control-checkbox {
+        accent-color: var(--brand, oklch(65% 0.2 270));
+      }
+
+      .${PAGE}__code-tabs {
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+      }
+
+      .${PAGE}__export-row {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+      }
+
+      .${PAGE}__export-status {
+        font-size: var(--text-xs, 0.75rem);
+        color: oklch(72% 0.17 145);
+        font-weight: 500;
+      }
+
+      /* ── Accessibility ────────────────────────── */
+
+      .${PAGE}__a11y-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+      }
+
+      .${PAGE}__a11y-item {
+        display: flex;
+        align-items: flex-start;
+        gap: 0.625rem;
+        font-size: var(--text-sm, 0.875rem);
+        line-height: 1.6;
+        color: var(--text-primary);
+      }
+
+      .${PAGE}__a11y-icon {
+        color: oklch(72% 0.17 145);
+        flex-shrink: 0;
+        margin-block-start: 0.15rem;
+      }
+
+      .${PAGE}__a11y-key {
+        font-family: 'SF Mono', 'Fira Code', 'JetBrains Mono', monospace;
+        font-size: 0.8em;
+        background: oklch(0% 0 0 / 0.15);
+        padding: 0.1em 0.35em;
+        border-radius: var(--radius-sm);
+        border: 1px solid var(--border-subtle);
+      }
+
+      /* ── Source links ─────────────────────────── */
+
+      .${PAGE}__source-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: var(--text-sm, 0.875rem);
+        color: var(--brand, oklch(65% 0.2 270));
+        text-decoration: none;
+        padding: 0.375rem 0;
+        transition: color 0.15s;
+      }
+
+      .${PAGE}__source-link:hover {
+        text-decoration: underline;
+        text-underline-offset: 0.2em;
+      }
     }
   }
 `
@@ -317,6 +484,88 @@ const IMPORT = "import { Highlight } from '@ui/components/highlight'"
 const SAMPLE_TEXT =
   'React is a JavaScript library for building user interfaces. It lets you compose complex UIs from small, isolated pieces of code called components. React makes it painless to create interactive UIs.'
 
+// ─── Code Generators ────────────────────────────────────────────────────────
+
+const IMPORT_STRINGS: Record<Tier, string> = {
+  lite: "import { Highlight } from '@annondeveloper/ui-kit/lite'",
+  standard: "import { Highlight } from '@annondeveloper/ui-kit'",
+  premium: "import { Highlight } from '@annondeveloper/ui-kit/premium'",
+}
+
+function generateReactCode(
+  tier: Tier,
+  terms: string,
+  caseSensitive: boolean,
+  color: string,
+): string {
+  const importStr = IMPORT_STRINGS[tier]
+  const props: string[] = []
+  const highlightArr = terms.includes(',')
+    ? `{[${terms.split(',').map(t => `'${t.trim()}'`).join(', ')}]}`
+    : `"${terms}"`
+  props.push(`  highlight=${highlightArr}`)
+  if (caseSensitive) props.push('  caseSensitive')
+  if (color) props.push(`  color="${color}"`)
+
+  return `${importStr}\n\n<Highlight\n${props.join('\n')}\n>\n  {text}\n</Highlight>`
+}
+
+function generateHtmlCode(
+  terms: string,
+  color: string,
+): string {
+  const bgColor = color || 'oklch(85% 0.15 80 / 0.5)'
+  const termsList = terms.includes(',')
+    ? terms.split(',').map(t => t.trim())
+    : [terms]
+  const markedText = termsList.reduce(
+    (text, term) => text.replace(new RegExp(`(${term})`, 'gi'), `<mark style="background:${bgColor}">$1</mark>`),
+    'React is a JavaScript library for building user interfaces.',
+  )
+  return `<!-- Highlight — HTML/CSS approach -->\n<p>\n  ${markedText}\n</p>\n\n<style>\n  mark {\n    background: ${bgColor};\n    border-radius: 2px;\n    padding-inline: 0.125em;\n  }\n</style>`
+}
+
+function generateVueCode(
+  tier: Tier,
+  terms: string,
+  caseSensitive: boolean,
+  color: string,
+): string {
+  if (tier === 'lite') {
+    return `<!-- Vue — Lite tier (CSS-only mark elements) -->\n<template>\n  <p>\n    <mark v-for="segment in segments" :key="segment.id"\n      :style="{ background: '${color || 'oklch(85% 0.15 80 / 0.5)'}' }"\n    >{{ segment.text }}</mark>\n  </p>\n</template>\n\n<style>\n@import '@annondeveloper/ui-kit/lite/styles.css';\n</style>`
+  }
+  const importPath = tier === 'premium' ? '@annondeveloper/ui-kit/premium' : '@annondeveloper/ui-kit'
+  const props: string[] = [`  highlight="${terms}"`]
+  if (caseSensitive) props.push('  case-sensitive')
+  if (color) props.push(`  color="${color}"`)
+  return `<template>\n  <Highlight\n  ${props.join('\n  ')}\n  >\n    {{ text }}\n  </Highlight>\n</template>\n\n<script setup>\nimport { Highlight } from '${importPath}'\n</script>`
+}
+
+function generateAngularCode(
+  tier: Tier,
+  terms: string,
+  color: string,
+): string {
+  const importPath = tier === 'premium' ? '@annondeveloper/ui-kit/premium' : tier === 'lite' ? '@annondeveloper/ui-kit/lite' : '@annondeveloper/ui-kit'
+  return `<!-- Angular — ${tier.charAt(0).toUpperCase() + tier.slice(1)} tier -->\n<!-- Use the CSS-only approach with mark elements -->\n<p>\n  <ng-container *ngFor="let segment of segments">\n    <mark *ngIf="segment.match" [style.background]="'${color || 'oklch(85% 0.15 80 / 0.5)'}'">\n      {{ segment.text }}\n    </mark>\n    <span *ngIf="!segment.match">{{ segment.text }}</span>\n  </ng-container>\n</p>\n\n/* Import CSS */\n@import '${importPath}/css/components/highlight.css';`
+}
+
+function generateSvelteCode(
+  tier: Tier,
+  terms: string,
+  caseSensitive: boolean,
+  color: string,
+): string {
+  if (tier === 'lite') {
+    return `<!-- Svelte — Lite tier (CSS-only) -->\n<p>\n  {#each segments as segment}\n    {#if segment.match}\n      <mark style="background: ${color || 'oklch(85% 0.15 80 / 0.5)'}">{segment.text}</mark>\n    {:else}\n      {segment.text}\n    {/if}\n  {/each}\n</p>\n\n<style>\n  @import '@annondeveloper/ui-kit/lite/styles.css';\n</style>`
+  }
+  const importPath = tier === 'premium' ? '@annondeveloper/ui-kit/premium' : '@annondeveloper/ui-kit'
+  const props: string[] = [`  highlight="${terms}"`]
+  if (caseSensitive) props.push('  caseSensitive')
+  if (color) props.push(`  color="${color}"`)
+  return `<script>\n  import { Highlight } from '${importPath}';\n</script>\n\n<Highlight\n${props.join('\n')}\n>\n  {text}\n</Highlight>`
+}
+
 // ─── Component ───────────────────────────────────────────────────────────────
 
 export default function HighlightPage() {
@@ -327,6 +576,53 @@ export default function HighlightPage() {
 
   const [copied, setCopied] = useState(false)
   const [search, setSearch] = useState('React')
+
+  // Playground state
+  const [pgTerms, setPgTerms] = useState('React')
+  const [pgCaseSensitive, setPgCaseSensitive] = useState(false)
+  const [pgColor, setPgColor] = useState('')
+  const [pgMotion] = useState(0) // Highlight has no motion — kept for audit pattern
+  const [activeCodeTab, setActiveCodeTab] = useState('react')
+  const [copyStatus, setCopyStatus] = useState('')
+
+  const codeTabs = [
+    { id: 'react', label: 'React' },
+    { id: 'html', label: 'HTML+CSS' },
+    { id: 'vue', label: 'Vue' },
+    { id: 'angular', label: 'Angular' },
+    { id: 'svelte', label: 'Svelte' },
+  ]
+
+  const reactCode = useMemo(
+    () => generateReactCode(tier, pgTerms, pgCaseSensitive, pgColor),
+    [tier, pgTerms, pgCaseSensitive, pgColor],
+  )
+  const htmlCssCode = useMemo(
+    () => generateHtmlCode(pgTerms, pgColor),
+    [pgTerms, pgColor],
+  )
+  const vueCode = useMemo(
+    () => generateVueCode(tier, pgTerms, pgCaseSensitive, pgColor),
+    [tier, pgTerms, pgCaseSensitive, pgColor],
+  )
+  const angularCode = useMemo(
+    () => generateAngularCode(tier, pgTerms, pgColor),
+    [tier, pgTerms, pgColor],
+  )
+  const svelteCode = useMemo(
+    () => generateSvelteCode(tier, pgTerms, pgCaseSensitive, pgColor),
+    [tier, pgTerms, pgCaseSensitive, pgColor],
+  )
+  const activeCode = useMemo(() => {
+    switch (activeCodeTab) {
+      case 'react': return reactCode
+      case 'html': return htmlCssCode
+      case 'vue': return vueCode
+      case 'angular': return angularCode
+      case 'svelte': return svelteCode
+      default: return reactCode
+    }
+  }, [activeCodeTab, reactCode, htmlCssCode, vueCode, angularCode, svelteCode])
 
   const copyImport = () => {
     navigator.clipboard.writeText(IMPORT).then(() => {
@@ -419,7 +715,7 @@ export default function HighlightPage() {
           <div className={`${PAGE}__tier-card${tier === 'lite' ? ` ${PAGE}__tier-card--active` : ''}`} onClick={() => setTier('lite')} role="button" tabIndex={0} onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setTier('lite') } }}>
             <div className={`${PAGE}__tier-header`}>
               <span className={`${PAGE}__tier-name`}>Lite</span>
-              <span className={`${PAGE}__tier-size`}>~0.3 KB</span>
+              <span className={`${PAGE}__tier-size`}>~0.3 KB gzip</span>
             </div>
             <p className={`${PAGE}__tier-desc`}>
               Re-exports the Standard component directly. Identical output, no extra overhead.
@@ -437,7 +733,7 @@ export default function HighlightPage() {
           <div className={`${PAGE}__tier-card${tier === 'standard' ? ` ${PAGE}__tier-card--active` : ''}`} onClick={() => setTier('standard')} role="button" tabIndex={0} onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setTier('standard') } }}>
             <div className={`${PAGE}__tier-header`}>
               <span className={`${PAGE}__tier-name`}>Standard</span>
-              <span className={`${PAGE}__tier-size`}>~0.3 KB</span>
+              <span className={`${PAGE}__tier-size`}>~0.3 KB gzip</span>
             </div>
             <p className={`${PAGE}__tier-desc`}>
               Core implementation. Splits text on matching substrings, wraps each in a{' '}
@@ -455,7 +751,7 @@ export default function HighlightPage() {
           <div className={`${PAGE}__tier-card${tier === 'premium' ? ` ${PAGE}__tier-card--active` : ''}`} onClick={() => setTier('premium')} role="button" tabIndex={0} onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setTier('premium') } }}>
             <div className={`${PAGE}__tier-header`}>
               <span className={`${PAGE}__tier-name`}>Premium</span>
-              <span className={`${PAGE}__tier-size`}>~0.3 KB</span>
+              <span className={`${PAGE}__tier-size`}>~0.3 KB gzip</span>
             </div>
             <p className={`${PAGE}__tier-desc`}>
               Re-exports the Standard component unchanged. Highlight has no motion props,
@@ -478,6 +774,200 @@ export default function HighlightPage() {
         <Card variant="default" padding="md">
           <PropsTable props={PROPS} />
         </Card>
+      </section>
+
+      {/* ── 5. Playground ───────────────────────────────── */}
+      <section className={`${PAGE}__section`} id="playground">
+        <h2 className={`${PAGE}__section-title`}>
+          <a href="#playground">Playground</a>
+        </h2>
+        <p className={`${PAGE}__section-desc`}>
+          Tweak props and preview the result. The code generators update as you change settings.
+          Motion level has no effect on Highlight as it is a purely visual component.
+        </p>
+
+        <div className={`${PAGE}__playground`}>
+          {/* Preview + code */}
+          <div className={`${PAGE}__playground-preview`}>
+            <div className={`${PAGE}__playground-result`}>
+              <ActiveHighlight
+                highlight={pgTerms.includes(',') ? pgTerms.split(',').map(t => t.trim()) : pgTerms}
+                caseSensitive={pgCaseSensitive}
+                color={pgColor || undefined}
+              >
+                {SAMPLE_TEXT}
+              </ActiveHighlight>
+            </div>
+
+            {/* Code tabs */}
+            <div className={`${PAGE}__code-tabs`}>
+              <div className={`${PAGE}__export-row`}>
+                <Button
+                  size="sm"
+                  variant="secondary"
+                  icon={<Icon name="copy" size="sm" />}
+                  onClick={() => {
+                    navigator.clipboard?.writeText(activeCode).then(() => {
+                      setCopyStatus(`Copied ${codeTabs.find(t => t.id === activeCodeTab)?.label}!`)
+                      setTimeout(() => setCopyStatus(''), 2000)
+                    })
+                  }}
+                >
+                  Copy {codeTabs.find(t => t.id === activeCodeTab)?.label}
+                </Button>
+                {copyStatus && <span className={`${PAGE}__export-status`}>{copyStatus}</span>}
+              </div>
+              <Tabs tabs={codeTabs} activeTab={activeCodeTab} onChange={setActiveCodeTab} size="sm" variant="pills">
+                <TabPanel tabId="react">
+                  <CopyBlock code={reactCode} language="typescript" showLineNumbers />
+                </TabPanel>
+                <TabPanel tabId="html">
+                  <CopyBlock code={htmlCssCode} language="html" showLineNumbers />
+                </TabPanel>
+                <TabPanel tabId="vue">
+                  <CopyBlock code={vueCode} language="html" showLineNumbers />
+                </TabPanel>
+                <TabPanel tabId="angular">
+                  <CopyBlock code={angularCode} language="html" showLineNumbers />
+                </TabPanel>
+                <TabPanel tabId="svelte">
+                  <CopyBlock code={svelteCode} language="html" showLineNumbers />
+                </TabPanel>
+              </Tabs>
+            </div>
+          </div>
+
+          {/* Controls */}
+          <div className={`${PAGE}__playground-controls`}>
+            <div className={`${PAGE}__control-group`}>
+              <label className={`${PAGE}__control-label`}>Search Terms</label>
+              <input
+                className={`${PAGE}__control-input`}
+                type="text"
+                value={pgTerms}
+                onChange={e => setPgTerms(e.target.value)}
+                placeholder="Comma-separated terms"
+                aria-label="Highlight search terms"
+              />
+            </div>
+
+            <div className={`${PAGE}__control-group`}>
+              <label className={`${PAGE}__control-label`}>Brand Color</label>
+              <input
+                className={`${PAGE}__control-input`}
+                type="text"
+                value={pgColor}
+                onChange={e => setPgColor(e.target.value)}
+                placeholder="e.g. oklch(85% 0.15 80 / 0.5)"
+                aria-label="Highlight brand color"
+              />
+            </div>
+
+            <div className={`${PAGE}__control-group`}>
+              <div className={`${PAGE}__control-row`}>
+                <input
+                  className={`${PAGE}__control-checkbox`}
+                  type="checkbox"
+                  id="pg-case"
+                  checked={pgCaseSensitive}
+                  onChange={e => setPgCaseSensitive(e.target.checked)}
+                />
+                <label htmlFor="pg-case" style={{ fontSize: 'var(--text-sm)', color: 'var(--text-primary)' }}>
+                  Case Sensitive
+                </label>
+              </div>
+            </div>
+
+            <div className={`${PAGE}__control-group`}>
+              <label className={`${PAGE}__control-label`}>Motion Level</label>
+              <select
+                className={`${PAGE}__control-input`}
+                value={pgMotion}
+                disabled
+                aria-label="Motion level (not applicable)"
+              >
+                <option value={0}>N/A (no motion)</option>
+              </select>
+              <span style={{ fontSize: 'var(--text-xs)', color: 'var(--text-tertiary)' }}>
+                Highlight is a pure rendering utility with no motion props.
+              </span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ── 6. Accessibility ──────────────────────────────── */}
+      <section className={`${PAGE}__section`} id="accessibility">
+        <h2 className={`${PAGE}__section-title`}>
+          <a href="#accessibility">Accessibility</a>
+        </h2>
+        <p className={`${PAGE}__section-desc`}>
+          Highlight is built on native HTML <code>&lt;mark&gt;</code> elements for maximum
+          screen reader compatibility.
+        </p>
+        <Card variant="default" padding="md">
+          <ul className={`${PAGE}__a11y-list`}>
+            <li className={`${PAGE}__a11y-item`}>
+              <span className={`${PAGE}__a11y-icon`}><Icon name="check-circle" size="sm" /></span>
+              <span>
+                <strong>Semantic HTML:</strong> Uses native <code className={`${PAGE}__a11y-key`}>&lt;mark&gt;</code> elements
+                which are recognized by assistive technologies as highlighted text.
+              </span>
+            </li>
+            <li className={`${PAGE}__a11y-item`}>
+              <span className={`${PAGE}__a11y-icon`}><Icon name="check-circle" size="sm" /></span>
+              <span>
+                <strong>Screen readers:</strong> VoiceOver, JAWS, and NVDA announce marked text
+                with highlight semantics when using <code className={`${PAGE}__a11y-key`}>&lt;mark&gt;</code>.
+              </span>
+            </li>
+            <li className={`${PAGE}__a11y-item`}>
+              <span className={`${PAGE}__a11y-icon`}><Icon name="check-circle" size="sm" /></span>
+              <span>
+                <strong>Contrast:</strong> Default highlight color meets WCAG AA contrast ratio
+                for both light and dark themes.
+              </span>
+            </li>
+            <li className={`${PAGE}__a11y-item`}>
+              <span className={`${PAGE}__a11y-icon`}><Icon name="check-circle" size="sm" /></span>
+              <span>
+                <strong>High contrast mode:</strong> Supports <code className={`${PAGE}__a11y-key`}>forced-colors: active</code> with
+                system highlight colors.
+              </span>
+            </li>
+            <li className={`${PAGE}__a11y-item`}>
+              <span className={`${PAGE}__a11y-icon`}><Icon name="check-circle" size="sm" /></span>
+              <span>
+                <strong>No motion:</strong> Highlight is a pure text component with zero animations,
+                so <code className={`${PAGE}__a11y-key`}>prefers-reduced-motion</code> has no effect.
+              </span>
+            </li>
+            <li className={`${PAGE}__a11y-item`}>
+              <span className={`${PAGE}__a11y-icon`}><Icon name="check-circle" size="sm" /></span>
+              <span>
+                <strong>Custom class:</strong> The <code className={`${PAGE}__a11y-key`}>highlightClassName</code> prop lets you
+                add ARIA-compatible styling without breaking semantic structure.
+              </span>
+            </li>
+          </ul>
+        </Card>
+      </section>
+
+      {/* ── Source ──────────────────────────────────────── */}
+      <section className={`${PAGE}__section`} id="source">
+        <h2 className={`${PAGE}__section-title`}><a href="#source">Source</a></h2>
+        <p className={`${PAGE}__section-desc`}>View the full component source code on GitHub.</p>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+          <a className={`${PAGE}__source-link`} href="https://github.com/annondeveloper/ui-kit/blob/main/src/domain/highlight.tsx" target="_blank" rel="noopener noreferrer">
+            <Icon name="code" size="sm" /> src/domain/highlight.tsx (Standard)
+          </a>
+          <a className={`${PAGE}__source-link`} href="https://github.com/annondeveloper/ui-kit/blob/main/src/lite/highlight.tsx" target="_blank" rel="noopener noreferrer">
+            <Icon name="code" size="sm" /> src/lite/highlight.tsx (Lite)
+          </a>
+          <a className={`${PAGE}__source-link`} href="https://github.com/annondeveloper/ui-kit/blob/main/src/premium/highlight.tsx" target="_blank" rel="noopener noreferrer">
+            <Icon name="code" size="sm" /> src/premium/highlight.tsx (Premium)
+          </a>
+        </div>
       </section>
     </div>
   )

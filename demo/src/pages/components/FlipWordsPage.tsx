@@ -4,6 +4,8 @@ import { useState, useMemo, useCallback, useRef, useEffect } from 'react'
 import { css } from '@ui/core/styles/css-tag'
 import { useStyles } from '@ui/core/styles/use-styles'
 import { FlipWords } from '@ui/domain/flip-words'
+import { FlipWords as LiteFlipWords } from '@ui/lite/flip-words'
+import { FlipWords as PremiumFlipWords } from '@ui/premium/flip-words'
 import { Button } from '@ui/components/button'
 import { Card } from '@ui/components/card'
 import { CopyBlock } from '@ui/domain/copy-block'
@@ -859,6 +861,8 @@ function PlaygroundSection({ tier: tierProp, brandColor }: { tier: Tier; brandCo
   const [copyStatus, setCopyStatus] = useState('')
   const [wordPreset, setWordPreset] = useState<keyof typeof WORD_PRESETS>('actions')
 
+  const FlipWordsComponent = tier === 'lite' ? LiteFlipWords : tier === 'premium' ? PremiumFlipWords : FlipWords
+
   const reactCode = useMemo(
     () => generateReactCode(tier, words, interval, motion),
     [tier, words, interval, motion],
@@ -919,7 +923,7 @@ function PlaygroundSection({ tier: tierProp, brandColor }: { tier: Tier; brandCo
           <div className="flip-words-page__playground-result">
             <span style={{ fontSize: 'clamp(1.5rem, 4vw, 2.5rem)', fontWeight: 700, position: 'relative' }}>
               We{' '}
-              <FlipWords
+              <FlipWordsComponent
                 words={words}
                 interval={interval}
                 motion={motion}
@@ -1242,7 +1246,7 @@ export default function FlipWordsPage() {
             </div>
             <div className="flip-words-page__tier-preview">
               <span style={{ fontSize: '0.875rem', fontWeight: 600, color: 'var(--text-primary)' }}>
-                build
+                <LiteFlipWords words={['build', 'deploy', 'scale']} />
               </span>
             </div>
             <div className="flip-words-page__size-breakdown">
@@ -1308,7 +1312,7 @@ export default function FlipWordsPage() {
             </div>
             <div className="flip-words-page__tier-preview">
               <span style={{ fontSize: '0.875rem', fontWeight: 600 }}>
-                <FlipWords words={['build', 'deploy', 'scale']} interval={2500} />
+                <PremiumFlipWords words={['build', 'deploy', 'scale']} interval={2500} />
               </span>
             </div>
             <div className="flip-words-page__size-breakdown">
@@ -1464,7 +1468,7 @@ export default function FlipWordsPage() {
         </p>
         <a
           className="flip-words-page__source-link"
-          href="https://github.com/annondeveloper/ui-kit/blob/v2/src/domain/flip-words.tsx"
+          href="https://github.com/annondeveloper/ui-kit/blob/main/src/domain/flip-words.tsx"
           target="_blank"
           rel="noopener noreferrer"
         >

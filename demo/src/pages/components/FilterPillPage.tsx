@@ -5,6 +5,7 @@ import { css } from '@ui/core/styles/css-tag'
 import { useStyles } from '@ui/core/styles/use-styles'
 import { FilterPill, FilterPillGroup } from '@ui/components/filter-pill'
 import { FilterPill as LiteFilterPill } from '@ui/lite/filter-pill'
+import { FilterPill as PremiumFilterPill } from '@ui/premium/filter-pill'
 import { Button } from '@ui/components/button'
 import { Card } from '@ui/components/card'
 import { CopyBlock } from '@ui/domain/copy-block'
@@ -578,6 +579,20 @@ const pageStyles = css`
         color: var(--text-primary);
       }
 
+      .filter-pill-page__source-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: var(--text-sm, 0.875rem);
+        color: var(--brand);
+        text-decoration: none;
+        font-weight: 500;
+      }
+      .filter-pill-page__source-link:hover {
+        text-decoration: underline;
+        text-underline-offset: 0.2em;
+      }
+
       /* ── Color presets ──────────────────────────────── */
 
       .filter-pill-page__color-presets {
@@ -931,7 +946,7 @@ function PlaygroundSection({ tier: tierProp }: { tier: Tier }) {
   const [copyStatus, setCopyStatus] = useState('')
   const [activeCodeTab, setActiveCodeTab] = useState('react')
 
-  const PillComponent = tier === 'lite' ? LiteFilterPill : FilterPill
+  const PillComponent = tier === 'lite' ? LiteFilterPill : tier === 'premium' ? PremiumFilterPill : FilterPill
 
   const reactCode = useMemo(
     () => generateReactCode(tier, label, active, showRemove, showCount ? count : undefined, showIcon, size, motion),
@@ -1538,6 +1553,22 @@ export default function FilterPillPage() {
           </ul>
         </Card>
       </section>
+
+      {/* Source */}
+      <section className="filter-pill-page__section" id="source">
+        <h2 className="filter-pill-page__section-title">
+          <a href="#source">Source</a>
+        </h2>
+        <a
+          className="filter-pill-page__source-link"
+          href="https://github.com/annondeveloper/ui-kit/blob/main/src/components/filter-pill.tsx"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          <Icon name="code" size="sm" />
+          View source on GitHub
+        </a>
+      </section>
     </div>
   )
 }
@@ -1620,6 +1651,14 @@ function FilterBarExample({ tier }: { tier: Tier }) {
                 >
                   {f}
                 </LiteFilterPill>
+              ) : tier === 'premium' ? (
+                <PremiumFilterPill
+                  key={f}
+                  label={f}
+                  active={activeFilters.has(f)}
+                  onClick={() => toggleFilter(f)}
+                  size="sm"
+                />
               ) : (
                 <FilterPill
                   key={f}

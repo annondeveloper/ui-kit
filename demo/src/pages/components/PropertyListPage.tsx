@@ -11,6 +11,7 @@ import { Card } from '@ui/components/card'
 import { CopyBlock } from '@ui/domain/copy-block'
 import { Tabs, TabPanel } from '@ui/components/tabs'
 import { Icon } from '@ui/core/icons/icon'
+import { ColorInput } from '@ui/components/color-input'
 import { PropsTable, type PropDef } from '../../components/PropsTable'
 import { useTier, type Tier } from '../../App'
 
@@ -417,6 +418,21 @@ const pageStyles = css`
         text-underline-offset: 0.2em;
       }
 
+      /* ── Size breakdown ─────────────────────────────── */
+
+      .property-list-page__size-breakdown {
+        display: flex;
+        flex-direction: column;
+        gap: 0.25rem;
+        font-size: 0.75rem;
+        color: var(--text-tertiary);
+      }
+      .property-list-page__size-row {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+
       @media (max-width: 768px) {
         .property-list-page__hero { padding: 2rem 1.25rem; }
         .property-list-page__title { font-size: 1.75rem; }
@@ -631,6 +647,7 @@ function PlaygroundSection() {
   const [size, setSize] = useState<Size>('md')
   const [columns, setColumns] = useState<Columns>(1)
   const [striped, setStriped] = useState(false)
+  const [motion, setMotion] = useState<0 | 1 | 2 | 3>(3)
   const [copyStatus, setCopyStatus] = useState('')
   const [activeCodeTab, setActiveCodeTab] = useState('react')
 
@@ -673,7 +690,7 @@ function PlaygroundSection() {
       <div className="property-list-page__playground">
         <div className="property-list-page__playground-preview">
           <div className="property-list-page__playground-result">
-            <Component items={sampleItems} size={size} columns={columns} striped={striped} />
+            <Component items={sampleItems} size={size} columns={columns} striped={striped} motion={motion} />
           </div>
 
           <div className="property-list-page__code-tabs">
@@ -706,6 +723,21 @@ function PlaygroundSection() {
         <div className="property-list-page__playground-controls">
           <OptionGroup label="Size" options={SIZES} value={size} onChange={setSize} />
           <OptionGroup label="Columns" options={COLUMNS.map(String) as ('1' | '2')[]} value={String(columns) as '1' | '2'} onChange={v => setColumns(Number(v) as Columns)} />
+          <div className="property-list-page__control-group">
+            <span className="property-list-page__control-label">Motion Level</span>
+            <div className="property-list-page__control-options">
+              {([0, 1, 2, 3] as const).map(m => (
+                <button
+                  key={m}
+                  type="button"
+                  className={`property-list-page__option-btn${motion === m ? ' property-list-page__option-btn--active' : ''}`}
+                  onClick={() => setMotion(m)}
+                >
+                  {m}
+                </button>
+              ))}
+            </div>
+          </div>
           <div className="property-list-page__toggle-row">
             <Toggle label="Striped" checked={striped} onChange={setStriped} />
           </div>
@@ -720,6 +752,7 @@ function PlaygroundSection() {
 export default function PropertyListPage() {
   useStyles('property-list-page', pageStyles)
   const { tier, setTier } = useTier()
+  const [brandColor, setBrandColor] = useState('#6366f1')
 
   const Component = tier === 'lite' ? LitePropertyList : tier === 'premium' ? PremiumPropertyList : PropertyList
   const importStr = IMPORT_STRINGS[tier]
@@ -770,6 +803,13 @@ export default function PropertyListPage() {
                 {t.id === 'lite' && <LitePropertyList items={sampleItems.slice(0, 3)} size="sm" />}
                 {t.id === 'standard' && <PropertyList items={sampleItems.slice(0, 3)} size="sm" />}
                 {t.id === 'premium' && <PremiumPropertyList items={sampleItems.slice(0, 3)} size="sm" />}
+              </div>
+              <div className="property-list-page__size-breakdown">
+                <div className="property-list-page__size-row">
+                  <span>Component: <strong style={{ color: 'var(--text-primary)' }}>{t.id === 'lite' ? '0.8 KB' : t.id === 'standard' ? '1.6 KB' : '3.1 KB'}</strong></span>
+                  <span>+ Shared: <strong style={{ color: 'var(--text-primary)' }}>{t.id === 'lite' ? '0.0 KB' : '0.9 KB'}</strong></span>
+                  <span>= <strong style={{ color: 'var(--brand)' }}>{t.id === 'lite' ? '0.8 KB' : t.id === 'standard' ? '2.5 KB' : '4.0 KB'}</strong> gzip</span>
+                </div>
               </div>
             </div>
           ))}
@@ -878,6 +918,25 @@ export default function PropertyListPage() {
             WCAG AA contrast ratios maintained across all themes
           </li>
         </ul>
+      </section>
+
+      {/* ── Brand Color ───────────────────────────────── */}
+      <section className="property-list-page__section" id="brand-color">
+        <h2 className="property-list-page__section-title">
+          <a href="#brand-color">Brand Color</a>
+        </h2>
+        <p className="property-list-page__section-desc">
+          Pick a brand color to preview the component with your brand identity.
+        </p>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+          <ColorInput
+            name="brand-color"
+            value={brandColor}
+            onChange={setBrandColor}
+            size="sm"
+            swatches={['#6366f1','#f97316','#f43f5e','#0ea5e9','#10b981','#8b5cf6','#d946ef','#f59e0b','#06b6d4','#64748b']}
+          />
+        </div>
       </section>
 
       {/* Source */}

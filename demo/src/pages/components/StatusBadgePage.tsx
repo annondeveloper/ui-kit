@@ -5,6 +5,7 @@ import { css } from '@ui/core/styles/css-tag'
 import { useStyles } from '@ui/core/styles/use-styles'
 import { StatusBadge } from '@ui/components/status-badge'
 import { StatusBadge as LiteStatusBadge } from '@ui/lite/status-badge'
+import { StatusBadge as PremiumStatusBadge } from '@ui/premium/status-badge'
 import { Button } from '@ui/components/button'
 import { Card } from '@ui/components/card'
 import { CopyBlock } from '@ui/domain/copy-block'
@@ -600,6 +601,22 @@ const pageStyles = css`
         box-shadow: 0 0 0 2px var(--bg-base), 0 0 0 4px oklch(100% 0 0 / 0.5);
       }
 
+      /* ── Source link ─────────────────────────────────── */
+
+      .status-badge-page__source-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: var(--text-sm, 0.875rem);
+        color: var(--brand);
+        text-decoration: none;
+        font-weight: 500;
+      }
+      .status-badge-page__source-link:hover {
+        text-decoration: underline;
+        text-underline-offset: 0.2em;
+      }
+
       /* ── Responsive ──────────────────────────────── */
 
       @media (max-width: 768px) {
@@ -878,7 +895,7 @@ function PlaygroundSection({ tier: tierProp }: { tier: Tier }) {
   const [copyStatus, setCopyStatus] = useState('')
   const [activeCodeTab, setActiveCodeTab] = useState('react')
 
-  const BadgeComponent = tier === 'lite' ? LiteStatusBadge : StatusBadge
+  const BadgeComponent = tier === 'lite' ? LiteStatusBadge : tier === 'premium' ? PremiumStatusBadge : StatusBadge
 
   const reactCode = useMemo(
     () => generateReactCode(tier, status, size, label, pulse, showIcon, motion),
@@ -1055,7 +1072,7 @@ export default function StatusBadgePage() {
     return () => observer.disconnect()
   }, [])
 
-  const BadgeComponent = tier === 'lite' ? LiteStatusBadge : StatusBadge
+  const BadgeComponent = tier === 'lite' ? LiteStatusBadge : tier === 'premium' ? PremiumStatusBadge : StatusBadge
 
   return (
     <div className="status-badge-page" style={themeStyle}>
@@ -1304,7 +1321,7 @@ export default function StatusBadgePage() {
               import {'{'} StatusBadge {'}'} from '@annondeveloper/ui-kit/premium'
             </div>
             <div className="status-badge-page__tier-preview">
-              <StatusBadge status="critical" label="Premium" pulse icon={<Icon name="alert-circle" size="sm" />} />
+              <PremiumStatusBadge status="critical" label="Premium" pulse icon={<Icon name="alert-circle" size="sm" />} />
             </div>
             <div className="status-badge-page__size-breakdown">
               <div className="status-badge-page__size-row">
@@ -1417,6 +1434,23 @@ export default function StatusBadgePage() {
             </li>
           </ul>
         </Card>
+      </section>
+
+      {/* ── Source ──────────────────────────────────────── */}
+      <section className="status-badge-page__section" id="source">
+        <h2 className="status-badge-page__section-title"><a href="#source">Source</a></h2>
+        <p className="status-badge-page__section-desc">View the full component source code on GitHub.</p>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+          <a className="status-badge-page__source-link" href="https://github.com/annondeveloper/ui-kit/blob/main/src/components/status-badge.tsx" target="_blank" rel="noopener noreferrer">
+            <Icon name="code" size="sm" /> src/components/status-badge.tsx (Standard)
+          </a>
+          <a className="status-badge-page__source-link" href="https://github.com/annondeveloper/ui-kit/blob/main/src/lite/status-badge.tsx" target="_blank" rel="noopener noreferrer">
+            <Icon name="code" size="sm" /> src/lite/status-badge.tsx (Lite)
+          </a>
+          <a className="status-badge-page__source-link" href="https://github.com/annondeveloper/ui-kit/blob/main/src/premium/status-badge.tsx" target="_blank" rel="noopener noreferrer">
+            <Icon name="code" size="sm" /> src/premium/status-badge.tsx (Premium)
+          </a>
+        </div>
       </section>
     </div>
   )

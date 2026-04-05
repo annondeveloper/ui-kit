@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { css } from '@ui/core/styles/css-tag'
 import { useStyles } from '@ui/core/styles/use-styles'
 import { CodeEditor } from '@ui/domain/code-editor'
@@ -9,7 +9,7 @@ import { CodeEditor as PremiumCodeEditor } from '@ui/premium/code-editor'
 import { Button } from '@ui/components/button'
 import { CopyBlock } from '@ui/domain/copy-block'
 import { PropsTable, type PropDef } from '../../components/PropsTable'
-import { useTier } from '../../App'
+import { useTier, type Tier } from '../../App'
 
 // ─── Sample Code ─────────────────────────────────────────────────────────────
 
@@ -318,6 +318,98 @@ const pageStyles = css`
       @container (max-width: 640px) {
         .code-editor-page__tiers { grid-template-columns: 1fr; }
       }
+
+      /* ── Playground ─────────────────────────────── */
+
+      .code-editor-page__playground {
+        display: grid;
+        grid-template-columns: 1fr 260px;
+        gap: 1.5rem;
+      }
+
+      @container (max-width: 640px) {
+        .code-editor-page__playground { grid-template-columns: 1fr; }
+      }
+
+      .code-editor-page__playground-controls {
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+      }
+
+      .code-editor-page__control-group {
+        display: flex;
+        flex-direction: column;
+        gap: 0.25rem;
+      }
+
+      .code-editor-page__control-label {
+        font-size: var(--text-xs, 0.75rem);
+        font-weight: 600;
+        color: var(--text-secondary);
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+      }
+
+      .code-editor-page__control-select {
+        padding: 0.375rem 0.5rem;
+        border-radius: var(--radius-sm);
+        border: 1px solid var(--border-subtle);
+        background: var(--bg-surface);
+        color: var(--text-primary);
+        font-size: var(--text-sm, 0.875rem);
+      }
+
+      .code-editor-page__control-toggle {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: var(--text-sm, 0.875rem);
+        color: var(--text-primary);
+        cursor: pointer;
+      }
+
+      .code-editor-page__code-tabs {
+        display: flex;
+        gap: 0.25rem;
+        margin-block-start: 1rem;
+        flex-wrap: wrap;
+      }
+
+      /* ── Accessibility ──────────────────────────── */
+
+      .code-editor-page__a11y-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+      }
+
+      .code-editor-page__a11y-item {
+        display: flex;
+        align-items: flex-start;
+        gap: 0.625rem;
+        font-size: var(--text-sm, 0.875rem);
+        color: var(--text-primary);
+        line-height: 1.5;
+      }
+
+      .code-editor-page__a11y-icon {
+        color: oklch(65% 0.18 145);
+        flex-shrink: 0;
+        margin-block-start: 0.125rem;
+      }
+
+      .code-editor-page__a11y-key {
+        font-family: 'SF Mono', 'Fira Code', 'JetBrains Mono', monospace;
+        font-size: 0.8em;
+        background: oklch(0% 0 0 / 0.15);
+        padding: 0.125rem 0.375rem;
+        border-radius: var(--radius-sm);
+        border: 1px solid var(--border-subtle);
+      }
     }
   }
 `
@@ -325,6 +417,314 @@ const pageStyles = css`
 const IMPORT_STR = "import { CodeEditor } from '@ui/domain/code-editor'"
 
 type Lang = 'typescript' | 'json' | 'python'
+
+type EditorConfig = {
+  language: Lang
+  showLineNumbers: boolean
+  readOnly: boolean
+  wordWrap: boolean
+  highlightActiveLine: boolean
+  tabSize: number
+  tier: Tier
+}
+
+// ─── Code Generators ────────────────────────────────────────────────────────
+
+function generateReactCode(cfg: EditorConfig): string {
+  const importPath = cfg.tier === 'lite'
+    ? "@annondeveloper/ui-kit/lite"
+    : cfg.tier === 'premium'
+      ? "@annondeveloper/ui-kit/premium"
+      : "@annondeveloper/ui-kit"
+
+  const props: string[] = []
+  props.push(`  language="${cfg.language}"`)
+  if (cfg.showLineNumbers) props.push('  showLineNumbers')
+  if (cfg.readOnly) props.push('  readOnly')
+  if (cfg.wordWrap) props.push('  wordWrap')
+  if (cfg.highlightActiveLine && cfg.tier !== 'lite') props.push('  highlightActiveLine')
+  if (cfg.tabSize !== 2) props.push(`  tabSize={${cfg.tabSize}}`)
+  props.push('  maxHeight="400px"')
+
+  return `import { CodeEditor } from '${importPath}'
+
+<CodeEditor
+  value={code}
+  onChange={setCode}
+${props.join('\n')}
+/>`
+}
+
+function generateHtmlExport(cfg: EditorConfig): string {
+  const cssImport = cfg.tier === 'lite'
+    ? `@import '@annondeveloper/ui-kit/lite/styles.css';`
+    : `@import '@annondeveloper/ui-kit/css/components/code-editor.css';`
+
+  return `<!-- CodeEditor — @annondeveloper/ui-kit ${cfg.tier} tier -->
+<link rel="stylesheet" href="https://unpkg.com/@annondeveloper/ui-kit/${cfg.tier === 'lite' ? 'lite/styles.css' : 'css/components/code-editor.css'}">
+
+<div class="ui-code-editor" data-language="${cfg.language}"${cfg.readOnly ? ' data-readonly' : ''}>
+  <textarea
+    spellcheck="false"
+    ${cfg.readOnly ? 'readonly' : ''}
+  ></textarea>
+</div>
+
+<!-- Or import in your CSS: -->
+<!-- ${cssImport} -->`
+}
+
+function generateVueCode(cfg: EditorConfig): string {
+  if (cfg.tier === 'lite') {
+    return `<template>
+  <div class="ui-code-editor" data-language="${cfg.language}">
+    <textarea v-model="code" spellcheck="false"${cfg.readOnly ? ' readonly' : ''} />
+  </div>
+</template>
+
+<style>
+@import '@annondeveloper/ui-kit/lite/styles.css';
+</style>`
+  }
+
+  const importPath = cfg.tier === 'premium' ? '@annondeveloper/ui-kit/premium' : '@annondeveloper/ui-kit'
+  const attrs: string[] = []
+  attrs.push(`  :value="code"`)
+  attrs.push(`  @change="code = $event"`)
+  attrs.push(`  language="${cfg.language}"`)
+  if (cfg.showLineNumbers) attrs.push('  show-line-numbers')
+  if (cfg.readOnly) attrs.push('  read-only')
+  if (cfg.highlightActiveLine) attrs.push('  highlight-active-line')
+
+  return `<template>
+  <CodeEditor
+${attrs.join('\n')}
+  />
+</template>
+
+<script setup>
+import { CodeEditor } from '${importPath}'
+import { ref } from 'vue'
+
+const code = ref('')
+</script>`
+}
+
+function generateAngularCode(cfg: EditorConfig): string {
+  const cssImport = cfg.tier === 'lite'
+    ? `@import '@annondeveloper/ui-kit/lite/styles.css';`
+    : cfg.tier === 'premium'
+      ? `@import '@annondeveloper/ui-kit/premium/css/components/code-editor.css';`
+      : `@import '@annondeveloper/ui-kit/css/components/code-editor.css';`
+
+  const attrs = [`class="ui-code-editor"`, `data-language="${cfg.language}"`]
+  if (cfg.readOnly) attrs.push('[attr.data-readonly]="true"')
+
+  return `<!-- Angular — ${cfg.tier === 'lite' ? 'Lite' : cfg.tier === 'premium' ? 'Premium' : 'Standard'} tier (CSS-only approach) -->
+<div ${attrs.join(' ')}>
+  <textarea
+    [(ngModel)]="code"
+    spellcheck="false"
+    ${cfg.readOnly ? 'readonly' : ''}
+  ></textarea>
+</div>
+
+/* In styles.css */
+${cssImport}`
+}
+
+function generateSvelteCode(cfg: EditorConfig): string {
+  if (cfg.tier === 'lite') {
+    return `<!-- Svelte — Lite tier -->
+<div class="ui-code-editor" data-language="${cfg.language}">
+  <textarea bind:value={code} spellcheck="false"${cfg.readOnly ? ' readonly' : ''} />
+</div>
+
+<style>
+  @import '@annondeveloper/ui-kit/lite/styles.css';
+</style>`
+  }
+
+  const importPath = cfg.tier === 'premium' ? '@annondeveloper/ui-kit/premium' : '@annondeveloper/ui-kit'
+  const attrs: string[] = []
+  attrs.push(`  value={code}`)
+  attrs.push(`  on:change={(e) => code = e.detail}`)
+  attrs.push(`  language="${cfg.language}"`)
+  if (cfg.showLineNumbers) attrs.push('  showLineNumbers')
+  if (cfg.readOnly) attrs.push('  readOnly')
+  if (cfg.highlightActiveLine) attrs.push('  highlightActiveLine')
+
+  return `<script>
+  import { CodeEditor } from '${importPath}';
+  let code = '';
+</script>
+
+<CodeEditor
+${attrs.join('\n')}
+/>`
+}
+
+// ─── Section: Interactive Playground ──────────────────────────────────────────
+
+function PlaygroundSection({ tier }: { tier: Tier }) {
+  const [pgLang, setPgLang] = useState<Lang>('typescript')
+  const [pgLineNumbers, setPgLineNumbers] = useState(true)
+  const [pgReadOnly, setPgReadOnly] = useState(false)
+  const [pgWordWrap, setPgWordWrap] = useState(false)
+  const [pgHighlightActive, setPgHighlightActive] = useState(true)
+  const [pgTabSize, setPgTabSize] = useState(2)
+  const [pgCode, setPgCode] = useState(TS_SAMPLE)
+  const [pgMotion, setMotion] = useState<0 | 1 | 2 | 3>(3)
+  const [activeCodeTab, setActiveCodeTab] = useState('react')
+
+  const SAMPLES_MAP: Record<Lang, string> = { typescript: TS_SAMPLE, json: JSON_SAMPLE, python: PYTHON_SAMPLE }
+
+  const ActiveEditor = tier === 'lite' ? LiteCodeEditor : tier === 'premium' ? PremiumCodeEditor : CodeEditor
+
+  const cfg: EditorConfig = {
+    language: pgLang,
+    showLineNumbers: pgLineNumbers,
+    readOnly: pgReadOnly,
+    wordWrap: pgWordWrap,
+    highlightActiveLine: pgHighlightActive,
+    tabSize: pgTabSize,
+    tier,
+  }
+
+  const reactCode = useMemo(() => generateReactCode(cfg), [pgLang, pgLineNumbers, pgReadOnly, pgWordWrap, pgHighlightActive, pgTabSize, tier])
+  const htmlCode = useMemo(() => generateHtmlExport(cfg), [pgLang, pgReadOnly, tier])
+  const vueCode = useMemo(() => generateVueCode(cfg), [pgLang, pgLineNumbers, pgReadOnly, pgHighlightActive, tier])
+  const angularCode = useMemo(() => generateAngularCode(cfg), [pgLang, pgReadOnly, tier])
+  const svelteCode = useMemo(() => generateSvelteCode(cfg), [pgLang, pgLineNumbers, pgReadOnly, pgHighlightActive, tier])
+
+  const codeTabs = [
+    { id: 'react', label: 'React' },
+    { id: 'html', label: 'HTML+CSS' },
+    { id: 'vue', label: 'Vue' },
+    { id: 'angular', label: 'Angular' },
+    { id: 'svelte', label: 'Svelte' },
+  ]
+
+  const activeCode = useMemo(() => {
+    switch (activeCodeTab) {
+      case 'react': return reactCode
+      case 'html': return htmlCode
+      case 'vue': return vueCode
+      case 'angular': return angularCode
+      case 'svelte': return svelteCode
+      default: return reactCode
+    }
+  }, [activeCodeTab, reactCode, htmlCode, vueCode, angularCode, svelteCode])
+
+  return (
+    <section className="code-editor-page__section" id="playground">
+      <h2 className="code-editor-page__section-title">
+        <a href="#playground">Playground</a>
+      </h2>
+      <p className="code-editor-page__section-desc">
+        Tweak every prop and see the result in real-time. The generated code updates as you change settings.
+      </p>
+
+      <div className="code-editor-page__playground">
+        {/* Preview area */}
+        <div>
+          <div className="code-editor-page__preview">
+            <ActiveEditor
+              value={pgCode}
+              onChange={setPgCode}
+              language={pgLang}
+              showLineNumbers={pgLineNumbers}
+              readOnly={pgReadOnly}
+              wordWrap={pgWordWrap}
+              highlightActiveLine={pgHighlightActive}
+              tabSize={pgTabSize}
+              motion={pgMotion}
+              maxHeight="300px"
+            />
+          </div>
+
+          {/* Code output tabs */}
+          <div className="code-editor-page__code-tabs">
+            {codeTabs.map(tab => (
+              <Button
+                key={tab.id}
+                size="xs"
+                variant={activeCodeTab === tab.id ? 'primary' : 'secondary'}
+                onClick={() => setActiveCodeTab(tab.id)}
+              >
+                {tab.label}
+              </Button>
+            ))}
+          </div>
+          <CopyBlock code={activeCode} language="typescript" />
+        </div>
+
+        {/* Controls */}
+        <div className="code-editor-page__playground-controls">
+          <div className="code-editor-page__control-group">
+            <span className="code-editor-page__control-label">Language</span>
+            <select
+              className="code-editor-page__control-select"
+              value={pgLang}
+              onChange={e => { const l = e.target.value as Lang; setPgLang(l); setPgCode(SAMPLES_MAP[l]) }}
+            >
+              <option value="typescript">TypeScript</option>
+              <option value="json">JSON</option>
+              <option value="python">Python</option>
+            </select>
+          </div>
+
+          <div className="code-editor-page__control-group">
+            <span className="code-editor-page__control-label">Tab Size</span>
+            <select
+              className="code-editor-page__control-select"
+              value={pgTabSize}
+              onChange={e => setPgTabSize(Number(e.target.value))}
+            >
+              <option value="2">2 spaces</option>
+              <option value="4">4 spaces</option>
+              <option value="8">8 spaces</option>
+            </select>
+          </div>
+
+          <label className="code-editor-page__control-toggle">
+            <input type="checkbox" checked={pgLineNumbers} onChange={e => setPgLineNumbers(e.target.checked)} />
+            Line numbers
+          </label>
+
+          <label className="code-editor-page__control-toggle">
+            <input type="checkbox" checked={pgReadOnly} onChange={e => setPgReadOnly(e.target.checked)} />
+            Read only
+          </label>
+
+          <label className="code-editor-page__control-toggle">
+            <input type="checkbox" checked={pgWordWrap} onChange={e => setPgWordWrap(e.target.checked)} />
+            Word wrap
+          </label>
+
+          <label className="code-editor-page__control-toggle">
+            <input type="checkbox" checked={pgHighlightActive} onChange={e => setPgHighlightActive(e.target.checked)} />
+            Highlight active line
+          </label>
+
+          <div className="code-editor-page__control-group">
+            <span className="code-editor-page__control-label">Motion Level</span>
+            <select
+              className="code-editor-page__control-select"
+              value={pgMotion}
+              onChange={e => setMotion(Number(e.target.value) as 0 | 1 | 2 | 3)}
+            >
+              <option value="0">0 — None</option>
+              <option value="1">1 — Subtle</option>
+              <option value="2">2 — Expressive</option>
+              <option value="3">3 — Cinematic</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </section>
+  )
+}
 
 // ─── Component ───────────────────────────────────────────────────────────────
 
@@ -460,7 +860,7 @@ export default function CodeEditorPage() {
           <div className={`code-editor-page__tier-card${tier === 'lite' ? ' code-editor-page__tier-card--active' : ''}`} onClick={() => setTier('lite')} role="button" tabIndex={0} onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setTier('lite') } }}>
             <div className="code-editor-page__tier-header">
               <span className="code-editor-page__tier-name">Lite</span>
-              <span className="code-editor-page__tier-size">~0.5 KB</span>
+              <span className="code-editor-page__tier-size">~0.5 KB gzip</span>
             </div>
             <p className="code-editor-page__tier-desc">
               Plain textarea with optional line-number gutter. Controlled and uncontrolled modes.
@@ -478,7 +878,7 @@ export default function CodeEditorPage() {
           <div className={`code-editor-page__tier-card${tier === 'standard' ? ' code-editor-page__tier-card--active' : ''}`} onClick={() => setTier('standard')} role="button" tabIndex={0} onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setTier('standard') } }}>
             <div className="code-editor-page__tier-header">
               <span className="code-editor-page__tier-name">Standard</span>
-              <span className="code-editor-page__tier-size">~4.1 KB</span>
+              <span className="code-editor-page__tier-size">~4.1 KB gzip</span>
             </div>
             <p className="code-editor-page__tier-desc">
               Tokenized syntax highlighting for TypeScript, JavaScript, JSON, Python, CSS, HTML,
@@ -496,7 +896,7 @@ export default function CodeEditorPage() {
           <div className={`code-editor-page__tier-card${tier === 'premium' ? ' code-editor-page__tier-card--active' : ''}`} onClick={() => setTier('premium')} role="button" tabIndex={0} onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setTier('premium') } }}>
             <div className="code-editor-page__tier-header">
               <span className="code-editor-page__tier-name">Premium</span>
-              <span className="code-editor-page__tier-size">~4.5 KB</span>
+              <span className="code-editor-page__tier-size">~4.5 KB gzip</span>
             </div>
             <p className="code-editor-page__tier-desc">
               Wraps Standard with aurora glow on focus, spring-scale animation on active line numbers,
@@ -512,10 +912,85 @@ export default function CodeEditorPage() {
         </div>
       </section>
 
+      {/* ── Playground ────────────────────────────────── */}
+      <PlaygroundSection tier={tier} />
+
       {/* ── Props ─────────────────────────────────────── */}
       <section className="code-editor-page__section" id="props">
         <h2 className="code-editor-page__section-title"><a href="#props">Props</a></h2>
         <PropsTable props={PROPS} />
+      </section>
+
+      {/* ── Accessibility ─────────────────────────────── */}
+      <section className="code-editor-page__section" id="accessibility">
+        <h2 className="code-editor-page__section-title">
+          <a href="#accessibility">Accessibility</a>
+        </h2>
+        <p className="code-editor-page__section-desc">
+          CodeEditor is built with accessibility in mind, using semantic HTML and ARIA attributes
+          to ensure a usable experience for keyboard and screen reader users.
+        </p>
+        <ul className="code-editor-page__a11y-list">
+          <li className="code-editor-page__a11y-item">
+            <span className="code-editor-page__a11y-icon">&#10003;</span>
+            <span>
+              <strong>Keyboard navigation:</strong> Full <code className="code-editor-page__a11y-key">Tab</code> key support for indentation, <code className="code-editor-page__a11y-key">Shift+Tab</code> for outdent, and <code className="code-editor-page__a11y-key">Enter</code> for auto-indent on new lines.
+            </span>
+          </li>
+          <li className="code-editor-page__a11y-item">
+            <span className="code-editor-page__a11y-icon">&#10003;</span>
+            <span>
+              <strong>Focus management:</strong> Visible focus ring with brand-colored glow via <code className="code-editor-page__a11y-key">:focus-visible</code>. Focus is contained within the editor textarea.
+            </span>
+          </li>
+          <li className="code-editor-page__a11y-item">
+            <span className="code-editor-page__a11y-icon">&#10003;</span>
+            <span>
+              <strong>ARIA roles:</strong> Uses <code className="code-editor-page__a11y-key">role="textbox"</code> with <code className="code-editor-page__a11y-key">aria-multiline="true"</code> to identify the editor to assistive technologies.
+            </span>
+          </li>
+          <li className="code-editor-page__a11y-item">
+            <span className="code-editor-page__a11y-icon">&#10003;</span>
+            <span>
+              <strong>Read-only state:</strong> Announces <code className="code-editor-page__a11y-key">aria-readonly="true"</code> when the editor is in read-only mode.
+            </span>
+          </li>
+          <li className="code-editor-page__a11y-item">
+            <span className="code-editor-page__a11y-icon">&#10003;</span>
+            <span>
+              <strong>Contrast:</strong> Syntax highlighting colors meet WCAG AA contrast ratio (4.5:1 for text) against the editor background.
+            </span>
+          </li>
+          <li className="code-editor-page__a11y-item">
+            <span className="code-editor-page__a11y-icon">&#10003;</span>
+            <span>
+              <strong>Reduced motion:</strong> Respects <code className="code-editor-page__a11y-key">prefers-reduced-motion</code> by disabling cursor blink and active line animations.
+            </span>
+          </li>
+          <li className="code-editor-page__a11y-item">
+            <span className="code-editor-page__a11y-icon">&#10003;</span>
+            <span>
+              <strong>High contrast:</strong> Supports <code className="code-editor-page__a11y-key">forced-colors: active</code> with visible borders and system color tokens.
+            </span>
+          </li>
+        </ul>
+      </section>
+
+      {/* ── Source ──────────────────────────────────────── */}
+      <section className="code-editor-page__section" id="source">
+        <h2 className="code-editor-page__section-title"><a href="#source">Source</a></h2>
+        <p className="code-editor-page__section-desc">View the full component source code on GitHub.</p>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+          <a href="https://github.com/annondeveloper/ui-kit/blob/main/src/domain/code-editor.tsx" target="_blank" rel="noopener noreferrer">
+            src/domain/code-editor.tsx (Standard)
+          </a>
+          <a href="https://github.com/annondeveloper/ui-kit/blob/main/src/lite/code-editor.tsx" target="_blank" rel="noopener noreferrer">
+            src/lite/code-editor.tsx (Lite)
+          </a>
+          <a href="https://github.com/annondeveloper/ui-kit/blob/main/src/premium/code-editor.tsx" target="_blank" rel="noopener noreferrer">
+            src/premium/code-editor.tsx (Premium)
+          </a>
+        </div>
       </section>
     </div>
   )

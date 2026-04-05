@@ -4,11 +4,17 @@ import { useState, useMemo, useCallback, useRef, useEffect } from 'react'
 import { css } from '@ui/core/styles/css-tag'
 import { useStyles } from '@ui/core/styles/use-styles'
 import { BorderBeam } from '@ui/domain/border-beam'
+import { BorderBeam as LiteBorderBeam } from '@ui/lite/border-beam'
+import { BorderBeam as PremiumBorderBeam } from '@ui/premium/border-beam'
 import { Button } from '@ui/components/button'
 import { Card } from '@ui/components/card'
 import { CopyBlock } from '@ui/domain/copy-block'
 import { Tabs, TabPanel } from '@ui/components/tabs'
 import { Icon } from '@ui/core/icons/icon'
+import { generateTheme } from '@ui/core/tokens/generator'
+import { TOKEN_TO_CSS, type ThemeTokens } from '@ui/core/tokens/tokens'
+import { useTheme } from '@ui/core/tokens/theme-context'
+import { ColorInput } from '@ui/components/color-input'
 import { PropsTable, type PropDef } from '../../components/PropsTable'
 import { useTier, type Tier } from '../../App'
 
@@ -567,9 +573,70 @@ const pageStyles = css`
       :scope ::-webkit-scrollbar-track { background: transparent; }
       :scope ::-webkit-scrollbar-thumb { background: var(--border-default); border-radius: 2px; }
       :scope ::-webkit-scrollbar-thumb:hover { background: var(--border-strong); }
+
+      /* ── Source link ─────────────────────────────────── */
+
+      .borderbeam-page__source-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: var(--text-sm, 0.875rem);
+        color: var(--brand);
+        text-decoration: none;
+        font-weight: 500;
+      }
+      .borderbeam-page__source-link:hover {
+        text-decoration: underline;
+        text-underline-offset: 0.2em;
+      }
+
+      /* ── Color presets ──────────────────────────────── */
+
+      .borderbeam-page__color-presets {
+        display: flex;
+        gap: 0.25rem;
+        flex-wrap: wrap;
+      }
+
+      .borderbeam-page__color-preset {
+        inline-size: 24px;
+        block-size: 24px;
+        border-radius: 50%;
+        border: 2px solid transparent;
+        cursor: pointer;
+        padding: 0;
+        transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1),
+                    border-color 0.15s,
+                    box-shadow 0.15s;
+        box-shadow: 0 1px 3px oklch(0% 0 0 / 0.2);
+      }
+      .borderbeam-page__color-preset:hover {
+        transform: scale(1.2);
+        box-shadow: 0 2px 8px oklch(0% 0 0 / 0.3);
+      }
+      .borderbeam-page__color-preset--active {
+        border-color: oklch(100% 0 0);
+        transform: scale(1.2);
+        box-shadow: 0 0 0 2px var(--bg-base), 0 0 0 4px oklch(100% 0 0 / 0.5);
+      }
     }
   }
 `
+
+// ─── Brand Color Presets ─────────────────────────────────────────────────────
+
+const BRAND_COLOR_PRESETS = [
+  { hex: '#6366f1', name: 'Indigo' },
+  { hex: '#f97316', name: 'Orange' },
+  { hex: '#f43f5e', name: 'Rose' },
+  { hex: '#0ea5e9', name: 'Sky' },
+  { hex: '#10b981', name: 'Emerald' },
+  { hex: '#8b5cf6', name: 'Violet' },
+  { hex: '#d946ef', name: 'Fuchsia' },
+  { hex: '#f59e0b', name: 'Amber' },
+  { hex: '#06b6d4', name: 'Cyan' },
+  { hex: '#64748b', name: 'Slate' },
+]
 
 // ─── Props Data ───────────────────────────────────────────────────────────────
 
@@ -834,7 +901,7 @@ function generateSvelteCode(tier: Tier, duration: number, size: number, color: s
 
 // ─── Playground Section ───────────────────────────────────────────────────────
 
-function PlaygroundSection({ tier: tierProp }: { tier: Tier }) {
+function PlaygroundSection({ tier: tierProp, brandColor }: { tier: Tier; brandColor: string }) {
   const { tier: contextTier } = useTier()
   const tier = tierProp ?? contextTier
   const [duration, setDuration] = useState<DurationPreset>(5)
@@ -842,6 +909,8 @@ function PlaygroundSection({ tier: tierProp }: { tier: Tier }) {
   const [motion, setMotion] = useState<MotionLevel>(3)
   const [color, setColor] = useState('')
   const [copyStatus, setCopyStatus] = useState('')
+
+  const BeamComponent = tier === 'lite' ? LiteBorderBeam : tier === 'premium' ? PremiumBorderBeam : BorderBeam
 
   const reactCode = useMemo(() => generateReactCode(tier, duration, size, color, motion), [tier, duration, size, color, motion])
   const htmlCode = useMemo(() => generateHtmlCode(tier, duration, size, color, motion), [tier, duration, size, color, motion])
@@ -883,7 +952,7 @@ function PlaygroundSection({ tier: tierProp }: { tier: Tier }) {
       <div className="borderbeam-page__playground">
         <div className="borderbeam-page__playground-preview">
           <div className="borderbeam-page__playground-result">
-            <BorderBeam
+            <BeamComponent
               duration={duration}
               size={size}
               motion={motion}
@@ -897,7 +966,7 @@ function PlaygroundSection({ tier: tierProp }: { tier: Tier }) {
                   {duration}s rotation, {size}px arc
                 </p>
               </div>
-            </BorderBeam>
+            </BeamComponent>
           </div>
 
           <div className="borderbeam-page__code-tabs">
@@ -995,6 +1064,33 @@ export default function BorderBeamPage() {
   useStyles('borderbeam-page', pageStyles)
 
   const { tier, setTier } = useTier()
+  const [brandColor, setBrandColor] = useState('#6366f1')
+  const pageRef = useRef<HTMLDivElement>(null)
+  const { mode } = useTheme()
+
+  const themeTokens = useMemo(() => {
+    try {
+      return generateTheme(brandColor, mode)
+    } catch {
+      return null
+    }
+  }, [brandColor, mode])
+
+  const BRAND_ONLY_KEYS: (keyof ThemeTokens)[] = [
+    'brand', 'brandLight', 'brandDark', 'brandSubtle', 'brandGlow',
+    'borderGlow', 'aurora1', 'aurora2',
+  ]
+
+  const themeStyle = useMemo(() => {
+    if (!themeTokens || brandColor === '#6366f1') return undefined
+    const style: Record<string, string> = {}
+    for (const key of BRAND_ONLY_KEYS) {
+      const cssVar = TOKEN_TO_CSS[key]
+      const value = themeTokens[key]
+      if (cssVar && value) style[cssVar] = value
+    }
+    return style as React.CSSProperties
+  }, [themeTokens, brandColor])
 
   // Scroll reveal JS fallback
   useEffect(() => {
@@ -1028,7 +1124,7 @@ export default function BorderBeamPage() {
   }, [])
 
   return (
-    <div className="borderbeam-page">
+    <div className="borderbeam-page" ref={pageRef} style={themeStyle}>
       {/* ── 1. Hero Header ──────────────────────────────── */}
       <div className="borderbeam-page__hero">
         <h1 className="borderbeam-page__title">BorderBeam</h1>
@@ -1044,7 +1140,7 @@ export default function BorderBeamPage() {
       </div>
 
       {/* ── 2. Live Playground ──────────────────────────── */}
-      <PlaygroundSection tier={tier} />
+      <PlaygroundSection tier={tier} brandColor={brandColor} />
 
       {/* ── 3. Duration Gallery ───────────────────────────── */}
       <section className="borderbeam-page__section" id="durations">
@@ -1207,11 +1303,11 @@ export default function BorderBeamPage() {
               @import '@annondeveloper/ui-kit/css/components/border-beam.css'
             </div>
             <div className="borderbeam-page__tier-preview">
-              <BorderBeam duration={5} size={60}>
+              <LiteBorderBeam duration={5} size={60}>
                 <div style={{ padding: '0.75rem 1rem', textAlign: 'center', fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
                   CSS-only beam
                 </div>
-              </BorderBeam>
+              </LiteBorderBeam>
             </div>
             <div className="borderbeam-page__size-breakdown">
               <div className="borderbeam-page__size-row">
@@ -1279,11 +1375,11 @@ export default function BorderBeamPage() {
               import {'{'} BorderBeam {'}'} from '@annondeveloper/ui-kit'
             </div>
             <div className="borderbeam-page__tier-preview">
-              <BorderBeam duration={4} size={100} color="oklch(70% 0.2 280)">
+              <PremiumBorderBeam duration={4} size={100} color="oklch(70% 0.2 280)">
                 <div style={{ padding: '0.75rem 1rem', textAlign: 'center', fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
                   Premium beam
                 </div>
-              </BorderBeam>
+              </PremiumBorderBeam>
             </div>
             <div className="borderbeam-page__size-breakdown">
               <div className="borderbeam-page__size-row">
@@ -1358,6 +1454,61 @@ export default function BorderBeamPage() {
             </li>
           </ul>
         </Card>
+      </section>
+
+      {/* ── 11. Brand Color ─────────────────────────────── */}
+      <section className="borderbeam-page__section" id="brand-color">
+        <h2 className="borderbeam-page__section-title">
+          <a href="#brand-color">Brand Color</a>
+        </h2>
+        <p className="borderbeam-page__section-desc">
+          Pick a brand color to see the border beam update in real-time. The theme generates
+          derived colors automatically from your choice.
+        </p>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+          <ColorInput
+            name="brand-color"
+            value={brandColor}
+            onChange={setBrandColor}
+            size="sm"
+            swatches={['#6366f1','#f97316','#f43f5e','#0ea5e9','#10b981','#8b5cf6','#d946ef','#f59e0b','#06b6d4','#64748b']}
+          />
+          <div className="borderbeam-page__color-presets">
+            {BRAND_COLOR_PRESETS.map(p => (
+              <button
+                key={p.hex}
+                type="button"
+                className={`borderbeam-page__color-preset${brandColor === p.hex ? ' borderbeam-page__color-preset--active' : ''}`}
+                style={{ background: p.hex }}
+                onClick={() => setBrandColor(p.hex)}
+                title={p.name}
+                aria-label={`Set brand color to ${p.name}`}
+              />
+            ))}
+          </div>
+          {brandColor !== '#6366f1' && (
+            <Button size="xs" variant="ghost" onClick={() => setBrandColor('#6366f1')}>
+              <Icon name="refresh" size="sm" /> Reset to default
+            </Button>
+          )}
+        </div>
+      </section>
+
+      {/* ── 12. Source ──────────────────────────────────── */}
+      <section className="borderbeam-page__section" id="source">
+        <h2 className="borderbeam-page__section-title"><a href="#source">Source</a></h2>
+        <p className="borderbeam-page__section-desc">View the full component source code on GitHub.</p>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+          <a className="borderbeam-page__source-link" href="https://github.com/annondeveloper/ui-kit/blob/main/src/domain/border-beam.tsx" target="_blank" rel="noopener noreferrer">
+            <Icon name="code" size="sm" /> src/domain/border-beam.tsx (Standard)
+          </a>
+          <a className="borderbeam-page__source-link" href="https://github.com/annondeveloper/ui-kit/blob/main/src/lite/border-beam.tsx" target="_blank" rel="noopener noreferrer">
+            <Icon name="code" size="sm" /> src/lite/border-beam.tsx (Lite)
+          </a>
+          <a className="borderbeam-page__source-link" href="https://github.com/annondeveloper/ui-kit/blob/main/src/premium/border-beam.tsx" target="_blank" rel="noopener noreferrer">
+            <Icon name="code" size="sm" /> src/premium/border-beam.tsx (Premium)
+          </a>
+        </div>
       </section>
     </div>
   )

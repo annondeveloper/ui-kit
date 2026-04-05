@@ -11,6 +11,7 @@ import { Button } from '@ui/components/button'
 import { CopyBlock } from '@ui/domain/copy-block'
 import { Tabs, TabPanel } from '@ui/components/tabs'
 import { Icon } from '@ui/core/icons/icon'
+import { ColorInput } from '@ui/components/color-input'
 import { PropsTable, type PropDef } from '../../components/PropsTable'
 import { useTier, type Tier } from '../../App'
 
@@ -385,6 +386,29 @@ const pageStyles = css`
         padding-block-start: 0.5rem;
       }
 
+      .topology-graph-page__size-breakdown {
+        display: flex;
+        flex-direction: column;
+        gap: 0.25rem;
+        font-size: 0.75rem;
+        color: var(--text-tertiary);
+      }
+
+      .topology-graph-page__size-row {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+
+      .topology-graph-page__source-link {
+        color: var(--brand);
+        text-decoration: none;
+      }
+
+      .topology-graph-page__source-link:hover {
+        text-decoration: underline;
+      }
+
       /* Code tabs */
       .topology-graph-page__code-tabs {
         margin-block-start: 1rem;
@@ -620,6 +644,52 @@ function generateReactCode(
   return `${importStr}\n\n${nodesDef}\n\n${edgesDef}\n\n<TopologyGraph\n${props.join('\n')}\n/>`
 }
 
+function generateHtmlCode(layout: Layout, showMinimap: boolean, showControls: boolean, showLegend: boolean): string {
+  return `<!-- TopologyGraph requires JS — use the React/Vue/Angular/Svelte integration -->
+<link rel="stylesheet" href="@annondeveloper/ui-kit/css/components/topology-graph.css" />
+<div class="ui-topology-graph"
+  data-layout="${layout}"${showMinimap ? '\n  data-minimap' : ''}${showLegend ? '\n  data-legend' : ''}${!showControls ? '\n  data-controls="false"' : ''}
+  style="height: 450px">
+  <!-- Canvas/SVG rendered by JS -->
+</div>`
+}
+
+function generateVueCode(tier: Tier, layout: Layout, showMinimap: boolean, showControls: boolean, showLegend: boolean, motion: number): string {
+  const importPath = tier === 'lite' ? '@annondeveloper/ui-kit/lite' : tier === 'premium' ? '@annondeveloper/ui-kit/premium' : '@annondeveloper/ui-kit'
+  const props: string[] = [':nodes="nodes"', ':edges="edges"']
+  if (layout !== 'force') props.push(`layout="${layout}"`)
+  if (showMinimap) props.push('show-minimap')
+  if (!showControls) props.push(':show-controls="false"')
+  if (showLegend) props.push('show-legend')
+  if (tier !== 'lite' && motion !== 3) props.push(`:motion="${motion}"`)
+  props.push(':height="450"')
+  return `<template>\n  <TopologyGraph\n    ${props.join('\n    ')}\n  />\n</template>\n\n<script setup>\nimport { TopologyGraph } from '${importPath}'\n\nconst nodes = [/* ... */]\nconst edges = [/* ... */]\n</script>`
+}
+
+function generateAngularCode(tier: Tier, layout: Layout, showMinimap: boolean, showControls: boolean, showLegend: boolean, motion: number): string {
+  const importPath = tier === 'lite' ? '@annondeveloper/ui-kit/lite' : tier === 'premium' ? '@annondeveloper/ui-kit/premium' : '@annondeveloper/ui-kit'
+  const attrs: string[] = ['[nodes]="nodes"', '[edges]="edges"']
+  if (layout !== 'force') attrs.push(`layout="${layout}"`)
+  if (showMinimap) attrs.push('[showMinimap]="true"')
+  if (!showControls) attrs.push('[showControls]="false"')
+  if (showLegend) attrs.push('[showLegend]="true"')
+  if (tier !== 'lite' && motion !== 3) attrs.push(`[motion]="${motion}"`)
+  attrs.push('[height]="450"')
+  return `// Angular — CSS import\nimport '${importPath}/css/components/topology-graph.css'\n\n<ui-topology-graph\n  ${attrs.join('\n  ')}\n/>`
+}
+
+function generateSvelteCode(tier: Tier, layout: Layout, showMinimap: boolean, showControls: boolean, showLegend: boolean, motion: number): string {
+  const importPath = tier === 'lite' ? '@annondeveloper/ui-kit/lite' : tier === 'premium' ? '@annondeveloper/ui-kit/premium' : '@annondeveloper/ui-kit'
+  const props: string[] = ['{nodes}', '{edges}']
+  if (layout !== 'force') props.push(`layout="${layout}"`)
+  if (showMinimap) props.push('showMinimap')
+  if (!showControls) props.push('showControls={false}')
+  if (showLegend) props.push('showLegend')
+  if (tier !== 'lite' && motion !== 3) props.push(`motion={${motion}}`)
+  props.push('height={450}')
+  return `<script>\n  import { TopologyGraph } from '${importPath}'\n\n  const nodes = [/* ... */]\n  const edges = [/* ... */]\n</script>\n\n<TopologyGraph\n  ${props.join('\n  ')}\n/>`
+}
+
 // ─── Tier Preview Data ───────────────────────────────────────────────────────
 
 const tierPreviewNodes: TopologyNode[] = [
@@ -762,6 +832,7 @@ export default function TopologyGraphPage() {
   useStyles('topology-graph-page', pageStyles)
 
   const { tier, setTier } = useTier()
+  const [brandColor, setBrandColor] = useState('#6366f1')
 
   // Scroll reveal JS fallback
   useEffect(() => {
@@ -841,6 +912,13 @@ export default function TopologyGraphPage() {
             <div className="topology-graph-page__tier-preview">
               <LiteTopologyGraph nodes={tierPreviewNodes} edges={tierPreviewEdges} height={160} />
             </div>
+            <div className="topology-graph-page__size-breakdown">
+              <div className="topology-graph-page__size-row">
+                <span>Component: <strong style={{ color: 'var(--text-primary)' }}>1.2 KB</strong></span>
+                <span>+ Shared: <strong style={{ color: 'var(--text-primary)' }}>0.0 KB</strong></span>
+                <span>= <strong style={{ color: 'var(--brand)' }}>1.2 KB</strong> gzip</span>
+              </div>
+            </div>
           </div>
 
           {/* Standard */}
@@ -862,6 +940,13 @@ export default function TopologyGraphPage() {
             <div className="topology-graph-page__tier-preview">
               <TopologyGraph nodes={tierPreviewNodes} edges={tierPreviewEdges} height={160} />
             </div>
+            <div className="topology-graph-page__size-breakdown">
+              <div className="topology-graph-page__size-row">
+                <span>Component: <strong style={{ color: 'var(--text-primary)' }}>5.5 KB</strong></span>
+                <span>+ Shared: <strong style={{ color: 'var(--text-primary)' }}>0.9 KB</strong></span>
+                <span>= <strong style={{ color: 'var(--brand)' }}>6.4 KB</strong> gzip</span>
+              </div>
+            </div>
           </div>
 
           {/* Premium */}
@@ -882,6 +967,13 @@ export default function TopologyGraphPage() {
             <div className="topology-graph-page__tier-import">{IMPORT_STRINGS.premium}</div>
             <div className="topology-graph-page__tier-preview">
               <PremiumTopologyGraph nodes={tierPreviewNodes} edges={tierPreviewEdges} height={160} />
+            </div>
+            <div className="topology-graph-page__size-breakdown">
+              <div className="topology-graph-page__size-row">
+                <span>Component: <strong style={{ color: 'var(--text-primary)' }}>6.2 KB</strong></span>
+                <span>+ Shared: <strong style={{ color: 'var(--text-primary)' }}>0.9 KB</strong></span>
+                <span>= <strong style={{ color: 'var(--brand)' }}>7.1 KB</strong> gzip</span>
+              </div>
             </div>
           </div>
         </div>
@@ -938,6 +1030,40 @@ export default function TopologyGraphPage() {
             <span>Keyboard-accessible control buttons with visible focus indicators.</span>
           </li>
         </ul>
+      </section>
+
+      {/* ── Brand Color ───────────────────────────────── */}
+      <section className="topology-graph-page__section" id="brand-color">
+        <h2 className="topology-graph-page__section-title"><a href="#brand-color">Brand Color</a></h2>
+        <p className="topology-graph-page__section-desc">
+          Pick a brand color to preview the component with your brand identity.
+        </p>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+          <ColorInput
+            name="brand-color"
+            value={brandColor}
+            onChange={setBrandColor}
+            size="sm"
+            swatches={['#6366f1','#f97316','#f43f5e','#0ea5e9','#10b981','#8b5cf6','#d946ef','#f59e0b','#06b6d4','#64748b']}
+          />
+        </div>
+      </section>
+
+      {/* ── Source ──────────────────────────────────────── */}
+      <section className="topology-graph-page__section" id="source">
+        <h2 className="topology-graph-page__section-title"><a href="#source">Source</a></h2>
+        <p className="topology-graph-page__section-desc">View the full component source code on GitHub.</p>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+          <a className="topology-graph-page__source-link" href="https://github.com/annondeveloper/ui-kit/blob/main/src/domain/topology-graph.tsx" target="_blank" rel="noopener noreferrer">
+            src/domain/topology-graph.tsx (Standard)
+          </a>
+          <a className="topology-graph-page__source-link" href="https://github.com/annondeveloper/ui-kit/blob/main/src/lite/topology-graph.tsx" target="_blank" rel="noopener noreferrer">
+            src/lite/topology-graph.tsx (Lite)
+          </a>
+          <a className="topology-graph-page__source-link" href="https://github.com/annondeveloper/ui-kit/blob/main/src/premium/topology-graph.tsx" target="_blank" rel="noopener noreferrer">
+            src/premium/topology-graph.tsx (Premium)
+          </a>
+        </div>
       </section>
     </div>
   )

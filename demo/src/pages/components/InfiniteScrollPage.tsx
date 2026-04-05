@@ -5,11 +5,16 @@ import { css } from '@ui/core/styles/css-tag'
 import { useStyles } from '@ui/core/styles/use-styles'
 import { InfiniteScroll } from '@ui/domain/infinite-scroll'
 import { InfiniteScroll as LiteInfiniteScroll } from '@ui/lite/infinite-scroll'
+import { InfiniteScroll as PremiumInfiniteScroll } from '@ui/premium/infinite-scroll'
 import { Button } from '@ui/components/button'
 import { Card } from '@ui/components/card'
 import { CopyBlock } from '@ui/domain/copy-block'
 import { Tabs, TabPanel } from '@ui/components/tabs'
 import { Icon } from '@ui/core/icons/icon'
+import { generateTheme } from '@ui/core/tokens/generator'
+import { TOKEN_TO_CSS, type ThemeTokens } from '@ui/core/tokens/tokens'
+import { useTheme } from '@ui/core/tokens/theme-context'
+import { ColorInput } from '@ui/components/color-input'
 import { PropsTable, type PropDef } from '../../components/PropsTable'
 import { useTier, type Tier } from '../../App'
 
@@ -424,6 +429,22 @@ const pageStyles = css`
       :scope ::-webkit-scrollbar-track { background: transparent; }
       :scope ::-webkit-scrollbar-thumb { background: var(--border-default); border-radius: 2px; }
       :scope ::-webkit-scrollbar-thumb:hover { background: var(--border-strong); }
+
+      /* ── Source link ─────────────────────────────────── */
+
+      .infinite-scroll-page__source-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: var(--text-sm, 0.875rem);
+        color: var(--brand);
+        text-decoration: none;
+        font-weight: 500;
+      }
+      .infinite-scroll-page__source-link:hover {
+        text-decoration: underline;
+        text-underline-offset: 0.2em;
+      }
     }
   }
 `
@@ -470,6 +491,21 @@ function DemoListItem({ item }: { item: DemoItem }) {
     </div>
   )
 }
+
+// ─── Color Presets ────────────────────────────────────────────────────────────
+
+const COLOR_PRESETS = [
+  { hex: '#6366f1', name: 'Indigo' },
+  { hex: '#f97316', name: 'Orange' },
+  { hex: '#f43f5e', name: 'Rose' },
+  { hex: '#0ea5e9', name: 'Sky' },
+  { hex: '#10b981', name: 'Emerald' },
+  { hex: '#8b5cf6', name: 'Violet' },
+  { hex: '#d946ef', name: 'Fuchsia' },
+  { hex: '#f59e0b', name: 'Amber' },
+  { hex: '#06b6d4', name: 'Cyan' },
+  { hex: '#64748b', name: 'Slate' },
+]
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -669,12 +705,15 @@ function useInfiniteList(pageSize: number = 10, maxItems: number = 50) {
 
 // ─── Playground Section ──────────────────────────────────────────────────────
 
-function PlaygroundSection({ tier }: { tier: Tier }) {
+function PlaygroundSection({ tier, brandColor }: { tier: Tier; brandColor: string }) {
   const [direction, setDirection] = useState<'down' | 'up'>('down')
   const [threshold, setThreshold] = useState(200)
   const [showEndMessage, setShowEndMessage] = useState(true)
+  const [motion, setMotion] = useState<0 | 1 | 2 | 3>(3)
   const [copyStatus, setCopyStatus] = useState('')
   const [activeCodeTab, setActiveCodeTab] = useState('react')
+
+  const ScrollComponent = tier === 'lite' ? LiteInfiniteScroll : tier === 'premium' ? PremiumInfiniteScroll : InfiniteScroll
 
   const { items, loading, hasMore, loadMore, reset } = useInfiniteList(8, 40)
 
@@ -722,19 +761,20 @@ function PlaygroundSection({ tier }: { tier: Tier }) {
                 </div>
               </LiteInfiniteScroll>
             ) : (
-              <InfiniteScroll
+              <ScrollComponent
                 onLoadMore={loadMore}
                 hasMore={hasMore}
                 loading={loading}
                 direction={direction}
                 threshold={threshold}
                 endMessage={endMsg}
+                motion={motion}
                 style={{ maxBlockSize: '380px' }}
               >
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', padding: '0.75rem' }}>
                   {items.map(item => <DemoListItem key={item.id} item={item} />)}
                 </div>
-              </InfiniteScroll>
+              </ScrollComponent>
             )}
           </div>
 
@@ -768,6 +808,12 @@ function PlaygroundSection({ tier }: { tier: Tier }) {
             <>
               <OptionGroup label="Direction" options={['down', 'up'] as const} value={direction} onChange={setDirection} />
               <OptionGroup label="Threshold (px)" options={['50', '200', '400'] as const} value={String(threshold)} onChange={v => setThreshold(Number(v))} />
+              <OptionGroup
+                label="Motion Level"
+                options={['0', '1', '2', '3'] as const}
+                value={String(motion) as '0' | '1' | '2' | '3'}
+                onChange={v => setMotion(Number(v) as 0 | 1 | 2 | 3)}
+              />
               <div className="infinite-scroll-page__control-group">
                 <span className="infinite-scroll-page__control-label">Toggles</span>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '0.375rem' }}>
@@ -789,7 +835,33 @@ export default function InfiniteScrollPage() {
   useStyles('infinite-scroll-page', pageStyles)
 
   const { tier, setTier } = useTier()
+  const [brandColor, setBrandColor] = useState('#6366f1')
   const pageRef = useRef<HTMLDivElement>(null)
+  const { mode } = useTheme()
+
+  const themeTokens = useMemo(() => {
+    try {
+      return generateTheme(brandColor, mode)
+    } catch {
+      return null
+    }
+  }, [brandColor, mode])
+
+  const BRAND_ONLY_KEYS: (keyof ThemeTokens)[] = [
+    'brand', 'brandLight', 'brandDark', 'brandSubtle', 'brandGlow',
+    'borderGlow', 'aurora1', 'aurora2',
+  ]
+
+  const themeStyle = useMemo(() => {
+    if (!themeTokens || brandColor === '#6366f1') return undefined
+    const style: Record<string, string> = {}
+    for (const key of BRAND_ONLY_KEYS) {
+      const cssVar = TOKEN_TO_CSS[key]
+      const value = themeTokens[key]
+      if (cssVar && value) style[cssVar] = value
+    }
+    return style as React.CSSProperties
+  }, [themeTokens, brandColor])
 
   // Scroll reveal fallback
   useEffect(() => {
@@ -826,7 +898,7 @@ export default function InfiniteScrollPage() {
   const endMessageDemo = useInfiniteList(5, 15)
 
   return (
-    <div className="infinite-scroll-page" ref={pageRef}>
+    <div className="infinite-scroll-page" ref={pageRef} style={themeStyle}>
       {/* ── 1. Hero Header ──────────────────────────────── */}
       <div className="infinite-scroll-page__hero">
         <h1 className="infinite-scroll-page__title">InfiniteScroll</h1>
@@ -842,7 +914,7 @@ export default function InfiniteScrollPage() {
       </div>
 
       {/* ── 2. Live Playground ──────────────────────────── */}
-      <PlaygroundSection tier={tier} />
+      <PlaygroundSection tier={tier} brandColor={brandColor} />
 
       {/* ── 3. Basic Usage ─────────────────────────────── */}
       <section className="infinite-scroll-page__section" id="basic">
@@ -1051,7 +1123,9 @@ export default function InfiniteScrollPage() {
               import {'{'} InfiniteScroll {'}'} from '@annondeveloper/ui-kit/premium'
             </div>
             <div className="infinite-scroll-page__tier-preview">
-              <span style={{ fontSize: 'var(--text-xs)', color: 'var(--text-tertiary)' }}>Premium preview</span>
+              <PremiumInfiniteScroll onLoadMore={() => {}} hasMore={false} loading={false} style={{ maxBlockSize: '80px' }}>
+                <div style={{ padding: '0.5rem', fontSize: 'var(--text-xs)', color: 'var(--text-tertiary)' }}>Premium preview</div>
+              </PremiumInfiniteScroll>
             </div>
             <div className="infinite-scroll-page__size-breakdown">
               <div className="infinite-scroll-page__size-row">
@@ -1116,6 +1190,60 @@ export default function InfiniteScrollPage() {
             </li>
           </ul>
         </Card>
+      </section>
+
+      {/* ── Brand Color ──────────────────────────────────── */}
+      <section className="infinite-scroll-page__section" id="brand-color">
+        <h2 className="infinite-scroll-page__section-title">
+          <a href="#brand-color">Brand Color</a>
+        </h2>
+        <p className="infinite-scroll-page__section-desc">
+          Pick a brand color to see all infinite scroll components update in real-time. The theme generates
+          derived colors (light, dark, subtle, glow) automatically from your choice.
+        </p>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+          <ColorInput
+            name="brand-color"
+            value={brandColor}
+            onChange={setBrandColor}
+            size="sm"
+            swatches={['#6366f1','#f97316','#f43f5e','#0ea5e9','#10b981','#8b5cf6','#d946ef','#f59e0b','#06b6d4','#64748b']}
+          />
+          <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+            {COLOR_PRESETS.map(p => (
+              <button
+                key={p.hex}
+                type="button"
+                style={{ width: 28, height: 28, borderRadius: '50%', border: brandColor === p.hex ? '2px solid var(--text-primary)' : '2px solid transparent', background: p.hex, cursor: 'pointer' }}
+                onClick={() => setBrandColor(p.hex)}
+                title={p.name}
+                aria-label={`Set brand color to ${p.name}`}
+              />
+            ))}
+          </div>
+          {brandColor !== '#6366f1' && (
+            <Button size="xs" variant="ghost" onClick={() => setBrandColor('#6366f1')}>
+              <Icon name="refresh" size="sm" /> Reset to default
+            </Button>
+          )}
+        </div>
+      </section>
+
+      {/* ── Source ──────────────────────────────────────── */}
+      <section className="infinite-scroll-page__section" id="source">
+        <h2 className="infinite-scroll-page__section-title"><a href="#source">Source</a></h2>
+        <p className="infinite-scroll-page__section-desc">View the full component source code on GitHub.</p>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+          <a className="infinite-scroll-page__source-link" href="https://github.com/annondeveloper/ui-kit/blob/main/src/domain/infinite-scroll.tsx" target="_blank" rel="noopener noreferrer">
+            <Icon name="code" size="sm" /> src/domain/infinite-scroll.tsx (Standard)
+          </a>
+          <a className="infinite-scroll-page__source-link" href="https://github.com/annondeveloper/ui-kit/blob/main/src/lite/infinite-scroll.tsx" target="_blank" rel="noopener noreferrer">
+            <Icon name="code" size="sm" /> src/lite/infinite-scroll.tsx (Lite)
+          </a>
+          <a className="infinite-scroll-page__source-link" href="https://github.com/annondeveloper/ui-kit/blob/main/src/premium/infinite-scroll.tsx" target="_blank" rel="noopener noreferrer">
+            <Icon name="code" size="sm" /> src/premium/infinite-scroll.tsx (Premium)
+          </a>
+        </div>
       </section>
     </div>
   )

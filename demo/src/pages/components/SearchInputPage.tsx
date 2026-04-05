@@ -5,6 +5,7 @@ import { css } from '@ui/core/styles/css-tag'
 import { useStyles } from '@ui/core/styles/use-styles'
 import { SearchInput } from '@ui/components/search-input'
 import { SearchInput as LiteSearchInput } from '@ui/lite/search-input'
+import { SearchInput as PremiumSearchInput } from '@ui/premium/search-input'
 import { Card } from '@ui/components/card'
 import { CopyBlock } from '@ui/domain/copy-block'
 import { Tabs, TabPanel } from '@ui/components/tabs'
@@ -408,6 +409,22 @@ const pageStyles = css`
         .search-input-page__preview { padding: 3.5rem; }
       }
 
+      /* ── Source link ─────────────────────────────────── */
+
+      .search-input-page__source-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        color: var(--brand, oklch(65% 0.2 270));
+        font-size: var(--text-sm, 0.875rem);
+        text-decoration: none;
+        font-weight: 500;
+      }
+      .search-input-page__source-link:hover {
+        text-decoration: underline;
+        text-underline-offset: 0.2em;
+      }
+
       /* ── Scrollbar ──────────────────────────────── */
       .search-input-page__import-code, .search-input-page code, pre {
         overflow-x: auto; scrollbar-width: thin; scrollbar-color: var(--border-default) transparent; max-inline-size: 100%;
@@ -498,7 +515,7 @@ function Toggle({ label, checked, onChange }: { label: string; checked: boolean;
 
 // ─── Code Generation ─────────────────────────────────────────────────────────
 
-function generateReactCode(tier: Tier, size: Size, placeholder: string, loading: boolean, clearable: boolean, disabled: boolean, debounce: number): string {
+function generateReactCode(tier: Tier, size: Size, placeholder: string, loading: boolean, clearable: boolean, disabled: boolean, debounce: number, motion: number): string {
   const importStr = IMPORT_STRINGS[tier]
 
   const props: string[] = []
@@ -508,6 +525,7 @@ function generateReactCode(tier: Tier, size: Size, placeholder: string, loading:
   if (!clearable && tier !== 'lite') props.push('  clearable={false}')
   if (disabled) props.push('  disabled')
   if (debounce !== 300 && tier !== 'lite') props.push(`  debounce={${debounce}}`)
+  if (motion !== 3 && tier !== 'lite') props.push(`  motion={${motion}}`)
 
   if (tier !== 'lite') {
     props.push('  onChange={(val) => console.log(val)}')
@@ -625,12 +643,13 @@ function PlaygroundSection({ tier: tierProp, brandColor }: { tier: Tier; brandCo
   const [disabled, setDisabled] = useState(false)
   const [debounce, setDebounce] = useState(300)
   const [searchValue, setSearchValue] = useState('')
+  const [motion, setMotion] = useState<0 | 1 | 2 | 3>(3)
   const [copyStatus, setCopyStatus] = useState('')
   const [activeCodeTab, setActiveCodeTab] = useState('react')
 
   const reactCode = useMemo(
-    () => generateReactCode(tier, size, placeholder, loading, clearable, disabled, debounce),
-    [tier, size, placeholder, loading, clearable, disabled, debounce],
+    () => generateReactCode(tier, size, placeholder, loading, clearable, disabled, debounce, motion),
+    [tier, size, placeholder, loading, clearable, disabled, debounce, motion],
   )
   const htmlCode = useMemo(() => generateHtmlCode(tier, size, placeholder), [tier, size, placeholder])
   const vueCode = useMemo(() => generateVueCode(tier, size, placeholder, disabled), [tier, size, placeholder, disabled])
@@ -673,6 +692,20 @@ function PlaygroundSection({ tier: tierProp, brandColor }: { tier: Tier; brandCo
                   size={size as 'sm' | 'md' | 'lg'}
                   disabled={disabled}
                 />
+              ) : tier === 'premium' ? (
+                <PremiumSearchInput
+                  value={searchValue}
+                  onChange={setSearchValue}
+                  onSearch={(val) => console.log('Search:', val)}
+                  onClear={() => setSearchValue('')}
+                  placeholder={placeholder}
+                  size={size}
+                  loading={loading}
+                  clearable={clearable}
+                  disabled={disabled}
+                  debounce={debounce}
+                  motion={motion}
+                />
               ) : (
                 <SearchInput
                   value={searchValue}
@@ -685,6 +718,7 @@ function PlaygroundSection({ tier: tierProp, brandColor }: { tier: Tier; brandCo
                   clearable={clearable}
                   disabled={disabled}
                   debounce={debounce}
+                  motion={motion}
                 />
               )}
             </div>
@@ -710,6 +744,15 @@ function PlaygroundSection({ tier: tierProp, brandColor }: { tier: Tier; brandCo
 
         <div className="search-input-page__playground-controls">
           <OptionGroup label="Size" options={tier === 'lite' ? (['sm', 'md', 'lg'] as const) : SIZES} value={size} onChange={setSize as (v: string) => void} />
+
+          {tier !== 'lite' && (
+            <OptionGroup
+              label="Motion"
+              options={['0', '1', '2', '3'] as const}
+              value={String(motion) as '0' | '1' | '2' | '3'}
+              onChange={v => setMotion(Number(v) as 0 | 1 | 2 | 3)}
+            />
+          )}
 
           {tier !== 'lite' && (
             <div className="search-input-page__control-group">
@@ -1009,7 +1052,7 @@ export default function SearchInputPage() {
             <div className="search-input-page__tier-import">import {'{'} SearchInput {'}'} from '@annondeveloper/ui-kit/premium'</div>
             <div className="search-input-page__tier-preview">
               <div style={{ inlineSize: '100%' }}>
-                <SearchInput placeholder="Premium search..." />
+                <PremiumSearchInput placeholder="Premium search..." />
               </div>
             </div>
             <div className="search-input-page__size-breakdown">
@@ -1197,6 +1240,23 @@ export default function SearchInputPage() {
             </li>
           </ul>
         </Card>
+      </section>
+
+      {/* ── Source ──────────────────────────────────────── */}
+      <section className="search-input-page__section" id="source">
+        <h2 className="search-input-page__section-title"><a href="#source">Source</a></h2>
+        <p className="search-input-page__section-desc">View the full component source code on GitHub.</p>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+          <a className="search-input-page__source-link" href="https://github.com/annondeveloper/ui-kit/blob/main/src/components/search-input.tsx" target="_blank" rel="noopener noreferrer">
+            <Icon name="code" size="sm" /> src/components/search-input.tsx (Standard)
+          </a>
+          <a className="search-input-page__source-link" href="https://github.com/annondeveloper/ui-kit/blob/main/src/lite/search-input.tsx" target="_blank" rel="noopener noreferrer">
+            <Icon name="code" size="sm" /> src/lite/search-input.tsx (Lite)
+          </a>
+          <a className="search-input-page__source-link" href="https://github.com/annondeveloper/ui-kit/blob/main/src/premium/search-input.tsx" target="_blank" rel="noopener noreferrer">
+            <Icon name="code" size="sm" /> src/premium/search-input.tsx (Premium)
+          </a>
+        </div>
       </section>
     </div>
   )

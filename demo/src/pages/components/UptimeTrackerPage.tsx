@@ -5,11 +5,13 @@ import { css } from '@ui/core/styles/css-tag'
 import { useStyles } from '@ui/core/styles/use-styles'
 import { UptimeTracker } from '@ui/domain/uptime-tracker'
 import { UptimeTracker as LiteUptimeTracker } from '@ui/lite/uptime-tracker'
+import { UptimeTracker as PremiumUptimeTracker } from '@ui/premium/uptime-tracker'
 import { Button } from '@ui/components/button'
 import { Card } from '@ui/components/card'
 import { CopyBlock } from '@ui/domain/copy-block'
 import { Tabs, TabPanel } from '@ui/components/tabs'
 import { Icon } from '@ui/core/icons/icon'
+import { ColorInput } from '@ui/components/color-input'
 import { PropsTable, type PropDef } from '../../components/PropsTable'
 import { useTier, type Tier } from '../../App'
 
@@ -743,7 +745,7 @@ function PlaygroundSection({ tier: tierProp }: { tier: Tier }) {
   const [copyStatus, setCopyStatus] = useState('')
   const [activeCodeTab, setActiveCodeTab] = useState('react')
 
-  const TrackerComponent = tier === 'lite' ? LiteUptimeTracker : UptimeTracker
+  const TrackerComponent = tier === 'premium' ? PremiumUptimeTracker : tier === 'lite' ? LiteUptimeTracker : UptimeTracker
 
   const days = useMemo(() => {
     const count = Number(dayCount)
@@ -864,6 +866,7 @@ export default function UptimeTrackerPage() {
 
   const { tier, setTier } = useTier()
   const pageRef = useRef<HTMLDivElement>(null)
+  const [brandColor, setBrandColor] = useState('#6366f1')
 
   useEffect(() => {
     const sections = document.querySelectorAll('.uptime-tracker-page__section')
@@ -895,7 +898,7 @@ export default function UptimeTrackerPage() {
     return () => observer.disconnect()
   }, [])
 
-  const TrackerComponent = tier === 'lite' ? LiteUptimeTracker : UptimeTracker
+  const TrackerComponent = tier === 'premium' ? PremiumUptimeTracker : tier === 'lite' ? LiteUptimeTracker : UptimeTracker
 
   return (
     <div className="uptime-tracker-page" ref={pageRef}>
@@ -1111,7 +1114,7 @@ export default function UptimeTrackerPage() {
               import {'{'} UptimeTracker {'}'} from '@annondeveloper/ui-kit/premium'
             </div>
             <div className="uptime-tracker-page__tier-preview">
-              <UptimeTracker days={SAMPLE_30_DAYS.slice(0, 15)} showSla slaTarget={0.999} />
+              <PremiumUptimeTracker days={SAMPLE_30_DAYS.slice(0, 15)} showSla slaTarget={0.999} />
             </div>
             <div className="uptime-tracker-page__size-breakdown">
               <div className="uptime-tracker-page__size-row">
@@ -1121,6 +1124,31 @@ export default function UptimeTrackerPage() {
               </div>
             </div>
           </div>
+        </div>
+      </section>
+
+      {/* ── 7b. Brand Color ──────────────────────────────── */}
+      <section className="uptime-tracker-page__section" id="brand-color">
+        <h2 className="uptime-tracker-page__section-title">
+          <a href="#brand-color">Brand Color</a>
+        </h2>
+        <p className="uptime-tracker-page__section-desc">
+          Pick a brand color to see all uptime trackers update in real-time. The theme generates
+          derived colors (light, dark, subtle, glow) automatically from your choice.
+        </p>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+          <ColorInput
+            name="brand-color"
+            value={brandColor}
+            onChange={setBrandColor}
+            size="sm"
+            swatches={['#6366f1','#f97316','#f43f5e','#0ea5e9','#10b981','#8b5cf6','#d946ef','#f59e0b','#06b6d4','#64748b']}
+          />
+          {brandColor !== '#6366f1' && (
+            <Button size="xs" variant="ghost" onClick={() => setBrandColor('#6366f1')}>
+              <Icon name="refresh" size="sm" /> Reset to default
+            </Button>
+          )}
         </div>
       </section>
 
@@ -1199,6 +1227,23 @@ export default function UptimeTrackerPage() {
             </li>
           </ul>
         </Card>
+      </section>
+
+      {/* ── Source ──────────────────────────────────────── */}
+      <section className="uptime-tracker-page__section" id="source">
+        <h2 className="uptime-tracker-page__section-title"><a href="#source">Source</a></h2>
+        <p className="uptime-tracker-page__section-desc">View the full component source code on GitHub.</p>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+          <a className="uptime-tracker-page__source-link" href="https://github.com/annondeveloper/ui-kit/blob/main/src/domain/uptime-tracker.tsx" target="_blank" rel="noopener noreferrer">
+            <Icon name="code" size="sm" /> src/domain/uptime-tracker.tsx (Standard)
+          </a>
+          <a className="uptime-tracker-page__source-link" href="https://github.com/annondeveloper/ui-kit/blob/main/src/lite/uptime-tracker.tsx" target="_blank" rel="noopener noreferrer">
+            <Icon name="code" size="sm" /> src/lite/uptime-tracker.tsx (Lite)
+          </a>
+          <a className="uptime-tracker-page__source-link" href="https://github.com/annondeveloper/ui-kit/blob/main/src/premium/uptime-tracker.tsx" target="_blank" rel="noopener noreferrer">
+            <Icon name="code" size="sm" /> src/premium/uptime-tracker.tsx (Premium)
+          </a>
+        </div>
       </section>
     </div>
   )

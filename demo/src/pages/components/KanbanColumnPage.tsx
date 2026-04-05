@@ -5,6 +5,7 @@ import { css } from '@ui/core/styles/css-tag'
 import { useStyles } from '@ui/core/styles/use-styles'
 import { KanbanColumn, type KanbanCard } from '@ui/domain/kanban-column'
 import { KanbanColumn as LiteKanbanColumn } from '@ui/lite/kanban-column'
+import { KanbanColumn as PremiumKanbanColumn } from '@ui/premium/kanban-column'
 import { Button } from '@ui/components/button'
 import { Card } from '@ui/components/card'
 import { CopyBlock } from '@ui/domain/copy-block'
@@ -482,6 +483,14 @@ const pageStyles = css`
         gap: 0.5rem;
       }
 
+      .kanban-column-page__source-link {
+        color: var(--brand);
+        text-decoration: none;
+      }
+      .kanban-column-page__source-link:hover {
+        text-decoration: underline;
+      }
+
       /* ── A11y list ──────────────────────────────────── */
 
       .kanban-column-page__a11y-list {
@@ -902,6 +911,17 @@ function PlaygroundSection({ tier }: { tier: Tier }) {
                 cards={cards.map(c => ({ id: c.id, title: c.title, description: c.description, tags: c.tags }))}
                 count={cards.length}
               />
+            ) : tier === 'premium' ? (
+              <PremiumKanbanColumn
+                title={title}
+                cards={cards}
+                columnId="playground-col"
+                wipLimit={effectiveWip}
+                collapsed={collapsed}
+                onCollapse={setCollapsed}
+                motion={motion}
+                onCardClick={(id) => setCopyStatus(`Clicked card: ${id}`)}
+              />
             ) : (
               <KanbanColumn
                 title={title}
@@ -1059,6 +1079,18 @@ export default function KanbanColumnPage() {
               }))}
               count={PRIORITIES.length}
             />
+          ) : tier === 'premium' ? (
+            <PremiumKanbanColumn
+              title="Priority Demo"
+              columnId="priorities"
+              cards={PRIORITIES.map((p, i) => ({
+                id: `prio-${i}`,
+                title: `${p.charAt(0).toUpperCase() + p.slice(1)} priority task`,
+                description: `This card demonstrates ${p} priority styling`,
+                priority: p,
+                tags: [p],
+              }))}
+            />
           ) : (
             <KanbanColumn
               title="Priority Demo"
@@ -1179,6 +1211,12 @@ export default function KanbanColumnPage() {
                 <LiteKanbanColumn title="Backlog" cards={BACKLOG_CARDS.map(c => ({ id: c.id, title: c.title, description: c.description, tags: c.tags }))} count={BACKLOG_CARDS.length} />
                 <LiteKanbanColumn title="In Progress" cards={IN_PROGRESS_CARDS.map(c => ({ id: c.id, title: c.title, description: c.description, tags: c.tags }))} count={IN_PROGRESS_CARDS.length} />
                 <LiteKanbanColumn title="Done" cards={DONE_CARDS.map(c => ({ id: c.id, title: c.title, description: c.description, tags: c.tags }))} count={DONE_CARDS.length} />
+              </>
+            ) : tier === 'premium' ? (
+              <>
+                <PremiumKanbanColumn title="Backlog" columnId="board-backlog" cards={BACKLOG_CARDS} />
+                <PremiumKanbanColumn title="In Progress" columnId="board-progress" cards={IN_PROGRESS_CARDS} wipLimit={3} />
+                <PremiumKanbanColumn title="Done" columnId="board-done" cards={DONE_CARDS} />
               </>
             ) : (
               <>
@@ -1315,7 +1353,7 @@ export default function KanbanColumnPage() {
               import {'{'} KanbanColumn {'}'} from '@annondeveloper/ui-kit/premium'
             </div>
             <div className="kanban-column-page__tier-preview">
-              <KanbanColumn
+              <PremiumKanbanColumn
                 title="Active"
                 columnId="tier-prem"
                 cards={[{ id: 'pm1', title: 'Build feature', tags: ['dev'], priority: 'high' }]}
@@ -1357,6 +1395,25 @@ export default function KanbanColumnPage() {
         <Card variant="default" padding="md">
           <PropsTable props={kanbanCardProps} />
         </Card>
+      </section>
+
+      {/* ── Source ──────────────────────────────────────── */}
+      <section className="kanban-column-page__section" id="source">
+        <h2 className="kanban-column-page__section-title">
+          <a href="#source">Source</a>
+        </h2>
+        <p className="kanban-column-page__section-desc">View the full component source code on GitHub.</p>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+          <a className="kanban-column-page__source-link" href="https://github.com/annondeveloper/ui-kit/blob/main/src/domain/kanban-column.tsx" target="_blank" rel="noopener noreferrer">
+            src/domain/kanban-column.tsx (Standard)
+          </a>
+          <a className="kanban-column-page__source-link" href="https://github.com/annondeveloper/ui-kit/blob/main/src/lite/kanban-column.tsx" target="_blank" rel="noopener noreferrer">
+            src/lite/kanban-column.tsx (Lite)
+          </a>
+          <a className="kanban-column-page__source-link" href="https://github.com/annondeveloper/ui-kit/blob/main/src/premium/kanban-column.tsx" target="_blank" rel="noopener noreferrer">
+            src/premium/kanban-column.tsx (Premium)
+          </a>
+        </div>
       </section>
 
       {/* ── 10. Accessibility ──────────────────────────── */}

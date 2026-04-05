@@ -11,6 +11,7 @@ import { Card } from '@ui/components/card'
 import { CopyBlock } from '@ui/domain/copy-block'
 import { Tabs, TabPanel } from '@ui/components/tabs'
 import { Icon } from '@ui/core/icons/icon'
+import { ColorInput } from '@ui/components/color-input'
 import { PropsTable, type PropDef } from '../../components/PropsTable'
 import { useTier, type Tier } from '../../App'
 
@@ -478,6 +479,12 @@ const pageStyles = css`
         padding-block-start: 0.5rem;
       }
 
+      .switch-faceplate-page__size-breakdown { display: flex; flex-direction: column; gap: 0.25rem; font-size: 0.75rem; color: var(--text-tertiary); }
+      .switch-faceplate-page__size-row { display: flex; align-items: center; gap: 0.5rem; }
+
+      .switch-faceplate-page__source-link { color: var(--brand); text-decoration: none; }
+      .switch-faceplate-page__source-link:hover { text-decoration: underline; }
+
       /* ── Code tabs ─────────────────────────────────── */
 
       .switch-faceplate-page__code-tabs {
@@ -936,6 +943,7 @@ export default function SwitchFaceplatePage() {
   useStyles('switch-faceplate-page', pageStyles)
 
   const { tier, setTier } = useTier()
+  const [brandColor, setBrandColor] = useState('#6366f1')
 
   // Scroll reveal for sections — JS fallback
   useEffect(() => {
@@ -1135,6 +1143,11 @@ export default function SwitchFaceplatePage() {
                 label="Lite"
               />
             </div>
+            <div className="switch-faceplate-page__size-breakdown">
+              <div className="switch-faceplate-page__size-row"><span>JS:</span> <span>~0.6 KB</span></div>
+              <div className="switch-faceplate-page__size-row"><span>CSS:</span> <span>~0.0 KB (inline)</span></div>
+              <div className="switch-faceplate-page__size-row"><span>Shared:</span> <span>~0.0 KB</span></div>
+            </div>
           </div>
 
           {/* Standard */}
@@ -1164,6 +1177,11 @@ export default function SwitchFaceplatePage() {
                 label="Standard"
               />
             </div>
+            <div className="switch-faceplate-page__size-breakdown">
+              <div className="switch-faceplate-page__size-row"><span>JS:</span> <span>~3 KB</span></div>
+              <div className="switch-faceplate-page__size-row"><span>CSS:</span> <span>~1.2 KB</span></div>
+              <div className="switch-faceplate-page__size-row"><span>Shared:</span> <span>~0.9 KB</span></div>
+            </div>
           </div>
 
           {/* Premium */}
@@ -1192,6 +1210,11 @@ export default function SwitchFaceplatePage() {
                 size="sm"
                 label="Premium"
               />
+            </div>
+            <div className="switch-faceplate-page__size-breakdown">
+              <div className="switch-faceplate-page__size-row"><span>JS:</span> <span>~4 KB</span></div>
+              <div className="switch-faceplate-page__size-row"><span>CSS:</span> <span>~1.5 KB</span></div>
+              <div className="switch-faceplate-page__size-row"><span>Shared:</span> <span>~0.9 KB</span></div>
             </div>
           </div>
         </div>
@@ -1272,6 +1295,33 @@ export default function SwitchFaceplatePage() {
             </li>
           </ul>
         </Card>
+      </section>
+
+      {/* ── Source ──────────────────────────────────────── */}
+      <section className="switch-faceplate-page__section" id="source">
+        <h2 className="switch-faceplate-page__section-title"><a href="#source">Source</a></h2>
+        <p className="switch-faceplate-page__section-desc">View the full component source code on GitHub.</p>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+          <a className="switch-faceplate-page__source-link" href="https://github.com/annondeveloper/ui-kit/blob/main/src/domain/switch-faceplate.tsx" target="_blank" rel="noopener noreferrer">
+            src/domain/switch-faceplate.tsx (Standard)
+          </a>
+          <a className="switch-faceplate-page__source-link" href="https://github.com/annondeveloper/ui-kit/blob/main/src/lite/switch-faceplate.tsx" target="_blank" rel="noopener noreferrer">
+            src/lite/switch-faceplate.tsx (Lite)
+          </a>
+          <a className="switch-faceplate-page__source-link" href="https://github.com/annondeveloper/ui-kit/blob/main/src/premium/switch-faceplate.tsx" target="_blank" rel="noopener noreferrer">
+            src/premium/switch-faceplate.tsx (Premium)
+          </a>
+        </div>
+      </section>
+
+      {/* ── Brand Color ───────────────────────────────── */}
+      <section className="switch-faceplate-page__section" id="brand-color">
+        <h2 className="switch-faceplate-page__section-title"><a href="#brand-color">Brand Color</a></h2>
+        <p className="switch-faceplate-page__section-desc">Pick a brand color to preview the component with your brand identity.</p>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+          <ColorInput name="brand-color" value={brandColor} onChange={setBrandColor} size="sm"
+            swatches={['#6366f1','#f97316','#f43f5e','#0ea5e9','#10b981','#8b5cf6','#d946ef','#f59e0b','#06b6d4','#64748b']} />
+        </div>
       </section>
     </div>
   )

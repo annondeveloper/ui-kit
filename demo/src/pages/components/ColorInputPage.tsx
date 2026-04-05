@@ -5,6 +5,7 @@ import { css } from '@ui/core/styles/css-tag'
 import { useStyles } from '@ui/core/styles/use-styles'
 import { ColorInput } from '@ui/components/color-input'
 import { ColorInput as LiteColorInput } from '@ui/lite/color-input'
+import { ColorInput as PremiumColorInput } from '@ui/premium/color-input'
 import { Button } from '@ui/components/button'
 import { Card } from '@ui/components/card'
 import { CopyBlock } from '@ui/domain/copy-block'
@@ -451,6 +452,9 @@ const pageStyles = css`
       :scope ::-webkit-scrollbar-track { background: transparent; }
       :scope ::-webkit-scrollbar-thumb { background: var(--border-default); border-radius: 2px; }
       :scope ::-webkit-scrollbar-thumb:hover { background: var(--border-strong); }
+
+      .color-input-page__source-link { color: var(--brand); text-decoration: none; }
+      .color-input-page__source-link:hover { text-decoration: underline; }
     }
   }
 `
@@ -714,6 +718,19 @@ function PlaygroundSection({ tier: tierProp }: { tier: Tier }) {
                   label={label || undefined}
                   value={color}
                   onChange={e => setColor((e.target as HTMLInputElement).value)}
+                />
+              ) : tier === 'premium' ? (
+                <PremiumColorInput
+                  name="playground-color"
+                  size={size}
+                  label={label || undefined}
+                  disabled={disabled}
+                  showInput={showInput}
+                  error={errorText || undefined}
+                  swatches={showSwatches ? DEFAULT_SWATCHES : undefined}
+                  motion={motion}
+                  value={color}
+                  onChange={setColor}
                 />
               ) : (
                 <ColorInput
@@ -1140,7 +1157,7 @@ export default function ColorInputPage() {
               import {'{'} ColorInput {'}'} from '@annondeveloper/ui-kit/premium'
             </div>
             <div className="color-input-page__tier-preview">
-              <ColorInput name="tier-prem" size="sm" defaultValue="#6366f1" />
+              <PremiumColorInput name="tier-prem" size="sm" defaultValue="#6366f1" />
             </div>
             <div className="color-input-page__size-breakdown">
               <div className="color-input-page__size-row">
@@ -1206,6 +1223,23 @@ export default function ColorInputPage() {
             </li>
           </ul>
         </Card>
+      </section>
+
+      {/* ── Source ──────────────────────────────────────── */}
+      <section className="color-input-page__section" id="source">
+        <h2 className="color-input-page__section-title"><a href="#source">Source</a></h2>
+        <p className="color-input-page__section-desc">View the full component source code on GitHub.</p>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+          <a className="color-input-page__source-link" href="https://github.com/annondeveloper/ui-kit/blob/main/src/components/color-input.tsx" target="_blank" rel="noopener noreferrer">
+            src/components/color-input.tsx (Standard)
+          </a>
+          <a className="color-input-page__source-link" href="https://github.com/annondeveloper/ui-kit/blob/main/src/lite/color-input.tsx" target="_blank" rel="noopener noreferrer">
+            src/lite/color-input.tsx (Lite)
+          </a>
+          <a className="color-input-page__source-link" href="https://github.com/annondeveloper/ui-kit/blob/main/src/premium/color-input.tsx" target="_blank" rel="noopener noreferrer">
+            src/premium/color-input.tsx (Premium)
+          </a>
+        </div>
       </section>
     </div>
   )

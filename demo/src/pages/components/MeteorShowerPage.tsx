@@ -4,11 +4,17 @@ import { useState, useMemo, useCallback, useRef, useEffect } from 'react'
 import { css } from '@ui/core/styles/css-tag'
 import { useStyles } from '@ui/core/styles/use-styles'
 import { MeteorShower } from '@ui/domain/meteor-shower'
+import { MeteorShower as LiteMeteorShower } from '@ui/lite/meteor-shower'
+import { MeteorShower as PremiumMeteorShower } from '@ui/premium/meteor-shower'
 import { Button } from '@ui/components/button'
 import { Card } from '@ui/components/card'
 import { CopyBlock } from '@ui/domain/copy-block'
 import { Tabs, TabPanel } from '@ui/components/tabs'
 import { Icon } from '@ui/core/icons/icon'
+import { ColorInput } from '@ui/components/color-input'
+import { generateTheme } from '@ui/core/tokens/generator'
+import { TOKEN_TO_CSS, type ThemeTokens } from '@ui/core/tokens/tokens'
+import { useTheme } from '@ui/core/tokens/theme-context'
 import { PropsTable, type PropDef } from '../../components/PropsTable'
 import { useTier, type Tier } from '../../App'
 
@@ -539,6 +545,22 @@ const pageStyles = css`
         .meteor-page__preview { padding: 3.5rem; }
       }
 
+      /* ── Source link ─────────────────────────────────── */
+
+      .meteor-page__source-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: var(--text-sm, 0.875rem);
+        color: var(--brand);
+        text-decoration: none;
+        font-weight: 500;
+      }
+      .meteor-page__source-link:hover {
+        text-decoration: underline;
+        text-underline-offset: 0.2em;
+      }
+
       /* ── Scrollbar ──────────────────────────────────── */
 
       .meteor-page__import-code,
@@ -782,12 +804,14 @@ function generateSvelteCode(tier: Tier, count: number, motion: MotionLevel): str
 
 // ─── Playground Section ───────────────────────────────────────────────────────
 
-function PlaygroundSection({ tier: tierProp }: { tier: Tier }) {
+function PlaygroundSection({ tier: tierProp, brandColor }: { tier: Tier; brandColor: string }) {
   const { tier: contextTier } = useTier()
   const tier = tierProp ?? contextTier
   const [count, setCount] = useState<MeteorCount>(20)
   const [motion, setMotion] = useState<MotionLevel>(3)
   const [copyStatus, setCopyStatus] = useState('')
+
+  const ShowerComponent = tier === 'lite' ? LiteMeteorShower : tier === 'premium' ? PremiumMeteorShower : MeteorShower
 
   const reactCode = useMemo(() => generateReactCode(tier, count, motion), [tier, count, motion])
   const htmlCode = useMemo(() => generateHtmlCode(tier, count, motion), [tier, count, motion])
@@ -829,7 +853,7 @@ function PlaygroundSection({ tier: tierProp }: { tier: Tier }) {
       <div className="meteor-page__playground">
         <div className="meteor-page__playground-preview">
           <div className="meteor-page__playground-result">
-            <MeteorShower
+            <ShowerComponent
               count={count}
               motion={motion}
               style={{ position: 'absolute', inset: 0, borderRadius: 'inherit' }}
@@ -842,7 +866,7 @@ function PlaygroundSection({ tier: tierProp }: { tier: Tier }) {
                   {count} meteors at motion level {motion}
                 </p>
               </div>
-            </MeteorShower>
+            </ShowerComponent>
           </div>
 
           <div className="meteor-page__code-tabs">
@@ -907,6 +931,32 @@ export default function MeteorShowerPage() {
   useStyles('meteor-page', pageStyles)
 
   const { tier, setTier } = useTier()
+  const [brandColor, setBrandColor] = useState('#6366f1')
+  const { mode } = useTheme()
+
+  const themeTokens = useMemo(() => {
+    try {
+      return generateTheme(brandColor, mode)
+    } catch {
+      return null
+    }
+  }, [brandColor, mode])
+
+  const BRAND_ONLY_KEYS: (keyof ThemeTokens)[] = [
+    'brand', 'brandLight', 'brandDark', 'brandSubtle', 'brandGlow',
+    'auroraOne', 'auroraTwo',
+  ]
+
+  const themeStyle = useMemo(() => {
+    if (!themeTokens || brandColor === '#6366f1') return undefined
+    const style: Record<string, string> = {}
+    for (const key of BRAND_ONLY_KEYS) {
+      const cssVar = TOKEN_TO_CSS[key]
+      const value = themeTokens[key]
+      if (cssVar && value) style[cssVar] = value
+    }
+    return style as React.CSSProperties
+  }, [themeTokens, brandColor])
 
   // Scroll reveal JS fallback
   useEffect(() => {
@@ -940,7 +990,7 @@ export default function MeteorShowerPage() {
   }, [])
 
   return (
-    <div className="meteor-page">
+    <div className="meteor-page" style={themeStyle}>
       {/* ── 1. Hero Header ──────────────────────────────── */}
       <div className="meteor-page__hero">
         <h1 className="meteor-page__title">MeteorShower</h1>
@@ -956,7 +1006,7 @@ export default function MeteorShowerPage() {
       </div>
 
       {/* ── 2. Live Playground ──────────────────────────── */}
-      <PlaygroundSection tier={tier} />
+      <PlaygroundSection tier={tier} brandColor={brandColor} />
 
       {/* ── 3. Meteor Count Gallery ───────────────────────── */}
       <section className="meteor-page__section" id="meteor-counts">
@@ -1172,7 +1222,7 @@ function HeroSection() {
                 background: 'oklch(8% 0.02 270)',
                 position: 'relative',
               }}>
-                <MeteorShower count={8} motion={2} />
+                <LiteMeteorShower count={8} />
               </div>
             </div>
             <div className="meteor-page__size-breakdown">
@@ -1243,7 +1293,7 @@ function HeroSection() {
               impact flash effects, and viewport-aware culling for performance.
             </p>
             <div className="meteor-page__tier-import">
-              import {'{'} MeteorShower {'}'} from '@annondeveloper/ui-kit'
+              import {'{'} MeteorShower {'}'} from '@annondeveloper/ui-kit/premium'
             </div>
             <div className="meteor-page__tier-preview">
               <div style={{
@@ -1254,7 +1304,7 @@ function HeroSection() {
                 background: 'oklch(8% 0.02 270)',
                 position: 'relative',
               }}>
-                <MeteorShower count={25} motion={3} />
+                <PremiumMeteorShower count={25} motion={3} />
               </div>
             </div>
             <div className="meteor-page__size-breakdown">
@@ -1330,6 +1380,57 @@ function HeroSection() {
             </li>
           </ul>
         </Card>
+      </section>
+
+      {/* ── 11. Brand Color ─────────────────────────────── */}
+      <section className="meteor-page__section" id="brand-color">
+        <h2 className="meteor-page__section-title">
+          <a href="#brand-color">Brand Color</a>
+        </h2>
+        <p className="meteor-page__section-desc">
+          Pick a brand color to see the meteor shower update in real-time. The theme generates
+          derived colors automatically from your choice.
+        </p>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+          <ColorInput
+            name="brand-color"
+            value={brandColor}
+            onChange={setBrandColor}
+            size="sm"
+            swatches={['#6366f1','#f97316','#f43f5e','#0ea5e9','#10b981','#8b5cf6','#d946ef','#f59e0b','#06b6d4','#64748b']}
+          />
+          {brandColor !== '#6366f1' && (
+            <Button size="xs" variant="ghost" onClick={() => setBrandColor('#6366f1')}>
+              <Icon name="refresh" size="sm" /> Reset to default
+            </Button>
+          )}
+          <div className="meteor-page__preview meteor-page__preview--tall" style={{ padding: 0 }}>
+            <MeteorShower count={25} style={{ width: '100%', minHeight: '200px', background: 'oklch(8% 0.02 270)', borderRadius: 'var(--radius-md)' }}>
+              <div style={{ display: 'grid', placeItems: 'center', minHeight: '200px', position: 'relative', zIndex: 1 }}>
+                <span style={{ color: 'oklch(90% 0 0)', fontWeight: 600, fontSize: '0.875rem' }}>
+                  Brand: {brandColor}
+                </span>
+              </div>
+            </MeteorShower>
+          </div>
+        </div>
+      </section>
+
+      {/* ── 12. Source ──────────────────────────────────── */}
+      <section className="meteor-page__section" id="source">
+        <h2 className="meteor-page__section-title"><a href="#source">Source</a></h2>
+        <p className="meteor-page__section-desc">View the full component source code on GitHub.</p>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+          <a className="meteor-page__source-link" href="https://github.com/annondeveloper/ui-kit/blob/main/src/domain/meteor-shower.tsx" target="_blank" rel="noopener noreferrer">
+            <Icon name="code" size="sm" /> src/domain/meteor-shower.tsx (Standard)
+          </a>
+          <a className="meteor-page__source-link" href="https://github.com/annondeveloper/ui-kit/blob/main/src/lite/meteor-shower.tsx" target="_blank" rel="noopener noreferrer">
+            <Icon name="code" size="sm" /> src/lite/meteor-shower.tsx (Lite)
+          </a>
+          <a className="meteor-page__source-link" href="https://github.com/annondeveloper/ui-kit/blob/main/src/premium/meteor-shower.tsx" target="_blank" rel="noopener noreferrer">
+            <Icon name="code" size="sm" /> src/premium/meteor-shower.tsx (Premium)
+          </a>
+        </div>
       </section>
     </div>
   )

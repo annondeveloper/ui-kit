@@ -5,6 +5,7 @@ import { css } from '@ui/core/styles/css-tag'
 import { useStyles } from '@ui/core/styles/use-styles'
 import { Typography } from '@ui/components/typography'
 import { Typography as LiteTypography } from '@ui/lite/typography'
+import { Typography as PremiumTypography } from '@ui/premium/typography'
 import { Button } from '@ui/components/button'
 import { Card } from '@ui/components/card'
 import { CopyBlock } from '@ui/domain/copy-block'
@@ -935,7 +936,9 @@ function PlaygroundSection({ tier: tierProp }: { tier: Tier }) {
   const [content, setContent] = useState('The quick brown fox jumps over the lazy dog')
   const [copyStatus, setCopyStatus] = useState('')
 
-  const TypoComponent = tier === 'lite' ? LiteTypography : Typography
+  const [motion, setMotion] = useState<0 | 1 | 2 | 3>(3)
+
+  const TypoComponent = tier === 'lite' ? LiteTypography : tier === 'premium' ? PremiumTypography : Typography
 
   const reactCode = useMemo(
     () => generateReactCode(tier, variant, color, weight, align, truncate, truncateLines, content),
@@ -978,7 +981,7 @@ function PlaygroundSection({ tier: tierProp }: { tier: Tier }) {
     }
   }, [activeCodeTab, reactCode, htmlCode, vueCode, angularCode, svelteCode])
 
-  const previewProps: Record<string, unknown> = { variant }
+  const previewProps: Record<string, unknown> = { variant, motion }
   if (color) previewProps.color = color
   if (tier !== 'lite') {
     if (weight) previewProps.weight = weight
@@ -1044,6 +1047,12 @@ function PlaygroundSection({ tier: tierProp }: { tier: Tier }) {
         <div className="typography-page__playground-controls">
           <OptionGroup label="Variant" options={VARIANTS} value={variant} onChange={setVariant} />
           <OptionGroup label="Color" options={['', ...COLORS] as const} value={color as string} onChange={v => setColor(v as Color | '')} />
+          <OptionGroup
+            label="Motion Level"
+            options={['0', '1', '2', '3'] as const}
+            value={String(motion)}
+            onChange={v => setMotion(Number(v) as 0 | 1 | 2 | 3)}
+          />
 
           {tier !== 'lite' && (
             <>
@@ -1103,7 +1112,7 @@ export default function TypographyPage() {
   const { tier, setTier } = useTier()
   const pageRef = useRef<HTMLDivElement>(null)
 
-  const TypoComponent = tier === 'lite' ? LiteTypography : Typography
+  const TypoComponent = tier === 'lite' ? LiteTypography : tier === 'premium' ? PremiumTypography : Typography
 
   // Scroll reveal for sections -- JS fallback for browsers without animation-timeline
   useEffect(() => {
@@ -1368,7 +1377,7 @@ export default function TypographyPage() {
               import {'{'} Typography {'}'} from '@annondeveloper/ui-kit/premium'
             </div>
             <div className="typography-page__tier-preview">
-              <Typography variant="h4" color="brand">Standard</Typography>
+              <PremiumTypography variant="h4" color="brand">Premium</PremiumTypography>
             </div>
             <div className="typography-page__size-breakdown">
               <div className="typography-page__size-row">
@@ -1439,6 +1448,47 @@ export default function TypographyPage() {
               <span className="typography-page__a11y-icon"><Icon name="check-circle" size="sm" /></span>
               <span>
                 <strong>Element override:</strong> Use the <code className="typography-page__a11y-key">as</code> prop to render a different element while keeping the variant styles.
+              </span>
+            </li>
+          </ul>
+        </Card>
+      </section>
+
+      {/* ── 11. Source ─────────────────────────────────── */}
+      <section className="typography-page__section" id="source">
+        <h2 className="typography-page__section-title">
+          <a href="#source">Source Code</a>
+        </h2>
+        <p className="typography-page__section-desc">
+          View the source on GitHub to understand the implementation details.
+        </p>
+        <Card variant="default" padding="md">
+          <ul className="typography-page__a11y-list">
+            <li className="typography-page__a11y-item">
+              <span className="typography-page__a11y-icon"><Icon name="external-link" size="sm" /></span>
+              <span>
+                <strong>Standard:</strong>{' '}
+                <a href="https://github.com/annondeveloper/ui-kit/blob/main/src/components/typography.tsx" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--brand)' }}>
+                  Source on GitHub
+                </a>
+              </span>
+            </li>
+            <li className="typography-page__a11y-item">
+              <span className="typography-page__a11y-icon"><Icon name="external-link" size="sm" /></span>
+              <span>
+                <strong>Lite:</strong>{' '}
+                <a href="https://github.com/annondeveloper/ui-kit/blob/main/src/lite/typography.tsx" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--brand)' }}>
+                  Source on GitHub
+                </a>
+              </span>
+            </li>
+            <li className="typography-page__a11y-item">
+              <span className="typography-page__a11y-icon"><Icon name="external-link" size="sm" /></span>
+              <span>
+                <strong>Premium:</strong>{' '}
+                <a href="https://github.com/annondeveloper/ui-kit/blob/main/src/premium/typography.tsx" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--brand)' }}>
+                  Source on GitHub
+                </a>
               </span>
             </li>
           </ul>

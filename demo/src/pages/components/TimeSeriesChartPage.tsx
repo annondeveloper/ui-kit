@@ -11,6 +11,7 @@ import { Card } from '@ui/components/card'
 import { CopyBlock } from '@ui/domain/copy-block'
 import { Tabs, TabPanel } from '@ui/components/tabs'
 import { Icon } from '@ui/core/icons/icon'
+import { ColorInput } from '@ui/components/color-input'
 import { PropsTable, type PropDef } from '../../components/PropsTable'
 import { useTier, type Tier } from '../../App'
 
@@ -482,6 +483,56 @@ const pageStyles = css`
         padding-block-start: 0.5rem;
       }
 
+      .time-series-chart-page__size-breakdown {
+        display: flex;
+        flex-direction: column;
+        gap: 0.25rem;
+        font-size: 0.75rem;
+        color: var(--text-tertiary);
+      }
+
+      .time-series-chart-page__size-row {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+
+      .time-series-chart-page__source-link {
+        color: var(--brand);
+        text-decoration: none;
+      }
+      .time-series-chart-page__source-link:hover {
+        text-decoration: underline;
+      }
+
+      .time-series-chart-page__color-presets {
+        display: flex;
+        gap: 0.25rem;
+        flex-wrap: wrap;
+      }
+
+      .time-series-chart-page__color-preset {
+        inline-size: 24px;
+        block-size: 24px;
+        border-radius: 50%;
+        border: 2px solid transparent;
+        cursor: pointer;
+        padding: 0;
+        transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1),
+                    border-color 0.15s,
+                    box-shadow 0.15s;
+        box-shadow: 0 1px 3px oklch(0% 0 0 / 0.2);
+      }
+      .time-series-chart-page__color-preset:hover {
+        transform: scale(1.2);
+        box-shadow: 0 2px 8px oklch(0% 0 0 / 0.3);
+      }
+      .time-series-chart-page__color-preset--active {
+        border-color: oklch(100% 0 0);
+        transform: scale(1.2);
+        box-shadow: 0 0 0 2px var(--bg-base), 0 0 0 4px oklch(100% 0 0 / 0.5);
+      }
+
       /* ── Code tabs ─────────────────────────────────── */
 
       .time-series-chart-page__code-tabs {
@@ -619,6 +670,19 @@ const TIERS: { id: Tier; label: string }[] = [
   { id: 'lite', label: 'Lite' },
   { id: 'standard', label: 'Standard' },
   { id: 'premium', label: 'Premium' },
+]
+
+const COLOR_PRESETS = [
+  { hex: '#6366f1', name: 'Indigo' },
+  { hex: '#f97316', name: 'Orange' },
+  { hex: '#f43f5e', name: 'Rose' },
+  { hex: '#0ea5e9', name: 'Sky' },
+  { hex: '#10b981', name: 'Emerald' },
+  { hex: '#8b5cf6', name: 'Violet' },
+  { hex: '#d946ef', name: 'Fuchsia' },
+  { hex: '#f59e0b', name: 'Amber' },
+  { hex: '#06b6d4', name: 'Cyan' },
+  { hex: '#64748b', name: 'Slate' },
 ]
 
 const IMPORT_STRINGS: Record<Tier, string> = {
@@ -812,6 +876,7 @@ function PlaygroundSection({ tier: tierProp }: { tier: Tier }) {
   const [showTooltip, setShowTooltip] = useState(true)
   const [showLegend, setShowLegend] = useState(true)
   const [height, setHeight] = useState(250)
+  const [motion, setMotion] = useState<0 | 1 | 2 | 3>(3)
   const [enabledSeries, setEnabledSeries] = useState<string[]>(['cpu', 'memory', 'network'])
   const [copyStatus, setCopyStatus] = useState('')
 
@@ -872,6 +937,7 @@ function PlaygroundSection({ tier: tierProp }: { tier: Tier }) {
     showGrid,
     showXAxis,
     showYAxis,
+    motion,
   }
   if (tier !== 'lite') {
     previewProps.showTooltip = showTooltip
@@ -962,6 +1028,8 @@ function PlaygroundSection({ tier: tierProp }: { tier: Tier }) {
             />
             <span style={{ fontSize: '0.75rem', color: 'var(--text-tertiary)' }}>{height}px</span>
           </div>
+
+          <OptionGroup label="Motion" options={['0', '1', '2', '3'] as const} value={String(motion) as any} onChange={v => setMotion(Number(v) as 0 | 1 | 2 | 3)} />
 
           <div className="time-series-chart-page__control-group">
             <span className="time-series-chart-page__control-label">Display</span>
@@ -1088,6 +1156,7 @@ export default function TimeSeriesChartPage() {
   useStyles('time-series-chart-page', pageStyles)
 
   const { tier, setTier } = useTier()
+  const [brandColor, setBrandColor] = useState('#6366f1')
 
   // Scroll reveal for sections — JS fallback
   useEffect(() => {
@@ -1237,6 +1306,13 @@ export default function TimeSeriesChartPage() {
             <div className="time-series-chart-page__tier-preview">
               <LiteTimeSeriesChart series={singleSeries} height={80} width={200} />
             </div>
+            <div className="time-series-chart-page__size-breakdown">
+              <div className="time-series-chart-page__size-row">
+                <span>Component: <strong style={{ color: 'var(--text-primary)' }}>1.0 KB</strong></span>
+                <span>+ Shared: <strong style={{ color: 'var(--text-primary)' }}>0.0 KB</strong></span>
+                <span>= <strong style={{ color: 'var(--brand)' }}>1.0 KB</strong> gzip</span>
+              </div>
+            </div>
           </div>
 
           {/* Standard */}
@@ -1259,6 +1335,13 @@ export default function TimeSeriesChartPage() {
             </div>
             <div className="time-series-chart-page__tier-preview">
               <TimeSeriesChart series={singleSeries} height={80} />
+            </div>
+            <div className="time-series-chart-page__size-breakdown">
+              <div className="time-series-chart-page__size-row">
+                <span>Component: <strong style={{ color: 'var(--text-primary)' }}>4.0 KB</strong></span>
+                <span>+ Shared: <strong style={{ color: 'var(--text-primary)' }}>0.9 KB</strong></span>
+                <span>= <strong style={{ color: 'var(--brand)' }}>4.9 KB</strong> gzip</span>
+              </div>
             </div>
           </div>
 
@@ -1283,6 +1366,13 @@ export default function TimeSeriesChartPage() {
             </div>
             <div className="time-series-chart-page__tier-preview">
               <PremiumTimeSeriesChart series={singleSeries} height={80} />
+            </div>
+            <div className="time-series-chart-page__size-breakdown">
+              <div className="time-series-chart-page__size-row">
+                <span>Component: <strong style={{ color: 'var(--text-primary)' }}>5.0 KB</strong></span>
+                <span>+ Shared: <strong style={{ color: 'var(--text-primary)' }}>0.9 KB</strong></span>
+                <span>= <strong style={{ color: 'var(--brand)' }}>5.9 KB</strong> gzip</span>
+              </div>
             </div>
           </div>
         </div>
@@ -1365,6 +1455,61 @@ export default function TimeSeriesChartPage() {
             </li>
           </ul>
         </Card>
+      </section>
+
+      {/* ── Brand Color ──────────────────────────────── */}
+      <section className="time-series-chart-page__section" id="brand-color">
+        <h2 className="time-series-chart-page__section-title">
+          <a href="#brand-color">Brand Color</a>
+        </h2>
+        <p className="time-series-chart-page__section-desc">
+          Pick a brand color to see the chart update in real-time. The theme generates
+          derived colors (light, dark, subtle, glow) automatically from your choice.
+        </p>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+          <ColorInput
+            name="brand-color"
+            value={brandColor}
+            onChange={setBrandColor}
+            size="sm"
+            swatches={['#6366f1','#f97316','#f43f5e','#0ea5e9','#10b981','#8b5cf6','#d946ef','#f59e0b','#06b6d4','#64748b']}
+          />
+          <div className="time-series-chart-page__color-presets">
+            {COLOR_PRESETS.map(p => (
+              <button
+                key={p.hex}
+                type="button"
+                className={`time-series-chart-page__color-preset${brandColor === p.hex ? ' time-series-chart-page__color-preset--active' : ''}`}
+                style={{ background: p.hex }}
+                onClick={() => setBrandColor(p.hex)}
+                title={p.name}
+                aria-label={`Set brand color to ${p.name}`}
+              />
+            ))}
+          </div>
+          {brandColor !== '#6366f1' && (
+            <Button size="xs" variant="ghost" onClick={() => setBrandColor('#6366f1')}>
+              <Icon name="refresh" size="sm" /> Reset to default
+            </Button>
+          )}
+        </div>
+      </section>
+
+      {/* ── Source ──────────────────────────────────────── */}
+      <section className="time-series-chart-page__section" id="source">
+        <h2 className="time-series-chart-page__section-title"><a href="#source">Source</a></h2>
+        <p className="time-series-chart-page__section-desc">View the full component source code on GitHub.</p>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+          <a className="time-series-chart-page__source-link" href="https://github.com/annondeveloper/ui-kit/blob/main/src/domain/time-series-chart.tsx" target="_blank" rel="noopener noreferrer">
+            src/domain/time-series-chart.tsx (Standard)
+          </a>
+          <a className="time-series-chart-page__source-link" href="https://github.com/annondeveloper/ui-kit/blob/main/src/lite/time-series-chart.tsx" target="_blank" rel="noopener noreferrer">
+            src/lite/time-series-chart.tsx (Lite)
+          </a>
+          <a className="time-series-chart-page__source-link" href="https://github.com/annondeveloper/ui-kit/blob/main/src/premium/time-series-chart.tsx" target="_blank" rel="noopener noreferrer">
+            src/premium/time-series-chart.tsx (Premium)
+          </a>
+        </div>
       </section>
     </div>
   )

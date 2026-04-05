@@ -4,6 +4,8 @@ import { useState, useMemo, useCallback, useRef, useEffect } from 'react'
 import { css } from '@ui/core/styles/css-tag'
 import { useStyles } from '@ui/core/styles/use-styles'
 import { NotificationStack, type Notification } from '@ui/domain/notification-stack'
+import { NotificationStack as LiteNotificationStack } from '@ui/lite/notification-stack'
+import { NotificationStack as PremiumNotificationStack } from '@ui/premium/notification-stack'
 import { Button } from '@ui/components/button'
 import { Card } from '@ui/components/card'
 import { CopyBlock } from '@ui/domain/copy-block'
@@ -515,6 +517,22 @@ const pageStyles = css`
       :scope ::-webkit-scrollbar-track { background: transparent; }
       :scope ::-webkit-scrollbar-thumb { background: var(--border-default); border-radius: 2px; }
       :scope ::-webkit-scrollbar-thumb:hover { background: var(--border-strong); }
+
+      /* ── Source link ─────────────────────────────────── */
+
+      .notification-stack-page__source-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: var(--text-sm, 0.875rem);
+        color: var(--brand);
+        text-decoration: none;
+        font-weight: 500;
+      }
+      .notification-stack-page__source-link:hover {
+        text-decoration: underline;
+        text-underline-offset: 0.2em;
+      }
     }
   }
 `
@@ -996,15 +1014,32 @@ function PlaygroundSection({ tier: tierProp }: { tier: Tier }) {
       <div className="notification-stack-page__playground">
         <div className="notification-stack-page__playground-preview">
           <div className="notification-stack-page__playground-result">
-            <NotificationStack
-              notifications={notifications}
-              onDismiss={handleDismiss}
-              onDismissAll={handleDismissAll}
-              onMarkAllRead={handleMarkAllRead}
-              onMarkRead={handleMarkRead}
-              maxVisible={maxVisible}
-              motion={tier !== 'lite' ? motion : undefined}
-            />
+            {tier === 'lite' ? (
+              <LiteNotificationStack
+                notifications={notifications}
+                onDismiss={handleDismiss}
+              />
+            ) : tier === 'premium' ? (
+              <PremiumNotificationStack
+                notifications={notifications}
+                onDismiss={handleDismiss}
+                onDismissAll={handleDismissAll}
+                onMarkAllRead={handleMarkAllRead}
+                onMarkRead={handleMarkRead}
+                maxVisible={maxVisible}
+                motion={motion}
+              />
+            ) : (
+              <NotificationStack
+                notifications={notifications}
+                onDismiss={handleDismiss}
+                onDismissAll={handleDismissAll}
+                onMarkAllRead={handleMarkAllRead}
+                onMarkRead={handleMarkRead}
+                maxVisible={maxVisible}
+                motion={motion}
+              />
+            )}
           </div>
 
           <div className="notification-stack-page__add-row">
@@ -1263,7 +1298,7 @@ export default function NotificationStackPage() {
               import {'{'} NotificationStack {'}'} from '@annondeveloper/ui-kit/lite'
             </div>
             <div className="notification-stack-page__tier-preview">
-              <span style={{ fontSize: 'var(--text-xs)', color: 'var(--text-tertiary)' }}>Static list rendering</span>
+              <LiteNotificationStack notifications={notifications.slice(0, 2)} />
             </div>
             <div className="notification-stack-page__size-breakdown">
               <div className="notification-stack-page__size-row">
@@ -1325,7 +1360,7 @@ export default function NotificationStackPage() {
               import {'{'} NotificationStack {'}'} from '@annondeveloper/ui-kit/premium'
             </div>
             <div className="notification-stack-page__tier-preview">
-              <span style={{ fontSize: 'var(--text-xs)', color: 'var(--text-tertiary)' }}>Swipe + Sound + Push</span>
+              <PremiumNotificationStack notifications={notifications.slice(0, 2)} />
             </div>
             <div className="notification-stack-page__size-breakdown">
               <div className="notification-stack-page__size-row">
@@ -1419,6 +1454,23 @@ export default function NotificationStackPage() {
             </li>
           </ul>
         </Card>
+      </section>
+
+      {/* ── Source ──────────────────────────────────────── */}
+      <section className="notification-stack-page__section" id="source">
+        <h2 className="notification-stack-page__section-title"><a href="#source">Source</a></h2>
+        <p className="notification-stack-page__section-desc">View the full component source code on GitHub.</p>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+          <a className="notification-stack-page__source-link" href="https://github.com/annondeveloper/ui-kit/blob/main/src/domain/notification-stack.tsx" target="_blank" rel="noopener noreferrer">
+            <Icon name="code" size="sm" /> src/domain/notification-stack.tsx (Standard)
+          </a>
+          <a className="notification-stack-page__source-link" href="https://github.com/annondeveloper/ui-kit/blob/main/src/lite/notification-stack.tsx" target="_blank" rel="noopener noreferrer">
+            <Icon name="code" size="sm" /> src/lite/notification-stack.tsx (Lite)
+          </a>
+          <a className="notification-stack-page__source-link" href="https://github.com/annondeveloper/ui-kit/blob/main/src/premium/notification-stack.tsx" target="_blank" rel="noopener noreferrer">
+            <Icon name="code" size="sm" /> src/premium/notification-stack.tsx (Premium)
+          </a>
+        </div>
       </section>
     </div>
   )

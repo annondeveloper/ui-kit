@@ -4,6 +4,8 @@ import { useState, useMemo, useCallback, useRef, useEffect } from 'react'
 import { css } from '@ui/core/styles/css-tag'
 import { useStyles } from '@ui/core/styles/use-styles'
 import { Ripple } from '@ui/domain/ripple'
+import { Ripple as LiteRipple } from '@ui/lite/ripple'
+import { Ripple as PremiumRipple } from '@ui/premium/ripple'
 import { Button } from '@ui/components/button'
 import { Card } from '@ui/components/card'
 import { CopyBlock } from '@ui/domain/copy-block'
@@ -682,6 +684,22 @@ const pageStyles = css`
       :scope ::-webkit-scrollbar-thumb:hover {
         background: var(--border-strong);
       }
+
+      /* ── Source link ─────────────────────────────────── */
+
+      .ripple-page__source-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: var(--text-sm, 0.875rem);
+        color: var(--brand);
+        text-decoration: none;
+        font-weight: 500;
+      }
+      .ripple-page__source-link:hover {
+        text-decoration: underline;
+        text-underline-offset: 0.2em;
+      }
     }
   }
 `
@@ -919,6 +937,8 @@ function PlaygroundSection({ tier: tierProp, brandColor }: { tier: Tier; brandCo
   const angularCode = useMemo(() => generateAngularCode(rippleColor, duration), [rippleColor, duration])
   const svelteCode = useMemo(() => generateSvelteCode(tier, rippleColor, duration), [tier, rippleColor, duration])
 
+  const RippleComponent = tier === 'lite' ? LiteRipple : tier === 'premium' ? PremiumRipple : Ripple
+
   const codeTabs = [
     { id: 'react', label: 'React' },
     { id: 'html', label: 'HTML+CSS' },
@@ -950,7 +970,7 @@ function PlaygroundSection({ tier: tierProp, brandColor }: { tier: Tier; brandCo
       <div className="ripple-page__playground">
         <div className="ripple-page__playground-preview">
           <div className="ripple-page__playground-result">
-            <Ripple
+            <RippleComponent
               color={rippleColor || undefined}
               duration={duration}
               motion={motion}
@@ -959,7 +979,7 @@ function PlaygroundSection({ tier: tierProp, brandColor }: { tier: Tier; brandCo
               <div className="ripple-page__target ripple-page__target--large">
                 Click anywhere in this area
               </div>
-            </Ripple>
+            </RippleComponent>
           </div>
 
           <div className="ripple-page__code-tabs">
@@ -1295,9 +1315,9 @@ export default function RipplePage() {
               import {'{'} Ripple {'}'} from '@annondeveloper/ui-kit/domain'
             </div>
             <div className="ripple-page__tier-preview">
-              <Ripple motion={0} style={{ borderRadius: 'var(--radius-sm)' }}>
+              <LiteRipple style={{ borderRadius: 'var(--radius-sm)' }}>
                 <div style={{ padding: '0.75rem 1.25rem', fontSize: 'var(--text-xs)', fontWeight: 600, color: 'var(--text-primary)' }}>Click me</div>
-              </Ripple>
+              </LiteRipple>
             </div>
             <div className="ripple-page__size-breakdown">
               <div className="ripple-page__size-row">
@@ -1361,9 +1381,9 @@ export default function RipplePage() {
               import {'{'} Ripple {'}'} from '@annondeveloper/ui-kit/premium'
             </div>
             <div className="ripple-page__tier-preview">
-              <Ripple style={{ borderRadius: 'var(--radius-sm)' }}>
+              <PremiumRipple style={{ borderRadius: 'var(--radius-sm)' }}>
                 <div style={{ padding: '0.75rem 1.25rem', fontSize: 'var(--text-xs)', fontWeight: 600, color: 'var(--text-primary)' }}>Click me</div>
-              </Ripple>
+              </PremiumRipple>
             </div>
             <div className="ripple-page__size-breakdown">
               <div className="ripple-page__size-row">
@@ -1476,6 +1496,23 @@ export default function RipplePage() {
             </li>
           </ul>
         </Card>
+      </section>
+
+      {/* ── Source ──────────────────────────────────────── */}
+      <section className="ripple-page__section" id="source">
+        <h2 className="ripple-page__section-title"><a href="#source">Source</a></h2>
+        <p className="ripple-page__section-desc">View the full component source code on GitHub.</p>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+          <a className="ripple-page__source-link" href="https://github.com/annondeveloper/ui-kit/blob/main/src/domain/ripple.tsx" target="_blank" rel="noopener noreferrer">
+            <Icon name="code" size="sm" /> src/domain/ripple.tsx (Standard)
+          </a>
+          <a className="ripple-page__source-link" href="https://github.com/annondeveloper/ui-kit/blob/main/src/lite/ripple.tsx" target="_blank" rel="noopener noreferrer">
+            <Icon name="code" size="sm" /> src/lite/ripple.tsx (Lite)
+          </a>
+          <a className="ripple-page__source-link" href="https://github.com/annondeveloper/ui-kit/blob/main/src/premium/ripple.tsx" target="_blank" rel="noopener noreferrer">
+            <Icon name="code" size="sm" /> src/premium/ripple.tsx (Premium)
+          </a>
+        </div>
       </section>
     </div>
   )

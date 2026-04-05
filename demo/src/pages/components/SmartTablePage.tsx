@@ -4,11 +4,17 @@ import { useState, useMemo, useCallback, useRef, useEffect } from 'react'
 import { css } from '@ui/core/styles/css-tag'
 import { useStyles } from '@ui/core/styles/use-styles'
 import { SmartTable } from '@ui/domain/smart-table'
+import { SmartTable as LiteSmartTable } from '@ui/lite/smart-table'
+import { SmartTable as PremiumSmartTable } from '@ui/premium/smart-table'
 import { Button } from '@ui/components/button'
 import { Card } from '@ui/components/card'
 import { CopyBlock } from '@ui/domain/copy-block'
 import { Tabs, TabPanel } from '@ui/components/tabs'
 import { Icon } from '@ui/core/icons/icon'
+import { generateTheme } from '@ui/core/tokens/generator'
+import { TOKEN_TO_CSS, type ThemeTokens } from '@ui/core/tokens/tokens'
+import { useTheme } from '@ui/core/tokens/theme-context'
+import { ColorInput } from '@ui/components/color-input'
 import { PropsTable, type PropDef } from '../../components/PropsTable'
 import { useTier, type Tier } from '../../App'
 
@@ -434,6 +440,52 @@ const pageStyles = css`
         gap: 0.5rem;
       }
 
+      /* ── Source link ─────────────────────────────────── */
+
+      .smart-table-page__source-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: var(--text-sm, 0.875rem);
+        color: var(--brand);
+        text-decoration: none;
+        font-weight: 500;
+      }
+      .smart-table-page__source-link:hover {
+        text-decoration: underline;
+        text-underline-offset: 0.2em;
+      }
+
+      /* ── Color picker ──────────────────────────────── */
+
+      .smart-table-page__color-presets {
+        display: flex;
+        gap: 0.25rem;
+        flex-wrap: wrap;
+      }
+
+      .smart-table-page__color-preset {
+        inline-size: 24px;
+        block-size: 24px;
+        border-radius: 50%;
+        border: 2px solid transparent;
+        cursor: pointer;
+        padding: 0;
+        transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1),
+                    border-color 0.15s,
+                    box-shadow 0.15s;
+        box-shadow: 0 1px 3px oklch(0% 0 0 / 0.2);
+      }
+      .smart-table-page__color-preset:hover {
+        transform: scale(1.2);
+        box-shadow: 0 2px 8px oklch(0% 0 0 / 0.3);
+      }
+      .smart-table-page__color-preset--active {
+        border-color: oklch(100% 0 0);
+        transform: scale(1.2);
+        box-shadow: 0 0 0 2px var(--bg-base), 0 0 0 4px oklch(100% 0 0 / 0.5);
+      }
+
       /* ── A11y list ──────────────────────────────────── */
 
       .smart-table-page__a11y-list {
@@ -791,6 +843,7 @@ function PlaygroundSection({ tier: tierProp }: { tier: Tier }) {
   const [sortable, setSortable] = useState(true)
   const [selectable, setSelectable] = useState(false)
   const [stickyHeader, setStickyHeader] = useState(false)
+  const [motion, setMotion] = useState<0 | 1 | 2 | 3>(3)
   const [copyStatus, setCopyStatus] = useState('')
   const [activeCodeTab, setActiveCodeTab] = useState('react')
 
@@ -842,6 +895,7 @@ function PlaygroundSection({ tier: tierProp }: { tier: Tier }) {
               sortable={sortable}
               selectable={selectable && tier !== 'lite'}
               stickyHeader={stickyHeader && tier !== 'lite'}
+              motion={motion}
               pageSize={5}
             />
           </div>
@@ -884,6 +938,21 @@ function PlaygroundSection({ tier: tierProp }: { tier: Tier }) {
               {tier !== 'lite' && <Toggle label="Sticky header" checked={stickyHeader} onChange={setStickyHeader} />}
             </div>
           </div>
+          <div className="smart-table-page__control-group">
+            <span className="smart-table-page__control-label">Motion</span>
+            <div className="smart-table-page__control-options">
+              {([0, 1, 2, 3] as const).map(level => (
+                <button
+                  key={level}
+                  type="button"
+                  className={`smart-table-page__option-btn${motion === level ? ' smart-table-page__option-btn--active' : ''}`}
+                  onClick={() => setMotion(level)}
+                >
+                  {level === 0 ? 'None' : level === 1 ? 'Subtle' : level === 2 ? 'Expressive' : 'Cinematic'}
+                </button>
+              ))}
+            </div>
+          </div>
         </div>
       </div>
     </section>
@@ -892,10 +961,45 @@ function PlaygroundSection({ tier: tierProp }: { tier: Tier }) {
 
 // ─── Main Page ────────────────────────────────────────────────────────────────
 
+const COLOR_PRESETS = [
+  { hex: '#6366f1', name: 'Indigo' },
+  { hex: '#f97316', name: 'Orange' },
+  { hex: '#f43f5e', name: 'Rose' },
+  { hex: '#0ea5e9', name: 'Sky' },
+  { hex: '#10b981', name: 'Emerald' },
+  { hex: '#8b5cf6', name: 'Violet' },
+  { hex: '#d946ef', name: 'Fuchsia' },
+  { hex: '#f59e0b', name: 'Amber' },
+  { hex: '#06b6d4', name: 'Cyan' },
+  { hex: '#64748b', name: 'Slate' },
+]
+
 export default function SmartTablePage() {
   useStyles('smart-table-page', pageStyles)
 
   const { tier, setTier } = useTier()
+  const [brandColor, setBrandColor] = useState('#6366f1')
+  const { mode } = useTheme()
+
+  const BRAND_ONLY_KEYS: (keyof ThemeTokens)[] = [
+    'brand', 'brandLight', 'brandDark', 'brandSubtle', 'brandGlow',
+    'borderGlow', 'aurora1', 'aurora2',
+  ]
+
+  const themeTokens = useMemo(() => {
+    try { return generateTheme(brandColor, mode) } catch { return null }
+  }, [brandColor, mode])
+
+  const themeStyle = useMemo(() => {
+    if (!themeTokens || brandColor === '#6366f1') return undefined
+    const style: Record<string, string> = {}
+    for (const key of BRAND_ONLY_KEYS) {
+      const cssVar = TOKEN_TO_CSS[key]
+      const value = themeTokens[key]
+      if (cssVar && value) style[cssVar] = value
+    }
+    return style as React.CSSProperties
+  }, [themeTokens, brandColor])
 
   // Scroll reveal fallback
   useEffect(() => {
@@ -929,7 +1033,7 @@ export default function SmartTablePage() {
   }, [])
 
   return (
-    <div className="smart-table-page">
+    <div className="smart-table-page" style={themeStyle}>
       {/* ── 1. Hero Header ──────────────────────────────── */}
       <div className="smart-table-page__hero">
         <h1 className="smart-table-page__title">SmartTable</h1>
@@ -1069,8 +1173,15 @@ export default function SmartTablePage() {
             <div className="smart-table-page__tier-import">
               import {'{'} SmartTable {'}'} from '@annondeveloper/ui-kit/lite'
             </div>
-            <div className="smart-table-page__tier-preview">
-              <span style={{ fontSize: 'var(--text-xs)', color: 'var(--text-tertiary)' }}>Static table rendering</span>
+            <div className="smart-table-page__tier-preview" style={{ overflow: 'hidden', maxBlockSize: 120, borderRadius: 'var(--radius-sm)' }}>
+              <LiteSmartTable
+                data={SAMPLE_DATA.slice(0, 3)}
+                columns={[
+                  { id: 'name', header: 'Name', accessor: 'name' as const },
+                  { id: 'role', header: 'Role', accessor: 'role' as const },
+                ]}
+                compact
+              />
             </div>
             <div className="smart-table-page__size-breakdown">
               <div className="smart-table-page__size-row">
@@ -1099,8 +1210,12 @@ export default function SmartTablePage() {
             <div className="smart-table-page__tier-import">
               import {'{'} SmartTable {'}'} from '@annondeveloper/ui-kit'
             </div>
-            <div className="smart-table-page__tier-preview">
-              <span style={{ fontSize: 'var(--text-xs)', color: 'var(--text-tertiary)' }}>Search + Sort + Paginate</span>
+            <div className="smart-table-page__tier-preview" style={{ overflow: 'hidden', maxBlockSize: 120, borderRadius: 'var(--radius-sm)' }}>
+              <SmartTable
+                data={SAMPLE_DATA.slice(0, 3)}
+                columns={COLUMNS.slice(0, 3)}
+                sortable
+              />
             </div>
             <div className="smart-table-page__size-breakdown">
               <div className="smart-table-page__size-row">
@@ -1130,8 +1245,13 @@ export default function SmartTablePage() {
             <div className="smart-table-page__tier-import">
               import {'{'} SmartTable {'}'} from '@annondeveloper/ui-kit/premium'
             </div>
-            <div className="smart-table-page__tier-preview">
-              <span style={{ fontSize: 'var(--text-xs)', color: 'var(--text-tertiary)' }}>Resize + Reorder + Export</span>
+            <div className="smart-table-page__tier-preview" style={{ overflow: 'hidden', maxBlockSize: 120, borderRadius: 'var(--radius-sm)' }}>
+              <PremiumSmartTable
+                data={SAMPLE_DATA.slice(0, 3)}
+                columns={COLUMNS.slice(0, 3)}
+                sortable
+                motion={2}
+              />
             </div>
             <div className="smart-table-page__size-breakdown">
               <div className="smart-table-page__size-row">
@@ -1212,6 +1332,61 @@ export default function SmartTablePage() {
             </li>
           </ul>
         </Card>
+      </section>
+
+      {/* ── Brand Color ───────────────────────────────── */}
+      <section className="smart-table-page__section" id="brand-color">
+        <h2 className="smart-table-page__section-title">
+          <a href="#brand-color">Brand Color</a>
+        </h2>
+        <p className="smart-table-page__section-desc">
+          Pick a brand color to see the SmartTable theme update in real-time. Sort indicators,
+          selection highlights, search accents, and focus rings all adapt automatically.
+        </p>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+          <ColorInput
+            name="brand-color"
+            value={brandColor}
+            onChange={setBrandColor}
+            size="sm"
+            swatches={['#6366f1', '#f97316', '#f43f5e', '#0ea5e9', '#10b981', '#8b5cf6', '#d946ef', '#f59e0b', '#06b6d4', '#64748b']}
+          />
+          <div className="smart-table-page__color-presets">
+            {COLOR_PRESETS.map(p => (
+              <button
+                key={p.hex}
+                type="button"
+                className={`smart-table-page__color-preset${brandColor === p.hex ? ' smart-table-page__color-preset--active' : ''}`}
+                style={{ background: p.hex }}
+                onClick={() => setBrandColor(p.hex)}
+                title={p.name}
+                aria-label={`Set brand color to ${p.name}`}
+              />
+            ))}
+          </div>
+          {brandColor !== '#6366f1' && (
+            <Button size="xs" variant="ghost" onClick={() => setBrandColor('#6366f1')}>
+              <Icon name="refresh" size="sm" /> Reset to default
+            </Button>
+          )}
+        </div>
+      </section>
+
+      {/* ── Source ──────────────────────────────────────── */}
+      <section className="smart-table-page__section" id="source">
+        <h2 className="smart-table-page__section-title"><a href="#source">Source</a></h2>
+        <p className="smart-table-page__section-desc">View the full component source code on GitHub.</p>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+          <a className="smart-table-page__source-link" href="https://github.com/annondeveloper/ui-kit/blob/main/src/domain/smart-table.tsx" target="_blank" rel="noopener noreferrer">
+            <Icon name="code" size="sm" /> src/domain/smart-table.tsx (Standard)
+          </a>
+          <a className="smart-table-page__source-link" href="https://github.com/annondeveloper/ui-kit/blob/main/src/lite/smart-table.tsx" target="_blank" rel="noopener noreferrer">
+            <Icon name="code" size="sm" /> src/lite/smart-table.tsx (Lite)
+          </a>
+          <a className="smart-table-page__source-link" href="https://github.com/annondeveloper/ui-kit/blob/main/src/premium/smart-table.tsx" target="_blank" rel="noopener noreferrer">
+            <Icon name="code" size="sm" /> src/premium/smart-table.tsx (Premium)
+          </a>
+        </div>
       </section>
     </div>
   )

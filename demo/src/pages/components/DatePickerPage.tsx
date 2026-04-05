@@ -5,6 +5,7 @@ import { css } from '@ui/core/styles/css-tag'
 import { useStyles } from '@ui/core/styles/use-styles'
 import { DatePicker } from '@ui/components/date-picker'
 import { DatePicker as LiteDatePicker } from '@ui/lite/date-picker'
+import { DatePicker as PremiumDatePicker } from '@ui/premium/date-picker'
 import { Button } from '@ui/components/button'
 import { Card } from '@ui/components/card'
 import { CopyBlock } from '@ui/domain/copy-block'
@@ -1010,6 +1011,20 @@ function PlaygroundSection({ tier: tierProp }: { tier: Tier }) {
                 disabled={disabled}
                 onChange={e => setSelectedDate((e.target as HTMLInputElement).value)}
               />
+            ) : tier === 'premium' ? (
+              <PremiumDatePicker
+                size={size}
+                label={label || undefined}
+                placeholder={placeholder || undefined}
+                disabled={disabled}
+                error={errorText || undefined}
+                min={min || undefined}
+                max={max || undefined}
+                firstDayOfWeek={firstDayOfWeek}
+                motion={motion}
+                value={selectedDate || undefined}
+                onChange={setSelectedDate}
+              />
             ) : (
               <DatePicker
                 size={size}
@@ -1231,6 +1246,8 @@ export default function DatePickerPage() {
           <div className="date-picker-page__state-cell">
             {tier === 'lite' ? (
               <LiteDatePicker label="Default" />
+            ) : tier === 'premium' ? (
+              <PremiumDatePicker label="Default" placeholder="Pick a date" />
             ) : (
               <DatePicker label="Default" placeholder="Pick a date" />
             )}
@@ -1239,6 +1256,8 @@ export default function DatePickerPage() {
           <div className="date-picker-page__state-cell">
             {tier === 'lite' ? (
               <LiteDatePicker label="With value" defaultValue="2026-03-24" />
+            ) : tier === 'premium' ? (
+              <PremiumDatePicker label="With value" defaultValue="2026-03-24" />
             ) : (
               <DatePicker label="With value" defaultValue="2026-03-24" />
             )}
@@ -1247,6 +1266,8 @@ export default function DatePickerPage() {
           <div className="date-picker-page__state-cell">
             {tier === 'lite' ? (
               <LiteDatePicker label="Error" error="Date required" />
+            ) : tier === 'premium' ? (
+              <PremiumDatePicker label="Error" error="Date is required" placeholder="Pick a date" />
             ) : (
               <DatePicker label="Error" error="Date is required" placeholder="Pick a date" />
             )}
@@ -1255,6 +1276,8 @@ export default function DatePickerPage() {
           <div className="date-picker-page__state-cell">
             {tier === 'lite' ? (
               <LiteDatePicker label="Disabled" disabled />
+            ) : tier === 'premium' ? (
+              <PremiumDatePicker label="Disabled" disabled placeholder="Pick a date" />
             ) : (
               <DatePicker label="Disabled" disabled placeholder="Pick a date" />
             )}
@@ -1416,7 +1439,7 @@ export default function DatePickerPage() {
               import {'{'} DatePicker {'}'} from '@annondeveloper/ui-kit/premium'
             </div>
             <div className="date-picker-page__tier-preview">
-              <DatePicker placeholder="Premium" size="sm" />
+              <PremiumDatePicker placeholder="Premium" size="sm" />
             </div>
             <div className="date-picker-page__size-breakdown">
               <div className="date-picker-page__size-row">
@@ -1503,6 +1526,23 @@ export default function DatePickerPage() {
             </li>
           </ul>
         </Card>
+      </section>
+
+      {/* ── Source ──────────────────────────────────────── */}
+      <section className="date-picker-page__section" id="source">
+        <h2 className="date-picker-page__section-title"><a href="#source">Source</a></h2>
+        <p className="date-picker-page__section-desc">View the full component source code on GitHub.</p>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+          <a className="date-picker-page__source-link" href="https://github.com/annondeveloper/ui-kit/blob/main/src/components/date-picker.tsx" target="_blank" rel="noopener noreferrer">
+            src/components/date-picker.tsx (Standard)
+          </a>
+          <a className="date-picker-page__source-link" href="https://github.com/annondeveloper/ui-kit/blob/main/src/lite/date-picker.tsx" target="_blank" rel="noopener noreferrer">
+            src/lite/date-picker.tsx (Lite)
+          </a>
+          <a className="date-picker-page__source-link" href="https://github.com/annondeveloper/ui-kit/blob/main/src/premium/date-picker.tsx" target="_blank" rel="noopener noreferrer">
+            src/premium/date-picker.tsx (Premium)
+          </a>
+        </div>
       </section>
     </div>
   )

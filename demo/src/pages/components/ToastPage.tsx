@@ -6,9 +6,12 @@ import { useStyles } from '@ui/core/styles/use-styles'
 import { Button } from '@ui/components/button'
 import { Card } from '@ui/components/card'
 import { ToastProvider, useToast } from '@ui/domain/toast'
+import { Toast as LiteToast } from '@ui/lite/toast'
+import { ToastProvider as PremiumToastProvider } from '@ui/premium/toast'
 import { CopyBlock } from '@ui/domain/copy-block'
 import { Tabs, TabPanel } from '@ui/components/tabs'
 import { Icon } from '@ui/core/icons/icon'
+import { ColorInput } from '@ui/components/color-input'
 import { PropsTable, type PropDef } from '../../components/PropsTable'
 import { useTier, type Tier } from '../../App'
 
@@ -444,6 +447,33 @@ const pageStyles = css`
         padding-block-start: 0.5rem;
       }
 
+      .toast-page__size-breakdown {
+        font-size: var(--text-xs, 0.75rem);
+        color: var(--text-tertiary);
+        padding-block-start: 0.25rem;
+      }
+
+      .toast-page__size-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        justify-content: center;
+      }
+
+      .toast-page__source-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.375rem;
+        font-size: var(--text-sm, 0.875rem);
+        color: var(--brand, oklch(65% 0.2 270));
+        text-decoration: none;
+        padding: 0.25rem 0;
+      }
+      .toast-page__source-link:hover {
+        text-decoration: underline;
+        text-underline-offset: 0.2em;
+      }
+
       /* ── A11y list ──────────────────────────────────── */
 
       .toast-page__a11y-list {
@@ -853,6 +883,7 @@ function PlaygroundSection({ tier: tierProp }: { tier: Tier }) {
   const [duration, setDuration] = useState(5000)
   const [dismissible, setDismissible] = useState(true)
   const [hasAction, setHasAction] = useState(false)
+  const [motion, setMotion] = useState<0 | 1 | 2 | 3>(3)
   const [copyStatus, setCopyStatus] = useState('')
 
   const { toast, dismissAll } = useToast()
@@ -926,14 +957,23 @@ function PlaygroundSection({ tier: tierProp }: { tier: Tier }) {
       <div className="toast-page__playground">
         <div className="toast-page__playground-preview">
           <div className="toast-page__playground-result">
-            <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap', justifyContent: 'center' }}>
-              <Button variant="primary" onClick={handleShowToast}>
-                Show Toast
-              </Button>
-              <Button variant="secondary" onClick={dismissAll}>
-                Dismiss All
-              </Button>
-            </div>
+            {tier === 'lite' ? (
+              <LiteToast
+                title={title}
+                description={description || undefined}
+                variant={variant}
+                onClose={dismissible ? () => {} : undefined}
+              />
+            ) : (
+              <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap', justifyContent: 'center' }}>
+                <Button variant="primary" onClick={handleShowToast}>
+                  Show Toast
+                </Button>
+                <Button variant="secondary" onClick={dismissAll}>
+                  Dismiss All
+                </Button>
+              </div>
+            )}
           </div>
 
           <div className="toast-page__code-tabs">
@@ -999,6 +1039,15 @@ function PlaygroundSection({ tier: tierProp }: { tier: Tier }) {
             />
           </div>
 
+          {tier !== 'lite' && (
+            <OptionGroup
+              label="Motion"
+              options={['0', '1', '2', '3'] as const}
+              value={String(motion) as '0' | '1' | '2' | '3'}
+              onChange={v => setMotion(Number(v) as 0 | 1 | 2 | 3)}
+            />
+          )}
+
           <OptionGroup
             label="Duration"
             options={['0', '3000', '5000', '8000'] as const}
@@ -1025,6 +1074,7 @@ export default function ToastPage() {
   useStyles('toast-page', pageStyles)
 
   const { tier, setTier } = useTier()
+  const [brandColor, setBrandColor] = useState('#6366f1')
 
   // Scroll reveal for sections — JS fallback for browsers without animation-timeline
   useEffect(() => {
@@ -1218,7 +1268,14 @@ toast({
                 import {'{'} Toast {'}'} from '@annondeveloper/ui-kit/lite'
               </div>
               <div className="toast-page__tier-preview">
-                <Button size="sm" variant="secondary" onClick={() => setTier('lite')}>Select Lite</Button>
+                <LiteToast title="Lite Toast" variant="success" onClose={() => {}} />
+              </div>
+              <div className="toast-page__size-breakdown">
+                <div className="toast-page__size-row">
+                  <span>CSS: <strong style={{ color: 'var(--text-primary)' }}>0.2 KB</strong></span>
+                  <span>JS: <strong style={{ color: 'var(--text-primary)' }}>0 KB</strong></span>
+                  <span>= <strong style={{ color: 'var(--brand)' }}>0.2 KB</strong> gzip</span>
+                </div>
               </div>
             </div>
 
@@ -1244,6 +1301,13 @@ toast({
               <div className="toast-page__tier-preview">
                 <Button size="sm" variant="primary" onClick={() => setTier('standard')}>Select Standard</Button>
               </div>
+              <div className="toast-page__size-breakdown">
+                <div className="toast-page__size-row">
+                  <span>Component: <strong style={{ color: 'var(--text-primary)' }}>2.8 KB</strong></span>
+                  <span>+ Shared: <strong style={{ color: 'var(--text-primary)' }}>0.7 KB</strong></span>
+                  <span>= <strong style={{ color: 'var(--brand)' }}>3.5 KB</strong> gzip</span>
+                </div>
+              </div>
             </div>
 
             {/* Premium */}
@@ -1260,13 +1324,22 @@ toast({
               </div>
               <p className="toast-page__tier-desc">
                 Everything in Standard plus spring-based entrance/exit animations,
-                progress bar indicator, stacking transitions, and swipe-to-dismiss on touch.
+                aurora glow per variant, shimmer dismiss effects, and motion levels.
               </p>
               <div className="toast-page__tier-import">
-                import {'{'} ToastProvider, useToast {'}'} from '@annondeveloper/ui-kit/premium'
+                import {'{'} ToastProvider {'}'} from '@annondeveloper/ui-kit/premium'
               </div>
               <div className="toast-page__tier-preview">
-                <Button size="sm" variant="primary" onClick={() => setTier('premium')}>Select Premium</Button>
+                <PremiumToastProvider>
+                  <PremiumTierButton />
+                </PremiumToastProvider>
+              </div>
+              <div className="toast-page__size-breakdown">
+                <div className="toast-page__size-row">
+                  <span>Component: <strong style={{ color: 'var(--text-primary)' }}>1.2 KB</strong></span>
+                  <span>+ Shared: <strong style={{ color: 'var(--text-primary)' }}>3.0 KB</strong></span>
+                  <span>= <strong style={{ color: 'var(--brand)' }}>4.2 KB</strong> gzip</span>
+                </div>
               </div>
             </div>
           </div>
@@ -1359,6 +1432,47 @@ toast({
             </ul>
           </Card>
         </section>
+        {/* ── Brand Color ───────────────────────────────── */}
+        <section className="toast-page__section" id="brand-color">
+          <h2 className="toast-page__section-title">
+            <a href="#brand-color">Brand Color</a>
+          </h2>
+          <p className="toast-page__section-desc">
+            Pick a brand color to see toast accents update in real-time. The theme generates
+            derived colors automatically from your choice.
+          </p>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+            <ColorInput
+              name="brand-color"
+              value={brandColor}
+              onChange={setBrandColor}
+              size="sm"
+              swatches={['#6366f1','#f97316','#f43f5e','#0ea5e9','#10b981','#8b5cf6','#d946ef','#f59e0b','#06b6d4','#64748b']}
+            />
+            {brandColor !== '#6366f1' && (
+              <Button size="xs" variant="ghost" onClick={() => setBrandColor('#6366f1')}>
+                <Icon name="refresh" size="sm" /> Reset to default
+              </Button>
+            )}
+          </div>
+        </section>
+
+        {/* ── Source ──────────────────────────────────────── */}
+        <section className="toast-page__section" id="source">
+          <h2 className="toast-page__section-title"><a href="#source">Source</a></h2>
+          <p className="toast-page__section-desc">View the full component source code on GitHub.</p>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+            <a className="toast-page__source-link" href="https://github.com/annondeveloper/ui-kit/blob/main/src/domain/toast.tsx" target="_blank" rel="noopener noreferrer">
+              <Icon name="code" size="sm" /> src/domain/toast.tsx (Standard)
+            </a>
+            <a className="toast-page__source-link" href="https://github.com/annondeveloper/ui-kit/blob/main/src/lite/toast.tsx" target="_blank" rel="noopener noreferrer">
+              <Icon name="code" size="sm" /> src/lite/toast.tsx (Lite)
+            </a>
+            <a className="toast-page__source-link" href="https://github.com/annondeveloper/ui-kit/blob/main/src/premium/toast.tsx" target="_blank" rel="noopener noreferrer">
+              <Icon name="code" size="sm" /> src/premium/toast.tsx (Premium)
+            </a>
+          </div>
+        </section>
       </div>
     </ToastProvider>
   )
@@ -1443,6 +1557,24 @@ function DeduplicationButton() {
       })}
     >
       Show Deduplicated Toast
+    </Button>
+  )
+}
+
+function PremiumTierButton() {
+  const { toast } = useToast()
+  return (
+    <Button
+      size="sm"
+      variant="primary"
+      onClick={() => toast({
+        title: 'Premium toast',
+        description: 'With aurora glow and spring animations.',
+        variant: 'success',
+        duration: 3000,
+      })}
+    >
+      Premium Toast
     </Button>
   )
 }

@@ -5,6 +5,7 @@ import { css } from '@ui/core/styles/css-tag'
 import { useStyles } from '@ui/core/styles/use-styles'
 import { InlineEdit } from '@ui/components/inline-edit'
 import { InlineEdit as LiteInlineEdit } from '@ui/lite/inline-edit'
+import { InlineEdit as PremiumInlineEdit } from '@ui/premium/inline-edit'
 import { Button } from '@ui/components/button'
 import { Card } from '@ui/components/card'
 import { CopyBlock } from '@ui/domain/copy-block'
@@ -355,6 +356,14 @@ const pageStyles = css`
       .inline-edit-page__size-breakdown { display: flex; flex-direction: column; gap: 0.25rem; font-size: 0.75rem; color: var(--text-tertiary); }
       .inline-edit-page__size-row { display: flex; align-items: center; gap: 0.5rem; }
 
+      .inline-edit-page__source-link {
+        color: var(--brand);
+        text-decoration: none;
+      }
+      .inline-edit-page__source-link:hover {
+        text-decoration: underline;
+      }
+
       /* ── Code tabs ─────────────────────────────────── */
 
       .inline-edit-page__code-tabs { margin-block-start: 1rem; }
@@ -668,6 +677,19 @@ function PlaygroundSection({ tier: tierProp }: { tier: Tier }) {
                   onChange={v => { setText(v); setLastAction('Saved') }}
                   placeholder={placeholder}
                 />
+              ) : tier === 'premium' ? (
+                <PremiumInlineEdit
+                  value={text}
+                  onChange={v => { setText(v); setLastAction('Changed') }}
+                  placeholder={placeholder}
+                  disabled={disabled}
+                  size={size}
+                  multiline={multiline}
+                  editTrigger={editTrigger}
+                  motion={motion}
+                  onSave={v => setLastAction(`Saved: "${v}"`)}
+                  onCancel={() => setLastAction('Cancelled')}
+                />
               ) : (
                 <InlineEdit
                   value={text}
@@ -862,6 +884,8 @@ export default function InlineEditPage() {
           <div className="inline-edit-page__state-cell">
             {tier === 'lite' ? (
               <LiteInlineEdit value="Click me" onChange={() => {}} />
+            ) : tier === 'premium' ? (
+              <PremiumInlineEdit value="Click me" onChange={() => {}} />
             ) : (
               <InlineEdit value="Click me" onChange={() => {}} />
             )}
@@ -871,6 +895,8 @@ export default function InlineEditPage() {
           <div className="inline-edit-page__state-cell">
             {tier === 'lite' ? (
               <LiteInlineEdit value="" onChange={() => {}} placeholder="Empty field" />
+            ) : tier === 'premium' ? (
+              <PremiumInlineEdit value="" onChange={() => {}} placeholder="Empty field" />
             ) : (
               <InlineEdit value="" onChange={() => {}} placeholder="Empty field" />
             )}
@@ -879,6 +905,8 @@ export default function InlineEditPage() {
           <div className="inline-edit-page__state-cell">
             {tier === 'lite' ? (
               <LiteInlineEdit value="Click to edit" onChange={() => {}} />
+            ) : tier === 'premium' ? (
+              <PremiumInlineEdit value="Click to edit" onChange={() => {}} />
             ) : (
               <InlineEdit value="Click to edit" onChange={() => {}} />
             )}
@@ -888,6 +916,8 @@ export default function InlineEditPage() {
           <div className="inline-edit-page__state-cell">
             {tier === 'lite' ? (
               <LiteInlineEdit value="Locked" onChange={() => {}} />
+            ) : tier === 'premium' ? (
+              <PremiumInlineEdit value="Locked" onChange={() => {}} disabled />
             ) : (
               <InlineEdit value="Locked" onChange={() => {}} disabled />
             )}
@@ -1035,7 +1065,7 @@ export default function InlineEditPage() {
               import {'{'} InlineEdit {'}'} from '@annondeveloper/ui-kit/premium'
             </div>
             <div className="inline-edit-page__tier-preview">
-              <InlineEdit value="Standard edit" onChange={() => {}} size="sm" />
+              <PremiumInlineEdit value="Premium edit" onChange={() => {}} size="sm" />
             </div>
             <div className="inline-edit-page__size-breakdown">
               <div className="inline-edit-page__size-row">
@@ -1057,6 +1087,23 @@ export default function InlineEditPage() {
         <Card variant="default" padding="md">
           <PropsTable props={inlineEditProps} />
         </Card>
+      </section>
+
+      {/* ── Source ──────────────────────────────────────── */}
+      <section className="inline-edit-page__section" id="source">
+        <h2 className="inline-edit-page__section-title"><a href="#source">Source</a></h2>
+        <p className="inline-edit-page__section-desc">View the full component source code on GitHub.</p>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+          <a className="inline-edit-page__source-link" href="https://github.com/annondeveloper/ui-kit/blob/main/src/components/inline-edit.tsx" target="_blank" rel="noopener noreferrer">
+            src/components/inline-edit.tsx (Standard)
+          </a>
+          <a className="inline-edit-page__source-link" href="https://github.com/annondeveloper/ui-kit/blob/main/src/lite/inline-edit.tsx" target="_blank" rel="noopener noreferrer">
+            src/lite/inline-edit.tsx (Lite)
+          </a>
+          <a className="inline-edit-page__source-link" href="https://github.com/annondeveloper/ui-kit/blob/main/src/premium/inline-edit.tsx" target="_blank" rel="noopener noreferrer">
+            src/premium/inline-edit.tsx (Premium)
+          </a>
+        </div>
       </section>
 
       {/* ── 10. Accessibility ──────────────────────────── */}

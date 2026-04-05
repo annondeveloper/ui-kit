@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useMemo, useEffect } from 'react'
+import { useState, useMemo, useEffect, useRef } from 'react'
 import { css } from '@ui/core/styles/css-tag'
 import { useStyles } from '@ui/core/styles/use-styles'
 import { ContainerQuery } from '@ui/components/container-query'
@@ -9,7 +9,12 @@ import { ContainerQuery as PremiumContainerQuery } from '@ui/premium/container-q
 import { Button } from '@ui/components/button'
 import { Card } from '@ui/components/card'
 import { CopyBlock } from '@ui/domain/copy-block'
+import { Tabs, TabPanel } from '@ui/components/tabs'
 import { Icon } from '@ui/core/icons/icon'
+import { generateTheme } from '@ui/core/tokens/generator'
+import { TOKEN_TO_CSS, type ThemeTokens } from '@ui/core/tokens/tokens'
+import { useTheme } from '@ui/core/tokens/theme-context'
+import { ColorInput } from '@ui/components/color-input'
 import { PropsTable, type PropDef } from '../../components/PropsTable'
 import { useTier, type Tier } from '../../App'
 
@@ -607,6 +612,84 @@ const pageStyles = css`
         background: var(--border-default);
         border-radius: 2px;
       }
+
+      /* ── Control options (playground) ───────────────── */
+
+      .container-query-page__control-options {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.375rem;
+      }
+
+      .container-query-page__option-btn {
+        font-size: var(--text-xs, 0.75rem);
+        padding: 0.25rem 0.625rem;
+        border: 1px solid var(--border-default);
+        border-radius: var(--radius-sm);
+        background: transparent;
+        color: var(--text-secondary);
+        cursor: pointer;
+        font-family: inherit;
+        font-weight: 500;
+        transition: all 0.12s;
+        line-height: 1.4;
+      }
+      .container-query-page__option-btn:hover {
+        border-color: var(--border-strong);
+        color: var(--text-primary);
+      }
+      .container-query-page__option-btn--active {
+        background: var(--brand);
+        color: oklch(100% 0 0);
+        border-color: var(--brand);
+        box-shadow: 0 0 0 3px var(--brand-subtle);
+      }
+
+      /* ── Size breakdown ─────────────────────────────── */
+
+      .container-query-page__size-breakdown {
+        display: flex;
+        flex-direction: column;
+        gap: 0.25rem;
+        font-size: 0.75rem;
+        color: var(--text-tertiary);
+      }
+
+      .container-query-page__size-row {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+
+      /* ── Color presets ──────────────────────────────── */
+
+      .container-query-page__color-presets {
+        display: flex;
+        gap: 0.25rem;
+        flex-wrap: wrap;
+      }
+
+      .container-query-page__color-preset {
+        inline-size: 24px;
+        block-size: 24px;
+        border-radius: 50%;
+        border: 2px solid transparent;
+        cursor: pointer;
+        padding: 0;
+        transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1),
+                    border-color 0.15s,
+                    box-shadow 0.15s;
+        box-shadow: 0 1px 3px oklch(0% 0 0 / 0.2);
+      }
+      .container-query-page__color-preset:hover {
+        transform: scale(1.2);
+        box-shadow: 0 2px 8px oklch(0% 0 0 / 0.3);
+      }
+      .container-query-page__color-preset--active {
+        border-color: oklch(100% 0 0);
+        transform: scale(1.2);
+        box-shadow: 0 0 0 2px var(--bg-base), 0 0 0 4px oklch(100% 0 0 / 0.5);
+      }
     }
   }
 `
@@ -669,6 +752,207 @@ function CopyButton({ text }: { text: string }) {
   )
 }
 
+const defaultBrand = '#6366f1'
+
+const COLOR_PRESETS = [
+  { name: 'Indigo', hex: '#6366f1' },
+  { name: 'Orange', hex: '#f97316' },
+  { name: 'Rose', hex: '#f43f5e' },
+  { name: 'Sky', hex: '#0ea5e9' },
+  { name: 'Emerald', hex: '#10b981' },
+  { name: 'Violet', hex: '#8b5cf6' },
+  { name: 'Fuchsia', hex: '#d946ef' },
+  { name: 'Amber', hex: '#f59e0b' },
+  { name: 'Cyan', hex: '#06b6d4' },
+  { name: 'Slate', hex: '#64748b' },
+]
+
+function OptionGroup<T extends string>({
+  label,
+  options,
+  value,
+  onChange,
+}: {
+  label: string
+  options: readonly T[]
+  value: T
+  onChange: (v: T) => void
+}) {
+  return (
+    <div className="container-query-page__control-group">
+      <span className="container-query-page__control-label">{label}</span>
+      <div className="container-query-page__control-options">
+        {options.map(opt => (
+          <button
+            key={opt}
+            type="button"
+            className={`container-query-page__option-btn${opt === value ? ' container-query-page__option-btn--active' : ''}`}
+            onClick={() => onChange(opt)}
+          >
+            {opt}
+          </button>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+// ─── Code Generation ─────────────────────────────────────────────────────────
+
+function generateReactCode(tier: Tier, motion: number): string {
+  const importStr = IMPORT_STRINGS[tier]
+  if (tier === 'lite') {
+    return `${importStr}
+
+// Lite tier — CSS @container only, no JS render-prop
+<ContainerQuery>
+  <div className="my-card">
+    {/* CSS @container rules handle layout */}
+  </div>
+</ContainerQuery>`
+  }
+  const motionProp = motion !== 3 ? `\n  motion={${motion}}` : ''
+  return `${importStr}
+
+<ContainerQuery${motionProp}>
+  {({ width, breakpoint }) => (
+    <div style={{
+      display: 'flex',
+      flexDirection: width >= 480 ? 'row' : 'column',
+      gap: '1rem',
+    }}>
+      <span>Breakpoint: {breakpoint}</span>
+      <span>Width: {width}px</span>
+    </div>
+  )}
+</ContainerQuery>`
+}
+
+function generateHtmlExport(tier: Tier): string {
+  if (tier === 'lite') {
+    return `<!-- HTML/CSS — Lite tier -->
+<div class="ui-lite-container-query">
+  <div class="my-card">...</div>
+</div>
+
+<style>
+@import '@annondeveloper/ui-kit/css/components/container-query.css';
+
+@container (min-width: 480px) {
+  .my-card { flex-direction: row; }
+}
+</style>`
+  }
+  const cssPath = tier === 'premium'
+    ? '@annondeveloper/ui-kit/premium/css/container-query.css'
+    : '@annondeveloper/ui-kit/css/components/container-query.css'
+  return `<!-- HTML/CSS — ${tier === 'premium' ? 'Premium' : 'Standard'} tier -->
+<div class="ui-container-query">
+  <div class="my-card">...</div>
+</div>
+
+<style>
+@import '${cssPath}';
+
+@container (min-width: 480px) {
+  .my-card { flex-direction: row; }
+}
+</style>`
+}
+
+function generateVueCode(tier: Tier, motion: number): string {
+  if (tier === 'lite') {
+    return `<template>
+  <div class="ui-lite-container-query">
+    <div class="my-card">...</div>
+  </div>
+</template>
+
+<style>
+@import '@annondeveloper/ui-kit/lite/styles.css';
+
+@container (min-width: 480px) {
+  .my-card { flex-direction: row; }
+}
+</style>`
+  }
+  const importPath = tier === 'premium' ? '@annondeveloper/ui-kit/premium' : '@annondeveloper/ui-kit'
+  const motionAttr = motion !== 3 ? `\n    :motion="${motion}"` : ''
+  return `<template>
+  <ContainerQuery${motionAttr}>
+    <template #default="{ width, breakpoint }">
+      <div :class="width >= 480 ? 'horizontal' : 'vertical'">
+        {{ breakpoint }} / {{ width }}px
+      </div>
+    </template>
+  </ContainerQuery>
+</template>
+
+<script setup>
+import { ContainerQuery } from '${importPath}'
+</script>`
+}
+
+function generateAngularCode(tier: Tier, motion: number): string {
+  if (tier === 'lite') {
+    return `<!-- Angular — Lite tier (CSS-only) -->
+<div class="ui-lite-container-query">
+  <div class="my-card">...</div>
+</div>
+
+/* In styles.css */
+@import '@annondeveloper/ui-kit/lite/styles.css';
+
+@container (min-width: 480px) {
+  .my-card { flex-direction: row; }
+}`
+  }
+  const importPath = tier === 'premium' ? '@annondeveloper/ui-kit/premium' : '@annondeveloper/ui-kit'
+  const motionAttr = motion !== 3 ? `\n  data-motion="${motion}"` : ''
+  return `<!-- Angular — ${tier === 'premium' ? 'Premium' : 'Standard'} tier -->
+<div
+  class="ui-container-query"${motionAttr}
+  style="container-type: inline-size"
+>
+  <div class="my-card">...</div>
+</div>
+
+/* Import component CSS */
+@import '${importPath}/css/components/container-query.css';
+
+@container (min-width: 480px) {
+  .my-card { flex-direction: row; }
+}`
+}
+
+function generateSvelteCode(tier: Tier, motion: number): string {
+  if (tier === 'lite') {
+    return `<!-- Svelte — Lite tier (CSS-only) -->
+<div class="ui-lite-container-query">
+  <div class="my-card">...</div>
+</div>
+
+<style>
+  @import '@annondeveloper/ui-kit/lite/styles.css';
+
+  @container (min-width: 480px) {
+    .my-card { flex-direction: row; }
+  }
+</style>`
+  }
+  const importPath = tier === 'premium' ? '@annondeveloper/ui-kit/premium' : '@annondeveloper/ui-kit'
+  const motionProp = motion !== 3 ? `\n  motion={${motion}}` : ''
+  return `<script>
+  import { ContainerQuery } from '${importPath}';
+</script>
+
+<ContainerQuery let:size${motionProp}>
+  <div class:horizontal={size.width >= 480}>
+    {size.breakpoint} / {size.width}px
+  </div>
+</ContainerQuery>`
+}
+
 // ─── Responsive Demo Card ────────────────────────────────────────────────────
 
 function ResponsiveDemoCard({ width, breakpoint }: { width: number; breakpoint: string }) {
@@ -694,45 +978,38 @@ function ResponsiveDemoCard({ width, breakpoint }: { width: number; breakpoint: 
 
 // ─── Playground Section ──────────────────────────────────────────────────────
 
-function PlaygroundSection({ tier: tierProp }: { tier: Tier }) {
+function PlaygroundSection({ tier: tierProp, brandColor }: { tier: Tier; brandColor: string }) {
   const { tier: contextTier } = useTier()
   const tier = tierProp ?? contextTier
   const [containerWidth, setContainerWidth] = useState(600)
+  const [motion, setMotion] = useState<0 | 1 | 2 | 3>(3)
 
   const ContainerComponent = tier === 'lite' ? LiteContainerQuery : tier === 'premium' ? PremiumContainerQuery : ContainerQuery
 
-  const reactCode = useMemo(() => {
-    const importStr = IMPORT_STRINGS[tier]
-    if (tier === 'lite') {
-      return `${importStr}
+  const reactCode = useMemo(
+    () => generateReactCode(tier, motion),
+    [tier, motion],
+  )
 
-// Lite uses CSS @container queries only (no JS render-prop)
-<ContainerQuery>
-  <div className="my-responsive-card">
-    {/* CSS @container rules handle layout changes */}
-  </div>
-</ContainerQuery>
+  const htmlCssCode = useMemo(
+    () => generateHtmlExport(tier),
+    [tier],
+  )
 
-/* In your CSS: */
-@container (min-width: 480px) {
-  .my-responsive-card { flex-direction: row; }
-}`
-    }
-    return `${importStr}
+  const vueCode = useMemo(
+    () => generateVueCode(tier, motion),
+    [tier, motion],
+  )
 
-<ContainerQuery>
-  {({ width, breakpoint }) => (
-    <div style={{
-      display: 'flex',
-      flexDirection: width >= 480 ? 'row' : 'column',
-      gap: '1rem',
-    }}>
-      <span>Breakpoint: {breakpoint}</span>
-      <span>Width: {width}px</span>
-    </div>
-  )}
-</ContainerQuery>`
-  }, [tier])
+  const angularCode = useMemo(
+    () => generateAngularCode(tier, motion),
+    [tier, motion],
+  )
+
+  const svelteCode = useMemo(
+    () => generateSvelteCode(tier, motion),
+    [tier, motion],
+  )
 
   return (
     <section className="container-query-page__section" id="playground">
@@ -773,8 +1050,30 @@ function PlaygroundSection({ tier: tierProp }: { tier: Tier }) {
             </div>
           </div>
 
-          <div className="container-query-page__code-tabs" style={{ marginBlockStart: '1rem' }}>
-            <CopyBlock code={reactCode} language="typescript" showLineNumbers />
+          <div style={{ marginBlockStart: '1rem' }}>
+            <Tabs defaultTab="react" tabs={[
+              { id: 'react', label: 'React' },
+              { id: 'html', label: 'HTML' },
+              { id: 'vue', label: 'Vue' },
+              { id: 'angular', label: 'Angular' },
+              { id: 'svelte', label: 'Svelte' },
+            ]}>
+              <TabPanel tabId="react">
+                <CopyBlock code={reactCode} language="typescript" showLineNumbers />
+              </TabPanel>
+              <TabPanel tabId="html">
+                <CopyBlock code={htmlCssCode} language="html" showLineNumbers />
+              </TabPanel>
+              <TabPanel tabId="vue">
+                <CopyBlock code={vueCode} language="html" showLineNumbers />
+              </TabPanel>
+              <TabPanel tabId="angular">
+                <CopyBlock code={angularCode} language="html" showLineNumbers />
+              </TabPanel>
+              <TabPanel tabId="svelte">
+                <CopyBlock code={svelteCode} language="html" showLineNumbers />
+              </TabPanel>
+            </Tabs>
           </div>
         </div>
 
@@ -800,6 +1099,15 @@ function PlaygroundSection({ tier: tierProp }: { tier: Tier }) {
               {containerWidth >= 960 ? 'xl' : containerWidth >= 640 ? 'lg' : containerWidth >= 480 ? 'md' : containerWidth >= 320 ? 'sm' : 'xs'}
             </div>
           </div>
+
+          {tier !== 'lite' && (
+            <OptionGroup
+              label="Motion"
+              options={['0', '1', '2', '3'] as const}
+              value={String(motion) as '0' | '1' | '2' | '3'}
+              onChange={v => setMotion(Number(v) as 0 | 1 | 2 | 3)}
+            />
+          )}
 
           <div className="container-query-page__control-group">
             <span className="container-query-page__control-label">Quick Widths</span>
@@ -1043,6 +1351,13 @@ resolveResponsive(columns, 'xl', 1) // => 4  (cascades from lg)`}
             <div className="container-query-page__tier-import">
               {IMPORT_STRINGS.lite}
             </div>
+            <div className="container-query-page__size-breakdown">
+              <div className="container-query-page__size-row">
+                <span>CSS: <strong style={{ color: 'var(--text-primary)' }}>0.1 KB</strong></span>
+                <span>+ JSX: <strong style={{ color: 'var(--text-primary)' }}>0.1 KB</strong></span>
+                <span>= <strong style={{ color: 'var(--brand)' }}>0.2 KB</strong> gzip</span>
+              </div>
+            </div>
           </div>
 
           {/* Standard */}
@@ -1064,6 +1379,13 @@ resolveResponsive(columns, 'xl', 1) // => 4  (cascades from lg)`}
             <div className="container-query-page__tier-import">
               {IMPORT_STRINGS.standard}
             </div>
+            <div className="container-query-page__size-breakdown">
+              <div className="container-query-page__size-row">
+                <span>CSS: <strong style={{ color: 'var(--text-primary)' }}>0.3 KB</strong></span>
+                <span>+ JSX: <strong style={{ color: 'var(--text-primary)' }}>0.9 KB</strong></span>
+                <span>= <strong style={{ color: 'var(--brand)' }}>1.2 KB</strong> gzip</span>
+              </div>
+            </div>
           </div>
 
           {/* Premium */}
@@ -1084,6 +1406,13 @@ resolveResponsive(columns, 'xl', 1) // => 4  (cascades from lg)`}
             </p>
             <div className="container-query-page__tier-import">
               {IMPORT_STRINGS.premium}
+            </div>
+            <div className="container-query-page__size-breakdown">
+              <div className="container-query-page__size-row">
+                <span>CSS: <strong style={{ color: 'var(--text-primary)' }}>0.5 KB</strong></span>
+                <span>+ JSX: <strong style={{ color: 'var(--text-primary)' }}>1.3 KB</strong></span>
+                <span>= <strong style={{ color: 'var(--brand)' }}>1.8 KB</strong> gzip</span>
+              </div>
             </div>
           </div>
         </div>

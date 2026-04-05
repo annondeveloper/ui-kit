@@ -5,6 +5,7 @@ import { css } from '@ui/core/styles/css-tag'
 import { useStyles } from '@ui/core/styles/use-styles'
 import { Avatar, AvatarGroup } from '@ui/components/avatar'
 import { Avatar as LiteAvatar } from '@ui/lite/avatar'
+import { Avatar as PremiumAvatar } from '@ui/premium/avatar'
 import { Button } from '@ui/components/button'
 import { Card } from '@ui/components/card'
 import { CopyBlock } from '@ui/domain/copy-block'
@@ -677,6 +678,7 @@ function PlaygroundSection({ tier: tierProp }: { tier: Tier }) {
   const [status, setStatus] = useState<string>('online')
   const [showIcon, setShowIcon] = useState(false)
   const [useImage, setUseImage] = useState(true)
+  const [motion, setMotion] = useState<0 | 1 | 2 | 3>(3)
   const [copyStatus, setCopyStatus] = useState('')
   const [activeCodeTab, setActiveCodeTab] = useState('react')
 
@@ -719,6 +721,8 @@ function PlaygroundSection({ tier: tierProp }: { tier: Tier }) {
           <div className="avatar-page__playground-result">
             {tier === 'lite' ? (
               <LiteAvatar size={size} src={effectiveSrc || undefined} alt={name} fallback={name ? name.split(' ').map(p => p[0]).join('').toUpperCase() : undefined} />
+            ) : tier === 'premium' ? (
+              <PremiumAvatar size={size} src={effectiveSrc || undefined} name={name || undefined} alt={name || undefined} status={status !== 'none' ? status as Status : undefined} icon={showIcon && !effectiveSrc && !name ? <Icon name="user" /> : undefined} motion={motion} />
             ) : (
               <Avatar size={size} src={effectiveSrc || undefined} name={name || undefined} alt={name || undefined} status={status !== 'none' ? status as Status : undefined} icon={showIcon && !effectiveSrc && !name ? <Icon name="user" /> : undefined} />
             )}
@@ -745,6 +749,14 @@ function PlaygroundSection({ tier: tierProp }: { tier: Tier }) {
           <OptionGroup label="Size" options={SIZES} value={size} onChange={setSize} />
           {tier !== 'lite' && (
             <OptionGroup label="Status" options={['none', ...STATUSES] as const} value={status as any} onChange={setStatus} />
+          )}
+          {tier !== 'lite' && (
+            <OptionGroup
+              label="Motion Level"
+              options={['0', '1', '2', '3'] as const}
+              value={String(motion) as '0' | '1' | '2' | '3'}
+              onChange={v => setMotion(Number(v) as 0 | 1 | 2 | 3)}
+            />
           )}
 
           <div className="avatar-page__control-group">
@@ -998,7 +1010,7 @@ export default function AvatarPage() {
             </p>
             <div className="avatar-page__tier-import">import {'{'} Avatar {'}'} from '@annondeveloper/ui-kit/premium'</div>
             <div className="avatar-page__tier-preview">
-              <Avatar size="xl" name="Premium User" status="away" />
+              <PremiumAvatar size="xl" name="Premium User" status="away" />
             </div>
           </div>
         </div>
@@ -1087,11 +1099,14 @@ export default function AvatarPage() {
         <h2 className="avatar-page__section-title"><a href="#source">Source</a></h2>
         <p className="avatar-page__section-desc">View the component source code on GitHub.</p>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-          <a className="avatar-page__source-link" href="https://github.com/annondeveloper/ui-kit/blob/v2/src/components/avatar.tsx" target="_blank" rel="noopener noreferrer">
+          <a className="avatar-page__source-link" href="https://github.com/annondeveloper/ui-kit/blob/main/src/components/avatar.tsx" target="_blank" rel="noopener noreferrer">
             <Icon name="code" size="sm" /> src/components/avatar.tsx — Standard tier
           </a>
-          <a className="avatar-page__source-link" href="https://github.com/annondeveloper/ui-kit/blob/v2/src/lite/avatar.tsx" target="_blank" rel="noopener noreferrer">
+          <a className="avatar-page__source-link" href="https://github.com/annondeveloper/ui-kit/blob/main/src/lite/avatar.tsx" target="_blank" rel="noopener noreferrer">
             <Icon name="code" size="sm" /> src/lite/avatar.tsx — Lite tier
+          </a>
+          <a className="avatar-page__source-link" href="https://github.com/annondeveloper/ui-kit/blob/main/src/premium/avatar.tsx" target="_blank" rel="noopener noreferrer">
+            <Icon name="code" size="sm" /> src/premium/avatar.tsx — Premium tier
           </a>
         </div>
       </section>

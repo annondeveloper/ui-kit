@@ -5,6 +5,7 @@ import { css } from '@ui/core/styles/css-tag'
 import { useStyles } from '@ui/core/styles/use-styles'
 import { ConfidenceBar } from '@ui/domain/confidence-bar'
 import { ConfidenceBar as LiteConfidenceBar } from '@ui/lite/confidence-bar'
+import { ConfidenceBar as PremiumConfidenceBar } from '@ui/premium/confidence-bar'
 import { Button } from '@ui/components/button'
 import { Card } from '@ui/components/card'
 import { CopyBlock } from '@ui/domain/copy-block'
@@ -585,6 +586,22 @@ const pageStyles = css`
         letter-spacing: 0.03em;
       }
 
+      /* ── Source link ─────────────────────────────────── */
+
+      .confidence-bar-page__source-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: var(--text-sm, 0.875rem);
+        color: var(--brand);
+        text-decoration: none;
+        font-weight: 500;
+      }
+      .confidence-bar-page__source-link:hover {
+        text-decoration: underline;
+        text-underline-offset: 0.2em;
+      }
+
       /* ── Responsive ──────────────────────────────── */
 
       @media (max-width: 768px) {
@@ -1025,12 +1042,20 @@ function PlaygroundSection({ tier: tierProp, brandColor }: { tier: Tier; brandCo
         <div className="confidence-bar-page__playground-preview">
           <div className="confidence-bar-page__playground-result">
             <div style={{ inlineSize: '100%', maxInlineSize: '400px', position: 'relative', zIndex: 1 }}>
-              {isLite ? (
+              {tier === 'lite' ? (
                 <LiteConfidenceBar
                   value={Math.round(value * 100)}
                   label={labelText || undefined}
                   showValue={showValue}
                   size={size}
+                />
+              ) : tier === 'premium' ? (
+                <PremiumConfidenceBar
+                  value={value}
+                  label={labelText || undefined}
+                  showValue={showValue}
+                  size={size}
+                  motion={motion}
                 />
               ) : (
                 <ConfidenceBar
@@ -1435,7 +1460,7 @@ export default function ConfidenceBarPage() {
               import {'{'} ConfidenceBar {'}'} from '@annondeveloper/ui-kit/premium'
             </div>
             <div className="confidence-bar-page__tier-preview">
-              <ConfidenceBar value={0.85} label="Premium" size="sm" />
+              <PremiumConfidenceBar value={0.85} label="Premium" size="sm" />
             </div>
             <div className="confidence-bar-page__size-breakdown">
               <div className="confidence-bar-page__size-row">
@@ -1549,6 +1574,23 @@ export default function ConfidenceBarPage() {
             </li>
           </ul>
         </Card>
+      </section>
+
+      {/* ── Source ──────────────────────────────────────── */}
+      <section className="confidence-bar-page__section" id="source">
+        <h2 className="confidence-bar-page__section-title"><a href="#source">Source</a></h2>
+        <p className="confidence-bar-page__section-desc">View the full component source code on GitHub.</p>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+          <a className="confidence-bar-page__source-link" href="https://github.com/annondeveloper/ui-kit/blob/main/src/domain/confidence-bar.tsx" target="_blank" rel="noopener noreferrer">
+            src/domain/confidence-bar.tsx (Standard)
+          </a>
+          <a className="confidence-bar-page__source-link" href="https://github.com/annondeveloper/ui-kit/blob/main/src/lite/confidence-bar.tsx" target="_blank" rel="noopener noreferrer">
+            src/lite/confidence-bar.tsx (Lite)
+          </a>
+          <a className="confidence-bar-page__source-link" href="https://github.com/annondeveloper/ui-kit/blob/main/src/premium/confidence-bar.tsx" target="_blank" rel="noopener noreferrer">
+            src/premium/confidence-bar.tsx (Premium)
+          </a>
+        </div>
       </section>
     </div>
   )

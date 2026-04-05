@@ -4,6 +4,8 @@ import { useState, useMemo, useCallback, useRef, useEffect } from 'react'
 import { css } from '@ui/core/styles/css-tag'
 import { useStyles } from '@ui/core/styles/use-styles'
 import { DataTable, type ColumnDef } from '@ui/domain/data-table'
+import { DataTable as LiteDataTable } from '@ui/lite/data-table'
+import { DataTable as PremiumDataTable } from '@ui/premium/data-table'
 import { Card } from '@ui/components/card'
 import { Button } from '@ui/components/button'
 import { CopyBlock } from '@ui/domain/copy-block'
@@ -545,6 +547,15 @@ const pageStyles = css`
         color: var(--text-tertiary);
       }
 
+      .datatable-page__tier-preview {
+        display: flex;
+        justify-content: center;
+        padding-block-start: 0.5rem;
+        overflow: hidden;
+        max-block-size: 160px;
+        border-radius: var(--radius-sm);
+      }
+
       /* ── Color picker ──────────────────────────────── */
 
       .datatable-page__color-presets {
@@ -573,6 +584,38 @@ const pageStyles = css`
         border-color: oklch(100% 0 0);
         transform: scale(1.2);
         box-shadow: 0 0 0 2px var(--bg-base), 0 0 0 4px oklch(100% 0 0 / 0.5);
+      }
+
+      /* ── Source link ─────────────────────────────────── */
+
+      .datatable-page__source-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: var(--text-sm, 0.875rem);
+        color: var(--brand);
+        text-decoration: none;
+        font-weight: 500;
+      }
+      .datatable-page__source-link:hover {
+        text-decoration: underline;
+        text-underline-offset: 0.2em;
+      }
+
+      /* ── Size breakdown bar ─────────────────────────── */
+
+      .datatable-page__size-breakdown {
+        display: flex;
+        flex-direction: column;
+        gap: 0.25rem;
+        font-size: 0.75rem;
+        color: var(--text-tertiary);
+      }
+
+      .datatable-page__size-row {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
       }
 
       /* ── A11y list ──────────────────────────────────── */
@@ -1260,6 +1303,9 @@ function PlaygroundSection({ tier, brandColor }: { tier: Tier; brandColor: strin
   const [bordered, setBordered] = useState(false)
   const [responsiveMode, setResponsiveMode] = useState<'scroll' | 'card'>('scroll')
 
+  // Motion
+  const [motion, setMotion] = useState<0 | 1 | 2 | 3>(3)
+
   const [copyStatus, setCopyStatus] = useState('')
   const [activeCodeTab, setActiveCodeTab] = useState('react')
 
@@ -1318,6 +1364,7 @@ function PlaygroundSection({ tier, brandColor }: { tier: Tier; brandColor: strin
     reorderable,
     exportable,
     stickyHeader,
+    motion,
     filterable,
     striped,
     compact,
@@ -1425,6 +1472,12 @@ function PlaygroundSection({ tier, brandColor }: { tier: Tier; brandColor: strin
                 options={['scroll', 'card'] as const}
                 value={responsiveMode}
                 onChange={setResponsiveMode}
+              />
+              <OptionGroup
+                label="Motion"
+                options={['0', '1', '2', '3'] as const}
+                value={String(motion) as '0'}
+                onChange={v => setMotion(Number(v) as 0 | 1 | 2 | 3)}
               />
             </div>
           </div>
@@ -2102,8 +2155,23 @@ const [totalRows, setTotalRows] = useState(0)
             <div className="datatable-page__tier-import">
               {IMPORT_STRINGS.lite}
             </div>
-            <div className="datatable-page__tier-features">
-              <span>Sort, Search, Paginate, Export</span>
+            <div className="datatable-page__tier-preview">
+              <LiteDataTable
+                data={sampleData.slice(0, 3)}
+                columns={[
+                  { id: 'hostname', header: 'Host', accessor: 'hostname' as const },
+                  { id: 'region', header: 'Region', accessor: 'region' as const },
+                  { id: 'status', header: 'Status', accessor: 'status' as const },
+                ]}
+                compact
+              />
+            </div>
+            <div className="datatable-page__size-breakdown">
+              <div className="datatable-page__size-row">
+                <span>Component: <strong style={{ color: 'var(--text-primary)' }}>3.0 KB</strong></span>
+                <span>+ Shared: <strong style={{ color: 'var(--text-primary)' }}>3.7 KB</strong></span>
+                <span>= <strong style={{ color: 'var(--brand)' }}>6.7 KB</strong> gzip</span>
+              </div>
             </div>
           </div>
 
@@ -2126,8 +2194,20 @@ const [totalRows, setTotalRows] = useState(0)
             <div className="datatable-page__tier-import">
               {IMPORT_STRINGS.standard}
             </div>
-            <div className="datatable-page__tier-features">
-              <span>All Lite + Virtual Scroll, Filters, Grouping, Editing, Pinning</span>
+            <div className="datatable-page__tier-preview">
+              <DataTable
+                data={sampleData.slice(0, 3)}
+                columns={basicColumns.slice(0, 3)}
+                sortable
+                compact
+              />
+            </div>
+            <div className="datatable-page__size-breakdown">
+              <div className="datatable-page__size-row">
+                <span>Component: <strong style={{ color: 'var(--text-primary)' }}>6.0 KB</strong></span>
+                <span>+ Shared: <strong style={{ color: 'var(--text-primary)' }}>0.9 KB</strong></span>
+                <span>= <strong style={{ color: 'var(--brand)' }}>6.9 KB</strong> gzip</span>
+              </div>
             </div>
           </div>
 
@@ -2150,8 +2230,21 @@ const [totalRows, setTotalRows] = useState(0)
             <div className="datatable-page__tier-import">
               {IMPORT_STRINGS.premium}
             </div>
-            <div className="datatable-page__tier-features">
-              <span>All Standard + Row Animations, Drag Select, Infinite Scroll</span>
+            <div className="datatable-page__tier-preview">
+              <PremiumDataTable
+                data={sampleData.slice(0, 3)}
+                columns={basicColumns.slice(0, 3)}
+                sortable
+                compact
+                motion={2}
+              />
+            </div>
+            <div className="datatable-page__size-breakdown">
+              <div className="datatable-page__size-row">
+                <span>Component: <strong style={{ color: 'var(--text-primary)' }}>4.7 KB</strong></span>
+                <span>+ Shared: <strong style={{ color: 'var(--text-primary)' }}>3.3 KB</strong></span>
+                <span>= <strong style={{ color: 'var(--brand)' }}>8.0 KB</strong> gzip</span>
+              </div>
             </div>
           </div>
         </div>
@@ -2284,6 +2377,23 @@ const [totalRows, setTotalRows] = useState(0)
             </li>
           </ul>
         </Card>
+      </section>
+
+      {/* ── Source ──────────────────────────────────────── */}
+      <section className="datatable-page__section" id="source">
+        <h2 className="datatable-page__section-title"><a href="#source">Source</a></h2>
+        <p className="datatable-page__section-desc">View the full component source code on GitHub.</p>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+          <a className="datatable-page__source-link" href="https://github.com/annondeveloper/ui-kit/blob/main/src/domain/data-table.tsx" target="_blank" rel="noopener noreferrer">
+            <Icon name="code" size="sm" /> src/domain/data-table.tsx (Standard)
+          </a>
+          <a className="datatable-page__source-link" href="https://github.com/annondeveloper/ui-kit/blob/main/src/lite/data-table.tsx" target="_blank" rel="noopener noreferrer">
+            <Icon name="code" size="sm" /> src/lite/data-table.tsx (Lite)
+          </a>
+          <a className="datatable-page__source-link" href="https://github.com/annondeveloper/ui-kit/blob/main/src/premium/data-table.tsx" target="_blank" rel="noopener noreferrer">
+            <Icon name="code" size="sm" /> src/premium/data-table.tsx (Premium)
+          </a>
+        </div>
       </section>
     </div>
   )

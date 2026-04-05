@@ -1,14 +1,19 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useMemo, useCallback } from 'react'
 import { css } from '@ui/core/styles/css-tag'
 import { useStyles } from '@ui/core/styles/use-styles'
 import { Indicator } from '@ui/components/indicator'
+import { Indicator as LiteIndicator } from '@ui/lite/indicator'
+import { Indicator as PremiumIndicator } from '@ui/premium/indicator'
 import { Button } from '@ui/components/button'
 import { Card } from '@ui/components/card'
+import { Tabs, TabPanel } from '@ui/components/tabs'
+import { CopyBlock } from '@ui/domain/copy-block'
 import { Icon } from '@ui/core/icons/icon'
+import { ColorInput } from '@ui/components/color-input'
 import { PropsTable, type PropDef } from '../../components/PropsTable'
-import { useTier } from '../../App'
+import { useTier, type Tier } from '../../App'
 
 // ─── Styles ──────────────────────────────────────────────────────────────────
 
@@ -213,6 +218,114 @@ const pageStyles = css`
         color: var(--text-tertiary);
         font-weight: 500;
       }
+
+      /* ── Playground ─────────────────────────────────── */
+
+      .${PAGE}__playground {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1.5rem;
+      }
+
+      @container ${PAGE} (max-width: 640px) {
+        .${PAGE}__playground {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      .${PAGE}__playground-preview {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+      }
+
+      .${PAGE}__playground-result {
+        position: relative;
+        padding: 2.5rem;
+        border-radius: var(--radius-md);
+        background: var(--bg-base);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 1rem;
+        min-block-size: 120px;
+        overflow: hidden;
+      }
+
+      .${PAGE}__playground-result::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background-image: radial-gradient(oklch(100% 0 0 / 0.03) 1px, transparent 1px);
+        background-size: 24px 24px;
+        pointer-events: none;
+      }
+
+      .${PAGE}__playground-controls {
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+      }
+
+      .${PAGE}__control-row {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+      }
+
+      .${PAGE}__control-label {
+        font-size: var(--text-xs, 0.75rem);
+        color: var(--text-secondary);
+        font-weight: 600;
+        min-inline-size: 5.5rem;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+      }
+
+      .${PAGE}__control-options {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.375rem;
+      }
+
+      .${PAGE}__control-chip {
+        font-size: var(--text-xs, 0.75rem);
+        padding: 0.25rem 0.625rem;
+        border-radius: var(--radius-sm);
+        border: 1px solid var(--border-default);
+        background: var(--bg-base);
+        color: var(--text-secondary);
+        cursor: pointer;
+        transition: all 0.15s;
+      }
+
+      .${PAGE}__control-chip[data-active="true"] {
+        background: var(--brand, oklch(65% 0.2 270));
+        color: var(--text-on-brand, oklch(100% 0 0));
+        border-color: var(--brand, oklch(65% 0.2 270));
+      }
+
+      .${PAGE}__control-toggle {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+
+      .${PAGE}__code-tabs {
+        margin-block-start: 0.5rem;
+      }
+
+      .${PAGE}__export-row {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin-block-end: 0.5rem;
+      }
+
+      .${PAGE}__export-status {
+        font-size: var(--text-xs, 0.75rem);
+        color: var(--status-ok, oklch(72% 0.19 155));
+      }
     }
   }
 `
@@ -252,6 +365,7 @@ export default function IndicatorPage() {
   const { tier } = useTier()
 
   const [copied, setCopied] = useState(false)
+  const [brandColor, setBrandColor] = useState('#6366f1')
 
   const copyImport = () => {
     navigator.clipboard.writeText(IMPORT).then(() => {
@@ -386,6 +500,12 @@ export default function IndicatorPage() {
             <p style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', margin: '0.25rem 0' }}>
               Full-featured with motion, theming, and accessibility.
             </p>
+            <div className={`${PAGE}__preview`} style={{ minBlockSize: 'auto', padding: '0.75rem', justifyContent: 'flex-start', gap: '0.75rem' }}>
+              <Indicator color="primary" processing>
+                <AvatarBox />
+              </Indicator>
+            </div>
+            <p className="size-row" style={{ fontSize: '0.6875rem', color: 'var(--text-tertiary)', margin: '0.25rem 0 0' }}>~1.8 KB gzip (JS) + ~0.4 KB gzip (CSS)</p>
             <code style={{ fontSize: '0.6875rem' }}>import {'{'} Indicator {'}'} from '@annondeveloper/ui-kit'</code>
           </Card>
           <Card padding="sm" style={{ borderColor: tier === 'lite' ? 'var(--brand)' : undefined }}>
@@ -393,6 +513,12 @@ export default function IndicatorPage() {
             <p style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', margin: '0.25rem 0' }}>
               Minimal footprint, no motion or advanced theming.
             </p>
+            <div className={`${PAGE}__preview`} style={{ minBlockSize: 'auto', padding: '0.75rem', justifyContent: 'flex-start', gap: '0.75rem' }}>
+              <LiteIndicator color="success">
+                <AvatarBox />
+              </LiteIndicator>
+            </div>
+            <p className="size-row" style={{ fontSize: '0.6875rem', color: 'var(--text-tertiary)', margin: '0.25rem 0 0' }}>~0.5 KB gzip (JS) + ~0.3 KB gzip (CSS)</p>
             <code style={{ fontSize: '0.6875rem' }}>import {'{'} Indicator {'}'} from '@annondeveloper/ui-kit/lite'</code>
           </Card>
           <Card padding="sm" style={{ borderColor: tier === 'premium' ? 'var(--brand)' : undefined }}>
@@ -400,12 +526,21 @@ export default function IndicatorPage() {
             <p style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', margin: '0.25rem 0' }}>
               Aurora glow, spring animations, and shimmer effects.
             </p>
+            <div className={`${PAGE}__preview`} style={{ minBlockSize: 'auto', padding: '0.75rem', justifyContent: 'flex-start', gap: '0.75rem' }}>
+              <PremiumIndicator color="danger" label={5} size={18} withBorder>
+                <AvatarBox />
+              </PremiumIndicator>
+            </div>
+            <p className="size-row" style={{ fontSize: '0.6875rem', color: 'var(--text-tertiary)', margin: '0.25rem 0 0' }}>~2.1 KB gzip (JS) + ~0.5 KB gzip (CSS)</p>
             <code style={{ fontSize: '0.6875rem' }}>import {'{'} Indicator {'}'} from '@annondeveloper/ui-kit/premium'</code>
           </Card>
         </div>
       </section>
 
-      {/* ── 4. Props API ─────────────────────────────────── */}
+      {/* ── 4. Interactive Playground ─────────────────────── */}
+      <PlaygroundSection tier={tier} />
+
+      {/* ── 5. Props API ─────────────────────────────────── */}
       <section className={`${PAGE}__section`} id="props">
         <h2 className={`${PAGE}__section-title`}><a href="#props">Props API</a></h2>
         <p className={`${PAGE}__section-desc`}>All available props for Indicator.</p>
@@ -413,6 +548,362 @@ export default function IndicatorPage() {
           <PropsTable props={PROPS} />
         </Card>
       </section>
+
+      {/* ── Brand Color ───────────────────────────────── */}
+      <section className={`${PAGE}__section`} id="brand-color">
+        <h2 className={`${PAGE}__section-title`}><a href="#brand-color">Brand Color</a></h2>
+        <p className={`${PAGE}__section-desc`}>
+          Pick a brand color to preview the component with your brand identity.
+        </p>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+          <ColorInput
+            name="brand-color"
+            value={brandColor}
+            onChange={setBrandColor}
+            size="sm"
+            swatches={['#6366f1','#f97316','#f43f5e','#0ea5e9','#10b981','#8b5cf6','#d946ef','#f59e0b','#06b6d4','#64748b']}
+          />
+        </div>
+      </section>
+
+      {/* ── Source ──────────────────────────────────────── */}
+      <section className={`${PAGE}__section`} id="source">
+        <h2 className={`${PAGE}__section-title`}><a href="#source">Source</a></h2>
+        <p className={`${PAGE}__section-desc`}>View the full component source code on GitHub.</p>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+          <a style={{ color: 'var(--brand)', textDecoration: 'none' }} href="https://github.com/annondeveloper/ui-kit/blob/main/src/components/indicator.tsx" target="_blank" rel="noopener noreferrer">
+            src/components/indicator.tsx (Standard)
+          </a>
+          <a style={{ color: 'var(--brand)', textDecoration: 'none' }} href="https://github.com/annondeveloper/ui-kit/blob/main/src/lite/indicator.tsx" target="_blank" rel="noopener noreferrer">
+            src/lite/indicator.tsx (Lite)
+          </a>
+          <a style={{ color: 'var(--brand)', textDecoration: 'none' }} href="https://github.com/annondeveloper/ui-kit/blob/main/src/premium/indicator.tsx" target="_blank" rel="noopener noreferrer">
+            src/premium/indicator.tsx (Premium)
+          </a>
+        </div>
+      </section>
     </div>
+  )
+}
+
+// ─── Code Generators ──────────────────────────────────────────────────────────
+
+type Color = typeof COLORS[number]
+type Position = typeof POSITIONS[number]
+
+function generateReactCode(
+  tier: Tier,
+  color: Color,
+  position: Position,
+  size: number,
+  processing: boolean,
+  withBorder: boolean,
+  disabled: boolean,
+  label: string,
+  motion: number,
+): string {
+  const importPath = tier === 'lite'
+    ? "@annondeveloper/ui-kit/lite"
+    : tier === 'premium'
+      ? "@annondeveloper/ui-kit/premium"
+      : "@annondeveloper/ui-kit"
+  const importLine = `import { Indicator } from '${importPath}'`
+
+  const props: string[] = []
+  if (color !== 'primary') props.push(`  color="${color}"`)
+  if (position !== 'top-end') props.push(`  position="${position}"`)
+  if (size !== 10) props.push(`  size={${size}}`)
+  if (processing) props.push('  processing')
+  if (withBorder) props.push('  withBorder')
+  if (disabled) props.push('  disabled')
+  if (label) props.push(`  label="${label}"`)
+  if (motion !== 3 && tier !== 'lite') props.push(`  motion={${motion}}`)
+
+  const jsx = props.length === 0
+    ? `<Indicator>\n  <Avatar />\n</Indicator>`
+    : `<Indicator\n${props.join('\n')}\n>\n  <Avatar />\n</Indicator>`
+
+  return `${importLine}\n\n${jsx}`
+}
+
+function generateHtmlExport(
+  tier: Tier,
+  color: Color,
+  position: Position,
+  processing: boolean,
+  label: string,
+): string {
+  const cssImport = tier === 'lite'
+    ? `@import '@annondeveloper/ui-kit/lite/styles.css';`
+    : `@import '@annondeveloper/ui-kit/css/components/indicator.css';`
+
+  return `<!-- Indicator — @annondeveloper/ui-kit ${tier} tier -->
+<link rel="stylesheet" href="https://unpkg.com/@annondeveloper/ui-kit/css/components/indicator.css">
+
+<div class="ui-indicator" data-color="${color}" data-position="${position}"${processing ? ' data-processing="true"' : ''}>
+  <span class="ui-indicator__dot"${label ? ` data-has-label="true"` : ''}>${label || ''}</span>
+  <img class="avatar" src="avatar.jpg" alt="User" />
+</div>
+
+<!-- Or import in your CSS: -->
+<!-- ${cssImport} -->`
+}
+
+function generateVueCode(
+  tier: Tier,
+  color: Color,
+  position: Position,
+  processing: boolean,
+  label: string,
+  disabled: boolean,
+): string {
+  if (tier === 'lite') {
+    const attrs = [`class="ui-indicator"`, `data-color="${color}"`, `data-position="${position}"`]
+    if (processing) attrs.push('data-processing="true"')
+    if (disabled) attrs.push('data-disabled="true"')
+    return `<template>\n  <div ${attrs.join(' ')}>\n    <span class="ui-indicator__dot"${label ? ` data-has-label="true"` : ''}>${label || ''}</span>\n    <slot />\n  </div>\n</template>\n\n<style>\n@import '@annondeveloper/ui-kit/lite/styles.css';\n</style>`
+  }
+
+  const importPath = tier === 'premium' ? '@annondeveloper/ui-kit/premium' : '@annondeveloper/ui-kit'
+  const attrs: string[] = []
+  if (color !== 'primary') attrs.push(`  color="${color}"`)
+  if (position !== 'top-end') attrs.push(`  position="${position}"`)
+  if (processing) attrs.push('  processing')
+  if (disabled) attrs.push('  disabled')
+  if (label) attrs.push(`  label="${label}"`)
+
+  const template = attrs.length === 0
+    ? `  <Indicator>\n    <Avatar />\n  </Indicator>`
+    : `  <Indicator\n  ${attrs.join('\n  ')}\n  >\n    <Avatar />\n  </Indicator>`
+
+  return `<template>\n${template}\n</template>\n\n<script setup>\nimport { Indicator } from '${importPath}'\n</script>`
+}
+
+// ─── Playground Section ───────────────────────────────────────────────────────
+
+function PlaygroundSection({ tier: tierProp }: { tier: Tier }) {
+  const { tier: contextTier } = useTier()
+  const tier = tierProp ?? contextTier
+
+  const [color, setColor] = useState<Color>('primary')
+  const [position, setPosition] = useState<Position>('top-end')
+  const [size, setSize] = useState(10)
+  const [processing, setProcessing] = useState(false)
+  const [withBorder, setWithBorder] = useState(false)
+  const [disabled, setDisabled] = useState(false)
+  const [label, setLabel] = useState('')
+  const [motion, setMotion] = useState<0 | 1 | 2 | 3>(3)
+  const [activeCodeTab, setActiveCodeTab] = useState('react')
+  const [copyStatus, setCopyStatus] = useState('')
+
+  const IndicatorComponent = tier === 'lite' ? LiteIndicator : tier === 'premium' ? PremiumIndicator : Indicator
+
+  const reactCode = useMemo(
+    () => generateReactCode(tier, color, position, size, processing, withBorder, disabled, label, motion),
+    [tier, color, position, size, processing, withBorder, disabled, label, motion],
+  )
+
+  const htmlCode = useMemo(
+    () => generateHtmlExport(tier, color, position, processing, label),
+    [tier, color, position, processing, label],
+  )
+
+  const vueCode = useMemo(
+    () => generateVueCode(tier, color, position, processing, label, disabled),
+    [tier, color, position, processing, label, disabled],
+  )
+
+  const angularCode = useMemo(() => {
+    if (tier === 'lite') {
+      const attrs = [`class="ui-indicator"`, `data-color="${color}"`, `data-position="${position}"`]
+      if (processing) attrs.push('data-processing="true"')
+      if (disabled) attrs.push('[attr.data-disabled]="\'true\'"')
+      return `<!-- Angular — Lite tier (CSS-only) -->\n<div ${attrs.join(' ')}>\n  <span class="ui-indicator__dot"${label ? ` data-has-label="true"` : ''}>${label || ''}</span>\n  <ng-content />\n</div>\n\n/* In styles.css */\n@import '@annondeveloper/ui-kit/lite/styles.css';`
+    }
+    const importPath = tier === 'premium' ? '@annondeveloper/ui-kit/premium' : '@annondeveloper/ui-kit'
+    return `<!-- Angular — ${tier === 'premium' ? 'Premium' : 'Standard'} tier -->\n<div\n  class="ui-indicator"\n  data-color="${color}"\n  data-position="${position}"\n  ${processing ? 'data-processing="true"' : ''}\n  ${disabled ? 'data-disabled="true"' : ''}\n>\n  <span class="ui-indicator__dot"${label ? ` data-has-label="true"` : ''}>${label || ''}</span>\n  <ng-content />\n</div>\n\n/* Import component CSS */\n@import '${importPath}/css/components/indicator.css';`
+  }, [color, position, processing, disabled, label, tier])
+
+  const svelteCode = useMemo(() => {
+    if (tier === 'lite') {
+      return `<!-- Svelte — Lite tier (CSS-only) -->\n<div\n  class="ui-indicator"\n  data-color="${color}"\n  data-position="${position}"\n  ${processing ? 'data-processing="true"' : ''}\n  ${disabled ? 'data-disabled="true"' : ''}\n>\n  <span class="ui-indicator__dot"${label ? ` data-has-label="true"` : ''}>${label || ''}</span>\n  <slot />\n</div>\n\n<style>\n  @import '@annondeveloper/ui-kit/lite/styles.css';\n</style>`
+    }
+    const importPath = tier === 'premium' ? '@annondeveloper/ui-kit/premium' : '@annondeveloper/ui-kit'
+    return `<script>\n  import { Indicator } from '${importPath}';\n</script>\n\n<Indicator\n  color="${color}"\n  position="${position}"\n  ${processing ? 'processing' : ''}\n  ${disabled ? 'disabled' : ''}\n  ${label ? `label="${label}"` : ''}\n>\n  <slot />\n</Indicator>`
+  }, [color, position, processing, disabled, label, tier])
+
+  const activeCode = useMemo(() => {
+    switch (activeCodeTab) {
+      case 'react': return reactCode
+      case 'html': return htmlCode
+      case 'vue': return vueCode
+      case 'angular': return angularCode
+      case 'svelte': return svelteCode
+      default: return reactCode
+    }
+  }, [activeCodeTab, reactCode, htmlCode, vueCode, angularCode, svelteCode])
+
+  const codeTabs = [
+    { id: 'react', label: 'React' },
+    { id: 'html', label: 'HTML+CSS' },
+    { id: 'vue', label: 'Vue' },
+    { id: 'angular', label: 'Angular' },
+    { id: 'svelte', label: 'Svelte' },
+  ]
+
+  const handleCopy = useCallback(() => {
+    navigator.clipboard?.writeText(activeCode).then(() => {
+      setCopyStatus(`Copied ${codeTabs.find(t => t.id === activeCodeTab)?.label}!`)
+      setTimeout(() => setCopyStatus(''), 2000)
+    })
+  }, [activeCode, activeCodeTab])
+
+  const indicatorProps: Record<string, unknown> = {
+    color,
+    position,
+    size: label ? size + 8 : size,
+    processing,
+    withBorder,
+    disabled,
+  }
+  if (label) indicatorProps.label = label
+  if (tier !== 'lite') indicatorProps.motion = motion
+
+  return (
+    <section className={`${PAGE}__section`} id="playground">
+      <h2 className={`${PAGE}__section-title`}>
+        <a href="#playground">Live Playground</a>
+      </h2>
+      <p className={`${PAGE}__section-desc`}>
+        Tweak every prop and see the result in real-time. The generated code updates as you change settings.
+      </p>
+
+      <div className={`${PAGE}__playground`}>
+        {/* Preview area */}
+        <div className={`${PAGE}__playground-preview`}>
+          <div className={`${PAGE}__playground-result`}>
+            <IndicatorComponent {...indicatorProps}>
+              <AvatarBox />
+            </IndicatorComponent>
+          </div>
+
+          {/* Code output with tabs */}
+          <div className={`${PAGE}__code-tabs`}>
+            <div className={`${PAGE}__export-row`}>
+              <Button
+                size="xs"
+                variant="secondary"
+                icon={<Icon name="copy" size="sm" />}
+                onClick={handleCopy}
+              >
+                Copy {codeTabs.find(t => t.id === activeCodeTab)?.label}
+              </Button>
+              {copyStatus && <span className={`${PAGE}__export-status`}>{copyStatus}</span>}
+            </div>
+            <Tabs tabs={codeTabs} activeTab={activeCodeTab} onChange={setActiveCodeTab} size="sm" variant="pills">
+              <TabPanel tabId="react">
+                <CopyBlock code={reactCode} language="typescript" showLineNumbers />
+              </TabPanel>
+              <TabPanel tabId="html">
+                <CopyBlock code={htmlCode} language="html" showLineNumbers />
+              </TabPanel>
+              <TabPanel tabId="vue">
+                <CopyBlock code={vueCode} language="html" showLineNumbers />
+              </TabPanel>
+              <TabPanel tabId="angular">
+                <CopyBlock code={angularCode} language="html" showLineNumbers />
+              </TabPanel>
+              <TabPanel tabId="svelte">
+                <CopyBlock code={svelteCode} language="html" showLineNumbers />
+              </TabPanel>
+            </Tabs>
+          </div>
+        </div>
+
+        {/* Controls */}
+        <div className={`${PAGE}__playground-controls`}>
+          {/* Color */}
+          <div className={`${PAGE}__control-row`}>
+            <span className={`${PAGE}__control-label`}>Color</span>
+            <div className={`${PAGE}__control-options`}>
+              {COLORS.map(c => (
+                <button key={c} className={`${PAGE}__control-chip`} data-active={c === color} onClick={() => setColor(c)}>{c}</button>
+              ))}
+            </div>
+          </div>
+
+          {/* Position */}
+          <div className={`${PAGE}__control-row`}>
+            <span className={`${PAGE}__control-label`}>Position</span>
+            <div className={`${PAGE}__control-options`}>
+              {POSITIONS.map(p => (
+                <button key={p} className={`${PAGE}__control-chip`} data-active={p === position} onClick={() => setPosition(p)}>{p}</button>
+              ))}
+            </div>
+          </div>
+
+          {/* Size */}
+          <div className={`${PAGE}__control-row`}>
+            <span className={`${PAGE}__control-label`}>Size</span>
+            <div className={`${PAGE}__control-options`}>
+              {[6, 8, 10, 14, 18].map(s => (
+                <button key={s} className={`${PAGE}__control-chip`} data-active={s === size} onClick={() => setSize(s)}>{s}px</button>
+              ))}
+            </div>
+          </div>
+
+          {/* Motion Level */}
+          {tier !== 'lite' && (
+            <div className={`${PAGE}__control-row`}>
+              <span className={`${PAGE}__control-label`}>Motion Level</span>
+              <div className={`${PAGE}__control-options`}>
+                {([0, 1, 2, 3] as const).map(m => (
+                  <button key={m} className={`${PAGE}__control-chip`} data-active={m === motion} onClick={() => setMotion(m)}>{m}</button>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Label */}
+          <div className={`${PAGE}__control-row`}>
+            <span className={`${PAGE}__control-label`}>Label</span>
+            <input
+              type="text"
+              value={label}
+              onChange={e => setLabel(e.target.value)}
+              placeholder="e.g. 3, new, 99+"
+              style={{
+                fontSize: 'var(--text-sm, 0.875rem)',
+                padding: '0.25rem 0.5rem',
+                borderRadius: 'var(--radius-sm)',
+                border: '1px solid var(--border-default)',
+                background: 'var(--bg-base)',
+                color: 'var(--text-primary)',
+                inlineSize: '8rem',
+              }}
+            />
+          </div>
+
+          {/* Toggles */}
+          <div className={`${PAGE}__control-row`}>
+            <span className={`${PAGE}__control-label`}>Toggles</span>
+            <div className={`${PAGE}__control-options`}>
+              <label className={`${PAGE}__control-toggle`}>
+                <input type="checkbox" checked={processing} onChange={e => setProcessing(e.target.checked)} />
+                <span style={{ fontSize: 'var(--text-xs, 0.75rem)' }}>Processing</span>
+              </label>
+              <label className={`${PAGE}__control-toggle`}>
+                <input type="checkbox" checked={withBorder} onChange={e => setWithBorder(e.target.checked)} />
+                <span style={{ fontSize: 'var(--text-xs, 0.75rem)' }}>Border</span>
+              </label>
+              <label className={`${PAGE}__control-toggle`}>
+                <input type="checkbox" checked={disabled} onChange={e => setDisabled(e.target.checked)} />
+                <span style={{ fontSize: 'var(--text-xs, 0.75rem)' }}>Disabled</span>
+              </label>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
   )
 }

@@ -4,6 +4,8 @@ import { useState, useMemo, useCallback, useRef, useEffect } from 'react'
 import { css } from '@ui/core/styles/css-tag'
 import { useStyles } from '@ui/core/styles/use-styles'
 import { EvervaultCard } from '@ui/domain/evervault-card'
+import { EvervaultCard as LiteEvervaultCard } from '@ui/lite/evervault-card'
+import { EvervaultCard as PremiumEvervaultCard } from '@ui/premium/evervault-card'
 import { Button } from '@ui/components/button'
 import { Card } from '@ui/components/card'
 import { CopyBlock } from '@ui/domain/copy-block'
@@ -653,6 +655,22 @@ const pageStyles = css`
       :scope ::-webkit-scrollbar-thumb:hover {
         background: var(--border-strong);
       }
+
+      /* ── Source link ─────────────────────────────────── */
+
+      .evervault-card-page__source-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        color: var(--text-secondary);
+        font-size: var(--text-sm, 0.875rem);
+        text-decoration: none;
+        font-weight: 500;
+      }
+      .evervault-card-page__source-link:hover {
+        text-decoration: underline;
+        text-underline-offset: 0.2em;
+      }
     }
   }
 `
@@ -1276,9 +1294,11 @@ export default function EvervaultCardPage() {
               import {'{'} EvervaultCard {'}'} from '@annondeveloper/ui-kit/lite'
             </div>
             <div className="evervault-card-page__tier-preview">
-              <div style={{ inlineSize: '160px', padding: '1rem', borderRadius: '0.75rem', background: 'var(--bg-surface)', border: '1px solid var(--border-subtle)', textAlign: 'center', fontSize: '0.8125rem', color: 'var(--text-secondary)' }}>
-                Lite Card
-              </div>
+              <LiteEvervaultCard style={{ inlineSize: '160px' }}>
+                <div style={{ padding: '1rem', textAlign: 'center', fontSize: '0.8125rem', color: 'var(--text-secondary)' }}>
+                  Lite Card
+                </div>
+              </LiteEvervaultCard>
             </div>
             <div className="evervault-card-page__size-breakdown">
               <div className="evervault-card-page__size-row">
@@ -1344,11 +1364,11 @@ export default function EvervaultCardPage() {
               import {'{'} EvervaultCard {'}'} from '@annondeveloper/ui-kit/premium'
             </div>
             <div className="evervault-card-page__tier-preview">
-              <EvervaultCard style={{ inlineSize: '160px' }}>
+              <PremiumEvervaultCard style={{ inlineSize: '160px' }}>
                 <div style={{ padding: '1rem', textAlign: 'center', fontSize: '0.8125rem', color: 'var(--text-primary)' }}>
                   Premium
                 </div>
-              </EvervaultCard>
+              </PremiumEvervaultCard>
             </div>
             <div className="evervault-card-page__size-breakdown">
               <div className="evervault-card-page__size-row">
@@ -1461,6 +1481,45 @@ export default function EvervaultCardPage() {
             </li>
           </ul>
         </Card>
+      </section>
+
+      {/* ── 10. Source ──────────────────────────────────── */}
+      <section className="evervault-card-page__section" id="source">
+        <h2 className="evervault-card-page__section-title">
+          <a href="#source">Source</a>
+        </h2>
+        <p className="evervault-card-page__section-desc">
+          View the component source on GitHub.
+        </p>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+          <a
+            href="https://github.com/annondeveloper/ui-kit/blob/main/src/domain/evervault-card.tsx"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="evervault-card-page__source-link"
+          >
+            <Icon name="code" size="sm" />
+            src/domain/evervault-card.tsx
+          </a>
+          <a
+            href="https://github.com/annondeveloper/ui-kit/blob/main/src/lite/evervault-card.tsx"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="evervault-card-page__source-link"
+          >
+            <Icon name="code" size="sm" />
+            src/lite/evervault-card.tsx
+          </a>
+          <a
+            href="https://github.com/annondeveloper/ui-kit/blob/main/src/premium/evervault-card.tsx"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="evervault-card-page__source-link"
+          >
+            <Icon name="code" size="sm" />
+            src/premium/evervault-card.tsx
+          </a>
+        </div>
       </section>
     </div>
   )

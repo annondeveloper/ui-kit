@@ -4,6 +4,8 @@ import { useState, useMemo, useCallback, useRef, useEffect } from 'react'
 import { css } from '@ui/core/styles/css-tag'
 import { useStyles } from '@ui/core/styles/use-styles'
 import { ShimmerButton } from '@ui/domain/shimmer-button'
+import { ShimmerButton as LiteShimmerButton } from '@ui/lite/shimmer-button'
+import { ShimmerButton as PremiumShimmerButton } from '@ui/premium/shimmer-button'
 import { Button } from '@ui/components/button'
 import { Card } from '@ui/components/card'
 import { CopyBlock } from '@ui/domain/copy-block'
@@ -694,6 +696,22 @@ const pageStyles = css`
       :scope ::-webkit-scrollbar-thumb:hover {
         background: var(--border-strong);
       }
+
+      /* ── Source link ─────────────────────────────────── */
+
+      .shimmer-button-page__source-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: var(--text-sm, 0.875rem);
+        color: var(--brand);
+        text-decoration: none;
+        font-weight: 500;
+      }
+      .shimmer-button-page__source-link:hover {
+        text-decoration: underline;
+        text-underline-offset: 0.2em;
+      }
     }
   }
 `
@@ -927,6 +945,8 @@ function PlaygroundSection({ tier: tierProp, brandColor }: { tier: Tier; brandCo
 
   const [activeCodeTab, setActiveCodeTab] = useState('react')
 
+  const ShimmerButtonComponent = tier === 'lite' ? LiteShimmerButton : tier === 'premium' ? PremiumShimmerButton : ShimmerButton
+
   const codeTabs = [
     { id: 'react', label: 'React' },
     { id: 'html', label: 'HTML+CSS' },
@@ -958,14 +978,14 @@ function PlaygroundSection({ tier: tierProp, brandColor }: { tier: Tier; brandCo
       <div className="shimmer-button-page__playground">
         <div className="shimmer-button-page__playground-preview">
           <div className="shimmer-button-page__playground-result">
-            <ShimmerButton
+            <ShimmerButtonComponent
               shimmerColor={shimmerColor}
               size={size}
               disabled={disabled}
               motion={motion}
             >
               {label}
-            </ShimmerButton>
+            </ShimmerButtonComponent>
           </div>
 
           <div className="shimmer-button-page__code-tabs">
@@ -1282,7 +1302,7 @@ export default function ShimmerButtonPage() {
               import {'{'} ShimmerButton {'}'} from '@annondeveloper/ui-kit/lite'
             </div>
             <div className="shimmer-button-page__tier-preview">
-              <ShimmerButton motion={0} size="sm">Lite</ShimmerButton>
+              <LiteShimmerButton size="sm">Lite</LiteShimmerButton>
             </div>
             <div className="shimmer-button-page__size-breakdown">
               <div className="shimmer-button-page__size-row">
@@ -1344,7 +1364,7 @@ export default function ShimmerButtonPage() {
               import {'{'} ShimmerButton {'}'} from '@annondeveloper/ui-kit/premium'
             </div>
             <div className="shimmer-button-page__tier-preview">
-              <ShimmerButton shimmerColor="oklch(75% 0.18 270)" size="sm">Premium</ShimmerButton>
+              <PremiumShimmerButton shimmerColor="oklch(75% 0.18 270)" size="sm">Premium</PremiumShimmerButton>
             </div>
             <div className="shimmer-button-page__size-breakdown">
               <div className="shimmer-button-page__size-row">
@@ -1463,6 +1483,23 @@ export default function ShimmerButtonPage() {
             </li>
           </ul>
         </Card>
+      </section>
+
+      {/* ── Source ──────────────────────────────────────── */}
+      <section className="shimmer-button-page__section" id="source">
+        <h2 className="shimmer-button-page__section-title"><a href="#source">Source</a></h2>
+        <p className="shimmer-button-page__section-desc">View the full component source code on GitHub.</p>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+          <a className="shimmer-button-page__source-link" href="https://github.com/annondeveloper/ui-kit/blob/main/src/domain/shimmer-button.tsx" target="_blank" rel="noopener noreferrer">
+            <Icon name="code" size="sm" /> src/domain/shimmer-button.tsx (Standard)
+          </a>
+          <a className="shimmer-button-page__source-link" href="https://github.com/annondeveloper/ui-kit/blob/main/src/lite/shimmer-button.tsx" target="_blank" rel="noopener noreferrer">
+            <Icon name="code" size="sm" /> src/lite/shimmer-button.tsx (Lite)
+          </a>
+          <a className="shimmer-button-page__source-link" href="https://github.com/annondeveloper/ui-kit/blob/main/src/premium/shimmer-button.tsx" target="_blank" rel="noopener noreferrer">
+            <Icon name="code" size="sm" /> src/premium/shimmer-button.tsx (Premium)
+          </a>
+        </div>
       </section>
     </div>
   )

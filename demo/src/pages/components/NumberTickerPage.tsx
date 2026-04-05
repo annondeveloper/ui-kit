@@ -4,6 +4,8 @@ import { useState, useMemo, useCallback, useRef, useEffect } from 'react'
 import { css } from '@ui/core/styles/css-tag'
 import { useStyles } from '@ui/core/styles/use-styles'
 import { NumberTicker } from '@ui/domain/number-ticker'
+import { NumberTicker as LiteNumberTicker } from '@ui/lite/number-ticker'
+import { NumberTicker as PremiumNumberTicker } from '@ui/premium/number-ticker'
 import { Button } from '@ui/components/button'
 import { Card } from '@ui/components/card'
 import { CopyBlock } from '@ui/domain/copy-block'
@@ -600,6 +602,22 @@ const pageStyles = css`
       :scope ::-webkit-scrollbar-track { background: transparent; }
       :scope ::-webkit-scrollbar-thumb { background: var(--border-default); border-radius: 2px; }
       :scope ::-webkit-scrollbar-thumb:hover { background: var(--border-strong); }
+
+      /* ── Source link ─────────────────────────────────── */
+
+      .number-ticker-page__source-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: var(--text-sm, 0.875rem);
+        color: var(--brand);
+        text-decoration: none;
+        font-weight: 500;
+      }
+      .number-ticker-page__source-link:hover {
+        text-decoration: underline;
+        text-underline-offset: 0.2em;
+      }
     }
   }
 `
@@ -806,7 +824,13 @@ function PlaygroundSection({ tier: tierProp, brandColor }: { tier: Tier; brandCo
         <div className="number-ticker-page__playground-preview">
           <div className="number-ticker-page__playground-result">
             <span className="number-ticker-page__big-value">
-              <NumberTicker value={value} direction={direction} delay={delay} motion={motion} />
+              {tier === 'lite' ? (
+                <LiteNumberTicker value={value} />
+              ) : tier === 'premium' ? (
+                <PremiumNumberTicker value={value} direction={direction} delay={delay} motion={motion} />
+              ) : (
+                <NumberTicker value={value} direction={direction} delay={delay} motion={motion} />
+              )}
             </span>
           </div>
 
@@ -1124,7 +1148,9 @@ export default function NumberTickerPage() {
               import {'{'} NumberTicker {'}'} from '@annondeveloper/ui-kit/lite'
             </div>
             <div className="number-ticker-page__tier-preview">
-              <span className="number-ticker-page__medium-value">42,195</span>
+              <span className="number-ticker-page__medium-value">
+                <LiteNumberTicker value={42195} />
+              </span>
             </div>
             <div className="number-ticker-page__size-breakdown">
               <div className="number-ticker-page__size-row">
@@ -1189,7 +1215,7 @@ export default function NumberTickerPage() {
             </div>
             <div className="number-ticker-page__tier-preview">
               <span className="number-ticker-page__medium-value">
-                <NumberTicker value={42195} />
+                <PremiumNumberTicker value={42195} />
               </span>
             </div>
             <div className="number-ticker-page__size-breakdown">
@@ -1301,6 +1327,23 @@ export default function NumberTickerPage() {
             </li>
           </ul>
         </Card>
+      </section>
+
+      {/* ── Source ──────────────────────────────────────── */}
+      <section className="number-ticker-page__section" id="source">
+        <h2 className="number-ticker-page__section-title"><a href="#source">Source</a></h2>
+        <p className="number-ticker-page__section-desc">View the full component source code on GitHub.</p>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+          <a className="number-ticker-page__source-link" href="https://github.com/annondeveloper/ui-kit/blob/main/src/domain/number-ticker.tsx" target="_blank" rel="noopener noreferrer">
+            <Icon name="code" size="sm" /> src/domain/number-ticker.tsx (Standard)
+          </a>
+          <a className="number-ticker-page__source-link" href="https://github.com/annondeveloper/ui-kit/blob/main/src/lite/number-ticker.tsx" target="_blank" rel="noopener noreferrer">
+            <Icon name="code" size="sm" /> src/lite/number-ticker.tsx (Lite)
+          </a>
+          <a className="number-ticker-page__source-link" href="https://github.com/annondeveloper/ui-kit/blob/main/src/premium/number-ticker.tsx" target="_blank" rel="noopener noreferrer">
+            <Icon name="code" size="sm" /> src/premium/number-ticker.tsx (Premium)
+          </a>
+        </div>
       </section>
     </div>
   )

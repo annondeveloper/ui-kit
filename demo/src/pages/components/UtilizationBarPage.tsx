@@ -5,11 +5,16 @@ import { css } from '@ui/core/styles/css-tag'
 import { useStyles } from '@ui/core/styles/use-styles'
 import { UtilizationBar } from '@ui/domain/utilization-bar'
 import { UtilizationBar as LiteUtilizationBar } from '@ui/lite/utilization-bar'
+import { UtilizationBar as PremiumUtilizationBar } from '@ui/premium/utilization-bar'
 import { Button } from '@ui/components/button'
 import { Card } from '@ui/components/card'
 import { CopyBlock } from '@ui/domain/copy-block'
 import { Tabs, TabPanel } from '@ui/components/tabs'
 import { Icon } from '@ui/core/icons/icon'
+import { generateTheme } from '@ui/core/tokens/generator'
+import { TOKEN_TO_CSS, type ThemeTokens } from '@ui/core/tokens/tokens'
+import { useTheme } from '@ui/core/tokens/theme-context'
+import { ColorInput } from '@ui/components/color-input'
 import { PropsTable, type PropDef } from '../../components/PropsTable'
 import { useTier, type Tier } from '../../App'
 
@@ -541,6 +546,52 @@ const pageStyles = css`
         color: var(--text-primary);
       }
 
+      /* ── Source link ──────────────────────────────── */
+
+      .utilization-bar-page__source-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: var(--text-sm, 0.875rem);
+        color: var(--brand);
+        text-decoration: none;
+        font-weight: 500;
+      }
+      .utilization-bar-page__source-link:hover {
+        text-decoration: underline;
+        text-underline-offset: 0.2em;
+      }
+
+      /* ── Color presets ─────────────────────────────── */
+
+      .utilization-bar-page__color-presets {
+        display: flex;
+        gap: 0.25rem;
+        flex-wrap: wrap;
+      }
+
+      .utilization-bar-page__color-preset {
+        inline-size: 24px;
+        block-size: 24px;
+        border-radius: 50%;
+        border: 2px solid transparent;
+        cursor: pointer;
+        padding: 0;
+        transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1),
+                    border-color 0.15s,
+                    box-shadow 0.15s;
+        box-shadow: 0 1px 3px oklch(0% 0 0 / 0.2);
+      }
+      .utilization-bar-page__color-preset:hover {
+        transform: scale(1.2);
+        box-shadow: 0 2px 8px oklch(0% 0 0 / 0.3);
+      }
+      .utilization-bar-page__color-preset--active {
+        border-color: oklch(100% 0 0);
+        transform: scale(1.2);
+        box-shadow: 0 0 0 2px var(--bg-base), 0 0 0 4px oklch(100% 0 0 / 0.5);
+      }
+
       /* ── Responsive ──────────────────────────────── */
 
       @media (max-width: 768px) {
@@ -569,6 +620,21 @@ const pageStyles = css`
     }
   }
 `
+
+// ─── Color Presets ───────────────────────────────────────────────────────────
+
+const COLOR_PRESETS = [
+  { hex: '#6366f1', name: 'Indigo' },
+  { hex: '#f97316', name: 'Orange' },
+  { hex: '#f43f5e', name: 'Rose' },
+  { hex: '#0ea5e9', name: 'Sky' },
+  { hex: '#10b981', name: 'Emerald' },
+  { hex: '#8b5cf6', name: 'Violet' },
+  { hex: '#d946ef', name: 'Fuchsia' },
+  { hex: '#f59e0b', name: 'Amber' },
+  { hex: '#06b6d4', name: 'Cyan' },
+  { hex: '#64748b', name: 'Slate' },
+]
 
 // ─── Props Data ───────────────────────────────────────────────────────────────
 
@@ -734,7 +800,7 @@ function PlaygroundSection({ tier: tierProp }: { tier: Tier }) {
   const [copyStatus, setCopyStatus] = useState('')
   const [activeCodeTab, setActiveCodeTab] = useState('react')
 
-  const BarComponent = tier === 'lite' ? LiteUtilizationBar : UtilizationBar
+  const BarComponent = tier === 'lite' ? LiteUtilizationBar : tier === 'premium' ? PremiumUtilizationBar : UtilizationBar
 
   const segments = dataset === 'cpu' ? CPU_SEGMENTS : dataset === 'memory' ? MEMORY_SEGMENTS : SIMPLE_SEGMENT
 
@@ -842,7 +908,33 @@ export default function UtilizationBarPage() {
   useStyles('utilization-bar-page', pageStyles)
 
   const { tier, setTier } = useTier()
+  const [brandColor, setBrandColor] = useState('#6366f1')
   const pageRef = useRef<HTMLDivElement>(null)
+  const { mode } = useTheme()
+
+  const BRAND_ONLY_KEYS: (keyof ThemeTokens)[] = [
+    'brand', 'brandLight', 'brandDark', 'brandSubtle', 'brandGlow',
+    'borderGlow', 'aurora1', 'aurora2',
+  ]
+
+  const themeTokens = useMemo(() => {
+    try {
+      return generateTheme(brandColor, mode)
+    } catch {
+      return null
+    }
+  }, [brandColor, mode])
+
+  const themeStyle = useMemo(() => {
+    if (!themeTokens || brandColor === '#6366f1') return undefined
+    const style: Record<string, string> = {}
+    for (const key of BRAND_ONLY_KEYS) {
+      const cssVar = TOKEN_TO_CSS[key]
+      const value = themeTokens[key]
+      if (cssVar && value) style[cssVar] = value
+    }
+    return style as React.CSSProperties
+  }, [themeTokens, brandColor])
 
   useEffect(() => {
     const sections = document.querySelectorAll('.utilization-bar-page__section')
@@ -874,10 +966,10 @@ export default function UtilizationBarPage() {
     return () => observer.disconnect()
   }, [])
 
-  const BarComponent = tier === 'lite' ? LiteUtilizationBar : UtilizationBar
+  const BarComponent = tier === 'lite' ? LiteUtilizationBar : tier === 'premium' ? PremiumUtilizationBar : UtilizationBar
 
   return (
-    <div className="utilization-bar-page" ref={pageRef}>
+    <div className="utilization-bar-page" ref={pageRef} style={themeStyle}>
       {/* ── 1. Hero Header ──────────────────────────────── */}
       <div className="utilization-bar-page__hero">
         <h1 className="utilization-bar-page__title">UtilizationBar</h1>
@@ -1087,7 +1179,7 @@ export default function UtilizationBarPage() {
               import {'{'} UtilizationBar {'}'} from '@annondeveloper/ui-kit/premium'
             </div>
             <div className="utilization-bar-page__tier-preview">
-              <UtilizationBar segments={CPU_SEGMENTS} showLabels size="md" />
+              <PremiumUtilizationBar segments={CPU_SEGMENTS} showLabels size="md" />
             </div>
             <div className="utilization-bar-page__size-breakdown">
               <div className="utilization-bar-page__size-row">
@@ -1100,7 +1192,45 @@ export default function UtilizationBarPage() {
         </div>
       </section>
 
-      {/* ── 8. Props API ───────────────────────────────── */}
+      {/* ── 8. Brand Color ──────────────────────────────── */}
+      <section className="utilization-bar-page__section" id="brand-color">
+        <h2 className="utilization-bar-page__section-title">
+          <a href="#brand-color">Brand Color</a>
+        </h2>
+        <p className="utilization-bar-page__section-desc">
+          Pick a brand color to see all utilization bars update in real-time. The theme generates
+          derived colors (light, dark, subtle, glow) automatically from your choice.
+        </p>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+          <ColorInput
+            name="brand-color"
+            value={brandColor}
+            onChange={setBrandColor}
+            size="sm"
+            swatches={['#6366f1','#f97316','#f43f5e','#0ea5e9','#10b981','#8b5cf6','#d946ef','#f59e0b','#06b6d4','#64748b']}
+          />
+          <div className="utilization-bar-page__color-presets">
+            {COLOR_PRESETS.map(p => (
+              <button
+                key={p.hex}
+                type="button"
+                className={`utilization-bar-page__color-preset${brandColor === p.hex ? ' utilization-bar-page__color-preset--active' : ''}`}
+                style={{ background: p.hex }}
+                onClick={() => setBrandColor(p.hex)}
+                title={p.name}
+                aria-label={`Set brand color to ${p.name}`}
+              />
+            ))}
+          </div>
+          {brandColor !== '#6366f1' && (
+            <Button size="xs" variant="ghost" onClick={() => setBrandColor('#6366f1')}>
+              <Icon name="refresh" size="sm" /> Reset to default
+            </Button>
+          )}
+        </div>
+      </section>
+
+      {/* ── 9. Props API ──────────────────────────────── */}
       <section className="utilization-bar-page__section" id="props">
         <h2 className="utilization-bar-page__section-title">
           <a href="#props">Props API</a>
@@ -1121,7 +1251,7 @@ export default function UtilizationBarPage() {
         </Card>
       </section>
 
-      {/* ── 9. Accessibility ──────────────────────────── */}
+      {/* ── 10. Accessibility ─────────────────────────── */}
       <section className="utilization-bar-page__section" id="accessibility">
         <h2 className="utilization-bar-page__section-title">
           <a href="#accessibility">Accessibility</a>
@@ -1169,6 +1299,23 @@ export default function UtilizationBarPage() {
             </li>
           </ul>
         </Card>
+      </section>
+
+      {/* ── Source ──────────────────────────────────────── */}
+      <section className="utilization-bar-page__section" id="source">
+        <h2 className="utilization-bar-page__section-title"><a href="#source">Source</a></h2>
+        <p className="utilization-bar-page__section-desc">View the full component source code on GitHub.</p>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+          <a className="utilization-bar-page__source-link" href="https://github.com/annondeveloper/ui-kit/blob/main/src/domain/utilization-bar.tsx" target="_blank" rel="noopener noreferrer">
+            <Icon name="code" size="sm" /> src/domain/utilization-bar.tsx (Standard)
+          </a>
+          <a className="utilization-bar-page__source-link" href="https://github.com/annondeveloper/ui-kit/blob/main/src/lite/utilization-bar.tsx" target="_blank" rel="noopener noreferrer">
+            <Icon name="code" size="sm" /> src/lite/utilization-bar.tsx (Lite)
+          </a>
+          <a className="utilization-bar-page__source-link" href="https://github.com/annondeveloper/ui-kit/blob/main/src/premium/utilization-bar.tsx" target="_blank" rel="noopener noreferrer">
+            <Icon name="code" size="sm" /> src/premium/utilization-bar.tsx (Premium)
+          </a>
+        </div>
       </section>
     </div>
   )

@@ -10,6 +10,7 @@ import { Button } from '@ui/components/button'
 import { CopyBlock } from '@ui/domain/copy-block'
 import { Tabs, TabPanel } from '@ui/components/tabs'
 import { Icon } from '@ui/core/icons/icon'
+import { ColorInput } from '@ui/components/color-input'
 import { PropsTable, type PropDef } from '../../components/PropsTable'
 import { useTier, type Tier } from '../../App'
 
@@ -483,6 +484,38 @@ const pageStyles = css`
         margin-block-start: 0.125rem;
       }
 
+      /* ── Source link ──────────────────────────── */
+
+      .dashboard-template-page__source-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: var(--text-sm, 0.875rem);
+        color: var(--brand);
+        text-decoration: none;
+        font-weight: 500;
+      }
+      .dashboard-template-page__source-link:hover {
+        text-decoration: underline;
+        text-underline-offset: 0.2em;
+      }
+
+      /* ── Size breakdown ────────────────────────── */
+
+      .dashboard-template-page__size-breakdown {
+        display: flex;
+        flex-direction: column;
+        gap: 0.25rem;
+        font-size: 0.75rem;
+        color: var(--text-tertiary);
+      }
+
+      .dashboard-template-page__size-row {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+
       /* ── Responsive ────────────────────────────── */
 
       @media (max-width: 768px) {
@@ -561,6 +594,7 @@ const STATUS_OPTIONS: Status[] = ['ok', 'warning', 'critical', 'unknown', 'maint
 const SIDEBAR_POS_OPTIONS = ['left', 'right'] as const
 const VARIANT_OPTIONS = ['default', 'compact', 'fullscreen'] as const
 const METRICS_LAYOUT_OPTIONS = ['row', 'grid'] as const
+const MOTION_OPTIONS = ['0', '1', '2', '3'] as const
 const TIERS: { id: Tier; label: string }[] = [
   { id: 'lite', label: 'Lite' },
   { id: 'standard', label: 'Standard' },
@@ -722,6 +756,92 @@ function generateHtmlCode(status: Status): string {
 </div>`
 }
 
+function generateVueCode(tier: Tier, columns: number, status: Status): string {
+  const importPath = tier === 'premium' ? '@annondeveloper/ui-kit/premium' : tier === 'lite' ? '@annondeveloper/ui-kit/lite' : '@annondeveloper/ui-kit'
+  return `<template>
+  <DashboardTemplate
+    title="System Dashboard"
+    status="${status}"
+    :metrics="metrics"
+    :sections="sections"
+    :columns="${columns}"
+    :sidebar="sidebar"
+  />
+</template>
+
+<script setup>
+import { DashboardTemplate } from '${importPath}'
+
+const metrics = [
+  { id: 'cpu', title: 'CPU Usage', value: '42%', status: 'ok', trend: 'up' },
+  { id: 'mem', title: 'Memory', value: '7.2 GB', status: 'warning', trend: 'up' },
+]
+
+const sections = [
+  { id: 'chart', title: 'CPU Over Time', content: '<Chart />', span: 2 },
+  { id: 'logs', title: 'Recent Logs', content: '<LogList />' },
+]
+</script>`
+}
+
+function generateAngularCode(status: Status): string {
+  return `<!-- Angular — CSS-only approach -->
+<link rel="stylesheet" href="https://unpkg.com/@annondeveloper/ui-kit/css/components/dashboard-template.css">
+
+<div class="ui-dashboard-template" data-columns="2" role="group"
+     aria-label="Dashboard: System Dashboard">
+  <div class="ui-dashboard-template__header">
+    <h2 class="ui-dashboard-template__title">System Dashboard</h2>
+    <span class="ui-dashboard-template__status-badge" data-status="${status}">
+      ${status}
+    </span>
+  </div>
+  <div class="ui-dashboard-template__metrics" role="list">
+    <div *ngFor="let m of metrics" class="ui-dashboard-template__metric" role="listitem">
+      <span class="ui-dashboard-template__metric-title">{{ m.title }}</span>
+      <span class="ui-dashboard-template__metric-value">{{ m.value }}</span>
+    </div>
+  </div>
+  <div class="ui-dashboard-template__body" data-sidebar="right">
+    <div class="ui-dashboard-template__main">
+      <ng-content></ng-content>
+    </div>
+    <aside class="ui-dashboard-template__sidebar">
+      <ng-content select="[sidebar]"></ng-content>
+    </aside>
+  </div>
+</div>
+
+<style>
+@import '@annondeveloper/ui-kit/css/components/dashboard-template.css';
+</style>`
+}
+
+function generateSvelteCode(tier: Tier, columns: number, status: Status): string {
+  const importPath = tier === 'premium' ? '@annondeveloper/ui-kit/premium' : tier === 'lite' ? '@annondeveloper/ui-kit/lite' : '@annondeveloper/ui-kit'
+  return `<script>
+  import { DashboardTemplate } from '${importPath}';
+
+  const metrics = [
+    { id: 'cpu', title: 'CPU Usage', value: '42%', status: 'ok', trend: 'up' },
+    { id: 'mem', title: 'Memory', value: '7.2 GB', status: 'warning', trend: 'up' },
+  ];
+
+  const sections = [
+    { id: 'chart', title: 'CPU Over Time', content: 'Chart', span: 2 },
+    { id: 'logs', title: 'Recent Logs', content: 'LogList' },
+  ];
+</script>
+
+<DashboardTemplate
+  title="System Dashboard"
+  status="${status}"
+  {metrics}
+  {sections}
+  columns={${columns}}
+/>`
+}
+
 // ─── Section: Interactive Playground ─────────────────────────────────────────
 
 function PlaygroundSection({ tier: tierProp }: { tier: Tier }) {
@@ -738,6 +858,7 @@ function PlaygroundSection({ tier: tierProp }: { tier: Tier }) {
   const [variant, setVariant] = useState<'default' | 'compact' | 'fullscreen'>('default')
   const [stickyHeader, setStickyHeader] = useState(false)
   const [metricsLayout, setMetricsLayout] = useState<'row' | 'grid'>('row')
+  const [motion, setMotion] = useState<0 | 1 | 2 | 3>(3)
   const [showStatusBar, setShowStatusBar] = useState(false)
   const [showBreadcrumb, setShowBreadcrumb] = useState(false)
   const [clickableMetrics, setClickableMetrics] = useState(false)
@@ -754,14 +875,21 @@ function PlaygroundSection({ tier: tierProp }: { tier: Tier }) {
     [tier, columns, sidebarPosition, sidebarCollapsible, status, variant, stickyHeader, metricsLayout],
   )
   const htmlCode = useMemo(() => generateHtmlCode(status), [status])
+  const vueCode = useMemo(() => generateVueCode(tier, columns, status), [tier, columns, status])
+  const angularCode = useMemo(() => generateAngularCode(status), [status])
+  const svelteCode = useMemo(() => generateSvelteCode(tier, columns, status), [tier, columns, status])
 
   const [activeCodeTab, setActiveCodeTab] = useState('react')
   const codeTabs = [
     { id: 'react', label: 'React' },
     { id: 'html', label: 'HTML+CSS' },
+    { id: 'vue', label: 'Vue' },
+    { id: 'angular', label: 'Angular' },
+    { id: 'svelte', label: 'Svelte' },
   ]
 
-  const activeCode = activeCodeTab === 'html' ? htmlCode : reactCode
+  const codeMap: Record<string, string> = { react: reactCode, html: htmlCode, vue: vueCode, angular: angularCode, svelte: svelteCode }
+  const activeCode = codeMap[activeCodeTab] ?? reactCode
 
   const previewProps: Record<string, unknown> = {
     title: 'System Dashboard',
@@ -819,6 +947,7 @@ function PlaygroundSection({ tier: tierProp }: { tier: Tier }) {
     showStatusBar,
     showBreadcrumb: showBreadcrumb ? <span>Home / Monitoring / <strong>Dashboard</strong></span> : undefined,
     onMetricClick: clickableMetrics ? (m: DashboardMetric) => setClickedMetric(m.title) : undefined,
+    motion,
   })
 
   return (
@@ -860,6 +989,15 @@ function PlaygroundSection({ tier: tierProp }: { tier: Tier }) {
               <TabPanel tabId="html">
                 <CopyBlock code={htmlCode} language="html" showLineNumbers />
               </TabPanel>
+              <TabPanel tabId="vue">
+                <CopyBlock code={vueCode} language="html" showLineNumbers />
+              </TabPanel>
+              <TabPanel tabId="angular">
+                <CopyBlock code={angularCode} language="html" showLineNumbers />
+              </TabPanel>
+              <TabPanel tabId="svelte">
+                <CopyBlock code={svelteCode} language="html" showLineNumbers />
+              </TabPanel>
             </Tabs>
           </div>
         </div>
@@ -895,6 +1033,12 @@ function PlaygroundSection({ tier: tierProp }: { tier: Tier }) {
             value={metricsLayout}
             onChange={v => setMetricsLayout(v as 'row' | 'grid')}
           />
+          <OptionGroup
+            label="Motion"
+            options={MOTION_OPTIONS}
+            value={String(motion) as '0' | '1' | '2' | '3'}
+            onChange={v => setMotion(Number(v) as 0 | 1 | 2 | 3)}
+          />
           <div className="dashboard-template-page__control-group">
             <span className="dashboard-template-page__control-label">Toggles</span>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.375rem' }}>
@@ -929,6 +1073,7 @@ export default function DashboardTemplatePage() {
   useStyles('dashboard-template-page', pageStyles)
 
   const { tier, setTier } = useTier()
+  const [brandColor, setBrandColor] = useState('#6366f1')
 
   // Scroll reveal for sections — JS fallback
   useEffect(() => {
@@ -1015,6 +1160,29 @@ export default function DashboardTemplatePage() {
               <div className="dashboard-template-page__tier-import">
                 {IMPORT_STRINGS[t.id]}
               </div>
+              <div className="dashboard-template-page__size-breakdown">
+                <div className="dashboard-template-page__size-row">
+                  {t.id === 'lite' ? (
+                    <>
+                      <span>JSX: <strong style={{ color: 'var(--text-primary)' }}>0.4 KB</strong></span>
+                      <span>CSS: <strong style={{ color: 'var(--text-primary)' }}>0.4 KB</strong></span>
+                      <span>= <strong style={{ color: 'var(--brand)' }}>0.8 KB</strong> gzip</span>
+                    </>
+                  ) : t.id === 'standard' ? (
+                    <>
+                      <span>JSX: <strong style={{ color: 'var(--text-primary)' }}>2.8 KB</strong></span>
+                      <span>CSS: <strong style={{ color: 'var(--text-primary)' }}>1.4 KB</strong></span>
+                      <span>= <strong style={{ color: 'var(--brand)' }}>4.2 KB</strong> gzip</span>
+                    </>
+                  ) : (
+                    <>
+                      <span>JSX: <strong style={{ color: 'var(--text-primary)' }}>3.6 KB</strong></span>
+                      <span>CSS: <strong style={{ color: 'var(--text-primary)' }}>2.2 KB</strong></span>
+                      <span>= <strong style={{ color: 'var(--brand)' }}>5.8 KB</strong> gzip</span>
+                    </>
+                  )}
+                </div>
+              </div>
               <div className="dashboard-template-page__tier-preview">
                 {t.id === 'lite' ? (
                   <LiteDashboardTemplate title="Server Overview" metrics={litePreviewMetrics}>
@@ -1094,6 +1262,47 @@ export default function DashboardTemplatePage() {
             <span><strong>forced-colors</strong> — borders and outlines adapt to high contrast mode.</span>
           </li>
         </ul>
+      </section>
+
+      {/* ── Brand Color ───────────────────────────────── */}
+      <section className="dashboard-template-page__section" id="brand-color">
+        <h2 className="dashboard-template-page__section-title">
+          <a href="#brand-color">Brand Color</a>
+        </h2>
+        <p className="dashboard-template-page__section-desc">
+          Pick a brand color to see the dashboard update in real-time. Derived tokens are generated automatically.
+        </p>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+          <ColorInput
+            name="brand-color"
+            value={brandColor}
+            onChange={setBrandColor}
+            size="sm"
+            swatches={['#6366f1','#f97316','#f43f5e','#0ea5e9','#10b981','#8b5cf6','#d946ef','#f59e0b','#06b6d4','#64748b']}
+          />
+          {brandColor !== '#6366f1' && (
+            <Button size="xs" variant="ghost" onClick={() => setBrandColor('#6366f1')}>
+              <Icon name="refresh" size="sm" /> Reset to default
+            </Button>
+          )}
+        </div>
+      </section>
+
+      {/* ── Source ────────────────────────────────────── */}
+      <section className="dashboard-template-page__section" id="source">
+        <h2 className="dashboard-template-page__section-title"><a href="#source">Source</a></h2>
+        <p className="dashboard-template-page__section-desc">View the full component source code on GitHub.</p>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+          <a className="dashboard-template-page__source-link" href="https://github.com/annondeveloper/ui-kit/blob/main/src/domain/dashboard-template.tsx" target="_blank" rel="noopener noreferrer">
+            <Icon name="code" size="sm" /> src/domain/dashboard-template.tsx (Standard)
+          </a>
+          <a className="dashboard-template-page__source-link" href="https://github.com/annondeveloper/ui-kit/blob/main/src/lite/dashboard-template.tsx" target="_blank" rel="noopener noreferrer">
+            <Icon name="code" size="sm" /> src/lite/dashboard-template.tsx (Lite)
+          </a>
+          <a className="dashboard-template-page__source-link" href="https://github.com/annondeveloper/ui-kit/blob/main/src/premium/dashboard-template.tsx" target="_blank" rel="noopener noreferrer">
+            <Icon name="code" size="sm" /> src/premium/dashboard-template.tsx (Premium)
+          </a>
+        </div>
       </section>
     </div>
   )

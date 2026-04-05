@@ -4,6 +4,8 @@ import { useState, useMemo, useCallback, useRef, useEffect } from 'react'
 import { css } from '@ui/core/styles/css-tag'
 import { useStyles } from '@ui/core/styles/use-styles'
 import { GlowCard } from '@ui/domain/glow-card'
+import { GlowCard as LiteGlowCard } from '@ui/lite/glow-card'
+import { GlowCard as PremiumGlowCard } from '@ui/premium/glow-card'
 import { Button } from '@ui/components/button'
 import { Card } from '@ui/components/card'
 import { CopyBlock } from '@ui/domain/copy-block'
@@ -661,6 +663,22 @@ const pageStyles = css`
       :scope ::-webkit-scrollbar-thumb:hover {
         background: var(--border-strong);
       }
+
+      /* ── Source link ─────────────────────────────────── */
+
+      .glow-card-page__source-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: var(--text-sm, 0.875rem);
+        color: var(--brand);
+        text-decoration: none;
+        font-weight: 500;
+      }
+      .glow-card-page__source-link:hover {
+        text-decoration: underline;
+        text-underline-offset: 0.2em;
+      }
     }
   }
 `
@@ -1222,12 +1240,12 @@ export default function GlowCardPage() {
               import {'{'} GlowCard {'}'} from '@annondeveloper/ui-kit/lite'
             </div>
             <div className="glow-card-page__tier-preview">
-              <GlowCard motion={0} style={{ inlineSize: '140px' }}>
+              <LiteGlowCard style={{ inlineSize: '140px' }}>
                 <div className="glow-card-page__demo-content">
                   <h3 style={{ fontSize: '0.75rem' }}>Lite</h3>
                   <p style={{ fontSize: '0.625rem' }}>Static hover</p>
                 </div>
-              </GlowCard>
+              </LiteGlowCard>
             </div>
             <div className="glow-card-page__size-breakdown">
               <div className="glow-card-page__size-row">
@@ -1294,12 +1312,12 @@ export default function GlowCardPage() {
               import {'{'} GlowCard {'}'} from '@annondeveloper/ui-kit/premium'
             </div>
             <div className="glow-card-page__tier-preview">
-              <GlowCard glowColor="oklch(75% 0.18 270 / 0.35)" style={{ inlineSize: '140px' }}>
+              <PremiumGlowCard glowColor="oklch(75% 0.18 270 / 0.35)" style={{ inlineSize: '140px' }}>
                 <div className="glow-card-page__demo-content">
                   <h3 style={{ fontSize: '0.75rem' }}>Premium</h3>
                   <p style={{ fontSize: '0.625rem' }}>Multi-layer glow</p>
                 </div>
-              </GlowCard>
+              </PremiumGlowCard>
             </div>
             <div className="glow-card-page__size-breakdown">
               <div className="glow-card-page__size-row">
@@ -1412,6 +1430,23 @@ export default function GlowCardPage() {
             </li>
           </ul>
         </Card>
+      </section>
+
+      {/* ── Source ──────────────────────────────────────── */}
+      <section className="glow-card-page__section" id="source">
+        <h2 className="glow-card-page__section-title"><a href="#source">Source</a></h2>
+        <p className="glow-card-page__section-desc">View the full component source code on GitHub.</p>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+          <a className="glow-card-page__source-link" href="https://github.com/annondeveloper/ui-kit/blob/main/src/domain/glow-card.tsx" target="_blank" rel="noopener noreferrer">
+            <Icon name="code" size="sm" /> src/domain/glow-card.tsx (Standard)
+          </a>
+          <a className="glow-card-page__source-link" href="https://github.com/annondeveloper/ui-kit/blob/main/src/lite/glow-card.tsx" target="_blank" rel="noopener noreferrer">
+            <Icon name="code" size="sm" /> src/lite/glow-card.tsx (Lite)
+          </a>
+          <a className="glow-card-page__source-link" href="https://github.com/annondeveloper/ui-kit/blob/main/src/premium/glow-card.tsx" target="_blank" rel="noopener noreferrer">
+            <Icon name="code" size="sm" /> src/premium/glow-card.tsx (Premium)
+          </a>
+        </div>
       </section>
     </div>
   )

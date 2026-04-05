@@ -5,11 +5,16 @@ import { css } from '@ui/core/styles/css-tag'
 import { useStyles } from '@ui/core/styles/use-styles'
 import { DropdownMenu, type MenuItem } from '@ui/components/dropdown-menu'
 import { DropdownMenu as LiteDropdownMenu } from '@ui/lite/dropdown-menu'
+import { DropdownMenu as PremiumDropdownMenu } from '@ui/premium/dropdown-menu'
 import { Button } from '@ui/components/button'
 import { Card } from '@ui/components/card'
 import { CopyBlock } from '@ui/domain/copy-block'
 import { Tabs, TabPanel } from '@ui/components/tabs'
 import { Icon } from '@ui/core/icons/icon'
+import { generateTheme } from '@ui/core/tokens/generator'
+import { TOKEN_TO_CSS, type ThemeTokens } from '@ui/core/tokens/tokens'
+import { useTheme } from '@ui/core/tokens/theme-context'
+import { ColorInput } from '@ui/components/color-input'
 import { PropsTable, type PropDef } from '../../components/PropsTable'
 import { useTier, type Tier } from '../../App'
 
@@ -509,6 +514,47 @@ const pageStyles = css`
         color: var(--text-primary);
       }
 
+      /* ── Source link ───���─────────────────────────────── */
+
+      .dropdown-menu-page__source-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: var(--text-sm, 0.875rem);
+        color: var(--brand);
+        text-decoration: none;
+        font-weight: 500;
+      }
+      .dropdown-menu-page__source-link:hover {
+        text-decoration: underline;
+        text-underline-offset: 0.2em;
+      }
+
+      /* ── Color presets ───��─────────────────────────────── */
+
+      .dropdown-menu-page__color-presets {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+      }
+
+      .dropdown-menu-page__color-preset {
+        inline-size: 1.75rem;
+        block-size: 1.75rem;
+        border-radius: 50%;
+        border: 2px solid transparent;
+        cursor: pointer;
+        transition: border-color 0.15s, transform 0.15s;
+        padding: 0;
+      }
+      .dropdown-menu-page__color-preset:hover {
+        transform: scale(1.15);
+      }
+      .dropdown-menu-page__color-preset--active {
+        border-color: var(--text-primary);
+        box-shadow: 0 0 0 2px var(--bg-base);
+      }
+
       /* ── Responsive ──────────────────────────────── */
 
       @media (max-width: 768px) {
@@ -629,6 +675,17 @@ const IMPORT_STRINGS: Record<Tier, string> = {
   standard: "import { DropdownMenu } from '@annondeveloper/ui-kit'",
   premium: "import { DropdownMenu } from '@annondeveloper/ui-kit/premium'",
 }
+
+const COLOR_PRESETS = [
+  { hex: '#6366f1', name: 'Indigo' },
+  { hex: '#f97316', name: 'Orange' },
+  { hex: '#f43f5e', name: 'Rose' },
+  { hex: '#0ea5e9', name: 'Sky' },
+  { hex: '#10b981', name: 'Emerald' },
+  { hex: '#8b5cf6', name: 'Violet' },
+  { hex: '#d946ef', name: 'Fuchsia' },
+  { hex: '#f59e0b', name: 'Amber' },
+]
 
 function CopyButton({ text }: { text: string }) {
   const [copied, setCopied] = useState(false)
@@ -1045,6 +1102,14 @@ function PlaygroundSection({ tier: tierProp }: { tier: Tier }) {
                 trigger={<Button variant="secondary">Actions</Button>}
                 items={liteItems}
               />
+            ) : tier === 'premium' ? (
+              <PremiumDropdownMenu
+                items={items}
+                placement={placement}
+                motion={motion}
+              >
+                <Button>Actions</Button>
+              </PremiumDropdownMenu>
             ) : (
               <DropdownMenu
                 items={items}
@@ -1128,6 +1193,29 @@ export default function DropdownMenuPage() {
   useStyles('dropdown-menu-page', pageStyles)
 
   const { tier, setTier } = useTier()
+  const [brandColor, setBrandColor] = useState('#6366f1')
+  const pageRef = useRef<HTMLDivElement>(null)
+  const { mode } = useTheme()
+
+  const themeTokens = useMemo(() => {
+    try { return generateTheme(brandColor, mode) } catch { return null }
+  }, [brandColor, mode])
+
+  const BRAND_ONLY_KEYS: (keyof ThemeTokens)[] = [
+    'brand', 'brandLight', 'brandDark', 'brandSubtle', 'brandGlow',
+    'accentText', 'accentBg',
+  ]
+
+  const themeStyle = useMemo(() => {
+    if (!themeTokens || brandColor === '#6366f1') return undefined
+    const style: Record<string, string> = {}
+    for (const key of BRAND_ONLY_KEYS) {
+      const cssVar = TOKEN_TO_CSS[key]
+      const value = themeTokens[key]
+      if (cssVar && value) style[cssVar] = value
+    }
+    return style as React.CSSProperties
+  }, [themeTokens, brandColor])
 
   // Scroll reveal — JS fallback
   useEffect(() => {
@@ -1162,8 +1250,8 @@ export default function DropdownMenuPage() {
   }, [])
 
   return (
-    <div className="dropdown-menu-page">
-      {/* ── 1. Hero Header ──────────────────────────────── */}
+    <div className="dropdown-menu-page" ref={pageRef} style={themeStyle}>
+      {/* ── 1. Hero Header ─────────────��────────────────── */}
       <div className="dropdown-menu-page__hero">
         <h1 className="dropdown-menu-page__title">DropdownMenu</h1>
         <p className="dropdown-menu-page__desc">
@@ -1480,6 +1568,61 @@ export default function DropdownMenuPage() {
             </li>
           </ul>
         </Card>
+      </section>
+
+      {/* ── Brand Color ───────────────────────────────── */}
+      <section className="dropdown-menu-page__section" id="brand-color">
+        <h2 className="dropdown-menu-page__section-title">
+          <a href="#brand-color">Brand Color</a>
+        </h2>
+        <p className="dropdown-menu-page__section-desc">
+          Pick a brand color to see all components update in real-time. The theme generates
+          derived colors (light, dark, subtle, glow) automatically from your choice.
+        </p>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+          <ColorInput
+            name="brand-color"
+            value={brandColor}
+            onChange={setBrandColor}
+            size="sm"
+            swatches={['#6366f1','#f97316','#f43f5e','#0ea5e9','#10b981','#8b5cf6','#d946ef','#f59e0b','#06b6d4','#64748b']}
+          />
+          <div className="dropdown-menu-page__color-presets">
+            {COLOR_PRESETS.map(p => (
+              <button
+                key={p.hex}
+                type="button"
+                className={`dropdown-menu-page__color-preset${brandColor === p.hex ? ' dropdown-menu-page__color-preset--active' : ''}`}
+                style={{ background: p.hex }}
+                onClick={() => setBrandColor(p.hex)}
+                title={p.name}
+                aria-label={`Set brand color to ${p.name}`}
+              />
+            ))}
+          </div>
+          {brandColor !== '#6366f1' && (
+            <Button size="xs" variant="ghost" onClick={() => setBrandColor('#6366f1')}>
+              <Icon name="refresh" size="sm" /> Reset to default
+            </Button>
+          )}
+        </div>
+      </section>
+
+      {/* ── Source ──────────────────────────────────────── */}
+      <section className="dropdown-menu-page__section" id="source">
+        <h2 className="dropdown-menu-page__section-title"><a href="#source">Source</a></h2>
+        <p className="dropdown-menu-page__section-desc">View the full component source code on GitHub.</p>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+          <a className="dropdown-menu-page__source-link" href="https://github.com/annondeveloper/ui-kit/blob/main/src/components/dropdown-menu.tsx" target="_blank" rel="noopener noreferrer">
+            <Icon name="code" size="sm" /> src/components/dropdown-menu.tsx (Standard)
+          </a>
+          <a className="dropdown-menu-page__source-link" href="https://github.com/annondeveloper/ui-kit/blob/main/src/lite/dropdown-menu.tsx" target="_blank" rel="noopener noreferrer">
+            <Icon name="code" size="sm" /> src/lite/dropdown-menu.tsx (Lite)
+          </a>
+          <a className="dropdown-menu-page__source-link" href="https://github.com/annondeveloper/ui-kit/blob/main/src/premium/dropdown-menu.tsx" target="_blank" rel="noopener noreferrer">
+            <Icon name="code" size="sm" /> src/premium/dropdown-menu.tsx (Premium)
+          </a>
+        </div>
       </section>
     </div>
   )

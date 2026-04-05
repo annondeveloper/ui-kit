@@ -6,9 +6,12 @@ import { useStyles } from '@ui/core/styles/use-styles'
 import { Button } from '@ui/components/button'
 import { Card } from '@ui/components/card'
 import { TreeView, type TreeNode } from '@ui/domain/tree-view'
+import { TreeView as LiteTreeView } from '@ui/lite/tree-view'
+import { TreeView as PremiumTreeView } from '@ui/premium/tree-view'
 import { CopyBlock } from '@ui/domain/copy-block'
 import { Tabs, TabPanel } from '@ui/components/tabs'
 import { Icon } from '@ui/core/icons/icon'
+import { ColorInput } from '@ui/components/color-input'
 import { PropsTable, type PropDef } from '../../components/PropsTable'
 import { useTier, type Tier } from '../../App'
 
@@ -458,6 +461,63 @@ const pageStyles = css`
         color: var(--text-primary);
       }
 
+      /* ── Size breakdown ────────────────────────────── */
+
+      .tree-view-page__size-breakdown {
+        display: flex;
+        flex-direction: column;
+        gap: 0.25rem;
+        font-size: 0.75rem;
+        color: var(--text-tertiary);
+      }
+
+      .tree-view-page__size-row {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+
+      /* ── Source link ─────────────────────────────────── */
+
+      .tree-view-page__source-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: var(--text-sm, 0.875rem);
+        color: var(--brand, oklch(65% 0.2 270));
+        text-decoration: none;
+        font-weight: 500;
+      }
+      .tree-view-page__source-link:hover {
+        text-decoration: underline;
+        text-underline-offset: 0.2em;
+      }
+
+      /* ── Brand color presets ─────────────────────────── */
+
+      .tree-view-page__color-presets {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.375rem;
+      }
+
+      .tree-view-page__color-preset {
+        inline-size: 28px;
+        block-size: 28px;
+        border-radius: 50%;
+        border: 2px solid transparent;
+        cursor: pointer;
+        transition: border-color 0.15s, transform 0.15s;
+        padding: 0;
+      }
+      .tree-view-page__color-preset:hover {
+        transform: scale(1.15);
+      }
+      .tree-view-page__color-preset--active {
+        border-color: var(--text-primary);
+        box-shadow: 0 0 0 2px var(--bg-base);
+      }
+
       /* ── Responsive ──────────────────────────────── */
 
       @media (max-width: 768px) {
@@ -528,6 +588,19 @@ const IMPORT_STRINGS: Record<Tier, string> = {
   standard: "import { TreeView } from '@annondeveloper/ui-kit'",
   premium: "import { TreeView } from '@annondeveloper/ui-kit/premium'",
 }
+
+const COLOR_PRESETS = [
+  { name: 'Indigo', hex: '#6366f1' },
+  { name: 'Orange', hex: '#f97316' },
+  { name: 'Rose', hex: '#f43f5e' },
+  { name: 'Sky', hex: '#0ea5e9' },
+  { name: 'Emerald', hex: '#10b981' },
+  { name: 'Violet', hex: '#8b5cf6' },
+  { name: 'Fuchsia', hex: '#d946ef' },
+  { name: 'Amber', hex: '#f59e0b' },
+  { name: 'Cyan', hex: '#06b6d4' },
+  { name: 'Slate', hex: '#64748b' },
+]
 
 const FILE_TREE: TreeNode[] = [
   {
@@ -980,6 +1053,7 @@ export default function TreeViewPage() {
   useStyles('tree-view-page', pageStyles)
 
   const { tier, setTier } = useTier()
+  const [brandColor, setBrandColor] = useState('#6366f1')
 
   // Scroll reveal — JS fallback
   useEffect(() => {
@@ -1145,7 +1219,20 @@ export default function TreeViewPage() {
               import {'{'} TreeView {'}'} from '@annondeveloper/ui-kit/lite'
             </div>
             <div className="tree-view-page__tier-preview">
-              <Button size="sm" variant="secondary" onClick={() => setTier('lite')}>Select Lite</Button>
+              <LiteTreeView nodes={[
+                { id: 'lite-src', label: 'src', children: [
+                  { id: 'lite-index', label: 'index.ts' },
+                  { id: 'lite-app', label: 'app.tsx' },
+                ]},
+                { id: 'lite-pkg', label: 'package.json' },
+              ]} />
+            </div>
+            <div className="tree-view-page__size-breakdown">
+              <div className="tree-view-page__size-row">
+                <span>Component: <strong style={{ color: 'var(--text-primary)' }}>0.2 KB</strong></span>
+                <span>+ Shared: <strong style={{ color: 'var(--text-primary)' }}>3.7 KB</strong></span>
+                <span>= <strong style={{ color: 'var(--brand)' }}>3.9 KB</strong> gzip</span>
+              </div>
             </div>
           </div>
 
@@ -1170,6 +1257,13 @@ export default function TreeViewPage() {
             <div className="tree-view-page__tier-preview">
               <Button size="sm" variant="primary" onClick={() => setTier('standard')}>Select Standard</Button>
             </div>
+            <div className="tree-view-page__size-breakdown">
+              <div className="tree-view-page__size-row">
+                <span>Component: <strong style={{ color: 'var(--text-primary)' }}>4.8 KB</strong></span>
+                <span>+ Shared: <strong style={{ color: 'var(--text-primary)' }}>0.9 KB</strong></span>
+                <span>= <strong style={{ color: 'var(--brand)' }}>5.7 KB</strong> gzip</span>
+              </div>
+            </div>
           </div>
 
           <div
@@ -1191,7 +1285,24 @@ export default function TreeViewPage() {
               import {'{'} TreeView {'}'} from '@annondeveloper/ui-kit/premium'
             </div>
             <div className="tree-view-page__tier-preview">
-              <Button size="sm" variant="primary" onClick={() => setTier('premium')}>Select Premium</Button>
+              <PremiumTreeView
+                nodes={[
+                  { id: 'prem-src', label: 'src', icon: <Icon name="folder" size="sm" />, children: [
+                    { id: 'prem-index', label: 'index.ts', icon: <Icon name="file" size="sm" /> },
+                    { id: 'prem-app', label: 'app.tsx', icon: <Icon name="file" size="sm" /> },
+                  ]},
+                  { id: 'prem-pkg', label: 'package.json', icon: <Icon name="file" size="sm" /> },
+                ]}
+                expanded={['prem-src']}
+                showGuides
+              />
+            </div>
+            <div className="tree-view-page__size-breakdown">
+              <div className="tree-view-page__size-row">
+                <span>Component: <strong style={{ color: 'var(--text-primary)' }}>6.2 KB</strong></span>
+                <span>+ Shared: <strong style={{ color: 'var(--text-primary)' }}>3.3 KB</strong></span>
+                <span>= <strong style={{ color: 'var(--brand)' }}>9.5 KB</strong> gzip</span>
+              </div>
             </div>
           </div>
         </div>
@@ -1283,6 +1394,61 @@ export default function TreeViewPage() {
             </li>
           </ul>
         </Card>
+      </section>
+
+      {/* ── 11. Brand Color ───────────────────────────── */}
+      <section className="tree-view-page__section" id="brand-color">
+        <h2 className="tree-view-page__section-title">
+          <a href="#brand-color">Brand Color</a>
+        </h2>
+        <p className="tree-view-page__section-desc">
+          Pick a brand color to see the tree view update in real-time. The theme generates
+          derived colors (light, dark, subtle, glow) automatically from your choice.
+        </p>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+          <ColorInput
+            name="brand-color"
+            value={brandColor}
+            onChange={setBrandColor}
+            size="sm"
+            swatches={['#6366f1','#f97316','#f43f5e','#0ea5e9','#10b981','#8b5cf6','#d946ef','#f59e0b','#06b6d4','#64748b']}
+          />
+          <div className="tree-view-page__color-presets">
+            {COLOR_PRESETS.map(p => (
+              <button
+                key={p.hex}
+                type="button"
+                className={`tree-view-page__color-preset${brandColor === p.hex ? ' tree-view-page__color-preset--active' : ''}`}
+                style={{ background: p.hex }}
+                onClick={() => setBrandColor(p.hex)}
+                title={p.name}
+                aria-label={`Set brand color to ${p.name}`}
+              />
+            ))}
+          </div>
+          {brandColor !== '#6366f1' && (
+            <Button size="xs" variant="ghost" onClick={() => setBrandColor('#6366f1')}>
+              <Icon name="refresh" size="sm" /> Reset to default
+            </Button>
+          )}
+        </div>
+      </section>
+
+      {/* ── 12. Source ────────────────────────────────── */}
+      <section className="tree-view-page__section" id="source">
+        <h2 className="tree-view-page__section-title"><a href="#source">Source</a></h2>
+        <p className="tree-view-page__section-desc">View the full component source code on GitHub.</p>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+          <a className="tree-view-page__source-link" href="https://github.com/annondeveloper/ui-kit/blob/main/src/domain/tree-view.tsx" target="_blank" rel="noopener noreferrer">
+            <Icon name="code" size="sm" /> src/domain/tree-view.tsx (Standard)
+          </a>
+          <a className="tree-view-page__source-link" href="https://github.com/annondeveloper/ui-kit/blob/main/src/lite/tree-view.tsx" target="_blank" rel="noopener noreferrer">
+            <Icon name="code" size="sm" /> src/lite/tree-view.tsx (Lite)
+          </a>
+          <a className="tree-view-page__source-link" href="https://github.com/annondeveloper/ui-kit/blob/main/src/premium/tree-view.tsx" target="_blank" rel="noopener noreferrer">
+            <Icon name="code" size="sm" /> src/premium/tree-view.tsx (Premium)
+          </a>
+        </div>
       </section>
     </div>
   )

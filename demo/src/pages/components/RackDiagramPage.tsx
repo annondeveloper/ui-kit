@@ -11,6 +11,7 @@ import { Card } from '@ui/components/card'
 import { CopyBlock } from '@ui/domain/copy-block'
 import { Tabs, TabPanel } from '@ui/components/tabs'
 import { Icon } from '@ui/core/icons/icon'
+import { ColorInput } from '@ui/components/color-input'
 import { PropsTable, type PropDef } from '../../components/PropsTable'
 import { useTier, type Tier } from '../../App'
 
@@ -444,6 +445,16 @@ const pageStyles = css`
         justify-content: center;
         padding-block-start: 0.5rem;
       }
+
+      .rack-diagram-page__size-breakdown {
+        display: flex; flex-direction: column; gap: 0.25rem; font-size: 0.75rem; color: var(--text-tertiary);
+      }
+      .rack-diagram-page__size-row {
+        display: flex; align-items: center; gap: 0.5rem;
+      }
+
+      .rack-diagram-page__source-link { color: var(--brand); text-decoration: none; }
+      .rack-diagram-page__source-link:hover { text-decoration: underline; }
 
       /* ── Code tabs ─────────────────────────────────── */
 
@@ -941,6 +952,7 @@ export default function RackDiagramPage() {
   useStyles('rack-diagram-page', pageStyles)
 
   const { tier, setTier } = useTier()
+  const [brandColor, setBrandColor] = useState('#6366f1')
 
   // Scroll reveal for sections — JS fallback
   useEffect(() => {
@@ -1122,6 +1134,13 @@ export default function RackDiagramPage() {
                 ]}
               />
             </div>
+            <div className="rack-diagram-page__size-breakdown">
+              <div className="rack-diagram-page__size-row">
+                <span>Component: <strong style={{ color: 'var(--text-primary)' }}>0.5 KB</strong></span>
+                <span>+ Shared: <strong style={{ color: 'var(--text-primary)' }}>0.0 KB</strong></span>
+                <span>= <strong style={{ color: 'var(--brand)' }}>0.5 KB</strong> gzip</span>
+              </div>
+            </div>
           </div>
 
           {/* Standard */}
@@ -1151,6 +1170,13 @@ export default function RackDiagramPage() {
                   { startU: 3, heightU: 2, label: 'SRV', status: 'critical' },
                 ]}
               />
+            </div>
+            <div className="rack-diagram-page__size-breakdown">
+              <div className="rack-diagram-page__size-row">
+                <span>Component: <strong style={{ color: 'var(--text-primary)' }}>2.5 KB</strong></span>
+                <span>+ Shared: <strong style={{ color: 'var(--text-primary)' }}>0.9 KB</strong></span>
+                <span>= <strong style={{ color: 'var(--brand)' }}>3.4 KB</strong> gzip</span>
+              </div>
             </div>
           </div>
 
@@ -1182,6 +1208,13 @@ export default function RackDiagramPage() {
                   { startU: 3, heightU: 2, label: 'SRV', status: 'critical' },
                 ]}
               />
+            </div>
+            <div className="rack-diagram-page__size-breakdown">
+              <div className="rack-diagram-page__size-row">
+                <span>Component: <strong style={{ color: 'var(--text-primary)' }}>3.5 KB</strong></span>
+                <span>+ Shared: <strong style={{ color: 'var(--text-primary)' }}>0.9 KB</strong></span>
+                <span>= <strong style={{ color: 'var(--brand)' }}>4.4 KB</strong> gzip</span>
+              </div>
             </div>
           </div>
         </div>
@@ -1256,6 +1289,33 @@ export default function RackDiagramPage() {
             </li>
           </ul>
         </Card>
+      </section>
+
+      {/* ── Source ──────────────────────────────────────── */}
+      <section className="rack-diagram-page__section" id="source">
+        <h2 className="rack-diagram-page__section-title"><a href="#source">Source</a></h2>
+        <p className="rack-diagram-page__section-desc">View the full component source code on GitHub.</p>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+          <a className="rack-diagram-page__source-link" href="https://github.com/annondeveloper/ui-kit/blob/main/src/domain/rack-diagram.tsx" target="_blank" rel="noopener noreferrer">
+            src/domain/rack-diagram.tsx (Standard)
+          </a>
+          <a className="rack-diagram-page__source-link" href="https://github.com/annondeveloper/ui-kit/blob/main/src/lite/rack-diagram.tsx" target="_blank" rel="noopener noreferrer">
+            src/lite/rack-diagram.tsx (Lite)
+          </a>
+          <a className="rack-diagram-page__source-link" href="https://github.com/annondeveloper/ui-kit/blob/main/src/premium/rack-diagram.tsx" target="_blank" rel="noopener noreferrer">
+            src/premium/rack-diagram.tsx (Premium)
+          </a>
+        </div>
+      </section>
+
+      {/* ── Brand Color ───────────────────────────────── */}
+      <section className="rack-diagram-page__section" id="brand-color">
+        <h2 className="rack-diagram-page__section-title"><a href="#brand-color">Brand Color</a></h2>
+        <p className="rack-diagram-page__section-desc">Pick a brand color to preview the component with your brand identity.</p>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+          <ColorInput name="brand-color" value={brandColor} onChange={setBrandColor} size="sm"
+            swatches={['#6366f1','#f97316','#f43f5e','#0ea5e9','#10b981','#8b5cf6','#d946ef','#f59e0b','#06b6d4','#64748b']} />
+        </div>
       </section>
     </div>
   )

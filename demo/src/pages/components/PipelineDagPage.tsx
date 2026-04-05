@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useMemo, useCallback, useEffect } from 'react'
+import { useState, useMemo, useCallback, useEffect, useRef } from 'react'
 import { css } from '@ui/core/styles/css-tag'
 import { useStyles } from '@ui/core/styles/use-styles'
 import { PipelineDAG, type PipelineNode, type PipelineEdge } from '@ui/domain/pipeline-dag'
@@ -11,6 +11,10 @@ import { Card } from '@ui/components/card'
 import { CopyBlock } from '@ui/domain/copy-block'
 import { Tabs, TabPanel } from '@ui/components/tabs'
 import { Icon } from '@ui/core/icons/icon'
+import { ColorInput } from '@ui/components/color-input'
+import { generateTheme } from '@ui/core/tokens/generator'
+import { TOKEN_TO_CSS, type ThemeTokens } from '@ui/core/tokens/tokens'
+import { useTheme } from '@ui/core/tokens/theme-context'
 import { PropsTable, type PropDef } from '../../components/PropsTable'
 import { useTier, type Tier } from '../../App'
 
@@ -418,6 +422,36 @@ const pageStyles = css`
         padding-block-start: 0.5rem;
       }
 
+      .pipeline-dag-page__size-breakdown {
+        display: flex;
+        flex-direction: column;
+        gap: 0.25rem;
+        font-size: 0.75rem;
+        color: var(--text-tertiary);
+      }
+
+      .pipeline-dag-page__size-row {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+
+      /* ── Source link ─────────────────────────── */
+
+      .pipeline-dag-page__source-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: var(--text-sm, 0.875rem);
+        color: var(--brand);
+        text-decoration: none;
+        font-weight: 500;
+      }
+      .pipeline-dag-page__source-link:hover {
+        text-decoration: underline;
+        text-underline-offset: 0.2em;
+      }
+
       /* ── Code tabs ──────────────────────────── */
 
       .pipeline-dag-page__code-tabs {
@@ -637,6 +671,139 @@ ${props.join('\n')}
 />`
 }
 
+function generateHtmlCode(tier: Tier, direction: string, showMetrics: boolean, showThroughput: boolean): string {
+  const cssImport = tier === 'lite'
+    ? `@import '@annondeveloper/ui-kit/lite/styles.css';`
+    : `@import '@annondeveloper/ui-kit/css/components/pipeline-dag.css';`
+
+  return `<!-- PipelineDAG — @annondeveloper/ui-kit ${tier} tier -->
+<link rel="stylesheet" href="https://unpkg.com/@annondeveloper/ui-kit/css/components/pipeline-dag.css">
+
+<div class="ui-pipeline-dag" data-direction="${direction}"${showMetrics ? ' data-show-metrics="true"' : ''}${showThroughput ? ' data-show-throughput="true"' : ''}>
+  <!-- SVG rendered by the component engine -->
+  <svg role="img" aria-label="Pipeline DAG with 4 nodes and 3 edges">
+    <!-- Nodes and edges rendered here -->
+  </svg>
+</div>
+
+<!-- Or import in your CSS: -->
+<!-- ${cssImport} -->`
+}
+
+function generateVueCode(tier: Tier, direction: string, showMetrics: boolean, showThroughput: boolean): string {
+  const importPath = tier === 'lite'
+    ? '@annondeveloper/ui-kit/lite'
+    : tier === 'premium'
+    ? '@annondeveloper/ui-kit/premium'
+    : '@annondeveloper/ui-kit'
+
+  const attrs: string[] = ['  :nodes="nodes"', '  :edges="edges"']
+  if (direction !== 'LR') attrs.push(`  direction="${direction}"`)
+  if (showMetrics) attrs.push('  show-metrics')
+  if (showThroughput) attrs.push('  show-throughput')
+  attrs.push('  @node-click="onNodeClick"')
+
+  return `<template>
+  <PipelineDAG
+${attrs.join('\n')}
+  />
+</template>
+
+<script setup>
+import { PipelineDAG } from '${importPath}'
+import { ref } from 'vue'
+
+const nodes = ref([
+  { id: 'kafka', label: 'Kafka Source', type: 'source', status: 'running', metrics: { throughput: 15000 } },
+  { id: 'parse', label: 'JSON Parser', type: 'transform', status: 'running' },
+  { id: 'elastic', label: 'Elasticsearch', type: 'sink', status: 'success' },
+])
+
+const edges = ref([
+  { source: 'kafka', target: 'parse', throughput: 15000 },
+  { source: 'parse', target: 'elastic', throughput: 12000 },
+])
+
+function onNodeClick(node) {
+  console.log('Clicked:', node.id)
+}
+</script>`
+}
+
+function generateAngularCode(tier: Tier, direction: string, showMetrics: boolean, showThroughput: boolean): string {
+  const importPath = tier === 'lite'
+    ? '@annondeveloper/ui-kit/lite'
+    : tier === 'premium'
+    ? '@annondeveloper/ui-kit/premium'
+    : '@annondeveloper/ui-kit'
+
+  const cssImport = `@import '${importPath}/css/components/pipeline-dag.css';`
+  const attrs: string[] = ['  class="ui-pipeline-dag"', `  data-direction="${direction}"`]
+  if (showMetrics) attrs.push('  data-show-metrics="true"')
+  if (showThroughput) attrs.push('  data-show-throughput="true"')
+
+  return `<!-- Angular — ${tier === 'lite' ? 'Lite' : tier === 'premium' ? 'Premium' : 'Standard'} tier -->
+<ui-pipeline-dag
+${attrs.join('\n')}
+  [nodes]="nodes"
+  [edges]="edges"
+  (nodeClick)="onNodeClick($event)"
+/>
+
+/* In styles.css */
+${cssImport}
+
+// In component.ts
+import { Component } from '@angular/core';
+
+@Component({ selector: 'app-pipeline', templateUrl: './pipeline.component.html' })
+export class PipelineComponent {
+  nodes = [
+    { id: 'kafka', label: 'Kafka Source', type: 'source', status: 'running' },
+    { id: 'parse', label: 'JSON Parser', type: 'transform', status: 'running' },
+    { id: 'elastic', label: 'Elasticsearch', type: 'sink', status: 'success' },
+  ];
+  edges = [
+    { source: 'kafka', target: 'parse', throughput: 15000 },
+    { source: 'parse', target: 'elastic', throughput: 12000 },
+  ];
+  onNodeClick(node: any) { console.log('Clicked:', node.id); }
+}`
+}
+
+function generateSvelteCode(tier: Tier, direction: string, showMetrics: boolean, showThroughput: boolean): string {
+  const importPath = tier === 'lite'
+    ? '@annondeveloper/ui-kit/lite'
+    : tier === 'premium'
+    ? '@annondeveloper/ui-kit/premium'
+    : '@annondeveloper/ui-kit'
+
+  const attrs: string[] = ['  {nodes}', '  {edges}']
+  if (direction !== 'LR') attrs.push(`  direction="${direction}"`)
+  if (showMetrics) attrs.push('  showMetrics')
+  if (showThroughput) attrs.push('  showThroughput')
+  attrs.push('  on:nodeClick={(e) => console.log(e.detail.id)}')
+
+  return `<script>
+  import { PipelineDAG } from '${importPath}';
+
+  const nodes = [
+    { id: 'kafka', label: 'Kafka Source', type: 'source', status: 'running', metrics: { throughput: 15000 } },
+    { id: 'parse', label: 'JSON Parser', type: 'transform', status: 'running' },
+    { id: 'elastic', label: 'Elasticsearch', type: 'sink', status: 'success' },
+  ];
+
+  const edges = [
+    { source: 'kafka', target: 'parse', throughput: 15000 },
+    { source: 'parse', target: 'elastic', throughput: 12000 },
+  ];
+</script>
+
+<PipelineDAG
+${attrs.join('\n')}
+/>`
+}
+
 // ─── Playground Section ─────────────────────────────────────────────────────
 
 function PlaygroundSection({ tier: tierProp }: { tier: Tier }) {
@@ -647,6 +814,7 @@ function PlaygroundSection({ tier: tierProp }: { tier: Tier }) {
   const [showThroughput, setShowThroughput] = useState(false)
   const [motion, setMotion] = useState<0 | 1 | 2 | 3>(3)
   const [selectedNode, setSelectedNode] = useState<string | undefined>()
+  const [activeCodeTab, setActiveCodeTab] = useState('react')
   const [copyStatus, setCopyStatus] = useState('')
 
   const DAGComponent = tier === 'lite'
@@ -659,6 +827,52 @@ function PlaygroundSection({ tier: tierProp }: { tier: Tier }) {
     () => generateReactCode(tier, direction, showMetrics, showThroughput),
     [tier, direction, showMetrics, showThroughput],
   )
+
+  const htmlCode = useMemo(
+    () => generateHtmlCode(tier, direction, showMetrics, showThroughput),
+    [tier, direction, showMetrics, showThroughput],
+  )
+
+  const vueCode = useMemo(
+    () => generateVueCode(tier, direction, showMetrics, showThroughput),
+    [tier, direction, showMetrics, showThroughput],
+  )
+
+  const angularCode = useMemo(
+    () => generateAngularCode(tier, direction, showMetrics, showThroughput),
+    [tier, direction, showMetrics, showThroughput],
+  )
+
+  const svelteCode = useMemo(
+    () => generateSvelteCode(tier, direction, showMetrics, showThroughput),
+    [tier, direction, showMetrics, showThroughput],
+  )
+
+  const activeCode = useMemo(() => {
+    switch (activeCodeTab) {
+      case 'react': return reactCode
+      case 'html': return htmlCode
+      case 'vue': return vueCode
+      case 'angular': return angularCode
+      case 'svelte': return svelteCode
+      default: return reactCode
+    }
+  }, [activeCodeTab, reactCode, htmlCode, vueCode, angularCode, svelteCode])
+
+  const codeTabs = [
+    { id: 'react', label: 'React' },
+    { id: 'html', label: 'HTML+CSS' },
+    { id: 'vue', label: 'Vue' },
+    { id: 'angular', label: 'Angular' },
+    { id: 'svelte', label: 'Svelte' },
+  ]
+
+  const handleCopy = useCallback(() => {
+    navigator.clipboard?.writeText(activeCode).then(() => {
+      setCopyStatus(`Copied ${codeTabs.find(t => t.id === activeCodeTab)?.label}!`)
+      setTimeout(() => setCopyStatus(''), 2000)
+    })
+  }, [activeCode, activeCodeTab])
 
   const previewProps: Record<string, unknown> = tier === 'lite'
     ? { nodes: liteNodes, edges: liteEdges, direction, height: 320 }
@@ -701,18 +915,29 @@ function PlaygroundSection({ tier: tierProp }: { tier: Tier }) {
                 size="xs"
                 variant="secondary"
                 icon={<Icon name="copy" size="sm" />}
-                onClick={() => {
-                  navigator.clipboard?.writeText(reactCode).then(() => {
-                    setCopyStatus('Copied React!')
-                    setTimeout(() => setCopyStatus(''), 2000)
-                  })
-                }}
+                onClick={handleCopy}
               >
-                Copy React
+                Copy {codeTabs.find(t => t.id === activeCodeTab)?.label}
               </Button>
               {copyStatus && <span className="pipeline-dag-page__export-status">{copyStatus}</span>}
             </div>
-            <CopyBlock code={reactCode} language="typescript" showLineNumbers />
+            <Tabs tabs={codeTabs} activeTab={activeCodeTab} onChange={setActiveCodeTab} size="sm" variant="pills">
+              <TabPanel tabId="react">
+                <CopyBlock code={reactCode} language="typescript" showLineNumbers />
+              </TabPanel>
+              <TabPanel tabId="html">
+                <CopyBlock code={htmlCode} language="html" showLineNumbers />
+              </TabPanel>
+              <TabPanel tabId="vue">
+                <CopyBlock code={vueCode} language="html" showLineNumbers />
+              </TabPanel>
+              <TabPanel tabId="angular">
+                <CopyBlock code={angularCode} language="html" showLineNumbers />
+              </TabPanel>
+              <TabPanel tabId="svelte">
+                <CopyBlock code={svelteCode} language="html" showLineNumbers />
+              </TabPanel>
+            </Tabs>
           </div>
         </div>
 
@@ -843,6 +1068,13 @@ export default function PipelineDagPage() {
                 height={120}
               />
             </div>
+            <div className="pipeline-dag-page__size-breakdown">
+              <div className="pipeline-dag-page__size-row">
+                <span>JS: <strong style={{ color: 'var(--text-primary)' }}>0.8 KB</strong></span>
+                <span>+ CSS: <strong style={{ color: 'var(--text-primary)' }}>0.4 KB</strong></span>
+                <span>= <strong style={{ color: 'var(--brand)' }}>1.2 KB</strong> gzip</span>
+              </div>
+            </div>
           </div>
 
           {/* Standard */}
@@ -870,6 +1102,13 @@ export default function PipelineDagPage() {
                 height={120}
                 showMetrics
               />
+            </div>
+            <div className="pipeline-dag-page__size-breakdown">
+              <div className="pipeline-dag-page__size-row">
+                <span>JS: <strong style={{ color: 'var(--text-primary)' }}>3.2 KB</strong></span>
+                <span>+ CSS: <strong style={{ color: 'var(--text-primary)' }}>0.8 KB</strong></span>
+                <span>= <strong style={{ color: 'var(--brand)' }}>4.0 KB</strong> gzip</span>
+              </div>
             </div>
           </div>
 
@@ -899,6 +1138,13 @@ export default function PipelineDagPage() {
                 height={120}
                 showMetrics
               />
+            </div>
+            <div className="pipeline-dag-page__size-breakdown">
+              <div className="pipeline-dag-page__size-row">
+                <span>JS: <strong style={{ color: 'var(--text-primary)' }}>4.5 KB</strong></span>
+                <span>+ CSS: <strong style={{ color: 'var(--text-primary)' }}>1.0 KB</strong></span>
+                <span>= <strong style={{ color: 'var(--brand)' }}>5.5 KB</strong> gzip</span>
+              </div>
             </div>
           </div>
         </div>
@@ -980,6 +1226,23 @@ export default function PipelineDagPage() {
             </li>
           </ul>
         </Card>
+      </section>
+
+      {/* ── 6. Source ──────────────────────────────── */}
+      <section className="pipeline-dag-page__section" id="source">
+        <h2 className="pipeline-dag-page__section-title"><a href="#source">Source</a></h2>
+        <p className="pipeline-dag-page__section-desc">View the full component source code on GitHub.</p>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+          <a className="pipeline-dag-page__source-link" href="https://github.com/annondeveloper/ui-kit/blob/main/src/domain/pipeline-dag.tsx" target="_blank" rel="noopener noreferrer">
+            src/domain/pipeline-dag.tsx (Standard)
+          </a>
+          <a className="pipeline-dag-page__source-link" href="https://github.com/annondeveloper/ui-kit/blob/main/src/lite/pipeline-dag.tsx" target="_blank" rel="noopener noreferrer">
+            src/lite/pipeline-dag.tsx (Lite)
+          </a>
+          <a className="pipeline-dag-page__source-link" href="https://github.com/annondeveloper/ui-kit/blob/main/src/premium/pipeline-dag.tsx" target="_blank" rel="noopener noreferrer">
+            src/premium/pipeline-dag.tsx (Premium)
+          </a>
+        </div>
       </section>
     </div>
   )

@@ -5,6 +5,7 @@ import { css } from '@ui/core/styles/css-tag'
 import { useStyles } from '@ui/core/styles/use-styles'
 import { Sidebar, SidebarHeader, SidebarContent, SidebarFooter, SidebarItem } from '@ui/components/sidebar'
 import { Sidebar as LiteSidebar, SidebarItem as LiteSidebarItem } from '@ui/lite/sidebar'
+import { Sidebar as PremiumSidebar } from '@ui/premium/sidebar'
 import { Button } from '@ui/components/button'
 import { Card } from '@ui/components/card'
 import { CopyBlock } from '@ui/domain/copy-block'
@@ -612,6 +613,23 @@ const pageStyles = css`
         :scope { max-inline-size: 1400px; }
         .sidebar-page__title { font-size: 4rem; }
       }
+
+      /* ── Source link ─────────────────────────────────── */
+
+      .sidebar-page__source-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: var(--text-sm, 0.875rem);
+        color: var(--brand);
+        text-decoration: none;
+        font-weight: 500;
+      }
+
+      .sidebar-page__source-link:hover {
+        text-decoration: underline;
+        text-underline-offset: 0.2em;
+      }
     }
   }
 `
@@ -749,6 +767,7 @@ function DemoSidebar({
   activeIndex,
   onActiveChange,
   lite,
+  premium,
 }: {
   collapsed: boolean
   onCollapse: (v: boolean) => void
@@ -759,8 +778,9 @@ function DemoSidebar({
   activeIndex: number
   onActiveChange: (i: number) => void
   lite?: boolean
+  premium?: boolean
 }) {
-  const SidebarComp = lite ? LiteSidebar : Sidebar
+  const SidebarComp = lite ? LiteSidebar : premium ? PremiumSidebar : Sidebar
   const HeaderComp = SidebarHeader
   const ContentComp = SidebarContent
   const FooterComp = SidebarFooter
@@ -1043,6 +1063,7 @@ function PlaygroundSection({ tier: tierProp, brandColor }: { tier: Tier; brandCo
               activeIndex={activeIndex}
               onActiveChange={setActiveIndex}
               lite={tier === 'lite'}
+              premium={tier === 'premium'}
             />
             <div className="sidebar-page__playground-body">
               Main content area
@@ -1221,6 +1242,7 @@ export default function SidebarPage() {
                 activeIndex={0}
                 onActiveChange={() => {}}
                 lite={tier === 'lite'}
+                premium={tier === 'premium'}
               />
               <div className="sidebar-page__sidebar-body">Content</div>
             </div>
@@ -1238,6 +1260,7 @@ export default function SidebarPage() {
                 activeIndex={0}
                 onActiveChange={() => {}}
                 lite={tier === 'lite'}
+                premium={tier === 'premium'}
               />
               <div className="sidebar-page__sidebar-body">Content</div>
             </div>
@@ -1268,6 +1291,7 @@ export default function SidebarPage() {
                 activeIndex={1}
                 onActiveChange={() => {}}
                 lite={tier === 'lite'}
+                premium={tier === 'premium'}
               />
               <div className="sidebar-page__sidebar-body">Content</div>
             </div>
@@ -1285,6 +1309,7 @@ export default function SidebarPage() {
                 activeIndex={2}
                 onActiveChange={() => {}}
                 lite={tier === 'lite'}
+                premium={tier === 'premium'}
               />
               <div className="sidebar-page__sidebar-body">Content</div>
             </div>
@@ -1461,12 +1486,12 @@ export default function SidebarPage() {
               import {'{'} Sidebar {'}'} from '@annondeveloper/ui-kit/premium'
             </div>
             <div className="sidebar-page__tier-preview">
-              <Sidebar collapsed={false} width={120} collapsedWidth={48} motion={0}>
+              <PremiumSidebar collapsed={false} width={120} collapsedWidth={48} motion={0}>
                 <SidebarContent>
                   <SidebarItem icon={<Icon name="home" size="sm" />} label="Home" active />
                   <SidebarItem icon={<Icon name="settings" size="sm" />} label="Settings" />
                 </SidebarContent>
-              </Sidebar>
+              </PremiumSidebar>
             </div>
             <div className="sidebar-page__size-breakdown">
               <div className="sidebar-page__size-row">
@@ -1594,6 +1619,14 @@ export default function SidebarPage() {
             </li>
           </ul>
         </Card>
+      </section>
+
+      {/* Source */}
+      <section className="sidebar-page__section" id="source">
+        <h2 className="sidebar-page__section-title"><a href="#source">Source</a></h2>
+        <a className="sidebar-page__source-link" href="https://github.com/annondeveloper/ui-kit/blob/main/src/components/sidebar.tsx" target="_blank" rel="noopener noreferrer">
+          <Icon name="code" size="sm" />View source on GitHub
+        </a>
       </section>
     </div>
   )

@@ -4,6 +4,8 @@ import { useState, useMemo, useCallback, useRef, useEffect } from 'react'
 import { css } from '@ui/core/styles/css-tag'
 import { useStyles } from '@ui/core/styles/use-styles'
 import { EncryptedText } from '@ui/domain/encrypted-text'
+import { EncryptedText as LiteEncryptedText } from '@ui/lite/encrypted-text'
+import { EncryptedText as PremiumEncryptedText } from '@ui/premium/encrypted-text'
 import { Button } from '@ui/components/button'
 import { Card } from '@ui/components/card'
 import { CopyBlock } from '@ui/domain/copy-block'
@@ -857,6 +859,8 @@ function PlaygroundSection({ tier: tierProp, brandColor }: { tier: Tier; brandCo
   const [copyStatus, setCopyStatus] = useState('')
   const [replayKey, setReplayKey] = useState(0)
 
+  const EncryptedTextComponent = tier === 'lite' ? LiteEncryptedText : tier === 'premium' ? PremiumEncryptedText : EncryptedText
+
   const reactCode = useMemo(
     () => generateReactCode(tier, text, trigger, speed, motion),
     [tier, text, trigger, speed, motion],
@@ -916,7 +920,7 @@ function PlaygroundSection({ tier: tierProp, brandColor }: { tier: Tier; brandCo
         <div className="encrypted-text-page__playground-preview">
           <div className="encrypted-text-page__playground-result">
             <span style={{ fontSize: 'clamp(1.25rem, 3vw, 2rem)', fontWeight: 700, position: 'relative' }}>
-              <EncryptedText
+              <EncryptedTextComponent
                 key={replayKey}
                 text={text}
                 trigger={trigger}
@@ -1238,7 +1242,7 @@ export default function EncryptedTextPage() {
             </div>
             <div className="encrypted-text-page__tier-preview">
               <span style={{ fontSize: '0.875rem', fontWeight: 600, color: 'var(--text-primary)' }}>
-                Static text display
+                <LiteEncryptedText text="Static text display" />
               </span>
             </div>
             <div className="encrypted-text-page__size-breakdown">
@@ -1304,7 +1308,7 @@ export default function EncryptedTextPage() {
             </div>
             <div className="encrypted-text-page__tier-preview">
               <span style={{ fontSize: '0.875rem', fontWeight: 600 }}>
-                <EncryptedText text="Premium tier" trigger="mount" speed={2} />
+                <PremiumEncryptedText text="Premium tier" trigger="mount" speed={2} />
               </span>
             </div>
             <div className="encrypted-text-page__size-breakdown">
@@ -1460,7 +1464,7 @@ export default function EncryptedTextPage() {
         </p>
         <a
           className="encrypted-text-page__source-link"
-          href="https://github.com/annondeveloper/ui-kit/blob/v2/src/domain/encrypted-text.tsx"
+          href="https://github.com/annondeveloper/ui-kit/blob/main/src/domain/encrypted-text.tsx"
           target="_blank"
           rel="noopener noreferrer"
         >

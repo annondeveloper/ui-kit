@@ -6,6 +6,8 @@ import { useStyles } from '@ui/core/styles/use-styles'
 import { Button } from '@ui/components/button'
 import { Card } from '@ui/components/card'
 import { MetricCard } from '@ui/domain/metric-card'
+import { MetricCard as LiteMetricCard } from '@ui/lite/metric-card'
+import { MetricCard as PremiumMetricCard } from '@ui/premium/metric-card'
 import { CopyBlock } from '@ui/domain/copy-block'
 import { Tabs, TabPanel } from '@ui/components/tabs'
 import { Icon } from '@ui/core/icons/icon'
@@ -464,6 +466,38 @@ const pageStyles = css`
         line-height: 1.4;
       }
       .mc-page__tier-preview { display: flex; justify-content: center; padding-block-start: 0.5rem; }
+
+      /* ── Size breakdown bar ─────────────────────────── */
+
+      .mc-page__size-breakdown {
+        display: flex;
+        flex-direction: column;
+        gap: 0.25rem;
+        font-size: 0.75rem;
+        color: var(--text-tertiary);
+      }
+
+      .mc-page__size-row {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+
+      /* ── Source link ─────────────────────────────────── */
+
+      .mc-page__source-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: var(--text-sm, 0.875rem);
+        color: var(--brand);
+        text-decoration: none;
+        font-weight: 500;
+      }
+      .mc-page__source-link:hover {
+        text-decoration: underline;
+        text-underline-offset: 0.2em;
+      }
 
       /* ── Code tabs ─────────────────────────────────── */
 
@@ -1375,7 +1409,14 @@ export default function MetricCardPage() {
               {IMPORT_STRINGS.lite}
             </div>
             <div className="mc-page__tier-preview">
-              <MetricCard title="Revenue" value="$48,290" trend="up" change={{ value: 12, period: 'last month' }} />
+              <LiteMetricCard title="Revenue" value="$48,290" trend="up" />
+            </div>
+            <div className="mc-page__size-breakdown">
+              <div className="mc-page__size-row">
+                <span>Component: <strong style={{ color: 'var(--text-primary)' }}>1.2 KB</strong></span>
+                <span>+ Shared: <strong style={{ color: 'var(--text-primary)' }}>0.4 KB</strong></span>
+                <span>= <strong style={{ color: 'var(--brand)' }}>1.6 KB</strong> gzip</span>
+              </div>
             </div>
           </div>
 
@@ -1409,6 +1450,13 @@ export default function MetricCardPage() {
                 icon={<Icon name="activity" size="sm" />}
               />
             </div>
+            <div className="mc-page__size-breakdown">
+              <div className="mc-page__size-row">
+                <span>Component: <strong style={{ color: 'var(--text-primary)' }}>3.5 KB</strong></span>
+                <span>+ Shared: <strong style={{ color: 'var(--text-primary)' }}>0.9 KB</strong></span>
+                <span>= <strong style={{ color: 'var(--brand)' }}>4.4 KB</strong> gzip</span>
+              </div>
+            </div>
           </div>
 
           {/* Premium */}
@@ -1431,7 +1479,7 @@ export default function MetricCardPage() {
               {IMPORT_STRINGS.premium}
             </div>
             <div className="mc-page__tier-preview">
-              <MetricCard
+              <PremiumMetricCard
                 title="Revenue"
                 value="$48,290"
                 trend="up"
@@ -1441,6 +1489,13 @@ export default function MetricCardPage() {
                 icon={<Icon name="activity" size="sm" />}
                 motion={3}
               />
+            </div>
+            <div className="mc-page__size-breakdown">
+              <div className="mc-page__size-row">
+                <span>Component: <strong style={{ color: 'var(--text-primary)' }}>2.8 KB</strong></span>
+                <span>+ Shared: <strong style={{ color: 'var(--text-primary)' }}>3.3 KB</strong></span>
+                <span>= <strong style={{ color: 'var(--brand)' }}>6.1 KB</strong> gzip</span>
+              </div>
             </div>
           </div>
         </div>
@@ -1598,6 +1653,23 @@ export default function MetricCardPage() {
             </li>
           </ul>
         </Card>
+      </section>
+
+      {/* ── Source ──────────────────────────────────────── */}
+      <section className="mc-page__section" id="source">
+        <h2 className="mc-page__section-title"><a href="#source">Source</a></h2>
+        <p className="mc-page__section-desc">View the full component source code on GitHub.</p>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+          <a className="mc-page__source-link" href="https://github.com/annondeveloper/ui-kit/blob/main/src/domain/metric-card.tsx" target="_blank" rel="noopener noreferrer">
+            <Icon name="code" size="sm" /> src/domain/metric-card.tsx (Standard)
+          </a>
+          <a className="mc-page__source-link" href="https://github.com/annondeveloper/ui-kit/blob/main/src/lite/metric-card.tsx" target="_blank" rel="noopener noreferrer">
+            <Icon name="code" size="sm" /> src/lite/metric-card.tsx (Lite)
+          </a>
+          <a className="mc-page__source-link" href="https://github.com/annondeveloper/ui-kit/blob/main/src/premium/metric-card.tsx" target="_blank" rel="noopener noreferrer">
+            <Icon name="code" size="sm" /> src/premium/metric-card.tsx (Premium)
+          </a>
+        </div>
       </section>
     </div>
   )

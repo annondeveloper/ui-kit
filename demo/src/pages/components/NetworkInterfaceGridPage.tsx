@@ -11,6 +11,7 @@ import { Card } from '@ui/components/card'
 import { CopyBlock } from '@ui/domain/copy-block'
 import { Tabs, TabPanel } from '@ui/components/tabs'
 import { Icon } from '@ui/core/icons/icon'
+import { ColorInput } from '@ui/components/color-input'
 import { PropsTable, type PropDef } from '../../components/PropsTable'
 import { useTier, type Tier } from '../../App'
 
@@ -512,6 +513,38 @@ const pageStyles = css`
         color: var(--text-primary);
       }
 
+      /* ── Source link ──────────────────────────────── */
+
+      .nig-page__source-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: var(--text-sm, 0.875rem);
+        color: var(--brand);
+        text-decoration: none;
+        font-weight: 500;
+      }
+      .nig-page__source-link:hover {
+        text-decoration: underline;
+        text-underline-offset: 0.2em;
+      }
+
+      /* ── Size breakdown bar ────────────────────────── */
+
+      .nig-page__size-breakdown {
+        display: flex;
+        flex-direction: column;
+        gap: 0.25rem;
+        font-size: 0.75rem;
+        color: var(--text-tertiary);
+      }
+
+      .nig-page__size-row {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+
       /* ── Responsive ──────────────────────────────── */
 
       @media (max-width: 768px) {
@@ -694,6 +727,106 @@ function generateReactCode(
   return `${importStr}\n\n${ifacesDef}\n\n<NetworkInterfaceGrid\n${props.join('\n')}\n/>`
 }
 
+function generateHtmlCode(
+  tier: Tier,
+  size: Size,
+  compact: boolean,
+  showTraffic: boolean,
+  showErrors: boolean,
+  columns: string,
+): string {
+  const cls = tier === 'lite' ? 'ui-lite-network-interface-grid' : tier === 'premium' ? 'ui-premium-network-interface-grid' : 'ui-network-interface-grid'
+  const importPath = tier === 'lite' ? '@annondeveloper/ui-kit/lite/styles.css' : tier === 'premium' ? '@annondeveloper/ui-kit/premium/css/components/network-interface-grid.css' : '@annondeveloper/ui-kit/css/components/network-interface-grid.css'
+
+  const attrs: string[] = [`class="${cls}"`]
+  if (size !== 'md') attrs.push(`data-size="${size}"`)
+  if (compact) attrs.push('data-compact')
+  if (showTraffic) attrs.push('data-show-traffic')
+  if (showErrors) attrs.push('data-show-errors')
+  if (columns !== 'auto') attrs.push(`style="--columns: ${columns}"`)
+
+  return `<!-- HTML+CSS — ${tier} tier -->\n<link rel="stylesheet" href="${importPath}" />\n\n<div ${attrs.join(' ')}>\n  <div class="${cls}__card" data-status="up">\n    <span class="${cls}__name">eth0</span>\n    <span class="${cls}__speed">10Gbps</span>\n  </div>\n  <div class="${cls}__card" data-status="down">\n    <span class="${cls}__name">eth1</span>\n    <span class="${cls}__speed">1Gbps</span>\n  </div>\n</div>`
+}
+
+function generateVueCode(
+  tier: Tier,
+  size: Size,
+  compact: boolean,
+  showTraffic: boolean,
+  showErrors: boolean,
+  columns: string,
+): string {
+  if (tier === 'lite') {
+    const attrs: string[] = []
+    if (size !== 'md') attrs.push(`  data-size="${size}"`)
+    if (compact) attrs.push('  data-compact')
+    return `<template>\n  <div class="ui-lite-network-interface-grid"${attrs.join('')}>\n    <div class="ui-lite-network-interface-grid__card"\n      v-for="iface in interfaces" :key="iface.name"\n      :data-status="iface.status"\n    >\n      {{ iface.name }} - {{ iface.speed }}\n    </div>\n  </div>\n</template>\n\n<style>\n@import '@annondeveloper/ui-kit/lite/styles.css';\n</style>`
+  }
+
+  const importPath = tier === 'premium' ? '@annondeveloper/ui-kit/premium' : '@annondeveloper/ui-kit'
+  const props: string[] = ['  :interfaces="interfaces"']
+  if (size !== 'md') props.push(`  size="${size}"`)
+  if (columns !== 'auto') props.push(`  :columns="${columns}"`)
+  if (compact) props.push('  compact')
+  if (showTraffic) props.push('  show-traffic')
+  if (showErrors) props.push('  show-errors')
+
+  return `<template>\n  <NetworkInterfaceGrid\n${props.join('\n')}\n  />\n</template>\n\n<script setup>\nimport { NetworkInterfaceGrid } from '${importPath}'\n</script>`
+}
+
+function generateAngularCode(
+  tier: Tier,
+  size: Size,
+  compact: boolean,
+  showTraffic: boolean,
+  showErrors: boolean,
+  columns: string,
+): string {
+  if (tier === 'lite') {
+    const attrs: string[] = ['class="ui-lite-network-interface-grid"']
+    if (size !== 'md') attrs.push(`data-size="${size}"`)
+    if (compact) attrs.push('data-compact')
+    return `<!-- Angular — Lite tier (CSS-only) -->\n<div ${attrs.join(' ')}>\n  <div *ngFor="let iface of interfaces"\n    class="ui-lite-network-interface-grid__card"\n    [attr.data-status]="iface.status"\n  >\n    {{ iface.name }} - {{ iface.speed }}\n  </div>\n</div>\n\n/* In styles.css */\n@import '@annondeveloper/ui-kit/lite/styles.css';`
+  }
+
+  const importPath = tier === 'premium' ? '@annondeveloper/ui-kit/premium' : '@annondeveloper/ui-kit'
+  const cls = tier === 'premium' ? 'ui-premium-network-interface-grid' : 'ui-network-interface-grid'
+  const attrs: string[] = [`class="${cls}"`]
+  if (size !== 'md') attrs.push(`data-size="${size}"`)
+  if (compact) attrs.push('data-compact')
+  if (showTraffic) attrs.push('data-show-traffic')
+  if (showErrors) attrs.push('data-show-errors')
+  if (columns !== 'auto') attrs.push(`[style]="'--columns: ${columns}'"`)
+
+  return `<!-- Angular — ${tier === 'premium' ? 'Premium' : 'Standard'} tier -->\n<div ${attrs.join(' ')}>\n  <div *ngFor="let iface of interfaces"\n    class="${cls}__card"\n    [attr.data-status]="iface.status"\n  >\n    {{ iface.name }} - {{ iface.speed }}\n  </div>\n</div>\n\n/* Import component CSS */\n@import '${importPath}/css/components/network-interface-grid.css';`
+}
+
+function generateSvelteCode(
+  tier: Tier,
+  size: Size,
+  compact: boolean,
+  showTraffic: boolean,
+  showErrors: boolean,
+  columns: string,
+): string {
+  if (tier === 'lite') {
+    const attrs: string[] = []
+    if (size !== 'md') attrs.push(`  data-size="${size}"`)
+    if (compact) attrs.push('  data-compact')
+    return `<!-- Svelte — Lite tier (CSS-only) -->\n<div class="ui-lite-network-interface-grid"${attrs.join('')}>\n  {#each interfaces as iface}\n    <div class="ui-lite-network-interface-grid__card" data-status={iface.status}>\n      {iface.name} - {iface.speed}\n    </div>\n  {/each}\n</div>\n\n<style>\n  @import '@annondeveloper/ui-kit/lite/styles.css';\n</style>`
+  }
+
+  const importPath = tier === 'premium' ? '@annondeveloper/ui-kit/premium' : '@annondeveloper/ui-kit'
+  const props: string[] = ['  interfaces={interfaces}']
+  if (size !== 'md') props.push(`  size="${size}"`)
+  if (columns !== 'auto') props.push(`  columns={${columns}}`)
+  if (compact) props.push('  compact')
+  if (showTraffic) props.push('  showTraffic')
+  if (showErrors) props.push('  showErrors')
+
+  return `<script>\n  import { NetworkInterfaceGrid } from '${importPath}';\n</script>\n\n<NetworkInterfaceGrid\n${props.join('\n')}\n/>`
+}
+
 // ─── Section: Interactive Playground ──────────────────────────────────────────
 
 function PlaygroundSection({ tier: tierProp }: { tier: Tier }) {
@@ -718,10 +851,45 @@ function PlaygroundSection({ tier: tierProp }: { tier: Tier }) {
     [tier, size, compact, showTraffic, showErrors, columns],
   )
 
+  const htmlCode = useMemo(
+    () => generateHtmlCode(tier, size, compact, showTraffic, showErrors, columns),
+    [tier, size, compact, showTraffic, showErrors, columns],
+  )
+
+  const vueCode = useMemo(
+    () => generateVueCode(tier, size, compact, showTraffic, showErrors, columns),
+    [tier, size, compact, showTraffic, showErrors, columns],
+  )
+
+  const angularCode = useMemo(
+    () => generateAngularCode(tier, size, compact, showTraffic, showErrors, columns),
+    [tier, size, compact, showTraffic, showErrors, columns],
+  )
+
+  const svelteCode = useMemo(
+    () => generateSvelteCode(tier, size, compact, showTraffic, showErrors, columns),
+    [tier, size, compact, showTraffic, showErrors, columns],
+  )
+
   const [activeCodeTab, setActiveCodeTab] = useState('react')
   const codeTabs = [
     { id: 'react', label: 'React' },
+    { id: 'html', label: 'HTML+CSS' },
+    { id: 'vue', label: 'Vue' },
+    { id: 'angular', label: 'Angular' },
+    { id: 'svelte', label: 'Svelte' },
   ]
+
+  const activeCode = useMemo(() => {
+    switch (activeCodeTab) {
+      case 'react': return reactCode
+      case 'html': return htmlCode
+      case 'vue': return vueCode
+      case 'angular': return angularCode
+      case 'svelte': return svelteCode
+      default: return reactCode
+    }
+  }, [activeCodeTab, reactCode, htmlCode, vueCode, angularCode, svelteCode])
 
   const previewProps: Record<string, unknown> = {
     interfaces: sampleInterfaces,
@@ -755,19 +923,31 @@ function PlaygroundSection({ tier: tierProp }: { tier: Tier }) {
                 variant="secondary"
                 icon={<Icon name="copy" size="sm" />}
                 onClick={() => {
-                  navigator.clipboard?.writeText(reactCode).then(() => {
-                    setCopyStatus('Copied React!')
+                  navigator.clipboard?.writeText(activeCode).then(() => {
+                    setCopyStatus(`Copied ${activeCodeTab}!`)
                     setTimeout(() => setCopyStatus(''), 2000)
                   })
                 }}
               >
-                Copy React
+                Copy {activeCodeTab === 'react' ? 'React' : activeCodeTab === 'html' ? 'HTML' : activeCodeTab === 'vue' ? 'Vue' : activeCodeTab === 'angular' ? 'Angular' : 'Svelte'}
               </Button>
               {copyStatus && <span className="nig-page__export-status">{copyStatus}</span>}
             </div>
             <Tabs tabs={codeTabs} activeTab={activeCodeTab} onChange={setActiveCodeTab} size="sm" variant="pills">
               <TabPanel tabId="react">
                 <CopyBlock code={reactCode} language="typescript" showLineNumbers />
+              </TabPanel>
+              <TabPanel tabId="html">
+                <CopyBlock code={htmlCode} language="html" showLineNumbers />
+              </TabPanel>
+              <TabPanel tabId="vue">
+                <CopyBlock code={vueCode} language="html" showLineNumbers />
+              </TabPanel>
+              <TabPanel tabId="angular">
+                <CopyBlock code={angularCode} language="html" showLineNumbers />
+              </TabPanel>
+              <TabPanel tabId="svelte">
+                <CopyBlock code={svelteCode} language="html" showLineNumbers />
               </TabPanel>
             </Tabs>
           </div>
@@ -811,6 +991,7 @@ export default function NetworkInterfaceGridPage() {
   useStyles('nig-page', pageStyles)
 
   const { tier, setTier } = useTier()
+  const [brandColor, setBrandColor] = useState('#6366f1')
 
   // Scroll reveal for sections — JS fallback
   useEffect(() => {
@@ -970,6 +1151,13 @@ export default function NetworkInterfaceGridPage() {
                 columns={2}
               />
             </div>
+            <div className="nig-page__size-breakdown">
+              <div className="nig-page__size-row">
+                <span>Component: <strong style={{ color: 'var(--text-primary)' }}>0.8 KB</strong></span>
+                <span>+ Shared: <strong style={{ color: 'var(--text-primary)' }}>3.7 KB</strong></span>
+                <span>= <strong style={{ color: 'var(--brand)' }}>4.5 KB</strong> gzip</span>
+              </div>
+            </div>
           </div>
 
           {/* Standard */}
@@ -999,6 +1187,13 @@ export default function NetworkInterfaceGridPage() {
                 showTraffic
               />
             </div>
+            <div className="nig-page__size-breakdown">
+              <div className="nig-page__size-row">
+                <span>Component: <strong style={{ color: 'var(--text-primary)' }}>3.5 KB</strong></span>
+                <span>+ Shared: <strong style={{ color: 'var(--text-primary)' }}>0.9 KB</strong></span>
+                <span>= <strong style={{ color: 'var(--brand)' }}>4.4 KB</strong> gzip</span>
+              </div>
+            </div>
           </div>
 
           {/* Premium */}
@@ -1027,6 +1222,13 @@ export default function NetworkInterfaceGridPage() {
                 size="sm"
                 showTraffic
               />
+            </div>
+            <div className="nig-page__size-breakdown">
+              <div className="nig-page__size-row">
+                <span>Component: <strong style={{ color: 'var(--text-primary)' }}>4.5 KB</strong></span>
+                <span>+ Shared: <strong style={{ color: 'var(--text-primary)' }}>1.2 KB</strong></span>
+                <span>= <strong style={{ color: 'var(--brand)' }}>5.7 KB</strong> gzip</span>
+              </div>
             </div>
           </div>
         </div>
@@ -1059,7 +1261,32 @@ export default function NetworkInterfaceGridPage() {
         </Card>
       </section>
 
-      {/* ── 7. Accessibility ──────────────────────────── */}
+      {/* ── 7. Brand Color ──────────────────────────── */}
+      <section className="nig-page__section" id="brand-color">
+        <h2 className="nig-page__section-title">
+          <a href="#brand-color">Brand Color</a>
+        </h2>
+        <p className="nig-page__section-desc">
+          Pick a brand color to see the grid components update in real-time. Derived colors
+          are generated automatically from your selection.
+        </p>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+          <ColorInput
+            name="brand-color"
+            value={brandColor}
+            onChange={setBrandColor}
+            size="sm"
+            swatches={['#6366f1','#f97316','#f43f5e','#0ea5e9','#10b981','#8b5cf6','#d946ef','#f59e0b','#06b6d4','#64748b']}
+          />
+          {brandColor !== '#6366f1' && (
+            <Button size="xs" variant="ghost" onClick={() => setBrandColor('#6366f1')}>
+              <Icon name="refresh" size="sm" /> Reset to default
+            </Button>
+          )}
+        </div>
+      </section>
+
+      {/* ── 8. Accessibility ──────────────────────────── */}
       <section className="nig-page__section" id="accessibility">
         <h2 className="nig-page__section-title">
           <a href="#accessibility">Accessibility</a>
@@ -1107,6 +1334,23 @@ export default function NetworkInterfaceGridPage() {
             </li>
           </ul>
         </Card>
+      </section>
+
+      {/* ── 9. Source ──────────────────────────────────── */}
+      <section className="nig-page__section" id="source">
+        <h2 className="nig-page__section-title"><a href="#source">Source</a></h2>
+        <p className="nig-page__section-desc">View the full component source code on GitHub.</p>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+          <a className="nig-page__source-link" href="https://github.com/annondeveloper/ui-kit/blob/main/src/domain/network-interface-grid.tsx" target="_blank" rel="noopener noreferrer">
+            <Icon name="code" size="sm" /> src/domain/network-interface-grid.tsx (Standard)
+          </a>
+          <a className="nig-page__source-link" href="https://github.com/annondeveloper/ui-kit/blob/main/src/lite/network-interface-grid.tsx" target="_blank" rel="noopener noreferrer">
+            <Icon name="code" size="sm" /> src/lite/network-interface-grid.tsx (Lite)
+          </a>
+          <a className="nig-page__source-link" href="https://github.com/annondeveloper/ui-kit/blob/main/src/premium/network-interface-grid.tsx" target="_blank" rel="noopener noreferrer">
+            <Icon name="code" size="sm" /> src/premium/network-interface-grid.tsx (Premium)
+          </a>
+        </div>
       </section>
     </div>
   )
