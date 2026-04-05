@@ -127,11 +127,11 @@
           <span class="info-value" id="info-motion">—</span>
         </div>
         <div class="info-row">
-          <span class="info-label">Measured Speed</span>
+          <span class="info-label">Probe Round-Trip</span>
           <span class="info-value" id="info-speed">measuring...</span>
         </div>
         <div class="info-row">
-          <span class="info-label">Probe Latency</span>
+          <span class="info-label">Probe Latency (raw)</span>
           <span class="info-value" id="info-latency">—</span>
         </div>
         <div class="info-row">
@@ -199,110 +199,108 @@
   </div>
 
   <script>
-    // ─── Speed Probe: measure actual download speed ───────────────────
-    // Downloads a small resource and measures how long it takes.
-    // This works with DevTools throttling (unlike navigator.connection).
+    // ─── Dual detection: navigator.connection + latency probe ────────
+    //
+    // Strategy:
+    // 1. navigator.connection gives the network TYPE (4g/3g/2g) — accurate on real devices
+    // 2. Latency probe measures round-trip time — works with DevTools throttling
+    // 3. Take the WORSE of the two — handles both real slow connections AND simulated throttling
 
-    async function measureSpeed() {
+    async function measureLatency() {
       const progress = document.getElementById('probe-progress')
       progress.style.width = '30%'
-
       try {
-        // Use a cache-busted fetch of this page itself as a probe
-        // The page is ~12KB — enough to measure, small enough for GPRS
-        const probeUrl = window.location.href + '?probe=' + Date.now()
+        const url = window.location.href.split('?')[0] + '?probe=' + Date.now()
         const start = performance.now()
-        const response = await fetch(probeUrl, { cache: 'no-store' })
-        const blob = await response.blob()
+        await fetch(url, { cache: 'no-store' })
         const elapsed = performance.now() - start
-        const bytes = blob.size
-        const bitsPerSecond = (bytes * 8) / (elapsed / 1000)
-        const mbps = bitsPerSecond / 1_000_000
-
         progress.style.width = '100%'
-
-        return {
-          mbps: Math.round(mbps * 100) / 100,
-          latencyMs: Math.round(elapsed),
-          bytes: bytes,
-          method: 'speed-probe'
-        }
-      } catch (e) {
+        return Math.round(elapsed)
+      } catch {
         progress.style.width = '100%'
-        return { mbps: -1, latencyMs: -1, bytes: 0, method: 'probe-failed' }
+        return -1
       }
     }
 
-    // ─── Tier Detection ──────────────────────────────────────────────
+    function tierFromLatency(ms) {
+      if (ms < 300) return { tier: 'premium', motion: 3, reason: 'Fast probe: ' + ms + 'ms' }
+      if (ms < 1000) return { tier: 'standard', motion: 2, reason: 'Moderate probe: ' + ms + 'ms' }
+      if (ms < 3000) return { tier: 'standard', motion: 1, reason: 'Slow probe: ' + ms + 'ms' }
+      return { tier: 'lite', motion: 0, reason: 'Very slow probe: ' + ms + 'ms' }
+    }
+
+    function tierFromConnection(conn) {
+      if (conn.saveData) return { tier: 'lite', motion: 0, reason: 'Save-Data enabled' }
+      var type = conn.effectiveType
+      var dl = conn.downlink || 10
+      var rtt = conn.rtt || 50
+      if (type === 'slow-2g' || type === '2g') return { tier: 'lite', motion: 0, reason: 'Connection: ' + type }
+      if (type === '3g' && dl < 0.5) return { tier: 'standard', motion: 1, reason: 'Slow 3G: ' + dl + 'Mbps' }
+      if (type === '3g') return { tier: 'standard', motion: 2, reason: '3G: ' + dl + 'Mbps' }
+      if (dl >= 1 || rtt < 100) return { tier: 'premium', motion: 3, reason: 'Fast: ' + dl + 'Mbps / ' + rtt + 'ms' }
+      if (dl >= 0.4) return { tier: 'standard', motion: 2, reason: 'Moderate: ' + dl + 'Mbps' }
+      return { tier: 'standard', motion: 1, reason: 'Slow 4G: ' + dl + 'Mbps' }
+    }
 
     async function detect() {
-      const badge = document.getElementById('tier-badge')
-      badge.textContent = '⏳ Measuring speed...'
+      var badge = document.getElementById('tier-badge')
+      badge.textContent = '⏳ Detecting...'
       badge.setAttribute('data-tier', 'standard')
 
-      const conn = navigator.connection || navigator.mozConnection || navigator.webkitConnection
+      var conn = navigator.connection || navigator.mozConnection || navigator.webkitConnection
 
-      // Quick checks first (no network needed)
+      // Quick OS-level checks
       if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-        return applyResult('lite', 0, 'prefers-reduced-motion', 'os-preference', null, conn)
+        return applyResult('lite', 0, 'prefers-reduced-motion', 'os-preference', -1, conn)
       }
       if (conn && conn.saveData) {
-        return applyResult('lite', 0, 'Save-Data enabled', 'save-data', null, conn)
+        return applyResult('lite', 0, 'Save-Data enabled', 'save-data', -1, conn)
       }
 
-      // Measure actual speed
-      const speed = await measureSpeed()
+      // Get both signals
+      var connResult = conn && conn.effectiveType ? tierFromConnection(conn) : null
+      var latencyMs = await measureLatency()
+      var probeResult = latencyMs >= 0 ? tierFromLatency(latencyMs) : null
 
-      if (speed.mbps < 0) {
-        // Probe failed — fall back to navigator.connection
-        if (conn && conn.effectiveType) {
-          const type = conn.effectiveType
-          if (type === 'slow-2g' || type === '2g') return applyResult('lite', 0, 'Connection API: ' + type, 'connection-api', speed, conn)
-          if (type === '3g') return applyResult('standard', 2, 'Connection API: 3G', 'connection-api', speed, conn)
-          return applyResult('premium', 3, 'Connection API: ' + type, 'connection-api', speed, conn)
+      var tier, motion, reason, method
+
+      if (connResult && probeResult) {
+        // Take the WORSE of the two signals
+        if (probeResult.motion <= connResult.motion) {
+          tier = probeResult.tier; motion = probeResult.motion
+          reason = probeResult.reason + ' | API: ' + connResult.reason
+          method = 'probe (downgraded from API)'
+        } else {
+          tier = connResult.tier; motion = connResult.motion
+          reason = connResult.reason + ' (probe: ' + latencyMs + 'ms)'
+          method = 'connection-api (confirmed by probe)'
         }
-        return applyResult('standard', 2, 'Could not measure speed', 'fallback', speed, conn)
-      }
-
-      // Classify based on ACTUAL measured speed
-      let tier, motion, reason
-      if (speed.mbps >= 2) {
-        tier = 'premium'; motion = 3
-        reason = 'Fast: ' + speed.mbps + ' Mbps'
-      } else if (speed.mbps >= 0.5) {
-        tier = 'standard'; motion = 2
-        reason = 'Moderate: ' + speed.mbps + ' Mbps'
-      } else if (speed.mbps >= 0.1) {
-        tier = 'standard'; motion = 1
-        reason = 'Slow: ' + speed.mbps + ' Mbps'
+      } else if (probeResult) {
+        tier = probeResult.tier; motion = probeResult.motion
+        reason = probeResult.reason; method = 'probe-only'
+      } else if (connResult) {
+        tier = connResult.tier; motion = connResult.motion
+        reason = connResult.reason; method = 'connection-api-only'
       } else {
-        tier = 'lite'; motion = 0
-        reason = 'Very slow: ' + speed.mbps + ' Mbps'
+        tier = 'standard'; motion = 2; reason = 'No signals'; method = 'fallback'
       }
 
-      // Cross-reference with connection API if available
-      if (conn && (conn.effectiveType === 'slow-2g' || conn.effectiveType === '2g')) {
-        tier = 'lite'; motion = 0
-        reason += ' (confirmed by connection API: ' + conn.effectiveType + ')'
-      }
-
-      applyResult(tier, motion, reason, speed.method, speed, conn)
+      applyResult(tier, motion, reason, method, latencyMs, conn)
     }
 
-    function applyResult(tier, motion, reason, method, speed, conn) {
+    function applyResult(tier, motion, reason, method, latencyMs, conn) {
       setTier(tier)
-
       document.getElementById('info-tier').textContent = tier
       document.getElementById('info-motion').textContent = motion
-      document.getElementById('info-speed').textContent = speed ? (speed.mbps >= 0 ? speed.mbps + ' Mbps' : 'failed') : 'skipped'
-      document.getElementById('info-latency').textContent = speed ? (speed.latencyMs >= 0 ? speed.latencyMs + ' ms' : '—') : '—'
+      document.getElementById('info-speed').textContent = latencyMs >= 0 ? latencyMs + 'ms round-trip' : 'skipped'
+      document.getElementById('info-latency').textContent = latencyMs >= 0 ? latencyMs + ' ms' : '—'
       document.getElementById('info-conn').textContent = conn ? (conn.effectiveType + ' / ' + (conn.downlink || '?') + ' Mbps / ' + (conn.rtt || '?') + 'ms RTT') : 'unavailable'
       document.getElementById('info-savedata').textContent = conn ? (conn.saveData ? 'Yes' : 'No') : '—'
       document.getElementById('info-reason').textContent = reason
       document.getElementById('info-method').textContent = method
 
-      const badge = document.getElementById('tier-badge')
-      const icon = tier === 'premium' ? '✨' : tier === 'standard' ? '⚡' : '🪶'
+      var badge = document.getElementById('tier-badge')
+      var icon = tier === 'premium' ? '✨' : tier === 'standard' ? '⚡' : '🪶'
       badge.textContent = icon + ' ' + tier.toUpperCase()
       badge.setAttribute('data-tier', tier)
     }
@@ -311,7 +309,6 @@
       document.getElementById('app').setAttribute('data-tier', tier)
     }
 
-    // Run on load
     detect()
     document.getElementById('timestamp').textContent = 'Page loaded: ' + new Date().toLocaleTimeString()
   </script>

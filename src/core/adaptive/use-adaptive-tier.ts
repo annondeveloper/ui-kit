@@ -132,41 +132,35 @@ export function detectAdaptiveTier(): AdaptiveResult {
 }
 
 /**
- * Measure actual download speed by fetching a small resource.
+ * Measure actual network latency by fetching a small resource.
  * This works with DevTools throttling (unlike navigator.connection).
- * Returns measured Mbps, or -1 if probe fails.
+ *
+ * Instead of measuring bandwidth (which is inaccurate with small files),
+ * we measure LATENCY — how long a round-trip takes. This is a much
+ * better signal for small probe files:
+ *   - Fast connection: <100ms round-trip
+ *   - Moderate: 100-500ms
+ *   - Slow (3G): 500-2000ms
+ *   - Very slow (GPRS): >2000ms
  */
-async function measureActualSpeed(): Promise<{ mbps: number; latencyMs: number }> {
+async function measureActualLatency(): Promise<{ latencyMs: number }> {
   try {
-    // Fetch a small cacheable resource with cache-bust to measure real speed
-    // Use a 1x1 transparent GIF data URL approach — generate a ~1KB payload
     const probeUrl = `${window.location.origin}/favicon.ico?_probe=${Date.now()}`
     const start = performance.now()
-    const response = await fetch(probeUrl, { cache: 'no-store', mode: 'no-cors' })
-    // Even with no-cors/opaque response, the timing tells us latency
+    await fetch(probeUrl, { cache: 'no-store', mode: 'no-cors' })
     const elapsed = performance.now() - start
-
-    // Try to get actual size from response
-    let bytes = 1024 // assume ~1KB if we can't read
-    try {
-      const blob = await response.blob()
-      bytes = blob.size || 1024
-    } catch { /* opaque response, use estimate */ }
-
-    const bitsPerSecond = (bytes * 8) / (elapsed / 1000)
-    const mbps = bitsPerSecond / 1_000_000
-
-    return { mbps: Math.round(mbps * 100) / 100, latencyMs: Math.round(elapsed) }
+    return { latencyMs: Math.round(elapsed) }
   } catch {
-    return { mbps: -1, latencyMs: -1 }
+    return { latencyMs: -1 }
   }
 }
 
-function tierFromMeasuredSpeed(mbps: number): AdaptiveResult {
-  if (mbps >= 2) return { tier: 'premium', motion: 3, confidence: 'high', reason: `Measured: ${mbps} Mbps` }
-  if (mbps >= 0.5) return { tier: 'standard', motion: 2, confidence: 'high', reason: `Measured: ${mbps} Mbps` }
-  if (mbps >= 0.1) return { tier: 'standard', motion: 1, confidence: 'high', reason: `Measured slow: ${mbps} Mbps` }
-  return { tier: 'lite', motion: 0, confidence: 'high', reason: `Measured very slow: ${mbps} Mbps` }
+function tierFromLatency(latencyMs: number): AdaptiveResult {
+  // Latency-based classification is more reliable than bandwidth for small probes
+  if (latencyMs < 300) return { tier: 'premium', motion: 3, confidence: 'high', reason: `Fast probe: ${latencyMs}ms` }
+  if (latencyMs < 1000) return { tier: 'standard', motion: 2, confidence: 'high', reason: `Moderate probe: ${latencyMs}ms` }
+  if (latencyMs < 3000) return { tier: 'standard', motion: 1, confidence: 'high', reason: `Slow probe: ${latencyMs}ms` }
+  return { tier: 'lite', motion: 0, confidence: 'high', reason: `Very slow probe: ${latencyMs}ms` }
 }
 
 /**
@@ -186,33 +180,35 @@ export function useAdaptiveTier(override?: AdaptiveTier): AdaptiveResult {
     return detectAdaptiveTier()
   })
 
-  // Async speed probe for refinement — catches DevTools throttling
+  // Async latency probe for refinement — catches DevTools throttling
   useEffect(() => {
     if (override) return
     if (typeof window === 'undefined') return
 
     let cancelled = false
 
-    // Start with synchronous detection
+    // Start with synchronous detection (navigator.connection + TTFB)
     const initial = detectAdaptiveTier()
     setResult(initial)
 
-    // Then refine with actual measurement
-    measureActualSpeed().then(({ mbps }) => {
+    // Then refine with actual round-trip measurement
+    measureActualLatency().then(({ latencyMs }) => {
       if (cancelled) return
-      if (mbps < 0) return // probe failed, keep initial detection
+      if (latencyMs < 0) return // probe failed, keep initial detection
 
-      const refined = tierFromMeasuredSpeed(mbps)
+      const probed = tierFromLatency(latencyMs)
 
-      // Only downgrade, never upgrade from initial
-      // This prevents a premium page from flickering to lite
-      // But if the measured speed is slower, we should respect it
-      if (refined.motion < initial.motion) {
-        setResult(refined)
-      }
-      // If measured speed confirms or upgrades, keep it
-      else {
-        setResult(prev => ({ ...prev, confidence: 'high', reason: `${prev.reason} (confirmed: ${mbps} Mbps)` }))
+      // Trust the WORSE of the two signals
+      // This correctly handles:
+      // - Real 4G (API=premium, probe=premium) → premium ✓
+      // - DevTools GPRS (API=premium, probe=lite) → lite ✓
+      // - Real slow connection (API=3g, probe=slow) → takes worse ✓
+      if (probed.motion < initial.motion) {
+        // Probe detected slower than API — real throttling, downgrade
+        setResult(probed)
+      } else {
+        // Probe confirms or is faster — trust initial + mark confirmed
+        setResult(prev => ({ ...prev, confidence: 'high', reason: `${prev.reason} (confirmed: ${latencyMs}ms probe)` }))
       }
     })
 
