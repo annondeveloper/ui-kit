@@ -1,9 +1,11 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useMemo, useCallback } from 'react'
 import { css } from '@ui/core/styles/css-tag'
 import { useStyles } from '@ui/core/styles/use-styles'
 import { Textarea } from '@ui/components/textarea'
+import { Textarea as LiteTextarea } from '@ui/lite/textarea'
+import { Textarea as PremiumTextarea } from '@ui/premium/textarea'
 import { Button } from '@ui/components/button'
 import { Card } from '@ui/components/card'
 import { Icon } from '@ui/core/icons/icon'
@@ -183,6 +185,190 @@ const pageStyles = css`
         max-inline-size: 480px;
         margin-inline: auto;
       }
+
+      /* ── Playground ─────────────────────────────────── */
+
+      .ta-page__playground {
+        display: grid;
+        grid-template-columns: 280px 1fr;
+        gap: 1.5rem;
+      }
+
+      @container ta-page (max-width: 640px) {
+        .ta-page__playground {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      .ta-page__playground-controls {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+      }
+
+      .ta-page__playground-control-group {
+        display: flex;
+        flex-direction: column;
+        gap: 0.375rem;
+      }
+
+      .ta-page__playground-control-label {
+        font-size: var(--text-xs, 0.75rem);
+        font-weight: 600;
+        color: var(--text-secondary);
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+      }
+
+      .ta-page__playground-options {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.375rem;
+      }
+
+      .ta-page__playground-opt {
+        font-size: var(--text-xs, 0.75rem);
+        padding: 0.25rem 0.625rem;
+        border-radius: var(--radius-sm, 4px);
+        border: 1px solid var(--border-default);
+        background: var(--bg-base);
+        color: var(--text-primary);
+        cursor: pointer;
+        transition: all 0.15s ease;
+      }
+
+      .ta-page__playground-opt:hover {
+        border-color: var(--brand, oklch(65% 0.2 270));
+      }
+
+      .ta-page__playground-opt[data-active='true'] {
+        background: var(--brand, oklch(65% 0.2 270));
+        border-color: var(--brand, oklch(65% 0.2 270));
+        color: white;
+      }
+
+      .ta-page__playground-toggle {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: var(--text-sm, 0.875rem);
+        color: var(--text-primary);
+        cursor: pointer;
+      }
+
+      .ta-page__playground-toggle input {
+        accent-color: var(--brand, oklch(65% 0.2 270));
+      }
+
+      .ta-page__playground-result {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+        padding: 2rem;
+        border-radius: var(--radius-md);
+        background: var(--bg-base);
+        position: relative;
+        min-block-size: 200px;
+      }
+
+      .ta-page__playground-result::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background-image: radial-gradient(oklch(100% 0 0 / 0.03) 1px, transparent 1px);
+        background-size: 24px 24px;
+        pointer-events: none;
+      }
+
+      .ta-page__playground-live {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        align-items: stretch;
+        max-inline-size: 480px;
+        margin-inline: auto;
+        inline-size: 100%;
+      }
+
+      /* ── Code tabs ───────────────────────────────────── */
+
+      .ta-page__code-tabs {
+        display: flex;
+        gap: 0;
+        border-block-end: 1px solid var(--border-default);
+        margin-block-start: 0.5rem;
+      }
+
+      .ta-page__code-tab {
+        padding: 0.5rem 1rem;
+        font-size: var(--text-xs, 0.75rem);
+        font-weight: 600;
+        color: var(--text-secondary);
+        cursor: pointer;
+        border: none;
+        background: none;
+        border-block-end: 2px solid transparent;
+        transition: all 0.15s ease;
+      }
+
+      .ta-page__code-tab:hover { color: var(--text-primary); }
+
+      .ta-page__code-tab[data-active='true'] {
+        color: var(--brand, oklch(65% 0.2 270));
+        border-block-end-color: var(--brand, oklch(65% 0.2 270));
+      }
+
+      .ta-page__code-block {
+        position: relative;
+        background: oklch(0% 0 0 / 0.3);
+        border-radius: var(--radius-md);
+        padding: 1rem;
+        overflow-x: auto;
+      }
+
+      .ta-page__code-block pre {
+        margin: 0;
+        font-family: 'SF Mono', 'Fira Code', 'JetBrains Mono', monospace;
+        font-size: var(--text-xs, 0.75rem);
+        line-height: 1.6;
+        color: var(--text-primary);
+        white-space: pre-wrap;
+      }
+
+      .ta-page__code-copy {
+        position: absolute;
+        inset-block-start: 0.5rem;
+        inset-inline-end: 0.5rem;
+      }
+
+      /* ── Accessibility ───────────────────────────────── */
+
+      .ta-page__a11y-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 0.75rem;
+      }
+
+      .ta-page__a11y-card {
+        padding: 1rem;
+        border-radius: var(--radius-md);
+        background: var(--bg-base);
+        border: 1px solid var(--border-subtle);
+      }
+
+      .ta-page__a11y-card h4 {
+        margin: 0 0 0.375rem;
+        font-size: var(--text-sm, 0.875rem);
+        font-weight: 600;
+        color: var(--text-primary);
+      }
+
+      .ta-page__a11y-card p {
+        margin: 0;
+        font-size: var(--text-xs, 0.75rem);
+        color: var(--text-secondary);
+        line-height: 1.5;
+      }
     }
   }
 `
@@ -210,6 +396,104 @@ const taProps: PropDef[] = [
   { name: 'motion', type: '0 | 1 | 2 | 3', description: 'Animation intensity (0=none, 1=subtle, 2=expressive, 3=cinematic).' },
 ]
 
+// ─── Code Generators ────────────────────────────────────────────────────────
+
+type Tier = 'lite' | 'standard' | 'premium'
+type Size = 'xs' | 'sm' | 'md' | 'lg' | 'xl'
+type Resize = 'none' | 'vertical' | 'horizontal' | 'both'
+
+function generateReactCode(
+  tier: Tier, size: Size, placeholder: string, disabled: boolean,
+  readOnly: boolean, required: boolean, rows: number, maxLength: number,
+  resize: Resize, motion: 0 | 1 | 2 | 3,
+): string {
+  const importPath = tier === 'lite'
+    ? "@annondeveloper/ui-kit/lite"
+    : tier === 'premium'
+      ? "@annondeveloper/ui-kit/premium"
+      : "@annondeveloper/ui-kit"
+  const props: string[] = []
+  props.push(`  label="Message"`)
+  if (placeholder) props.push(`  placeholder="${placeholder}"`)
+  if (size !== 'md') props.push(`  size="${size}"`)
+  if (disabled) props.push('  disabled')
+  if (readOnly) props.push('  readOnly')
+  if (required) props.push('  required')
+  if (rows !== 3) props.push(`  minRows={${rows}}`)
+  if (maxLength > 0) props.push(`  maxLength={${maxLength}}`)
+  if (maxLength > 0) props.push('  showCount')
+  if (resize !== 'vertical') props.push(`  resize="${resize}"`)
+  if (tier !== 'lite' && motion !== 3) props.push(`  motion={${motion}}`)
+  return `import { Textarea } from '${importPath}'\n\n<Textarea\n${props.join('\n')}\n/>`
+}
+
+function generateHtmlCode(
+  tier: Tier, size: Size, placeholder: string, disabled: boolean,
+  rows: number, maxLength: number, resize: Resize,
+): string {
+  const cls = tier === 'lite' ? 'ui-lite-textarea' : 'ui-textarea'
+  const attrs: string[] = [`class="${cls}"`, `data-size="${size}"`]
+  if (placeholder) attrs.push(`placeholder="${placeholder}"`)
+  if (disabled) attrs.push('disabled')
+  if (rows !== 3) attrs.push(`rows="${rows}"`)
+  if (maxLength > 0) attrs.push(`maxlength="${maxLength}"`)
+  const cssImport = tier === 'lite'
+    ? "@import '@annondeveloper/ui-kit/css/lite/textarea.css';"
+    : "@import '@annondeveloper/ui-kit/css/components/textarea.css';"
+  const style = resize !== 'vertical' ? `\n\n<style>\n  .${cls} textarea { resize: ${resize}; }\n</style>` : ''
+  return `<div ${attrs.join(' ')}>\n  <label>Message</label>\n  <textarea ${attrs.filter(a => a !== `class="${cls}"` && a !== `data-size="${size}"`).join(' ')}></textarea>\n</div>${style}\n\n<style>\n  ${cssImport}\n</style>`
+}
+
+function generateVueCode(
+  tier: Tier, size: Size, placeholder: string, disabled: boolean,
+  rows: number, maxLength: number,
+): string {
+  const importPath = tier === 'lite'
+    ? "@annondeveloper/ui-kit/lite"
+    : tier === 'premium'
+      ? "@annondeveloper/ui-kit/premium"
+      : "@annondeveloper/ui-kit"
+  const props: string[] = [`  label="Message"`]
+  if (placeholder) props.push(`  placeholder="${placeholder}"`)
+  if (size !== 'md') props.push(`  size="${size}"`)
+  if (disabled) props.push('  :disabled="true"')
+  if (rows !== 3) props.push(`  :min-rows="${rows}"`)
+  if (maxLength > 0) props.push(`  :max-length="${maxLength}"`)
+  if (maxLength > 0) props.push('  show-count')
+  return `<template>\n  <Textarea\n  ${props.join('\n  ')}\n    v-model="text"\n  />\n</template>\n\n<script setup>\nimport { ref } from 'vue'\nimport { Textarea } from '${importPath}'\n\nconst text = ref('')\n</script>`
+}
+
+function generateAngularCode(
+  tier: Tier, size: Size, placeholder: string, disabled: boolean,
+  rows: number, maxLength: number,
+): string {
+  if (tier === 'lite') {
+    const attrs = [`class="ui-lite-textarea"`, `data-size="${size}"`]
+    if (disabled) attrs.push('[disabled]="true"')
+    return `<!-- Angular — Lite tier (CSS-only) -->\n<div ${attrs.join(' ')}>\n  <label>Message</label>\n  <textarea\n    ${placeholder ? `placeholder="${placeholder}"` : ''}\n    ${rows !== 3 ? `rows="${rows}"` : ''}\n    ${maxLength > 0 ? `maxlength="${maxLength}"` : ''}\n  ></textarea>\n</div>\n\n/* In styles.css */\n@import '@annondeveloper/ui-kit/css/lite/textarea.css';`
+  }
+  const importPath = tier === 'premium' ? '@annondeveloper/ui-kit/premium' : '@annondeveloper/ui-kit'
+  return `<!-- Angular — ${tier === 'premium' ? 'Premium' : 'Standard'} tier -->\n<div\n  class="ui-textarea"\n  data-size="${size}"\n  ${disabled ? '[attr.data-disabled]="true"' : ''}\n>\n  <label>Message</label>\n  <textarea\n    ${placeholder ? `placeholder="${placeholder}"` : ''}\n    ${rows !== 3 ? `rows="${rows}"` : ''}\n    ${maxLength > 0 ? `maxlength="${maxLength}"` : ''}\n    [(ngModel)]="text"\n  ></textarea>\n</div>\n\n/* Import component CSS */\n@import '${importPath}/css/components/textarea.css';`
+}
+
+function generateSvelteCode(
+  tier: Tier, size: Size, placeholder: string, disabled: boolean,
+  rows: number, maxLength: number,
+): string {
+  if (tier === 'lite') {
+    return `<!-- Svelte — Lite tier (CSS-only) -->\n<div class="ui-lite-textarea" data-size="${size}">\n  <label>Message</label>\n  <textarea\n    bind:value={text}\n    ${placeholder ? `placeholder="${placeholder}"` : ''}\n    ${disabled ? 'disabled' : ''}\n    ${rows !== 3 ? `rows="${rows}"` : ''}\n    ${maxLength > 0 ? `maxlength="${maxLength}"` : ''}\n  ></textarea>\n</div>\n\n<style>\n  @import '@annondeveloper/ui-kit/css/lite/textarea.css';\n</style>`
+  }
+  const importPath = tier === 'premium' ? '@annondeveloper/ui-kit/premium' : '@annondeveloper/ui-kit'
+  const props: string[] = [`  label="Message"`]
+  if (placeholder) props.push(`  placeholder="${placeholder}"`)
+  if (size !== 'md') props.push(`  size="${size}"`)
+  if (disabled) props.push('  disabled')
+  if (rows !== 3) props.push(`  minRows={${rows}}`)
+  if (maxLength > 0) props.push(`  maxLength={${maxLength}}`)
+  if (maxLength > 0) props.push('  showCount')
+  return `<script>\n  import { Textarea } from '${importPath}';\n</script>\n\n<Textarea\n${props.join('\n')}\n  bind:value={text}\n/>`
+}
+
 // ─── Helpers ────────────────────────────────────────────────────────────────
 
 function CopyButton({ text }: { text: string }) {
@@ -225,6 +509,37 @@ function CopyButton({ text }: { text: string }) {
   )
 }
 
+function OptionGroup<T extends string | number>({
+  label, options, value, onChange,
+}: { label: string; options: T[]; value: T; onChange: (v: T) => void }) {
+  return (
+    <div className="ta-page__playground-control-group">
+      <span className="ta-page__playground-control-label">{label}</span>
+      <div className="ta-page__playground-options">
+        {options.map(opt => (
+          <button
+            key={String(opt)}
+            className="ta-page__playground-opt"
+            data-active={opt === value}
+            onClick={() => onChange(opt)}
+          >
+            {String(opt)}
+          </button>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+function Toggle({ label, checked, onChange }: { label: string; checked: boolean; onChange: (v: boolean) => void }) {
+  return (
+    <label className="ta-page__playground-toggle">
+      <input type="checkbox" checked={checked} onChange={e => onChange(e.target.checked)} />
+      {label}
+    </label>
+  )
+}
+
 // ─── Page ───────────────────────────────────────────────────────────────────
 
 const IMPORT_STR = "import { Textarea } from '@anthropic/ui-kit'"
@@ -232,6 +547,63 @@ const IMPORT_STR = "import { Textarea } from '@anthropic/ui-kit'"
 export default function TextareaPage() {
   useStyles('ta-page', pageStyles)
   const { tier } = useTier()
+
+  // Playground state
+  const [size, setSize] = useState<Size>('md')
+  const [placeholder, setPlaceholder] = useState('Type your message...')
+  const [disabled, setDisabled] = useState(false)
+  const [readOnly, setReadOnly] = useState(false)
+  const [required, setRequired] = useState(false)
+  const [rows, setRows] = useState(3)
+  const [maxLength, setMaxLength] = useState(0)
+  const [resize, setResize] = useState<Resize>('vertical')
+  const [motion, setMotion] = useState<0 | 1 | 2 | 3>(3)
+  const [activeCodeTab, setActiveCodeTab] = useState('react')
+
+  const TextareaComponent = tier === 'lite' ? LiteTextarea : tier === 'premium' ? PremiumTextarea : Textarea
+
+  const reactCode = useMemo(
+    () => generateReactCode(tier as Tier, size, placeholder, disabled, readOnly, required, rows, maxLength, resize, motion),
+    [tier, size, placeholder, disabled, readOnly, required, rows, maxLength, resize, motion],
+  )
+
+  const htmlCode = useMemo(
+    () => generateHtmlCode(tier as Tier, size, placeholder, disabled, rows, maxLength, resize),
+    [tier, size, placeholder, disabled, rows, maxLength, resize],
+  )
+
+  const vueCode = useMemo(
+    () => generateVueCode(tier as Tier, size, placeholder, disabled, rows, maxLength),
+    [tier, size, placeholder, disabled, rows, maxLength],
+  )
+
+  const angularCode = useMemo(
+    () => generateAngularCode(tier as Tier, size, placeholder, disabled, rows, maxLength),
+    [tier, size, placeholder, disabled, rows, maxLength],
+  )
+
+  const svelteCode = useMemo(
+    () => generateSvelteCode(tier as Tier, size, placeholder, disabled, rows, maxLength),
+    [tier, size, placeholder, disabled, rows, maxLength],
+  )
+
+  const activeCode = activeCodeTab === 'react' ? reactCode
+    : activeCodeTab === 'html' ? htmlCode
+    : activeCodeTab === 'vue' ? vueCode
+    : activeCodeTab === 'angular' ? angularCode
+    : svelteCode
+
+  const handleCopyCode = useCallback(() => {
+    navigator.clipboard.writeText(activeCode)
+  }, [activeCode])
+
+  const codeTabs = [
+    { id: 'react', label: 'React' },
+    { id: 'html', label: 'HTML+CSS' },
+    { id: 'vue', label: 'Vue' },
+    { id: 'angular', label: 'Angular' },
+    { id: 'svelte', label: 'Svelte' },
+  ]
 
   return (
     <div className="ta-page">
@@ -246,6 +618,63 @@ export default function TextareaPage() {
           <CopyButton text={IMPORT_STR} />
         </div>
       </div>
+
+      {/* ── Playground ─────────────────────────────────── */}
+      <section className="ta-page__section" id="playground">
+        <h2 className="ta-page__section-title"><a href="#playground">Playground</a></h2>
+        <p className="ta-page__section-desc">
+          Interactively configure the Textarea component and copy generated code for your framework.
+        </p>
+
+        <div className="ta-page__playground">
+          <div className="ta-page__playground-controls">
+            <OptionGroup label="Size" options={['xs', 'sm', 'md', 'lg', 'xl'] as Size[]} value={size} onChange={setSize} />
+            <OptionGroup label="Resize" options={['none', 'vertical', 'horizontal', 'both'] as Resize[]} value={resize} onChange={setResize} />
+            <OptionGroup label="Rows" options={[2, 3, 4, 6, 8]} value={rows} onChange={v => setRows(v as number)} />
+            <OptionGroup label="Max Length" options={[0, 100, 280, 500]} value={maxLength} onChange={v => setMaxLength(v as number)} />
+            <OptionGroup label="Motion Level" options={[0, 1, 2, 3] as (0 | 1 | 2 | 3)[]} value={motion} onChange={v => setMotion(v as 0 | 1 | 2 | 3)} />
+            <Toggle label="Disabled" checked={disabled} onChange={setDisabled} />
+            <Toggle label="Read only" checked={readOnly} onChange={setReadOnly} />
+            <Toggle label="Required" checked={required} onChange={setRequired} />
+          </div>
+
+          <div className="ta-page__playground-result">
+            <div className="ta-page__playground-live">
+              <TextareaComponent
+                label="Message"
+                placeholder={placeholder}
+                size={size}
+                disabled={disabled}
+                required={required}
+                minRows={rows}
+                resize={resize}
+                maxLength={maxLength > 0 ? maxLength : undefined}
+                showCount={maxLength > 0}
+                motion={tier !== 'lite' ? motion : undefined}
+              />
+            </div>
+
+            <div className="ta-page__code-tabs">
+              {codeTabs.map(tab => (
+                <button
+                  key={tab.id}
+                  className="ta-page__code-tab"
+                  data-active={activeCodeTab === tab.id}
+                  onClick={() => setActiveCodeTab(tab.id)}
+                >
+                  {tab.label}
+                </button>
+              ))}
+            </div>
+            <div className="ta-page__code-block">
+              <pre>{activeCode}</pre>
+              <div className="ta-page__code-copy">
+                <CopyButton text={activeCode} />
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
 
       {/* ── Auto-Resize ────────────────────────────────── */}
       <section className="ta-page__section" id="autoresize">
@@ -310,6 +739,44 @@ export default function TextareaPage() {
         </div>
       </section>
 
+      {/* ── Accessibility ──────────────────────────────── */}
+      <section className="ta-page__section" id="accessibility">
+        <h2 className="ta-page__section-title"><a href="#accessibility">Accessibility</a></h2>
+        <p className="ta-page__section-desc">
+          Built-in accessibility features following WAI-ARIA authoring practices.
+        </p>
+        <div className="ta-page__a11y-grid">
+          <div className="ta-page__a11y-card">
+            <h4>Label association</h4>
+            <p>
+              The label prop automatically creates an associated label element with a stable
+              generated ID, providing screen reader context.
+            </p>
+          </div>
+          <div className="ta-page__a11y-card">
+            <h4>Error announcements</h4>
+            <p>
+              Error messages use aria-describedby and aria-invalid to communicate
+              validation state to assistive technology.
+            </p>
+          </div>
+          <div className="ta-page__a11y-card">
+            <h4>Character count</h4>
+            <p>
+              When showCount is enabled, the remaining character count is announced
+              via a live region as the user approaches the limit.
+            </p>
+          </div>
+          <div className="ta-page__a11y-card">
+            <h4>Reduced motion</h4>
+            <p>
+              All animations respect prefers-reduced-motion and the motion prop,
+              ensuring a comfortable experience for motion-sensitive users.
+            </p>
+          </div>
+        </div>
+      </section>
+
       {/* ── Weight Tiers ──────────────────────────────────── */}
       <section className="ta-page__section" id="tiers">
         <h2 className="ta-page__section-title">Weight Tiers</h2>
@@ -320,6 +787,9 @@ export default function TextareaPage() {
               Full-featured with motion, theming, and accessibility.
             </p>
             <code style={{ fontSize: '0.6875rem' }}>import {'{'} Textarea {'}'} from '@annondeveloper/ui-kit'</code>
+            <p className="size-row" style={{ fontSize: '0.6875rem', color: 'var(--text-tertiary)', margin: '0.25rem 0 0' }}>
+              ~3.1 KB gzip (JS) + ~0.9 KB gzip (CSS)
+            </p>
           </Card>
           <Card padding="sm" style={{ borderColor: tier === 'lite' ? 'var(--brand)' : undefined }}>
             <strong>Lite</strong>
@@ -327,6 +797,9 @@ export default function TextareaPage() {
               Minimal footprint, no motion or advanced theming.
             </p>
             <code style={{ fontSize: '0.6875rem' }}>import {'{'} Textarea {'}'} from '@annondeveloper/ui-kit/lite'</code>
+            <p className="size-row" style={{ fontSize: '0.6875rem', color: 'var(--text-tertiary)', margin: '0.25rem 0 0' }}>
+              ~0.8 KB gzip (JS) + ~0.4 KB gzip (CSS)
+            </p>
           </Card>
           <Card padding="sm" style={{ borderColor: tier === 'premium' ? 'var(--brand)' : undefined }}>
             <strong>Premium</strong>
@@ -334,7 +807,59 @@ export default function TextareaPage() {
               Aurora glow, spring animations, and shimmer effects.
             </p>
             <code style={{ fontSize: '0.6875rem' }}>import {'{'} Textarea {'}'} from '@annondeveloper/ui-kit/premium'</code>
+            <p className="size-row" style={{ fontSize: '0.6875rem', color: 'var(--text-tertiary)', margin: '0.25rem 0 0' }}>
+              ~4.2 KB gzip (JS) + ~1.2 KB gzip (CSS)
+            </p>
           </Card>
+        </div>
+      </section>
+
+      {/* ── Source & Brand Color ──────────────────────────── */}
+      <section className="ta-page__section" id="source">
+        <h2 className="ta-page__section-title"><a href="#source">Source & Customization</a></h2>
+        <p className="ta-page__section-desc">
+          View the component source, customize the brand color used by the Textarea focus ring and accents.
+        </p>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+          <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
+            <a
+              href="https://github.com/annondeveloper/ui-kit/blob/main/src/components/textarea.tsx"
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{ fontSize: '0.875rem', color: 'var(--brand, oklch(65% 0.2 270))' }}
+            >
+              Source on GitHub
+            </a>
+            <a
+              href="https://github.com/annondeveloper/ui-kit/blob/main/src/lite/textarea.tsx"
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{ fontSize: '0.875rem', color: 'var(--brand, oklch(65% 0.2 270))' }}
+            >
+              Lite Source
+            </a>
+            <a
+              href="https://github.com/annondeveloper/ui-kit/blob/main/src/premium/textarea.tsx"
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{ fontSize: '0.875rem', color: 'var(--brand, oklch(65% 0.2 270))' }}
+            >
+              Premium Source
+            </a>
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+            <label style={{ fontSize: '0.875rem', color: 'var(--text-secondary)', fontWeight: 600 }}>
+              Brand Color
+            </label>
+            <input
+              type="color"
+              defaultValue="#6366f1"
+              onChange={e => {
+                document.documentElement.style.setProperty('--brand', e.target.value)
+              }}
+              style={{ blockSize: '2rem', inlineSize: '3rem', border: 'none', borderRadius: 'var(--radius-sm)', cursor: 'pointer' }}
+            />
+          </div>
         </div>
       </section>
 
