@@ -6,6 +6,8 @@ import { MotionProvider } from '../core/motion/motion-context'
 import { DensityProvider, type Density } from '../core/tokens/density-context'
 import { oklchFallbackStyles } from '../core/styles/fallbacks'
 import { injectCSS } from '../core/styles/dom-injector'
+import { useAdaptiveTier, type AdaptiveTier } from '../core/adaptive/use-adaptive-tier'
+import { AdaptiveProvider } from '../core/adaptive/adaptive-context'
 
 export interface UIProviderProps {
   children: ReactNode
@@ -14,6 +16,16 @@ export interface UIProviderProps {
   motion?: 0 | 1 | 2 | 3
   density?: Density
   onModeChange?: (mode: 'dark' | 'light') => void
+  /**
+   * Enable adaptive tier rendering based on network bandwidth.
+   * - `true`: auto-detect tier per page (lite/standard/premium)
+   * - `false` (default in v2.x): use fixed `motion` prop
+   * - `'lite' | 'standard' | 'premium'`: force a specific tier
+   *
+   * When adaptive is enabled, the `motion` prop is ignored and
+   * motion level is set automatically based on detected bandwidth.
+   */
+  adaptive?: boolean | AdaptiveTier
 }
 
 export function UIProvider({
@@ -23,7 +35,15 @@ export function UIProvider({
   motion = 3,
   density = 'default',
   onModeChange,
+  adaptive = false,
 }: UIProviderProps): ReactElement {
+  // Adaptive tier detection — runs per-page, non-blocking
+  const adaptiveOverride = typeof adaptive === 'string' ? adaptive : undefined
+  const adaptiveResult = useAdaptiveTier(adaptive ? adaptiveOverride : undefined)
+  const isAdaptive = adaptive !== false
+
+  // When adaptive is enabled, override motion with detected level
+  const effectiveMotion = isAdaptive ? adaptiveResult.motion : motion
   // Inject OKLCH fallbacks for older browsers (no-op if already injected)
   useEffect(() => {
     injectCSS(oklchFallbackStyles.id, oklchFallbackStyles.css)
@@ -62,11 +82,18 @@ export function UIProvider({
 
   return (
     <ThemeProvider tokens={theme} mode={mode} onModeChange={onModeChange}>
-      <MotionProvider level={motion}>
+      <MotionProvider level={effectiveMotion}>
         <DensityProvider density={density}>
-          <div data-motion={motion} data-density={density} data-ui-provider>
-            {children}
-          </div>
+          <AdaptiveProvider value={{ ...adaptiveResult, isAdaptive }}>
+            <div
+              data-motion={effectiveMotion}
+              data-density={density}
+              data-ui-provider
+              data-adaptive-tier={isAdaptive ? adaptiveResult.tier : undefined}
+            >
+              {children}
+            </div>
+          </AdaptiveProvider>
         </DensityProvider>
       </MotionProvider>
     </ThemeProvider>

@@ -7,6 +7,7 @@ import './index.css'
 
 // ─── Utility Pages ──────────────────────────────────────────────────────────
 const Home = lazy(() => import('./pages/Home'))
+const AdaptiveTierDemo = lazy(() => import('./pages/AdaptiveTierDemo'))
 const DocsPage = lazy(() => import('./pages/DocsPage'))
 const IconsPage = lazy(() => import('./pages/IconsPage'))
 const ThemePage = lazy(() => import('./pages/ThemePage'))
@@ -199,6 +200,7 @@ createRoot(document.getElementById('root')!).render(
             <Route path="themes" element={<Suspense><ThemePage /></Suspense>} />
             <Route path="docs" element={<Suspense><DocsPage /></Suspense>} />
             <Route path="performance" element={<Suspense><PerformancePage /></Suspense>} />
+            <Route path="adaptive" element={<Suspense><AdaptiveTierDemo /></Suspense>} />
             <Route path="generator" element={<Suspense><GeneratorPage /></Suspense>} />
             <Route path="choreography" element={<Suspense><ChoreographyPage /></Suspense>} />
             <Route path="mcp" element={<Suspense><McpPage /></Suspense>} />
