@@ -115,12 +115,12 @@
     <p>This page measures your actual connection speed by downloading a small probe. DevTools throttling works correctly with this approach.</p>
 
     <div class="card">
-      <div class="tier-badge" id="tier-badge" data-tier="standard">⏳ Measuring speed...</div>
-      <div class="progress-bar"><div class="progress-bar-fill" id="probe-progress" style="width: 0%"></div></div>
+      <div class="tier-badge" id="tier-badge" data-tier="standard">⚡ STANDARD</div>
+      <div class="progress-bar"><div class="progress-bar-fill" id="probe-progress" style="width: 50%"></div></div>
       <div style="margin-top: 0.75rem;">
         <div class="info-row">
           <span class="info-label">Detected Tier</span>
-          <span class="info-value" id="info-tier">measuring...</span>
+          <span class="info-value" id="info-tier">detecting...</span>
         </div>
         <div class="info-row">
           <span class="info-label">Motion Level</span>
@@ -242,14 +242,10 @@
       return { tier: 'standard', motion: 1, reason: 'Slow 4G: ' + dl + 'Mbps' }
     }
 
-    async function detect() {
-      var badge = document.getElementById('tier-badge')
-      badge.textContent = '⏳ Detecting...'
-      badge.setAttribute('data-tier', 'standard')
-
+    function detect() {
       var conn = navigator.connection || navigator.mozConnection || navigator.webkitConnection
 
-      // Quick OS-level checks
+      // ── INSTANT (synchronous) — show result immediately ──
       if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
         return applyResult('lite', 0, 'prefers-reduced-motion', 'os-preference', -1, conn)
       }
@@ -257,35 +253,40 @@
         return applyResult('lite', 0, 'Save-Data enabled', 'save-data', -1, conn)
       }
 
-      // Get both signals
+      // Use navigator.connection for instant result (0ms delay)
       var connResult = conn && conn.effectiveType ? tierFromConnection(conn) : null
-      var latencyMs = await measureLatency()
-      var probeResult = latencyMs >= 0 ? tierFromLatency(latencyMs) : null
-
-      var tier, motion, reason, method
-
-      if (connResult && probeResult) {
-        // Take the WORSE of the two signals
-        if (probeResult.motion <= connResult.motion) {
-          tier = probeResult.tier; motion = probeResult.motion
-          reason = probeResult.reason + ' | API: ' + connResult.reason
-          method = 'probe (downgraded from API)'
-        } else {
-          tier = connResult.tier; motion = connResult.motion
-          reason = connResult.reason + ' (probe: ' + latencyMs + 'ms)'
-          method = 'connection-api (confirmed by probe)'
-        }
-      } else if (probeResult) {
-        tier = probeResult.tier; motion = probeResult.motion
-        reason = probeResult.reason; method = 'probe-only'
-      } else if (connResult) {
-        tier = connResult.tier; motion = connResult.motion
-        reason = connResult.reason; method = 'connection-api-only'
+      if (connResult) {
+        applyResult(connResult.tier, connResult.motion, connResult.reason, 'connection-api (instant)', -1, conn)
       } else {
-        tier = 'standard'; motion = 2; reason = 'No signals'; method = 'fallback'
+        // No connection API — show standard as default
+        applyResult('standard', 2, 'Default (probing...)', 'probing', -1, conn)
       }
 
-      applyResult(tier, motion, reason, method, latencyMs, conn)
+      // ── BACKGROUND (async) — refine with latency probe, no blocking ──
+      measureLatency().then(function(latencyMs) {
+        if (latencyMs < 0) return // probe failed, keep initial result
+        var probeResult = tierFromLatency(latencyMs)
+
+        if (connResult) {
+          // Take WORSE of API + probe
+          if (probeResult.motion < connResult.motion) {
+            applyResult(probeResult.tier, probeResult.motion,
+              probeResult.reason + ' | API said: ' + connResult.reason,
+              'probe (downgraded)', latencyMs, conn)
+          } else {
+            // Probe confirms — just update the reason
+            document.getElementById('info-reason').textContent =
+              connResult.reason + ' (confirmed: ' + latencyMs + 'ms probe)'
+            document.getElementById('info-method').textContent = 'connection-api (confirmed)'
+            document.getElementById('info-speed').textContent = latencyMs + 'ms round-trip'
+            document.getElementById('info-latency').textContent = latencyMs + ' ms'
+          }
+        } else {
+          // No API — probe is our only signal
+          applyResult(probeResult.tier, probeResult.motion,
+            probeResult.reason, 'probe-only', latencyMs, conn)
+        }
+      })
     }
 
     function applyResult(tier, motion, reason, method, latencyMs, conn) {
