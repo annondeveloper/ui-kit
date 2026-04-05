@@ -255,6 +255,9 @@ const componentGroups: ComponentGroup[] = [
       { name: 'PageHeader', path: '/components/page-header' },
       { name: 'SectionHeader', path: '/components/section-header' },
       { name: 'Toolbar', path: '/components/toolbar' },
+      { name: 'StatsGrid', path: '/components/stats-grid' },
+      { name: 'CardGrid', path: '/components/card-grid' },
+      { name: 'ListLayout', path: '/components/list-layout' },
     ],
   },
 ]

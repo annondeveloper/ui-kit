@@ -183,6 +183,9 @@ const PageShellPage = lazy(() => import('./pages/components/PageShellPage'))
 const PageHeaderPage = lazy(() => import('./pages/components/PageHeaderPage'))
 const SectionHeaderPage = lazy(() => import('./pages/components/SectionHeaderPage'))
 const ToolbarPage = lazy(() => import('./pages/components/ToolbarPage'))
+const StatsGridPage = lazy(() => import('./pages/components/StatsGridPage'))
+const CardGridPage = lazy(() => import('./pages/components/CardGridPage'))
+const ListLayoutPage = lazy(() => import('./pages/components/ListLayoutPage'))
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
@@ -367,6 +370,9 @@ createRoot(document.getElementById('root')!).render(
             <Route path="components/page-header" element={<Suspense><PageHeaderPage /></Suspense>} />
             <Route path="components/section-header" element={<Suspense><SectionHeaderPage /></Suspense>} />
             <Route path="components/toolbar" element={<Suspense><ToolbarPage /></Suspense>} />
+            <Route path="components/stats-grid" element={<Suspense><StatsGridPage /></Suspense>} />
+            <Route path="components/card-grid" element={<Suspense><CardGridPage /></Suspense>} />
+            <Route path="components/list-layout" element={<Suspense><ListLayoutPage /></Suspense>} />
           </Route>
 
           {/* Embed route — rendered WITHOUT App shell (no sidebar/header) */}

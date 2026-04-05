@@ -3,6 +3,25 @@ import { z } from 'zod'
 import { loadRegistry, getComponent, searchComponents } from './registry/loader.js'
 import { logToolCall } from './analytics.js'
 
+// ─── Helpers ──────────────────────────────────────────────────────────────────
+
+function findSimilarNames(name: string, allNames: string[], limit = 5): string[] {
+  const lower = name.toLowerCase()
+  // Exact substring matches first
+  const substring = allNames.filter(n => n.toLowerCase().includes(lower) || lower.includes(n.toLowerCase()))
+  if (substring.length > 0) return substring.slice(0, limit)
+  // Levenshtein-like: sort by edit distance
+  const scored = allNames.map(n => {
+    const a = n.toLowerCase(), b = lower
+    let dist = 0
+    for (let i = 0; i < Math.max(a.length, b.length); i++) {
+      if (a[i] !== b[i]) dist++
+    }
+    return { name: n, dist }
+  }).sort((a, b) => a.dist - b.dist)
+  return scored.slice(0, limit).map(s => s.name)
+}
+
 const CSS_SETUP_NOTE = `
 > **Required CSS Setup** — Add these imports to your root layout (e.g. \`app/layout.tsx\` or \`main.tsx\`):
 > \`\`\`tsx
@@ -44,7 +63,15 @@ export function createServer() {
     try {
       logToolCall('get_component', { components: [name] })
       const comp = getComponent(name)
-      if (!comp) return { content: [{ type: 'text' as const, text: `Component "${name}" not found.` }] }
+      if (!comp) {
+        const reg = loadRegistry()
+        const allNames = Object.keys(reg.components)
+        const suggestions = findSimilarNames(name, allNames)
+        const suggestText = suggestions.length > 0
+          ? `\n\nDid you mean one of these?\n${suggestions.map(s => `- **${s}**`).join('\n')}\n\nUse \`list_components\` to see all available components.`
+          : '\n\nUse `list_components` to see all available components.'
+        return { content: [{ type: 'text' as const, text: `Component "${name}" not found.${suggestText}` }] }
+      }
 
       const propsTable = comp.props.map(p =>
         `| \`${p.name}\` | \`${p.type}\` | ${p.required ? 'Yes' : 'No'} | ${p.default || '-'} | ${p.description} |`
@@ -215,6 +242,91 @@ export function ${scenario ? scenario.replace(/[^a-zA-Z0-9]/g, '').slice(0, 30) 
     } catch (error) {
       console.error('[ui-kit-mcp]', 'get_icons', error)
       return { content: [{ type: 'text' as const, text: `Error in get_icons: ${(error as Error).message}` }], isError: true }
+    }
+  })
+
+  // Tool 7: get_started — guided setup for novice users
+  server.tool('get_started', 'Complete setup guide for new projects. Start here if you are using UI Kit for the first time.', {
+    framework: z.enum(['nextjs', 'vite', 'remix', 'cra', 'other']).optional().default('nextjs').describe('Your framework'),
+  }, async ({ framework }) => {
+    try {
+      logToolCall('get_started', { query: framework })
+
+      const layoutFile: Record<string, string> = {
+        nextjs: 'app/layout.tsx',
+        vite: 'src/main.tsx',
+        remix: 'app/root.tsx',
+        cra: 'src/index.tsx',
+        other: 'your root/entry file',
+      }
+      const file = layoutFile[framework] || layoutFile.other
+
+      const text = `# Getting Started with UI Kit
+
+## Step 1: Install
+\`\`\`bash
+npm install @annondeveloper/ui-kit
+\`\`\`
+
+## Step 2: Import CSS (⚠️ Required!)
+Add these to \`${file}\`:
+\`\`\`tsx
+import '@annondeveloper/ui-kit/css/theme.css'
+import '@annondeveloper/ui-kit/css/all.css'
+\`\`\`
+> Without CSS imports, components render correct HTML but have **no visual styling**.
+
+## Step 3: Wrap with UIProvider
+\`\`\`tsx
+import { UIProvider } from '@annondeveloper/ui-kit'
+
+export default function RootLayout({ children }) {
+  return (
+    <UIProvider mode="dark" motion={3}>
+      {children}
+    </UIProvider>
+  )
+}
+\`\`\`
+
+## Step 4: Use Components
+\`\`\`tsx
+import { Button, Card, Badge } from '@annondeveloper/ui-kit'
+
+function MyPage() {
+  return (
+    <Card>
+      <h2>Hello World</h2>
+      <Badge>New</Badge>
+      <Button variant="primary">Get Started</Button>
+    </Card>
+  )
+}
+\`\`\`
+
+## Weight Tiers
+Each component comes in 3 tiers:
+- **Lite** (\`@annondeveloper/ui-kit/lite\`) — minimal CSS-only, ~0.3KB
+- **Standard** (\`@annondeveloper/ui-kit\`) — full features, ~2KB
+- **Premium** (\`@annondeveloper/ui-kit/premium\`) — spring animations + aurora glow, ~3KB
+
+## Theming
+\`\`\`tsx
+import { generateTheme, applyTheme } from '@annondeveloper/ui-kit/theme'
+const theme = generateTheme('#6366f1', 'dark')
+applyTheme(theme)
+\`\`\`
+
+## Next Steps
+- Use \`list_components\` to browse all ${Object.keys(reg.components).length} components
+- Use \`search_components\` to find components by use-case
+- Use \`generate_snippet\` to get working code examples
+- Use \`get_theme\` to explore pre-built themes`
+
+      return { content: [{ type: 'text' as const, text }] }
+    } catch (error) {
+      console.error('[ui-kit-mcp]', 'get_started', error)
+      return { content: [{ type: 'text' as const, text: `Error: ${(error as Error).message}` }], isError: true }
     }
   })
 
