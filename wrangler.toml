@@ -1,0 +1,8 @@
+# Root wrangler.toml — delegates to workers/mcp/
+# Cloudflare runs `wrangler deploy` from the repo root, so this file
+# points to the actual worker source in workers/mcp/
+
+name = "ui-kit-mcp"
+main = "workers/mcp/src/worker.ts"
+compatibility_date = "2024-12-01"
+compatibility_flags = ["nodejs_compat"]
