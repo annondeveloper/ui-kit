@@ -29,6 +29,26 @@ export function UIProvider({
     injectCSS(oklchFallbackStyles.id, oklchFallbackStyles.css)
   }, [])
 
+  // Warn if component CSS is not loaded (catches missing CSS import)
+  useEffect(() => {
+    if (typeof document === 'undefined') return
+    // Check for a sentinel property set by theme.css or all.css
+    const root = document.documentElement
+    const styles = getComputedStyle(root)
+    const hasBrand = styles.getPropertyValue('--brand').trim()
+    const hasBg = styles.getPropertyValue('--bg-base').trim()
+    if (!hasBrand && !hasBg) {
+      console.warn(
+        '[ui-kit] Component styles not detected. Did you import the CSS?\n\n' +
+        '  Add to your root layout:\n' +
+        "    import '@annondeveloper/ui-kit/css/theme.css'\n" +
+        "    import '@annondeveloper/ui-kit/css/all.css'\n\n" +
+        '  Or use the CLI: npx @annondeveloper/ui-kit init\n' +
+        '  Docs: https://github.com/annondeveloper/ui-kit#setup'
+      )
+    }
+  }, [])
+
   // Apply theme tokens if provided
   useEffect(() => {
     if (theme) applyTheme(theme)

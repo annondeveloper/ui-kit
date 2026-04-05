@@ -3,6 +3,14 @@ import { z } from 'zod'
 import { loadRegistry, getComponent, searchComponents } from './registry/loader.js'
 import { logToolCall } from './analytics.js'
 
+const CSS_SETUP_NOTE = `
+> **Required CSS Setup** — Add these imports to your root layout (e.g. \`app/layout.tsx\` or \`main.tsx\`):
+> \`\`\`tsx
+> import '@annondeveloper/ui-kit/css/theme.css'
+> import '@annondeveloper/ui-kit/css/all.css'
+> \`\`\`
+> Without these imports, components will render with correct HTML/ARIA but no visual styling.`
+
 export function createServer() {
   const reg = loadRegistry()
   const server = new McpServer({
@@ -22,7 +30,7 @@ export function createServer() {
       if (category) components = components.filter(c => c.category === category)
       if (tier) components = components.filter(c => c.tier.includes(tier))
       const list = components.map(c => `- **${c.name}** (${c.category}) — ${c.description}\n  Import: \`${c.importStatement}\``)
-      return { content: [{ type: 'text' as const, text: `# Components (${components.length})\n\n${list.join('\n\n')}` }] }
+      return { content: [{ type: 'text' as const, text: `# Components (${components.length})\n\n${CSS_SETUP_NOTE}\n\n${list.join('\n\n')}` }] }
     } catch (error) {
       console.error('[ui-kit-mcp]', 'list_components', error)
       return { content: [{ type: 'text' as const, text: `Error in list_components: ${(error as Error).message}` }], isError: true }
@@ -67,7 +75,9 @@ ${comp.accessibility}
 ## Related Components
 ${comp.relatedComponents.join(', ') || 'None'}
 
-**Category:** ${comp.category} | **Tiers:** ${comp.tier.join(', ')}`
+**Category:** ${comp.category} | **Tiers:** ${comp.tier.join(', ')}
+
+${CSS_SETUP_NOTE}`
 
       return { content: [{ type: 'text' as const, text }] }
     } catch (error) {
@@ -143,7 +153,11 @@ ${comp.relatedComponents.join(', ') || 'None'}
 
       const indent = '        '
       const snippet = jsxParts.join(`\n${indent}`)
-      const code = `${imports}
+      const code = `// Required CSS imports — add to your root layout:
+// import '@annondeveloper/ui-kit/css/theme.css'
+// import '@annondeveloper/ui-kit/css/all.css'
+
+${imports}
 import { UIProvider } from '@annondeveloper/ui-kit'
 
 export function ${scenario ? scenario.replace(/[^a-zA-Z0-9]/g, '').slice(0, 30) || 'Example' : 'Example'}() {

@@ -1,4 +1,4 @@
-import { copyFileSync, existsSync, mkdirSync } from 'fs'
+import { copyFileSync, existsSync, mkdirSync, readFileSync, writeFileSync } from 'fs'
 import { join, resolve, dirname } from 'path'
 import { fileURLToPath } from 'url'
 import { componentRegistry } from './registry.js'
@@ -74,9 +74,62 @@ function init(flags: string[]) {
     console.log('Theme CSS not found in dist. Import from @annondeveloper/ui-kit/css/theme.css instead.')
   }
 
-  console.log('\nSetup:')
-  console.log('  import { UIProvider } from "@annondeveloper/ui-kit"')
-  console.log('  // Wrap your app: <UIProvider><App /></UIProvider>')
+  // Try to auto-detect and patch root layout file
+  const layoutCandidates = [
+    join(target, 'app', 'layout.tsx'),        // Next.js App Router
+    join(target, 'app', 'layout.jsx'),
+    join(target, 'src', 'app', 'layout.tsx'),  // Next.js with src/
+    join(target, 'src', 'app', 'layout.jsx'),
+    join(target, 'src', 'main.tsx'),           // Vite/CRA
+    join(target, 'src', 'main.jsx'),
+    join(target, 'src', 'index.tsx'),
+    join(target, 'src', 'index.jsx'),
+  ]
+
+  const cssImportLine = "import '@annondeveloper/ui-kit/css/all.css'"
+  const themeImportLine = "import '@annondeveloper/ui-kit/css/theme.css'"
+
+  let patched = false
+  for (const candidate of layoutCandidates) {
+    if (existsSync(candidate)) {
+      const content = readFileSync(candidate, 'utf-8')
+      if (!content.includes('@annondeveloper/ui-kit/css')) {
+        const lines = content.split('\n')
+        // Find last import line to insert after
+        let lastImportIdx = -1
+        for (let i = 0; i < lines.length; i++) {
+          if (lines[i].startsWith('import ')) lastImportIdx = i
+        }
+        const insertIdx = lastImportIdx >= 0 ? lastImportIdx + 1 : 0
+        lines.splice(insertIdx, 0, themeImportLine, cssImportLine)
+        writeFileSync(candidate, lines.join('\n'))
+        console.log(`\u2713 Added CSS imports to ${candidate}`)
+        patched = true
+      } else {
+        console.log(`\u2713 CSS imports already present in ${candidate}`)
+        patched = true
+      }
+      break
+    }
+  }
+
+  if (!patched) {
+    console.log('\n\u26a0\ufe0f  Could not auto-detect root layout. Add these imports manually:')
+  }
+
+  console.log('\n\u2500\u2500 Setup \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500')
+  console.log('')
+  console.log('  1. Import CSS (required for styling):')
+  console.log(`     ${themeImportLine}`)
+  console.log(`     ${cssImportLine}`)
+  console.log('')
+  console.log('  2. Wrap your app with UIProvider:')
+  console.log('     import { UIProvider } from "@annondeveloper/ui-kit"')
+  console.log('     <UIProvider><App /></UIProvider>')
+  console.log('')
+  console.log('  3. Start using components:')
+  console.log('     import { Button, Card } from "@annondeveloper/ui-kit"')
+  console.log('')
 }
 
 function runAdd(argv: string[]) {
