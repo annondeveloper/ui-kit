@@ -809,7 +809,7 @@ export default {
 
       // Patch the transport to write to our stream instead of Node response
       const originalSend = transport.send?.bind(transport)
-      if (originalSend) {
+      if (typeof originalSend === 'function') {
         transport.send = async (message: unknown) => {
           await writer.write(encoder.encode(`data: ${JSON.stringify(message)}\n\n`))
         }

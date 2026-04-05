@@ -7,6 +7,11 @@
     "build:worker": "node scripts/bundle-registry.js"
   },
   "devDependencies": {
-    "wrangler": "^4.0.0"
+    "@cloudflare/workers-types": "^4.20260405.1",
+    "@modelcontextprotocol/sdk": "^1.29.0",
+    "@types/node": "^25.5.2",
+    "typescript": "^6.0.2",
+    "wrangler": "^4.0.0",
+    "zod": "^4.3.6"
   }
 }
