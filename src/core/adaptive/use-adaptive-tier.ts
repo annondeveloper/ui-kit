@@ -132,9 +132,50 @@ export function detectAdaptiveTier(): AdaptiveResult {
 }
 
 /**
+ * Measure actual download speed by fetching a small resource.
+ * This works with DevTools throttling (unlike navigator.connection).
+ * Returns measured Mbps, or -1 if probe fails.
+ */
+async function measureActualSpeed(): Promise<{ mbps: number; latencyMs: number }> {
+  try {
+    // Fetch a small cacheable resource with cache-bust to measure real speed
+    // Use a 1x1 transparent GIF data URL approach — generate a ~1KB payload
+    const probeUrl = `${window.location.origin}/favicon.ico?_probe=${Date.now()}`
+    const start = performance.now()
+    const response = await fetch(probeUrl, { cache: 'no-store', mode: 'no-cors' })
+    // Even with no-cors/opaque response, the timing tells us latency
+    const elapsed = performance.now() - start
+
+    // Try to get actual size from response
+    let bytes = 1024 // assume ~1KB if we can't read
+    try {
+      const blob = await response.blob()
+      bytes = blob.size || 1024
+    } catch { /* opaque response, use estimate */ }
+
+    const bitsPerSecond = (bytes * 8) / (elapsed / 1000)
+    const mbps = bitsPerSecond / 1_000_000
+
+    return { mbps: Math.round(mbps * 100) / 100, latencyMs: Math.round(elapsed) }
+  } catch {
+    return { mbps: -1, latencyMs: -1 }
+  }
+}
+
+function tierFromMeasuredSpeed(mbps: number): AdaptiveResult {
+  if (mbps >= 2) return { tier: 'premium', motion: 3, confidence: 'high', reason: `Measured: ${mbps} Mbps` }
+  if (mbps >= 0.5) return { tier: 'standard', motion: 2, confidence: 'high', reason: `Measured: ${mbps} Mbps` }
+  if (mbps >= 0.1) return { tier: 'standard', motion: 1, confidence: 'high', reason: `Measured slow: ${mbps} Mbps` }
+  return { tier: 'lite', motion: 0, confidence: 'high', reason: `Measured very slow: ${mbps} Mbps` }
+}
+
+/**
  * React hook for adaptive tier detection.
- * Runs detection on mount (per-page), locks tier for the page lifecycle.
- * Returns { tier, motion, confidence, reason }
+ *
+ * Strategy:
+ * 1. Synchronous initial detection via navigator.connection + performance timing
+ * 2. Async refinement via actual speed probe (catches DevTools throttling, VPNs, etc.)
+ * 3. Locks tier for the page lifecycle after refinement
  */
 export function useAdaptiveTier(override?: AdaptiveTier): AdaptiveResult {
   const [result, setResult] = useState<AdaptiveResult>(() => {
@@ -145,11 +186,37 @@ export function useAdaptiveTier(override?: AdaptiveTier): AdaptiveResult {
     return detectAdaptiveTier()
   })
 
-  // Re-detect on mount (handles client-side navigation / new page loads)
+  // Async speed probe for refinement — catches DevTools throttling
   useEffect(() => {
     if (override) return
-    const detected = detectAdaptiveTier()
-    setResult(detected)
+    if (typeof window === 'undefined') return
+
+    let cancelled = false
+
+    // Start with synchronous detection
+    const initial = detectAdaptiveTier()
+    setResult(initial)
+
+    // Then refine with actual measurement
+    measureActualSpeed().then(({ mbps }) => {
+      if (cancelled) return
+      if (mbps < 0) return // probe failed, keep initial detection
+
+      const refined = tierFromMeasuredSpeed(mbps)
+
+      // Only downgrade, never upgrade from initial
+      // This prevents a premium page from flickering to lite
+      // But if the measured speed is slower, we should respect it
+      if (refined.motion < initial.motion) {
+        setResult(refined)
+      }
+      // If measured speed confirms or upgrades, keep it
+      else {
+        setResult(prev => ({ ...prev, confidence: 'high', reason: `${prev.reason} (confirmed: ${mbps} Mbps)` }))
+      }
+    })
+
+    return () => { cancelled = true }
   }, [override])
 
   // Log detection result in development

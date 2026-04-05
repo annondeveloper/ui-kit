@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Adaptive Tier Test — @annondeveloper/ui-kit</title>
   <style>
-    /* Total CSS: ~3KB — loads instantly even on GPRS */
     :root {
       --bg: #0f0f14;
       --bg-card: #1a1a24;
@@ -17,91 +16,52 @@
       --danger: #ef4444;
       --radius: 12px;
     }
-
     * { box-sizing: border-box; margin: 0; }
-
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      padding: 1.5rem;
-      max-width: 600px;
-      margin: 0 auto;
-      line-height: 1.5;
+      background: var(--bg); color: var(--text);
+      padding: 1.5rem; max-width: 600px; margin: 0 auto; line-height: 1.5;
     }
-
     h1 { font-size: 1.5rem; font-weight: 800; margin-bottom: 0.5rem; }
     h2 { font-size: 1rem; font-weight: 600; margin: 1.5rem 0 0.75rem; color: var(--text-dim); }
     p { color: var(--text-dim); font-size: 0.875rem; margin-bottom: 1rem; }
-
     .card {
-      background: var(--bg-card);
-      border: 1px solid rgba(255,255,255,0.06);
-      border-radius: var(--radius);
-      padding: 1.25rem;
-      margin-bottom: 1rem;
+      background: var(--bg-card); border: 1px solid rgba(255,255,255,0.06);
+      border-radius: var(--radius); padding: 1.25rem; margin-bottom: 1rem;
     }
-
     .tier-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.375rem;
-      padding: 0.375rem 1rem;
-      border-radius: 999px;
-      font-size: 0.8125rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
+      display: inline-flex; align-items: center; gap: 0.375rem;
+      padding: 0.375rem 1rem; border-radius: 999px;
+      font-size: 0.8125rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em;
     }
     .tier-badge[data-tier="lite"] { background: rgba(16,185,129,0.15); color: #10b981; }
     .tier-badge[data-tier="standard"] { background: rgba(59,130,246,0.15); color: #3b82f6; }
     .tier-badge[data-tier="premium"] { background: rgba(139,92,246,0.15); color: #8b5cf6; }
-
     .info-row {
-      display: flex;
-      justify-content: space-between;
-      padding: 0.5rem 0;
-      border-bottom: 1px solid rgba(255,255,255,0.04);
-      font-size: 0.8125rem;
+      display: flex; justify-content: space-between; padding: 0.5rem 0;
+      border-bottom: 1px solid rgba(255,255,255,0.04); font-size: 0.8125rem;
     }
     .info-row:last-child { border-bottom: none; }
     .info-label { color: var(--text-dim); }
     .info-value { color: var(--text); font-weight: 600; font-family: 'SF Mono', monospace; }
-
-    /* Demo components — visual tier differences */
     .demo-button {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.5rem;
-      padding: 0.625rem 1.25rem;
-      border: none;
-      border-radius: 8px;
-      font-size: 0.875rem;
-      font-weight: 600;
-      cursor: pointer;
-      background: var(--brand);
-      color: white;
-      margin: 0.25rem;
+      display: inline-flex; align-items: center; gap: 0.5rem;
+      padding: 0.625rem 1.25rem; border: none; border-radius: 8px;
+      font-size: 0.875rem; font-weight: 600; cursor: pointer;
+      background: var(--brand); color: white; margin: 0.25rem;
     }
-
     .demo-card-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-      gap: 0.75rem;
-      margin: 0.75rem 0;
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+      gap: 0.75rem; margin: 0.75rem 0;
     }
-
     .demo-metric {
-      background: var(--bg-card);
-      border: 1px solid rgba(255,255,255,0.06);
-      border-radius: 8px;
-      padding: 1rem;
-      text-align: center;
+      background: var(--bg-card); border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 8px; padding: 1rem; text-align: center;
     }
     .demo-metric-value { font-size: 1.5rem; font-weight: 800; }
     .demo-metric-label { font-size: 0.6875rem; color: var(--text-dim); margin-top: 0.25rem; }
 
-    /* Tier-specific visual treatments */
+    /* Premium effects */
     [data-tier="premium"] .demo-button {
       box-shadow: 0 0 20px rgba(99,102,241,0.4);
       transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease;
@@ -114,71 +74,69 @@
       box-shadow: 0 0 24px rgba(99,102,241,0.08);
       transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
     }
-    [data-tier="premium"] .demo-metric:hover {
-      transform: translateY(-4px);
-    }
+    [data-tier="premium"] .demo-metric:hover { transform: translateY(-4px); }
     [data-tier="premium"] .card {
       border-color: rgba(99,102,241,0.15);
       box-shadow: 0 0 32px rgba(99,102,241,0.06);
     }
 
-    [data-tier="standard"] .demo-button {
-      transition: background 0.2s ease, transform 0.2s ease;
-    }
-    [data-tier="standard"] .demo-button:hover {
-      transform: translateY(-1px);
-    }
-    [data-tier="standard"] .demo-metric {
-      transition: box-shadow 0.2s ease;
-    }
+    /* Standard effects */
+    [data-tier="standard"] .demo-button { transition: transform 0.2s ease; }
+    [data-tier="standard"] .demo-button:hover { transform: translateY(-1px); }
+    [data-tier="standard"] .demo-metric { transition: box-shadow 0.2s ease; }
 
+    /* Lite — no effects */
     [data-tier="lite"] .demo-button { transition: none; }
     [data-tier="lite"] .demo-metric { transition: none; }
     [data-tier="lite"] .card { border-color: rgba(255,255,255,0.04); }
 
     .btn-row { display: flex; gap: 0.5rem; flex-wrap: wrap; margin: 1rem 0; }
     .override-btn {
-      padding: 0.5rem 1rem;
-      border: 1px solid rgba(255,255,255,0.1);
-      border-radius: 8px;
-      background: transparent;
-      color: var(--text-dim);
-      font-size: 0.75rem;
-      cursor: pointer;
+      padding: 0.5rem 1rem; border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 8px; background: transparent; color: var(--text-dim);
+      font-size: 0.75rem; cursor: pointer;
     }
     .override-btn:hover { border-color: var(--brand); color: var(--brand); }
     .override-btn.active { background: var(--brand); color: white; border-color: var(--brand); }
-
+    .progress-bar {
+      height: 4px; background: rgba(255,255,255,0.06); border-radius: 2px;
+      margin: 0.75rem 0; overflow: hidden;
+    }
+    .progress-bar-fill {
+      height: 100%; background: var(--brand); border-radius: 2px;
+      transition: width 0.3s ease;
+    }
     .timestamp { font-size: 0.6875rem; color: var(--text-dim); text-align: center; margin-top: 1.5rem; }
   </style>
 </head>
 <body>
   <div id="app" data-tier="standard">
     <h1>Adaptive Tier Test</h1>
-    <p>This page is ~4KB total (HTML+CSS+JS). It loads instantly on any connection and demonstrates bandwidth-adaptive rendering.</p>
+    <p>This page measures your actual connection speed by downloading a small probe. DevTools throttling works correctly with this approach.</p>
 
     <div class="card">
-      <div class="tier-badge" id="tier-badge" data-tier="standard">Detecting...</div>
-      <div style="margin-top: 1rem;">
+      <div class="tier-badge" id="tier-badge" data-tier="standard">⏳ Measuring speed...</div>
+      <div class="progress-bar"><div class="progress-bar-fill" id="probe-progress" style="width: 0%"></div></div>
+      <div style="margin-top: 0.75rem;">
         <div class="info-row">
           <span class="info-label">Detected Tier</span>
-          <span class="info-value" id="info-tier">—</span>
+          <span class="info-value" id="info-tier">measuring...</span>
         </div>
         <div class="info-row">
           <span class="info-label">Motion Level</span>
           <span class="info-value" id="info-motion">—</span>
         </div>
         <div class="info-row">
-          <span class="info-label">Connection Type</span>
-          <span class="info-value" id="info-type">—</span>
+          <span class="info-label">Measured Speed</span>
+          <span class="info-value" id="info-speed">measuring...</span>
         </div>
         <div class="info-row">
-          <span class="info-label">Downlink</span>
-          <span class="info-value" id="info-downlink">—</span>
+          <span class="info-label">Probe Latency</span>
+          <span class="info-value" id="info-latency">—</span>
         </div>
         <div class="info-row">
-          <span class="info-label">RTT</span>
-          <span class="info-value" id="info-rtt">—</span>
+          <span class="info-label">navigator.connection</span>
+          <span class="info-value" id="info-conn">—</span>
         </div>
         <div class="info-row">
           <span class="info-label">Save-Data</span>
@@ -189,21 +147,21 @@
           <span class="info-value" id="info-reason">—</span>
         </div>
         <div class="info-row">
-          <span class="info-label">Detection Time</span>
-          <span class="info-value" id="info-time">—</span>
+          <span class="info-label">Detection Method</span>
+          <span class="info-value" id="info-method">—</span>
         </div>
       </div>
     </div>
 
     <h2>Manual Override</h2>
     <div class="btn-row">
-      <button class="override-btn" onclick="setTier('lite')">Lite (motion 0)</button>
-      <button class="override-btn" onclick="setTier('standard')">Standard (motion 2)</button>
-      <button class="override-btn" onclick="setTier('premium')">Premium (motion 3)</button>
-      <button class="override-btn" onclick="detect()">Re-detect</button>
+      <button class="override-btn" onclick="setTier('lite')">🪶 Lite</button>
+      <button class="override-btn" onclick="setTier('standard')">⚡ Standard</button>
+      <button class="override-btn" onclick="setTier('premium')">✨ Premium</button>
+      <button class="override-btn" onclick="detect()">🔄 Re-detect</button>
     </div>
 
-    <h2>Demo Components</h2>
+    <h2>Demo Components — hover to see tier effects</h2>
     <div class="demo-card-grid">
       <div class="demo-metric">
         <div class="demo-metric-value">1,284</div>
@@ -230,93 +188,132 @@
     </div>
 
     <div class="card">
-      <h2 style="margin-top: 0">How to Test</h2>
-      <p>On mobile: switch between WiFi and cellular, or enable Data Saver mode.</p>
-      <p>On desktop: Chrome DevTools → Network → Throttle to GPRS/2G/3G and reload.</p>
-      <p><strong>Premium:</strong> Cards glow, buttons have spring hover, metrics lift on hover.</p>
-      <p><strong>Standard:</strong> Subtle transitions on hover.</p>
-      <p><strong>Lite:</strong> No effects — instant, static rendering.</p>
+      <h2 style="margin-top: 0">How This Works</h2>
+      <p><strong>Real speed measurement:</strong> Downloads a small image probe and measures actual throughput. Unlike navigator.connection, this reflects DevTools throttling, VPNs, and real network conditions.</p>
+      <p><strong>Premium:</strong> Cards glow purple, buttons spring-hover with scale, metrics lift on hover.</p>
+      <p><strong>Standard:</strong> Subtle CSS transitions on hover.</p>
+      <p><strong>Lite:</strong> Zero effects — everything instant and static. Fastest possible render.</p>
     </div>
 
     <div class="timestamp" id="timestamp"></div>
   </div>
 
   <script>
-    // Adaptive tier detection — same logic as useAdaptiveTier.ts
-    function detect() {
-      const start = performance.now()
+    // ─── Speed Probe: measure actual download speed ───────────────────
+    // Downloads a small resource and measures how long it takes.
+    // This works with DevTools throttling (unlike navigator.connection).
+
+    async function measureSpeed() {
+      const progress = document.getElementById('probe-progress')
+      progress.style.width = '30%'
+
+      try {
+        // Use a cache-busted fetch of this page itself as a probe
+        // The page is ~12KB — enough to measure, small enough for GPRS
+        const probeUrl = window.location.href + '?probe=' + Date.now()
+        const start = performance.now()
+        const response = await fetch(probeUrl, { cache: 'no-store' })
+        const blob = await response.blob()
+        const elapsed = performance.now() - start
+        const bytes = blob.size
+        const bitsPerSecond = (bytes * 8) / (elapsed / 1000)
+        const mbps = bitsPerSecond / 1_000_000
+
+        progress.style.width = '100%'
+
+        return {
+          mbps: Math.round(mbps * 100) / 100,
+          latencyMs: Math.round(elapsed),
+          bytes: bytes,
+          method: 'speed-probe'
+        }
+      } catch (e) {
+        progress.style.width = '100%'
+        return { mbps: -1, latencyMs: -1, bytes: 0, method: 'probe-failed' }
+      }
+    }
+
+    // ─── Tier Detection ──────────────────────────────────────────────
+
+    async function detect() {
+      const badge = document.getElementById('tier-badge')
+      badge.textContent = '⏳ Measuring speed...'
+      badge.setAttribute('data-tier', 'standard')
+
       const conn = navigator.connection || navigator.mozConnection || navigator.webkitConnection
-      let tier = 'standard', motion = 2, reason = 'default'
 
-      // Check reduced motion preference
+      // Quick checks first (no network needed)
       if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-        tier = 'lite'; motion = 0; reason = 'prefers-reduced-motion'
+        return applyResult('lite', 0, 'prefers-reduced-motion', 'os-preference', null, conn)
       }
-      // Check Save-Data
-      else if (conn && conn.saveData) {
-        tier = 'lite'; motion = 0; reason = 'Save-Data enabled'
+      if (conn && conn.saveData) {
+        return applyResult('lite', 0, 'Save-Data enabled', 'save-data', null, conn)
       }
-      // Check connection type
-      else if (conn && conn.effectiveType) {
-        const type = conn.effectiveType
-        const downlink = conn.downlink || 10
-        const rtt = conn.rtt || 50
 
-        if (type === 'slow-2g' || type === '2g') {
-          tier = 'lite'; motion = 0; reason = 'Slow: ' + type
-        } else if (type === '3g' && downlink < 0.5) {
-          tier = 'standard'; motion = 1; reason = 'Slow 3G: ' + downlink + 'Mbps'
-        } else if (type === '3g') {
-          tier = 'standard'; motion = 2; reason = '3G: ' + downlink + 'Mbps'
-        } else if (downlink >= 1 || rtt < 100) {
-          tier = 'premium'; motion = 3; reason = 'Fast: ' + downlink + 'Mbps, ' + rtt + 'ms RTT'
-        } else if (downlink >= 0.4) {
-          tier = 'standard'; motion = 2; reason = 'Moderate: ' + downlink + 'Mbps'
-        } else {
-          tier = 'standard'; motion = 1; reason = 'Slow 4G: ' + downlink + 'Mbps'
+      // Measure actual speed
+      const speed = await measureSpeed()
+
+      if (speed.mbps < 0) {
+        // Probe failed — fall back to navigator.connection
+        if (conn && conn.effectiveType) {
+          const type = conn.effectiveType
+          if (type === 'slow-2g' || type === '2g') return applyResult('lite', 0, 'Connection API: ' + type, 'connection-api', speed, conn)
+          if (type === '3g') return applyResult('standard', 2, 'Connection API: 3G', 'connection-api', speed, conn)
+          return applyResult('premium', 3, 'Connection API: ' + type, 'connection-api', speed, conn)
         }
-      }
-      // Fallback: performance timing
-      else {
-        const nav = performance.getEntriesByType('navigation')[0]
-        if (nav) {
-          const ttfb = nav.responseStart - nav.requestStart
-          if (ttfb < 800) { tier = 'premium'; motion = 3; reason = 'TTFB: ' + Math.round(ttfb) + 'ms' }
-          else if (ttfb < 2000) { tier = 'standard'; motion = 2; reason = 'TTFB: ' + Math.round(ttfb) + 'ms' }
-          else { tier = 'lite'; motion = 0; reason = 'Slow TTFB: ' + Math.round(ttfb) + 'ms' }
-        }
+        return applyResult('standard', 2, 'Could not measure speed', 'fallback', speed, conn)
       }
 
-      const elapsed = (performance.now() - start).toFixed(1)
+      // Classify based on ACTUAL measured speed
+      let tier, motion, reason
+      if (speed.mbps >= 2) {
+        tier = 'premium'; motion = 3
+        reason = 'Fast: ' + speed.mbps + ' Mbps'
+      } else if (speed.mbps >= 0.5) {
+        tier = 'standard'; motion = 2
+        reason = 'Moderate: ' + speed.mbps + ' Mbps'
+      } else if (speed.mbps >= 0.1) {
+        tier = 'standard'; motion = 1
+        reason = 'Slow: ' + speed.mbps + ' Mbps'
+      } else {
+        tier = 'lite'; motion = 0
+        reason = 'Very slow: ' + speed.mbps + ' Mbps'
+      }
 
-      // Apply
+      // Cross-reference with connection API if available
+      if (conn && (conn.effectiveType === 'slow-2g' || conn.effectiveType === '2g')) {
+        tier = 'lite'; motion = 0
+        reason += ' (confirmed by connection API: ' + conn.effectiveType + ')'
+      }
+
+      applyResult(tier, motion, reason, speed.method, speed, conn)
+    }
+
+    function applyResult(tier, motion, reason, method, speed, conn) {
       setTier(tier)
 
-      // Update info
       document.getElementById('info-tier').textContent = tier
       document.getElementById('info-motion').textContent = motion
-      document.getElementById('info-type').textContent = conn ? (conn.effectiveType || 'unknown') : 'API unavailable'
-      document.getElementById('info-downlink').textContent = conn ? (conn.downlink + ' Mbps') : '—'
-      document.getElementById('info-rtt').textContent = conn ? (conn.rtt + ' ms') : '—'
+      document.getElementById('info-speed').textContent = speed ? (speed.mbps >= 0 ? speed.mbps + ' Mbps' : 'failed') : 'skipped'
+      document.getElementById('info-latency').textContent = speed ? (speed.latencyMs >= 0 ? speed.latencyMs + ' ms' : '—') : '—'
+      document.getElementById('info-conn').textContent = conn ? (conn.effectiveType + ' / ' + (conn.downlink || '?') + ' Mbps / ' + (conn.rtt || '?') + 'ms RTT') : 'unavailable'
       document.getElementById('info-savedata').textContent = conn ? (conn.saveData ? 'Yes' : 'No') : '—'
       document.getElementById('info-reason').textContent = reason
-      document.getElementById('info-time').textContent = elapsed + 'ms'
+      document.getElementById('info-method').textContent = method
 
       const badge = document.getElementById('tier-badge')
-      badge.textContent = (tier === 'premium' ? '✨ ' : tier === 'standard' ? '⚡ ' : '🪶 ') + tier.toUpperCase()
+      const icon = tier === 'premium' ? '✨' : tier === 'standard' ? '⚡' : '🪶'
+      badge.textContent = icon + ' ' + tier.toUpperCase()
       badge.setAttribute('data-tier', tier)
     }
 
     function setTier(tier) {
       document.getElementById('app').setAttribute('data-tier', tier)
-      // Update active button
-      document.querySelectorAll('.override-btn').forEach(b => b.classList.remove('active'))
     }
 
-    // Run detection on load
+    // Run on load
     detect()
-    document.getElementById('timestamp').textContent =
-      'Page loaded: ' + new Date().toLocaleTimeString() + ' | Page size: ~4KB'
+    document.getElementById('timestamp').textContent = 'Page loaded: ' + new Date().toLocaleTimeString()
   </script>
 </body>
 </html>
