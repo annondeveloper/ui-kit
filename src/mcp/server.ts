@@ -30,6 +30,56 @@ const CSS_SETUP_NOTE = `
 > \`\`\`
 > Without these imports, components will render with correct HTML/ARIA but no visual styling.`
 
+const DESIGN_GUIDE = `
+## Design Best Practices
+
+### Layout Pattern
+Always wrap pages with \`<PageShell>\` and use layout primitives:
+\`\`\`tsx
+<PageShell padding="lg" maxWidth="xl">
+  <PageHeader title="..." />
+  {/* content sections */}
+</PageShell>
+\`\`\`
+
+### Spacing Rules
+- Use layout components (PageShell, SectionHeader, Toolbar) — they handle spacing automatically
+- Never add manual margins between layout components — they have built-in spacing
+- Use \`gap\` prop on StatsGrid/CardGrid, not CSS gaps
+
+### Responsive Design
+- All layout components are responsive by default — no media queries needed
+- CardGrid/StatsGrid use CSS Grid auto-fit — they reflow automatically
+- PageHeader stacks on narrow viewports via container queries
+- Toolbar wraps on mobile automatically
+
+### Color & Theme
+- Always use semantic color tokens: \`var(--text-primary)\`, \`var(--bg-surface)\`, \`var(--brand)\`
+- Never use hardcoded hex colors — they break in light mode and high contrast
+- Use \`generateTheme('#hex')\` to create a brand theme from any color
+
+### Typography
+- Titles: use PageHeader/SectionHeader — they handle fluid sizing with clamp()
+- Body text: system default is optimized; use \`text-wrap: pretty\` for paragraphs
+- Don't override font sizes — the design system handles responsive scaling
+
+### Motion
+- All components respect \`prefers-reduced-motion\` automatically
+- Use \`motion\` prop (0-3) to control animation intensity
+- Premium tier adds spring physics and aurora effects
+
+### Accessibility (built-in)
+- All components ship with WCAG AA contrast, ARIA attributes, keyboard navigation
+- Use semantic HTML: \`PageHeader\` renders \`<header>\`, \`Toolbar\` has \`role="toolbar"\`
+- Focus management is handled automatically for dialogs, dropdowns, popovers
+
+### Common Patterns
+- **Dashboard**: PageShell > PageHeader > StatsGrid > SectionHeader > CardGrid
+- **Settings**: PageShell > PageHeader > SectionHeader > Card > ListLayout > FormInputs
+- **List view**: PageShell > PageHeader > Toolbar > ListLayout > Pagination
+- **Detail view**: PageShell > PageHeader (with breadcrumbs) > CardGrid > PropertyList
+`
+
 export function createServer() {
   const reg = loadRegistry()
   const server = new McpServer({
@@ -104,7 +154,9 @@ ${comp.relatedComponents.join(', ') || 'None'}
 
 **Category:** ${comp.category} | **Tiers:** ${comp.tier.join(', ')}
 
-${CSS_SETUP_NOTE}`
+${CSS_SETUP_NOTE}
+
+${DESIGN_GUIDE}`
 
       return { content: [{ type: 'text' as const, text }] }
     } catch (error) {
