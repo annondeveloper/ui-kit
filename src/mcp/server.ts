@@ -330,6 +330,341 @@ applyTheme(theme)
     }
   })
 
+  // Tool 8: get_page_template — full page scaffolds with proper layout
+  server.tool('get_page_template', 'Get a complete, working page scaffold with proper layout and spacing. Returns production-ready code.', {
+    template: z.enum([
+      'dashboard', 'settings', 'list', 'detail', 'empty', 'auth', 'landing'
+    ]).describe('Page template type'),
+    tier: z.enum(['standard', 'lite', 'premium']).optional().default('standard').describe('Component tier'),
+  }, async ({ template, tier }) => {
+    try {
+      logToolCall('get_page_template', { query: `${template}-${tier}` })
+
+      const importPath = tier === 'lite'
+        ? '@annondeveloper/ui-kit/lite'
+        : tier === 'premium'
+          ? '@annondeveloper/ui-kit/premium'
+          : '@annondeveloper/ui-kit'
+
+      const templates: Record<string, string> = {
+        dashboard: `// Dashboard Page — stats overview + content sections
+import '@annondeveloper/ui-kit/css/theme.css'
+import '@annondeveloper/ui-kit/css/all.css'
+import {
+  PageShell, PageHeader, StatsGrid, SectionHeader,
+  CardGrid, Card, Toolbar, ListLayout
+} from '${importPath}'
+import { MetricCard } from '${importPath}'
+import { Button } from '${importPath}'
+import { SearchInput } from '${importPath}'
+import { Badge } from '${importPath}'
+import { UIProvider } from '@annondeveloper/ui-kit'
+
+export default function DashboardPage() {
+  return (
+    <UIProvider>
+      <PageShell padding="lg" maxWidth="xl">
+        <PageHeader
+          title="Dashboard"
+          description="Overview of your system status and metrics"
+          actions={<Button variant="primary">Create New</Button>}
+        />
+
+        <StatsGrid columns={4}>
+          <MetricCard label="Total Users" value={1284} trend={12} status="ok" />
+          <MetricCard label="Active Now" value={42} status="ok" />
+          <MetricCard label="Errors" value={3} status="critical" />
+          <MetricCard label="Uptime" value="99.9%" status="ok" />
+        </StatsGrid>
+
+        <Toolbar justify="between">
+          <SearchInput placeholder="Search..." />
+          <div style={{ display: 'flex', gap: '0.5rem' }}>
+            <Button variant="secondary" size="sm">Filter</Button>
+            <Button variant="secondary" size="sm">Export</Button>
+          </div>
+        </Toolbar>
+
+        <SectionHeader title="Recent Activity" action={<Button variant="ghost" size="sm">View All</Button>} />
+        <ListLayout dividers>
+          <div>Activity item 1 <Badge>New</Badge></div>
+          <div>Activity item 2</div>
+          <div>Activity item 3</div>
+        </ListLayout>
+
+        <SectionHeader title="Quick Actions" />
+        <CardGrid columns={3}>
+          <Card padding="md"><h3>Reports</h3><p>Generate and view reports</p></Card>
+          <Card padding="md"><h3>Settings</h3><p>Configure your workspace</p></Card>
+          <Card padding="md"><h3>Team</h3><p>Manage team members</p></Card>
+        </CardGrid>
+      </PageShell>
+    </UIProvider>
+  )
+}`,
+
+        settings: `// Settings Page — form sections with save actions
+import '@annondeveloper/ui-kit/css/theme.css'
+import '@annondeveloper/ui-kit/css/all.css'
+import { PageShell, PageHeader, SectionHeader, Card, ListLayout } from '${importPath}'
+import { FormInput } from '${importPath}'
+import { Button } from '${importPath}'
+import { ToggleSwitch } from '${importPath}'
+import { UIProvider } from '@annondeveloper/ui-kit'
+
+export default function SettingsPage() {
+  return (
+    <UIProvider>
+      <PageShell padding="lg" maxWidth="md">
+        <PageHeader title="Settings" description="Manage your account preferences" />
+
+        <SectionHeader title="Profile" />
+        <Card padding="md">
+          <ListLayout gap="md">
+            <FormInput label="Display Name" placeholder="Your name" />
+            <FormInput label="Email" type="email" placeholder="you@example.com" />
+            <FormInput label="Bio" placeholder="Tell us about yourself" />
+          </ListLayout>
+        </Card>
+
+        <SectionHeader title="Notifications" />
+        <Card padding="md">
+          <ListLayout gap="md">
+            <ToggleSwitch label="Email notifications" />
+            <ToggleSwitch label="Push notifications" />
+            <ToggleSwitch label="Weekly digest" />
+          </ListLayout>
+        </Card>
+
+        <div style={{ display: 'flex', gap: '0.75rem', justifyContent: 'flex-end' }}>
+          <Button variant="secondary">Cancel</Button>
+          <Button variant="primary">Save Changes</Button>
+        </div>
+      </PageShell>
+    </UIProvider>
+  )
+}`,
+
+        list: `// List Page — searchable, filterable list of items
+import '@annondeveloper/ui-kit/css/theme.css'
+import '@annondeveloper/ui-kit/css/all.css'
+import { PageShell, PageHeader, Toolbar, ListLayout, Card } from '${importPath}'
+import { SearchInput } from '${importPath}'
+import { Button } from '${importPath}'
+import { Badge } from '${importPath}'
+import { Pagination } from '${importPath}'
+import { UIProvider } from '@annondeveloper/ui-kit'
+
+export default function ListPage() {
+  return (
+    <UIProvider>
+      <PageShell padding="lg" maxWidth="lg">
+        <PageHeader
+          title="Devices"
+          description="Manage your connected devices"
+          actions={<Button variant="primary">Add Device</Button>}
+        />
+
+        <Toolbar justify="between">
+          <SearchInput placeholder="Search devices..." />
+          <Button variant="secondary" size="sm">Filters</Button>
+        </Toolbar>
+
+        <ListLayout dividers>
+          {/* Repeat for each item */}
+          <Card padding="md" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div>
+              <strong>Device Name</strong>
+              <p style={{ margin: 0, color: 'var(--text-secondary)' }}>192.168.1.100</p>
+            </div>
+            <Badge color="success">Online</Badge>
+          </Card>
+        </ListLayout>
+
+        <Pagination total={50} pageSize={10} />
+      </PageShell>
+    </UIProvider>
+  )
+}`,
+
+        detail: `// Detail Page — single item view with metadata
+import '@annondeveloper/ui-kit/css/theme.css'
+import '@annondeveloper/ui-kit/css/all.css'
+import { PageShell, PageHeader, SectionHeader, Card, CardGrid } from '${importPath}'
+import { Button } from '${importPath}'
+import { Badge } from '${importPath}'
+import { PropertyList } from '${importPath}'
+import { UIProvider } from '@annondeveloper/ui-kit'
+
+export default function DetailPage() {
+  return (
+    <UIProvider>
+      <PageShell padding="lg" maxWidth="lg">
+        <PageHeader
+          title="Device: Core Router"
+          description="Detailed view of device status and configuration"
+          breadcrumbs={<span>Devices &gt; Core Router</span>}
+          actions={
+            <div style={{ display: 'flex', gap: '0.5rem' }}>
+              <Button variant="secondary">Edit</Button>
+              <Button variant="danger">Delete</Button>
+            </div>
+          }
+        />
+
+        <CardGrid columns={2}>
+          <Card padding="md">
+            <SectionHeader title="Status" size="sm" />
+            <Badge color="success" size="lg">Online</Badge>
+          </Card>
+          <Card padding="md">
+            <SectionHeader title="Uptime" size="sm" />
+            <p style={{ fontSize: '2rem', fontWeight: 700, margin: 0 }}>99.9%</p>
+          </Card>
+        </CardGrid>
+
+        <SectionHeader title="Properties" />
+        <Card padding="md">
+          <PropertyList items={[
+            { label: 'IP Address', value: '192.168.1.1' },
+            { label: 'MAC Address', value: 'AA:BB:CC:DD:EE:FF' },
+            { label: 'Firmware', value: 'v3.2.1' },
+          ]} />
+        </Card>
+      </PageShell>
+    </UIProvider>
+  )
+}`,
+
+        empty: `// Empty State Page — when no data exists yet
+import '@annondeveloper/ui-kit/css/theme.css'
+import '@annondeveloper/ui-kit/css/all.css'
+import { PageShell, PageHeader } from '${importPath}'
+import { EmptyState } from '${importPath}'
+import { Button } from '${importPath}'
+import { UIProvider } from '@annondeveloper/ui-kit'
+
+export default function EmptyPage() {
+  return (
+    <UIProvider>
+      <PageShell padding="lg" maxWidth="md">
+        <PageHeader title="Devices" />
+        <EmptyState
+          title="No devices yet"
+          description="Add your first device to start monitoring your infrastructure."
+          action={<Button variant="primary">Add Device</Button>}
+          icon="server"
+        />
+      </PageShell>
+    </UIProvider>
+  )
+}`,
+
+        auth: `// Auth Page — centered login/signup form
+import '@annondeveloper/ui-kit/css/theme.css'
+import '@annondeveloper/ui-kit/css/all.css'
+import { PageShell, Card } from '${importPath}'
+import { FormInput } from '${importPath}'
+import { Button } from '${importPath}'
+import { UIProvider } from '@annondeveloper/ui-kit'
+
+export default function AuthPage() {
+  return (
+    <UIProvider>
+      <PageShell padding="lg" maxWidth="sm" style={{ minBlockSize: '100vh', justifyContent: 'center' }}>
+        <Card padding="lg">
+          <h1 style={{ textAlign: 'center', marginBlockEnd: '1.5rem' }}>Sign In</h1>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+            <FormInput label="Email" type="email" placeholder="you@example.com" />
+            <FormInput label="Password" type="password" placeholder="Your password" />
+            <Button variant="primary" style={{ inlineSize: '100%' }}>Sign In</Button>
+          </div>
+          <p style={{ textAlign: 'center', marginBlockStart: '1rem', color: 'var(--text-secondary)' }}>
+            Don't have an account? <a href="/signup">Sign up</a>
+          </p>
+        </Card>
+      </PageShell>
+    </UIProvider>
+  )
+}`,
+
+        landing: `// Landing Page — hero + features + CTA
+import '@annondeveloper/ui-kit/css/theme.css'
+import '@annondeveloper/ui-kit/css/all.css'
+import { PageShell, CardGrid, Card, SectionHeader } from '${importPath}'
+import { Button } from '${importPath}'
+import { Icon } from '@annondeveloper/ui-kit'
+import { UIProvider } from '@annondeveloper/ui-kit'
+
+export default function LandingPage() {
+  return (
+    <UIProvider>
+      <PageShell padding="lg" maxWidth="xl">
+        <header style={{ textAlign: 'center', paddingBlock: '4rem' }}>
+          <h1 style={{ fontSize: 'clamp(2rem, 5vw, 3.5rem)', fontWeight: 800, marginBlockEnd: '1rem' }}>
+            Build Beautiful Dashboards
+          </h1>
+          <p style={{ fontSize: '1.125rem', color: 'var(--text-secondary)', maxInlineSize: '50ch', marginInline: 'auto' }}>
+            Zero-dependency React component library with 150+ components,
+            physics-based animations, and Aurora Fluid design.
+          </p>
+          <div style={{ display: 'flex', gap: '0.75rem', justifyContent: 'center', marginBlockStart: '2rem' }}>
+            <Button variant="primary" size="lg">Get Started</Button>
+            <Button variant="secondary" size="lg">View Demo</Button>
+          </div>
+        </header>
+
+        <SectionHeader title="Features" />
+        <CardGrid columns={3}>
+          <Card padding="lg">
+            <Icon name="layers" size="lg" />
+            <h3>3 Weight Tiers</h3>
+            <p>Lite, Standard, Premium — choose your bundle budget.</p>
+          </Card>
+          <Card padding="lg">
+            <Icon name="zap" size="lg" />
+            <h3>Physics Animations</h3>
+            <p>Real spring solver, not approximations.</p>
+          </Card>
+          <Card padding="lg">
+            <Icon name="palette" size="lg" />
+            <h3>OKLCH Colors</h3>
+            <p>Perceptually uniform, theme from any brand color.</p>
+          </Card>
+        </CardGrid>
+      </PageShell>
+    </UIProvider>
+  )
+}`,
+      }
+
+      const code = templates[template] || 'Template not found.'
+      const text = `# Page Template: ${template}
+
+Tier: **${tier}**
+
+\`\`\`tsx
+${code}
+\`\`\`
+
+## Layout Components Used
+- \`PageShell\` — page container with padding and max-width
+- \`PageHeader\` — title + description + actions
+- \`SectionHeader\` — section dividers with optional actions
+- \`StatsGrid\` — responsive metric card grid
+- \`CardGrid\` — responsive card layout
+- \`Toolbar\` — search/filter/action bar
+- \`ListLayout\` — vertical list with dividers
+
+${CSS_SETUP_NOTE}`
+
+      return { content: [{ type: 'text' as const, text }] }
+    } catch (error) {
+      console.error('[ui-kit-mcp]', 'get_page_template', error)
+      return { content: [{ type: 'text' as const, text: `Error: ${(error as Error).message}` }], isError: true }
+    }
+  })
+
   // Resources: component://
   server.resource('component', new ResourceTemplate('component://{name}', {
     list: async () => ({

@@ -327,9 +327,9 @@ describe('MCP Server integration', () => {
   // =========================================================================
 
   describe('server creation', () => {
-    it('registers all 7 tools', () => {
+    it('registers all 8 tools', () => {
       const srv = server as unknown as MockServer
-      expect(srv._registeredTools.size).toBe(7)
+      expect(srv._registeredTools.size).toBe(8)
       expect(srv._registeredTools.has('list_components')).toBe(true)
       expect(srv._registeredTools.has('get_component')).toBe(true)
       expect(srv._registeredTools.has('search_components')).toBe(true)
@@ -337,6 +337,7 @@ describe('MCP Server integration', () => {
       expect(srv._registeredTools.has('get_theme')).toBe(true)
       expect(srv._registeredTools.has('get_icons')).toBe(true)
       expect(srv._registeredTools.has('get_started')).toBe(true)
+      expect(srv._registeredTools.has('get_page_template')).toBe(true)
     })
 
     it('registers the component resource', () => {
