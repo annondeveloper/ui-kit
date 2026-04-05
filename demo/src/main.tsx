@@ -179,6 +179,10 @@ const DashboardTemplatePage = lazy(() => import('./pages/components/DashboardTem
 const PluginDashboardPage = lazy(() => import('./pages/components/PluginDashboardPage'))
 const ContainerQueryPage = lazy(() => import('./pages/components/ContainerQueryPage'))
 const SuccessCheckmarkPage = lazy(() => import('./pages/components/SuccessCheckmarkPage'))
+const PageShellPage = lazy(() => import('./pages/components/PageShellPage'))
+const PageHeaderPage = lazy(() => import('./pages/components/PageHeaderPage'))
+const SectionHeaderPage = lazy(() => import('./pages/components/SectionHeaderPage'))
+const ToolbarPage = lazy(() => import('./pages/components/ToolbarPage'))
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
@@ -359,6 +363,10 @@ createRoot(document.getElementById('root')!).render(
             <Route path="components/plugin-dashboard" element={<Suspense><PluginDashboardPage /></Suspense>} />
             <Route path="components/container-query" element={<Suspense><ContainerQueryPage /></Suspense>} />
             <Route path="components/success-checkmark" element={<Suspense><SuccessCheckmarkPage /></Suspense>} />
+            <Route path="components/page-shell" element={<Suspense><PageShellPage /></Suspense>} />
+            <Route path="components/page-header" element={<Suspense><PageHeaderPage /></Suspense>} />
+            <Route path="components/section-header" element={<Suspense><SectionHeaderPage /></Suspense>} />
+            <Route path="components/toolbar" element={<Suspense><ToolbarPage /></Suspense>} />
           </Route>
 
           {/* Embed route — rendered WITHOUT App shell (no sidebar/header) */}

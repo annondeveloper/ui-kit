@@ -251,6 +251,10 @@ const componentGroups: ComponentGroup[] = [
       { name: 'Spoiler', path: '/components/spoiler' },
       { name: 'Affix', path: '/components/affix' },
       { name: 'AvatarUpload', path: '/components/avatar-upload' },
+      { name: 'PageShell', path: '/components/page-shell' },
+      { name: 'PageHeader', path: '/components/page-header' },
+      { name: 'SectionHeader', path: '/components/section-header' },
+      { name: 'Toolbar', path: '/components/toolbar' },
     ],
   },
 ]
