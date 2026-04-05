@@ -1,6 +1,6 @@
 'use client'
 
-import { useRef, useCallback, type MouseEvent, type ReactElement } from 'react'
+import { useRef, useCallback, type ReactElement } from 'react'
 import { CSVExportButton as BaseCSVExportButton, type CSVExportButtonProps } from '../domain/csv-export'
 import { useMotionLevel } from '../core/motion/use-motion-level'
 import { useEntrance } from '../core/motion/use-entrance'
@@ -20,15 +20,31 @@ const premiumCSVExportStyles = css`
       /* Shared premium effects */
       ${sharedPremiumCSS}
 
-      /* Success particle burst */
-      .ui-premium-csv-export__particle {
+      /* CSS-only particle burst via box-shadow animation */
+      :scope[data-burst="true"]::before {
+        content: '';
         position: absolute;
-        inline-size: 3px;
-        block-size: 3px;
-        border-radius: var(--radius-full, 9999px);
-        background: oklch(75% 0.2 150);
+        inset: 0;
+        border-radius: inherit;
         pointer-events: none;
         z-index: 3;
+        animation: ui-premium-csv-burst 0.5s ease-out forwards;
+      }
+      @keyframes ui-premium-csv-burst {
+        0% {
+          box-shadow:
+            0 0 0 oklch(75% 0.2 150),
+            0 0 0 oklch(75% 0.2 180),
+            0 0 0 oklch(75% 0.2 210);
+          opacity: 1;
+        }
+        100% {
+          box-shadow:
+            -15px -20px 0 oklch(75% 0.2 150),
+            15px -18px 0 oklch(75% 0.2 180),
+            0px 22px 0 oklch(75% 0.2 210);
+          opacity: 0;
+        }
       }
       /* Ripple on click */
       .ui-premium-csv-export__ripple {
@@ -81,34 +97,17 @@ export function CSVExportButton({
       wrapperRef.current.setAttribute('data-success', 'true')
       setTimeout(() => wrapperRef.current?.removeAttribute('data-success'), 600)
 
-      // Spawn particles at motion 3
+      // Particle burst at motion 3 — CSS-only via class toggle
       if (motionLevel >= 3) {
-        const el = wrapperRef.current
-        const rect = el.getBoundingClientRect()
-        const cx = rect.width / 2
-        const cy = rect.height / 2
-        for (let i = 0; i < 6; i++) {
-          const p = document.createElement('span')
-          p.className = 'ui-premium-csv-export__particle'
-          const angle = (Math.PI * 2 / 6) * i
-          const dist = 25 + Math.random() * 15
-          p.style.left = `${cx}px`
-          p.style.top = `${cy}px`
-          p.style.transition = 'transform 0.4s ease-out, opacity 0.4s ease-out'
-          p.style.opacity = '1'
-          el.appendChild(p)
-          p.getBoundingClientRect()
-          p.style.transform = `translate(${Math.cos(angle) * dist}px, ${Math.sin(angle) * dist}px)`
-          p.style.opacity = '0'
-          p.addEventListener('transitionend', () => p.remove(), { once: true })
-        }
+        wrapperRef.current.setAttribute('data-burst', 'true')
+        setTimeout(() => wrapperRef.current?.removeAttribute('data-burst'), 500)
       }
     }
     onExport?.()
   }, [motionLevel, onExport])
 
   return (
-    <div ref={wrapperRef} className="ui-premium-csv-export" data-motion={motionLevel}>
+    <div ref={wrapperRef} className="ui-premium-csv-export" data-motion={motionLevel} style={{ display: 'contents' }}>
       <BaseCSVExportButton motion={motionProp} onExport={handleExport} {...rest} />
     </div>
   )

@@ -43,7 +43,7 @@ export const Toolbar = forwardRef<HTMLDivElement, ToolbarProps>((props, ref) => 
   useStyles('premium-toolbar', premiumToolbarStyles)
 
   return (
-    <div ref={wrapperRef} className="ui-premium-toolbar">
+    <div ref={wrapperRef} className="ui-premium-toolbar" style={{ display: 'contents' }}>
       <BaseToolbar ref={ref} {...props} />
     </div>
   )

@@ -102,7 +102,7 @@ export const Avatar = forwardRef<HTMLDivElement, PremiumAvatarProps>(
     useStyles('premium-avatar', premiumAvatarStyles)
 
     return (
-      <span className="ui-premium-avatar" data-motion={motionLevel}>
+      <span className="ui-premium-avatar" data-motion={motionLevel} style={{ display: 'contents' }}>
         <BaseAvatar ref={ref} {...rest} />
       </span>
     )

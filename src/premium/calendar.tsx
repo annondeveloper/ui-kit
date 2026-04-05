@@ -55,7 +55,7 @@ export const Calendar = forwardRef<HTMLDivElement, CalendarProps>(
     useStyles('premium-calendar', premiumStyles)
 
     return (
-      <div className="ui-premium-calendar" data-motion={motionLevel}>
+      <div className="ui-premium-calendar" data-motion={motionLevel} style={{ display: 'contents' }}>
         <BaseCalendar ref={ref} motion={motionProp} {...rest} />
       </div>
     )

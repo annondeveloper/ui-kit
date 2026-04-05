@@ -120,7 +120,7 @@ export function Tabs({
   }, [onChange, updateIndicator])
 
   return (
-    <div ref={wrapperRef} className="ui-premium-tabs" data-motion={motionLevel}>
+    <div ref={wrapperRef} className="ui-premium-tabs" data-motion={motionLevel} style={{ display: 'contents' }}>
       {motionLevel >= 2 && (
         <div ref={indicatorRef} className="ui-premium-tabs__indicator" style={{ opacity: 0 }} />
       )}

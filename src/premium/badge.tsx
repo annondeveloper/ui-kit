@@ -83,7 +83,7 @@ export const Badge = forwardRef<HTMLSpanElement, BadgeProps>(
     useStyles('premium-badge', premiumBadgeStyles)
 
     return (
-      <span className="ui-premium-badge" data-motion={motionLevel}>
+      <span className="ui-premium-badge" data-motion={motionLevel} style={{ display: 'contents' }}>
         <BaseBadge ref={ref} motion={motionProp} {...rest} />
       </span>
     )

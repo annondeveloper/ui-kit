@@ -127,7 +127,7 @@ function analyzeFile(path: string): {
   const wrapperMatch = content.match(/className\s*=\s*["']ui-premium-\w+["']/)
   if (wrapperMatch) {
     // Check if it uses display:contents (no extra DOM impact)
-    if (/display:\s*contents/.test(content)) {
+    if (/display:\s*['"]?contents['"]?/.test(content)) {
       domDetail = 'Premium wrapper with display:contents (no layout impact)'
     } else {
       addsExtraDOM = true

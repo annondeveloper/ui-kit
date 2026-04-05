@@ -63,7 +63,7 @@ export function Tour({ motion: motionProp, ...rest }: TourProps): ReactElement {
   useStyles('premium-tour', premiumTourStyles)
 
   return (
-    <div className="ui-premium-tour" data-motion={motionLevel}>
+    <div className="ui-premium-tour" data-motion={motionLevel} style={{ display: 'contents' }}>
       <BaseTour motion={motionProp} {...rest} />
     </div>
   )

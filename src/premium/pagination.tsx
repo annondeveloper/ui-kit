@@ -96,7 +96,7 @@ export const Pagination = forwardRef<HTMLElement, PaginationProps>(
     useStyles('premium-pagination', premiumPaginationStyles)
 
     return (
-      <span className="ui-premium-pagination" data-motion={motionLevel}>
+      <span className="ui-premium-pagination" data-motion={motionLevel} style={{ display: 'contents' }}>
         <BasePagination ref={ref} motion={motionProp} {...rest} />
       </span>
     )

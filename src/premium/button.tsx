@@ -126,7 +126,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>((props, ref) =>
   }, [motionLevel, props.onClick, spawnParticles])
 
   return (
-    <div ref={wrapperRef} className="ui-premium-button" onMouseMove={handleMouseMove}>
+    <div ref={wrapperRef} className="ui-premium-button" onMouseMove={handleMouseMove} style={{ display: 'contents' }}>
       <BaseButton ref={ref} {...props} onClick={handleClick} />
     </div>
   )

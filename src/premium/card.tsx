@@ -96,6 +96,7 @@ export const Card = forwardRef<HTMLElement, CardProps>((props, ref) => {
       className="ui-premium-card"
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
+      style={{ display: 'contents' }}
     >
       <BaseCard ref={ref} {...props} />
     </div>

@@ -92,7 +92,7 @@ export function Sparkline({ motion: motionProp, ...rest }: SparklineProps): Reac
   useStyles('premium-sparkline', premiumSparklineStyles)
 
   return (
-    <div className="ui-premium-sparkline" data-motion={motionLevel}>
+    <div className="ui-premium-sparkline" data-motion={motionLevel} style={{ display: 'contents' }}>
       <BaseSparkline motion={motionProp} {...rest} />
     </div>
   )

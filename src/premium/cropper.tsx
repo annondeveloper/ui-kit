@@ -67,7 +67,7 @@ export const Cropper = forwardRef<HTMLDivElement, CropperProps>(
     useStyles('premium-cropper', premiumCropperStyles)
 
     return (
-      <div ref={ref} className="ui-premium-cropper" data-motion={motionLevel}>
+      <div ref={ref} className="ui-premium-cropper" data-motion={motionLevel} style={{ display: 'contents' }}>
         <BaseCropper motion={motionProp} {...rest} />
       </div>
     )

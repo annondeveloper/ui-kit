@@ -117,7 +117,7 @@ export const Carousel = forwardRef<HTMLDivElement, CarouselProps>(
     useStyles('premium-carousel', premiumCarouselStyles)
 
     return (
-      <div className="ui-premium-carousel" data-motion={motionLevel}>
+      <div className="ui-premium-carousel" data-motion={motionLevel} style={{ display: 'contents' }}>
         <BaseCarousel ref={ref} motion={motionProp} {...rest} />
       </div>
     )

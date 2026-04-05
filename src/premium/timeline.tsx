@@ -107,7 +107,7 @@ export const Timeline = forwardRef<HTMLDivElement, TimelineProps>(
     useStyles('premium-timeline', premiumTimelineStyles)
 
     return (
-      <div className="ui-premium-timeline" data-motion={motionLevel}>
+      <div className="ui-premium-timeline" data-motion={motionLevel} style={{ display: 'contents' }}>
         <BaseTimeline ref={ref} motion={motionProp} {...rest} />
       </div>
     )

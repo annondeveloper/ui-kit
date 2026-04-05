@@ -48,7 +48,7 @@ export const Chip = forwardRef<HTMLLabelElement, ChipProps>(
     useStyles('premium-chip', premiumStyles)
 
     return (
-      <span className="ui-premium-chip" data-motion={motionLevel}>
+      <span className="ui-premium-chip" data-motion={motionLevel} style={{ display: 'contents' }}>
         <BaseChip ref={ref} motion={motionProp} {...rest} />
       </span>
     )

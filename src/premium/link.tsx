@@ -93,7 +93,7 @@ export const Link = forwardRef<HTMLAnchorElement, LinkProps>(
     useStyles('premium-link', premiumLinkStyles)
 
     return (
-      <span className="ui-premium-link" data-motion={motionLevel}>
+      <span className="ui-premium-link" data-motion={motionLevel} style={{ display: 'contents' }}>
         <BaseLink ref={ref} motion={motionProp} {...rest} />
       </span>
     )

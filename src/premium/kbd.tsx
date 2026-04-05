@@ -103,7 +103,7 @@ export const Kbd = forwardRef<HTMLElement, KbdProps>(
     useStyles('premium-kbd', premiumKbdStyles)
 
     return (
-      <span className="ui-premium-kbd" data-motion={motionLevel}>
+      <span className="ui-premium-kbd" data-motion={motionLevel} style={{ display: 'contents' }}>
         <BaseKbd ref={ref} motion={motionProp} {...rest} />
       </span>
     )
