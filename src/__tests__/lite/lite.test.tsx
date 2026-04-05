@@ -180,7 +180,7 @@ describe('Lite tier components', () => {
   describe('ToggleSwitch', () => {
     it('renders with correct className', () => {
       render(<ToggleSwitch label="Dark mode" />)
-      const wrapper = screen.getByText('Dark mode').closest('.ui-lite-toggle')
+      const wrapper = screen.getByText('Dark mode').closest('.ui-lite-toggle-switch')
       expect(wrapper).toBeTruthy()
     })
 
