@@ -8,6 +8,8 @@ import { oklchFallbackStyles } from '../core/styles/fallbacks'
 import { injectCSS } from '../core/styles/dom-injector'
 import { useAdaptiveTier, type AdaptiveTier } from '../core/adaptive/use-adaptive-tier'
 import { AdaptiveProvider } from '../core/adaptive/adaptive-context'
+import { adaptiveStyles, ADAPTIVE_CSS_ID } from '../core/adaptive/adaptive-css'
+import { AdaptiveDevOverlay } from '../core/adaptive/dev-overlay'
 
 export interface UIProviderProps {
   children: ReactNode
@@ -35,7 +37,7 @@ export function UIProvider({
   motion = 3,
   density = 'default',
   onModeChange,
-  adaptive = false,
+  adaptive = true,
 }: UIProviderProps): ReactElement {
   // Adaptive tier detection — runs per-page, non-blocking
   const adaptiveOverride = typeof adaptive === 'string' ? adaptive : undefined
@@ -48,6 +50,13 @@ export function UIProvider({
   useEffect(() => {
     injectCSS(oklchFallbackStyles.id, oklchFallbackStyles.css)
   }, [])
+
+  // Inject adaptive CSS layer when adaptive mode is active
+  useEffect(() => {
+    if (isAdaptive) {
+      injectCSS(ADAPTIVE_CSS_ID, adaptiveStyles.css)
+    }
+  }, [isAdaptive])
 
   // Warn if component CSS is not loaded (catches missing CSS import)
   useEffect(() => {
@@ -92,6 +101,7 @@ export function UIProvider({
               data-adaptive-tier={isAdaptive ? adaptiveResult.tier : undefined}
             >
               {children}
+              {isAdaptive && process.env.NODE_ENV === 'development' && <AdaptiveDevOverlay />}
             </div>
           </AdaptiveProvider>
         </DensityProvider>
