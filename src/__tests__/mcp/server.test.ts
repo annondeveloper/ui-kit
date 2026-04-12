@@ -327,9 +327,9 @@ describe('MCP Server integration', () => {
   // =========================================================================
 
   describe('server creation', () => {
-    it('registers all 8 tools', () => {
+    it('registers all 9 tools', () => {
       const srv = server as unknown as MockServer
-      expect(srv._registeredTools.size).toBe(8)
+      expect(srv._registeredTools.size).toBe(9)
       expect(srv._registeredTools.has('list_components')).toBe(true)
       expect(srv._registeredTools.has('get_component')).toBe(true)
       expect(srv._registeredTools.has('search_components')).toBe(true)
@@ -338,6 +338,7 @@ describe('MCP Server integration', () => {
       expect(srv._registeredTools.has('get_icons')).toBe(true)
       expect(srv._registeredTools.has('get_started')).toBe(true)
       expect(srv._registeredTools.has('get_page_template')).toBe(true)
+      expect(srv._registeredTools.has('get_adaptive_info')).toBe(true)
     })
 
     it('registers the component resource', () => {
@@ -652,6 +653,68 @@ describe('MCP Server integration', () => {
     it('includes usage syntax for each icon', async () => {
       const text = await callTool(server, 'get_icons', { search: 'search' })
       expect(text).toContain('<Icon name="search" />')
+    })
+  })
+
+  // =========================================================================
+  // get_adaptive_info
+  // =========================================================================
+
+  describe('get_adaptive_info', () => {
+    it('returns comprehensive adaptive system documentation', async () => {
+      const text = await callTool(server, 'get_adaptive_info', {})
+      expect(text).toContain('# Adaptive Tier Rendering')
+      expect(text).toContain('navigator.connection')
+      expect(text).toContain('Ctrl+Shift+A')
+      expect(text).toContain('adaptive={false}')
+      expect(text).toContain('Zero layout shift')
+    })
+
+    it('explains all three tiers', async () => {
+      const text = await callTool(server, 'get_adaptive_info', {})
+      expect(text).toContain('Premium (fast)')
+      expect(text).toContain('Standard (moderate)')
+      expect(text).toContain('Lite (slow)')
+    })
+
+    it('includes override instructions', async () => {
+      const text = await callTool(server, 'get_adaptive_info', {})
+      expect(text).toContain('<UIProvider adaptive={false} motion={3}>')
+      expect(text).toContain('<UIProvider tier="lite">')
+    })
+
+    it('includes testing instructions', async () => {
+      const text = await callTool(server, 'get_adaptive_info', {})
+      expect(text).toContain('Chrome DevTools')
+      expect(text).toContain('Slow 3G')
+      expect(text).toContain('Dev Overlay')
+    })
+  })
+
+  // =========================================================================
+  // get_component adaptive behavior section
+  // =========================================================================
+
+  describe('get_component adaptive behavior', () => {
+    it('includes adaptive behavior section in component docs', async () => {
+      const text = await callTool(server, 'get_component', { name: 'Button' })
+      expect(text).toContain('## Adaptive Behavior')
+      expect(text).toContain('spring animations, aurora glow, shimmer effects')
+      expect(text).toContain('CSS transitions, subtle shadows')
+      expect(text).toContain('instant render, no animations, minimal effects')
+      expect(text).toContain('zero layout shift')
+    })
+  })
+
+  // =========================================================================
+  // get_started adaptive mention
+  // =========================================================================
+
+  describe('get_started adaptive mention', () => {
+    it('mentions adaptive rendering as a built-in feature', async () => {
+      const text = await callTool(server, 'get_started', { framework: 'nextjs' })
+      expect(text).toContain('Adaptive Rendering')
+      expect(text).toContain('get_adaptive_info')
     })
   })
 

@@ -152,6 +152,13 @@ ${comp.accessibility}
 ## Related Components
 ${comp.relatedComponents.join(', ') || 'None'}
 
+## Adaptive Behavior
+This component automatically adjusts based on network bandwidth:
+- **Premium** (fast): spring animations, aurora glow, shimmer effects
+- **Standard** (moderate): CSS transitions, subtle shadows
+- **Lite** (slow): instant render, no animations, minimal effects
+Layout is identical across all tiers — zero layout shift.
+
 **Category:** ${comp.category} | **Tiers:** ${comp.tier.join(', ')}
 
 ${CSS_SETUP_NOTE}
@@ -370,11 +377,25 @@ const theme = generateTheme('#6366f1', 'dark')
 applyTheme(theme)
 \`\`\`
 
+## Adaptive Rendering (built-in)
+UI Kit automatically detects network bandwidth and adjusts component rendering:
+- **Fast connection** → Premium tier: spring physics, aurora glow, shimmer effects
+- **Moderate connection** → Standard tier: CSS transitions, subtle shadows
+- **Slow connection** → Lite tier: instant render, no animations, minimal effects
+
+This is **ON by default** — no configuration needed. Override with:
+\`\`\`tsx
+<UIProvider adaptive={false} motion={3}>
+\`\`\`
+
+Use \`get_adaptive_info\` to learn more about testing and customization.
+
 ## Next Steps
 - Use \`list_components\` to browse all ${Object.keys(reg.components).length} components
 - Use \`search_components\` to find components by use-case
 - Use \`generate_snippet\` to get working code examples
-- Use \`get_theme\` to explore pre-built themes`
+- Use \`get_theme\` to explore pre-built themes
+- Use \`get_adaptive_info\` to learn about bandwidth-adaptive rendering`
 
       return { content: [{ type: 'text' as const, text }] }
     } catch (error) {
@@ -715,6 +736,81 @@ ${CSS_SETUP_NOTE}`
     } catch (error) {
       console.error('[ui-kit-mcp]', 'get_page_template', error)
       return { content: [{ type: 'text' as const, text: `Error: ${(error as Error).message}` }], isError: true }
+    }
+  })
+
+  // Tool 9: get_adaptive_info — explain bandwidth-adaptive tier rendering
+  server.tool('get_adaptive_info', 'Learn about automatic bandwidth-adaptive tier rendering', {}, async () => {
+    try {
+      logToolCall('get_adaptive_info', {})
+
+      const text = `# Adaptive Tier Rendering
+
+UI Kit automatically detects the user's network bandwidth and adjusts every component's visual fidelity in real time. This is **ON by default** — zero configuration required.
+
+## How It Works
+
+1. **Detection** — On mount, \`<UIProvider>\` probes bandwidth using \`navigator.connection\` (Network Information API) plus a small latency probe (~1 KB fetch). The result is classified into one of three tiers.
+2. **Tier Assignment** — The detected tier is stored in React context and applied as a \`data-tier\` attribute on the root element, enabling both JS and CSS to respond.
+3. **Live Updates** — If network conditions change (e.g., user switches from Wi-Fi to cellular), the tier updates automatically via the \`change\` event on \`navigator.connection\`.
+
+## What Changes Between Tiers
+
+| Aspect | Premium (fast) | Standard (moderate) | Lite (slow) |
+|--------|---------------|--------------------|-|
+| **Animations** | Spring physics (real differential equation solver) | CSS transitions (\`transition\` property) | Instant / no animation |
+| **Visual effects** | Aurora glow, shimmer, glassmorphism | Subtle box-shadow, opacity | Flat surfaces, no effects |
+| **Motion intensity** | \`--motion: 3\` (cinematic) | \`--motion: 1\` (subtle) | \`--motion: 0\` (none) |
+| **Layout** | Identical | Identical | Identical |
+| **Accessibility** | Full ARIA + keyboard | Full ARIA + keyboard | Full ARIA + keyboard |
+
+**Zero layout shift** — only visual fidelity changes. Layout, spacing, and content are identical across all tiers.
+
+## How to Test
+
+1. **Chrome DevTools** — Open Network tab → select "Slow 3G" or "Fast 3G" throttling preset → reload. Components will render in the corresponding tier.
+2. **Dev Overlay** — Press \`Ctrl+Shift+A\` (or \`Cmd+Shift+A\` on macOS) in development mode to toggle the adaptive tier overlay, which shows the current detected tier and bandwidth.
+3. **Force a tier** — Use the \`tier\` prop on \`<UIProvider>\`:
+\`\`\`tsx
+<UIProvider tier="lite">   {/* Force lite tier */}
+<UIProvider tier="premium"> {/* Force premium tier */}
+\`\`\`
+
+## How to Override
+
+Disable adaptive rendering entirely and lock to a specific motion level:
+\`\`\`tsx
+<UIProvider adaptive={false} motion={3}>
+  {/* Always premium-level motion, regardless of bandwidth */}
+</UIProvider>
+\`\`\`
+
+Or control per-component:
+\`\`\`tsx
+<Button motion={0} />  {/* This button never animates */}
+<Card motion={3} />     {/* This card always uses full physics */}
+\`\`\`
+
+## API Summary
+
+| Prop / API | Description |
+|-----------|-------------|
+| \`<UIProvider adaptive={true|false}>\` | Enable/disable adaptive detection (default: \`true\`) |
+| \`<UIProvider tier="lite|standard|premium">\` | Force a specific tier |
+| \`<UIProvider motion={0|1|2|3}>\` | Set motion intensity (overrides adaptive) |
+| \`navigator.connection\` | Browser API used for bandwidth detection |
+| \`data-tier\` attribute | Set on root element for CSS-based tier styling |
+| \`Ctrl+Shift+A\` | Toggle dev overlay showing current tier |
+
+## Related
+- Use \`get_started\` for initial setup
+- Use \`get_component\` to see per-component adaptive behavior
+- Each component's docs include an **Adaptive Behavior** section`
+
+      return { content: [{ type: 'text' as const, text }] }
+    } catch (error) {
+      console.error('[ui-kit-mcp]', 'get_adaptive_info', error)
+      return { content: [{ type: 'text' as const, text: `Error in get_adaptive_info: ${(error as Error).message}` }], isError: true }
     }
   })
 

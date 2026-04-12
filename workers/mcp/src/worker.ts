@@ -1,7 +1,7 @@
 /**
  * Cloudflare Worker — hosted MCP server for @annondeveloper/ui-kit
  *
- * Provides the same 8 MCP tools as the local server but accessible via
+ * Provides the same 9 MCP tools as the local server but accessible via
  * HTTP SSE transport from anywhere. No Node.js required on the client.
  *
  * Endpoints:
@@ -655,6 +655,232 @@ ${CSS_SETUP_NOTE}`
     return { content: [{ type: 'text' as const, text }] }
   })
 
+  // Tool 9: get_adaptive_info
+  server.tool('get_adaptive_info', 'Explains the adaptive tier system — how UI Kit auto-detects network conditions and switches between lite/standard/premium tiers.', {
+    section: z.enum(['overview', 'detection', 'css', 'testing', 'api']).optional().default('overview').describe('Which section to return'),
+  }, async ({ section }) => {
+    const sections: Record<string, string> = {
+      overview: `# Adaptive Tier System
+
+UI Kit automatically detects client network conditions and renders the optimal weight tier:
+
+| Tier | When | Motion | Effects |
+|------|------|--------|---------|
+| **Premium** | 4G, downlink > 1Mbps, RTT < 100ms | 3 (cinematic) | Spring physics, aurora glow, shimmer |
+| **Standard** | 3G decent bandwidth, moderate connections | 2 (expressive) | Full features, CSS transitions |
+| **Lite** | 2G, slow-2g, Save-Data header, very slow | 0 (none) | Minimal CSS-only, no animations |
+
+## How It Works
+1. **Synchronous detection** — checks \`navigator.connection\` API + performance timing on mount
+2. **Async refinement** — probes actual round-trip latency (catches DevTools throttling, VPNs)
+3. **Locks tier** for the page lifecycle after refinement
+4. Sets \`data-adaptive-tier\` attribute on root element for CSS-level tier switching
+
+## Quick Setup
+\`\`\`tsx
+// Adaptive is ON by default — just use UIProvider
+<UIProvider>
+  <App />
+</UIProvider>
+
+// Disable adaptive (force a specific tier):
+<UIProvider adaptive={false} motion={3}>
+  <App />
+</UIProvider>
+\`\`\`
+
+Use \`get_adaptive_info\` with section "detection", "css", "testing", or "api" for details on each area.`,
+
+      detection: `# Adaptive Detection Strategy
+
+## Primary: navigator.connection API
+\`\`\`
+saveData → lite (motion 0)
+slow-2g / 2g → lite (motion 0)
+3g + downlink < 0.5Mbps → standard (motion 1)
+3g → standard (motion 2)
+4g + downlink >= 1Mbps or RTT < 100ms → premium (motion 3)
+4g + downlink >= 0.4Mbps → standard (motion 2)
+4g + slow → standard (motion 1)
+\`\`\`
+
+## Fallback: Performance Timing (TTFB)
+When navigator.connection is unavailable:
+- TTFB < 800ms → premium
+- TTFB < 2000ms → standard
+- TTFB >= 2000ms → lite
+
+## Async Latency Probe
+Fetches \`/favicon.ico\` with cache-busting to measure real round-trip:
+- < 300ms → premium
+- < 1000ms → standard (motion 2)
+- < 3000ms → standard (motion 1)
+- >= 3000ms → lite
+
+The system takes the **worse** of API detection and probe results, ensuring DevTools throttling and VPN overhead are correctly detected.
+
+## Special Cases
+- **SSR**: defaults to standard (motion 2)
+- **prefers-reduced-motion**: always lite (motion 0)
+- **Save-Data header**: always lite (motion 0)`,
+
+      css: `# Adaptive CSS System
+
+The adaptive tier sets a \`data-adaptive-tier\` attribute on the root element. CSS rules respond automatically:
+
+## Lite Tier — strips expensive visuals
+\`\`\`css
+[data-adaptive-tier="lite"] [class*="ui-"] {
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+}
+[data-adaptive-tier="lite"] *::before,
+[data-adaptive-tier="lite"] *::after {
+  animation: none !important;
+  transition: none !important;
+}
+\`\`\`
+
+## Premium Tier — enhanced interactivity
+\`\`\`css
+[data-adaptive-tier="premium"] .ui-button:hover,
+[data-adaptive-tier="premium"] .ui-card:hover {
+  box-shadow:
+    0 0 0 1px oklch(65% 0.2 270 / 0.2),
+    0 4px 20px oklch(65% 0.2 270 / 0.12);
+  transition: box-shadow 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+\`\`\`
+
+## Premium Fade-in
+Premium effects appear with a subtle 150ms fade-in, making the page feel like it's "coming alive":
+\`\`\`css
+[data-adaptive-tier="premium"] [class*="ui-premium"] {
+  animation: adaptive-premium-fadein 0.15s ease-in both;
+}
+\`\`\`
+
+## Always Respects User Preferences
+\`\`\`css
+@media (prefers-reduced-motion: reduce) {
+  [data-adaptive-tier] * {
+    animation-duration: 0s !important;
+    transition-duration: 0s !important;
+  }
+}
+\`\`\``,
+
+      testing: `# Testing Adaptive Tiers
+
+## DevTools Network Throttling
+The adaptive system detects DevTools throttling via the async latency probe:
+1. Open Chrome DevTools > Network tab
+2. Select "Slow 3G" or "Offline" throttling
+3. Reload — the probe catches the real latency and downgrades accordingly
+
+## Manual Override
+\`\`\`tsx
+// Force a specific tier for testing
+<UIProvider adaptive={false} tier="lite" motion={0}>
+  <App />
+</UIProvider>
+\`\`\`
+
+## Dev Overlay
+Import the dev overlay to see real-time adaptive info:
+\`\`\`tsx
+import { AdaptiveDevOverlay } from '@annondeveloper/ui-kit'
+
+// Shows: tier, motion level, confidence, detection reason
+<AdaptiveDevOverlay />
+\`\`\`
+
+## Reading the Current Tier in Components
+\`\`\`tsx
+import { useAdaptiveContext } from '@annondeveloper/ui-kit'
+
+function MyComponent() {
+  const { tier, motion, confidence, reason } = useAdaptiveContext()
+  // tier: 'lite' | 'standard' | 'premium'
+  // motion: 0 | 1 | 2 | 3
+  // confidence: 'high' | 'medium' | 'low'
+  // reason: human-readable detection explanation
+}
+\`\`\`
+
+## Console Logging
+In development mode, the adaptive system logs detection results:
+\`\`\`
+[ui-kit adaptive] Tier: premium | Motion: 3 | Confidence: high | Reason: Fast: 10Mbps, 50ms RTT
+\`\`\``,
+
+      api: `# Adaptive API Reference
+
+## Hooks
+
+### useAdaptiveTier(override?)
+\`\`\`tsx
+import { useAdaptiveTier } from '@annondeveloper/ui-kit'
+
+const { tier, motion, confidence, reason } = useAdaptiveTier()
+// override?: 'lite' | 'standard' | 'premium' — bypasses detection
+\`\`\`
+
+### useAdaptiveContext()
+\`\`\`tsx
+import { useAdaptiveContext } from '@annondeveloper/ui-kit'
+
+const { tier, motion, confidence, reason, isAdaptive } = useAdaptiveContext()
+// isAdaptive: boolean — whether auto-detection is enabled
+\`\`\`
+
+## Functions
+
+### detectAdaptiveTier()
+\`\`\`tsx
+import { detectAdaptiveTier } from '@annondeveloper/ui-kit'
+
+const result = detectAdaptiveTier()
+// Runs synchronously — no async, no delays
+// Returns: { tier, motion, confidence, reason }
+\`\`\`
+
+## Types
+\`\`\`tsx
+type AdaptiveTier = 'lite' | 'standard' | 'premium'
+
+interface AdaptiveResult {
+  tier: AdaptiveTier
+  motion: 0 | 1 | 2 | 3
+  confidence: 'high' | 'medium' | 'low'
+  reason: string
+}
+
+interface AdaptiveContextValue extends AdaptiveResult {
+  isAdaptive: boolean
+}
+\`\`\`
+
+## Components
+
+### AdaptiveProvider
+\`\`\`tsx
+import { AdaptiveProvider } from '@annondeveloper/ui-kit'
+
+<AdaptiveProvider value={{ tier, motion, confidence, reason, isAdaptive }}>
+  {children}
+</AdaptiveProvider>
+\`\`\`
+Note: You rarely need this directly — UIProvider wraps it automatically.
+
+## CSS Attribute
+The root element gets \`data-adaptive-tier="lite|standard|premium"\` for CSS-level switching.`,
+    }
+
+    const text = sections[section] || sections.overview
+    return { content: [{ type: 'text' as const, text }] }
+  })
+
   server.resource('component', new ResourceTemplate('component://{name}', {
     list: async () => ({
       resources: Object.values(reg.components).map(c => ({
@@ -760,6 +986,7 @@ code{font-family:'SF Mono','Fira Code','JetBrains Mono',monospace}
       <div class="tool"><strong>get_icons</strong><span>50+ built-in SVG icons</span></div>
       <div class="tool"><strong>get_started</strong><span>Framework-aware setup guide</span></div>
       <div class="tool"><strong>get_page_template</strong><span>7 production-ready page scaffolds</span></div>
+      <div class="tool"><strong>get_adaptive_info</strong><span>Bandwidth-adaptive tier system docs</span></div>
     </div>
   </div>
 

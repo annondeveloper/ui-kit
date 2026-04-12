@@ -23,8 +23,9 @@ import { applyTheme } from '../../core/tokens/generator'
 const mockedApplyTheme = vi.mocked(applyTheme)
 
 function renderWithProvider(ui: ReactNode, props: Partial<UIProviderProps> = {}) {
+  // Disable adaptive by default in tests so motion values are deterministic
   return render(
-    <UIProvider {...props}>{ui}</UIProvider>
+    <UIProvider adaptive={false} {...props}>{ui}</UIProvider>
   )
 }
 
