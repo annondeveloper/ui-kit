@@ -11,3 +11,6 @@ demo/out/
 .gstack/
 .playwright-mcp/
 *.png
+graphify-out/
+.remember/
+.env

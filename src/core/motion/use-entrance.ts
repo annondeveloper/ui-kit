@@ -31,23 +31,29 @@ export function useEntrance(
     else if (animation.includes('right')) el.style.transform = 'translateX(-12px)'
     else if (animation === 'scale') el.style.transform = 'scale(0.95)'
 
+    // Both timers are tracked so the effect cleanup can cancel either one on
+    // unmount — otherwise the inner timer can fire on a detached node and call
+    // setState after teardown.
+    let settleTimer: ReturnType<typeof setTimeout> | undefined
+
     const timer = setTimeout(() => {
       el.style.transition = `opacity ${duration}ms var(--ease-out, ease-out), transform ${duration}ms var(--ease-out, ease-out)`
       el.style.opacity = '1'
       el.style.transform = 'none'
 
-      const cleanup = setTimeout(() => {
+      settleTimer = setTimeout(() => {
         el.style.transition = ''
         el.style.transform = ''
         el.style.opacity = ''
         setEntered(true)
         hasEntered.current = true
       }, duration)
-
-      return () => clearTimeout(cleanup)
     }, delay)
 
-    return () => clearTimeout(timer)
+    return () => {
+      clearTimeout(timer)
+      if (settleTimer) clearTimeout(settleTimer)
+    }
   }, [ref, animation, delay, duration, motionLevel, once])
 
   return entered

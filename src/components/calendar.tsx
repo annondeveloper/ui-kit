@@ -1,6 +1,7 @@
 'use client'
 
 import {
+  Fragment,
   forwardRef,
   useCallback,
   useEffect,
@@ -784,7 +785,7 @@ export const Calendar = forwardRef<HTMLDivElement, CalendarProps>(
 
             {/* Day cells */}
             {weeks.map((week, wi) => (
-              <>
+              <Fragment key={wi}>
                 {showWeekNumbers && (
                   <div key={`wn-${wi}`} className="ui-calendar__week-number" aria-hidden="true">
                     {getWeekNumber(week[0].date)}
@@ -840,7 +841,7 @@ export const Calendar = forwardRef<HTMLDivElement, CalendarProps>(
                     </button>
                   )
                 })}
-              </>
+              </Fragment>
             ))}
           </div>
         </div>

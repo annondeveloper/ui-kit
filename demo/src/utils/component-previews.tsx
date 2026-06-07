@@ -456,13 +456,10 @@ function ComponentPreviewSwitch({ name }: { name: string }) {
         </div>
       )
     case 'CopyButton':
+      // CopyButton renders its own <button>, so children are the label (not a nested Button).
       return (
         <CopyButtonComp value="npm install @annondeveloper/ui-kit">
-          {({ copied, copy }) => (
-            <Button size="sm" variant={copied ? 'primary' : 'secondary'} onClick={copy}>
-              {copied ? 'Copied!' : 'Copy install command'}
-            </Button>
-          )}
+          {({ copied }) => (copied ? 'Copied!' : 'Copy install command')}
         </CopyButtonComp>
       )
     case 'Indicator':
