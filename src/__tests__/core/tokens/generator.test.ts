@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest'
-import { generateTheme, themeToCSS, validateContrast } from '../../../core/tokens/generator'
-import { TOKEN_KEYS } from '../../../core/tokens/tokens'
+import { generateTheme, themeToCSS, themeToInlineStyle, validateContrast } from '../../../core/tokens/generator'
+import { TOKEN_KEYS, TOKEN_TO_CSS } from '../../../core/tokens/tokens'
 
 describe('generateTheme', () => {
   it('returns all TOKEN_KEYS for dark mode (default)', () => {
@@ -69,8 +69,39 @@ describe('themeToCSS', () => {
 })
 
 describe('validateContrast', () => {
-  it('returns true for default theme', () => {
+  it('returns a contrast result with ratio/aa/aaa/pairs', () => {
     const theme = generateTheme('#6366f1')
-    expect(validateContrast(theme)).toBe(true)
+    const result = validateContrast(theme)
+    expect(typeof result.ratio).toBe('number')
+    expect(typeof result.aa).toBe('boolean')
+    expect(typeof result.aaa).toBe('boolean')
+    expect(Array.isArray(result.pairs)).toBe(true)
+    expect(result.pairs.length).toBeGreaterThan(0)
+  })
+
+  it('default dark theme has readable primary text (passes AA)', () => {
+    const theme = generateTheme('#6366f1', 'dark')
+    const result = validateContrast(theme)
+    // textPrimary oklch(97%) on bgBase oklch(8%) is very high contrast
+    expect(result.ratio).toBeGreaterThan(4.5)
+    expect(result.aa).toBe(true)
+  })
+
+  it('pairs are sorted worst-contrast-first', () => {
+    const result = validateContrast(generateTheme('#6366f1'))
+    for (let i = 1; i < result.pairs.length; i++) {
+      expect(result.pairs[i].ratio).toBeGreaterThanOrEqual(result.pairs[i - 1].ratio)
+    }
+  })
+})
+
+describe('themeToInlineStyle', () => {
+  it('maps every token to its CSS custom property', () => {
+    const theme = generateTheme('#6366f1')
+    const style = themeToInlineStyle(theme)
+    for (const key of TOKEN_KEYS) {
+      const cssVar = TOKEN_TO_CSS[key]
+      expect(style[cssVar]).toBe(theme[key])
+    }
   })
 })

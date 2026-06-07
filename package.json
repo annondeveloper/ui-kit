@@ -37,7 +37,7 @@
         "default": "./dist/esm/premium.js"
       }
     },
-    "./lite/styles.css": "./src/lite/lite.css",
+    "./lite/styles.css": "./dist/css/lite.css",
     "./css/theme.css": "./dist/css/theme.css",
     "./css/all.css": "./dist/css/all.css",
     "./css/components/*": "./dist/css/components/*",
@@ -51,6 +51,12 @@
       "import": {
         "types": "./dist/esm/web-components.d.ts",
         "default": "./dist/esm/web-components.js"
+      }
+    },
+    "./ai": {
+      "import": {
+        "types": "./dist/esm/ai.d.ts",
+        "default": "./dist/esm/ai.js"
       }
     }
   },

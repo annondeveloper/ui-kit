@@ -6,6 +6,8 @@ Generate production-ready component compositions from templates or custom select
 
 The AI Component Generator provides a template gallery with pre-built layouts, a custom composition builder for assembling components, and a searchable component database with metadata. Generated code is available in React (JSX), React (TypeScript), Vue, Svelte, and HTML/CSS.
 
+The generator ships as a tree-shakeable subpath, `@annondeveloper/ui-kit/ai`, so importing it never pulls component runtime into your main bundle.
+
 ## Quick Start
 
 Access the Generator page in the demo app, or use the underlying utilities directly:
@@ -16,7 +18,7 @@ import {
   searchComponents,
   generateFromTemplate,
   generateFromComponents,
-} from '@annondeveloper/ui-kit'
+} from '@annondeveloper/ui-kit/ai'
 ```
 
 ## API Reference
@@ -121,7 +123,7 @@ The `GeneratedCode` object contains:
 ### Browse and search components
 
 ```tsx
-import { getComponentDatabase, searchComponents } from '@annondeveloper/ui-kit'
+import { getComponentDatabase, searchComponents } from '@annondeveloper/ui-kit/ai'
 
 // Get all components
 const all = getComponentDatabase()
@@ -138,24 +140,16 @@ const domain = all.filter((c) => c.category === 'domain')
 ### Generate from template and copy
 
 ```tsx
-import { useState } from 'react'
-import { generateFromTemplate } from '@annondeveloper/ui-kit'
+import { generateFromTemplate } from '@annondeveloper/ui-kit/ai'
 
 function GeneratorUI() {
-  const [framework, setFramework] = useState('react-ts')
-  const code = generateFromTemplate('dashboard', { framework })
+  // The GeneratedCode key for "react-ts" is `reactTs` (camelCase).
+  const code = generateFromTemplate('dashboard', { framework: 'react-ts' })
 
   return (
     <div>
-      <select value={framework} onChange={(e) => setFramework(e.target.value)}>
-        <option value="react-ts">React (TS)</option>
-        <option value="react">React (JS)</option>
-        <option value="vue">Vue</option>
-        <option value="svelte">Svelte</option>
-        <option value="html">HTML</option>
-      </select>
-      <pre>{code[framework]}</pre>
-      <button onClick={() => navigator.clipboard.writeText(code[framework])}>
+      <pre>{code.reactTs}</pre>
+      <button onClick={() => navigator.clipboard.writeText(code.reactTs)}>
         Copy Code
       </button>
     </div>

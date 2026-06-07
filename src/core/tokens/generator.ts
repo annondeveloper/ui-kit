@@ -1,5 +1,6 @@
-import { hexToOklch, oklchToHex, getContrastRatio, adjustLightness, type OklchColor } from '../utils/color'
+import { hexToOklch, adjustLightness, type OklchColor } from '../utils/color'
 import { type ThemeTokens, TOKEN_TO_CSS } from './tokens'
+import { auditThemeContrast, type ContrastResult } from './contrast'
 
 export type ThemeMode = 'dark' | 'light'
 
@@ -87,9 +88,36 @@ export function applyTheme(tokens: ThemeTokens): void {
   }
 }
 
-export function validateContrast(tokens: ThemeTokens): boolean {
-  // Simplified: check text-primary on bg-base has adequate contrast
-  // In real implementation, parse OKLCH values and compute contrast
-  // For now, return true for default themes (they've been manually verified)
-  return true
+/**
+ * Convert theme tokens to an inline-style object of CSS custom properties,
+ * suitable for scoping a theme to a single element:
+ *
+ * ```tsx
+ * <div style={themeToInlineStyle(generateTheme('#10b981'))}>...</div>
+ * ```
+ */
+export function themeToInlineStyle(tokens: ThemeTokens): Record<string, string> {
+  const style: Record<string, string> = {}
+  for (const [key, value] of Object.entries(tokens)) {
+    const cssVar = TOKEN_TO_CSS[key as keyof ThemeTokens]
+    if (cssVar) style[cssVar] = value
+  }
+  return style
+}
+
+/**
+ * Validate a theme's text-on-background contrast against WCAG 2.1.
+ *
+ * `ratio` is the contrast of primary text on the base background; `aa`/`aaa`
+ * report whether primary text clears 4.5:1 / 7:1 on every surface. `pairs`
+ * carries the full audit (worst contrast first) for detailed reporting.
+ */
+export function validateContrast(tokens: ThemeTokens): ContrastResult {
+  const pairs = auditThemeContrast(tokens)
+  const primaryPairs = pairs.filter(p => p.foreground.token === 'textPrimary')
+  const basePair = primaryPairs.find(p => p.background.token === 'bgBase')
+  const ratio = basePair ? basePair.ratio : (primaryPairs[0]?.ratio ?? 0)
+  const aa = primaryPairs.length > 0 && primaryPairs.every(p => p.passAA)
+  const aaa = primaryPairs.length > 0 && primaryPairs.every(p => p.passAAA)
+  return { ratio, aa, aaa, pairs }
 }

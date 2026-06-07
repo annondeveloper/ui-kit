@@ -5,6 +5,7 @@ export interface UIKitConfig {
   tier: string
   theme: string
   outDir: string
+  typescript: boolean
 }
 
 const CONFIG_FILE = 'ui-kit.config.json'
@@ -13,6 +14,7 @@ const defaults: UIKitConfig = {
   tier: 'standard',
   theme: 'aurora',
   outDir: './src/components',
+  typescript: true,
 }
 
 export function loadConfig(dir?: string): UIKitConfig | null {

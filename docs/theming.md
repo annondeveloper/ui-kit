@@ -73,8 +73,18 @@ const css = themeToCSS(tokens, '.my-app')
 import { validateContrast } from '@annondeveloper/ui-kit/theme'
 
 const tokens = generateTheme('#6366f1', 'dark')
-const isAccessible = validateContrast(tokens) // true if WCAG AA compliant
+const result = validateContrast(tokens)
+// { ratio: number, aa: boolean, aaa: boolean, pairs: ContrastPair[] }
+// `ratio` is primary text on the base background; `aa`/`aaa` report whether
+// primary text clears 4.5:1 / 7:1 on every surface. `pairs` is the full audit.
+
+if (result.aa) {
+  // theme meets WCAG AA for body text
+}
 ```
+
+For a full per-pair report (every foreground token against every surface), use
+`auditThemeContrast(tokens)` which returns `ContrastPair[]` sorted worst-first.
 
 ## CSS Custom Properties Reference
 

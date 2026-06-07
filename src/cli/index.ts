@@ -6,6 +6,7 @@ import { addCommand } from './commands/add.js'
 import { createCommand, TEMPLATE_NAMES } from './commands/create.js'
 import { figmaExportCommand } from './commands/figma-export.js'
 import { mcpSetupCommand } from './commands/mcp-setup.js'
+import { loadConfig } from './config.js'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = dirname(__filename)
@@ -139,7 +140,12 @@ function runAdd(argv: string[]) {
     process.exit(1)
   }
   const flags = parseFlags(argv)
-  addCommand(name, { tier: flags['tier'], outDir: flags['out-dir'] })
+  const config = loadConfig()
+  // Precedence: explicit flag > ui-kit.config.json > built-in default
+  addCommand(name, {
+    tier: flags['tier'] ?? config?.tier,
+    outDir: flags['out-dir'] ?? config?.outDir,
+  })
 }
 
 function runCreate(argv: string[]) {
@@ -155,7 +161,12 @@ function runCreate(argv: string[]) {
     console.error(`Templates: ${TEMPLATE_NAMES.join(', ')}`)
     process.exit(1)
   }
-  createCommand(name, { template: flags['template'], tier: flags['tier'], theme: flags['theme'] })
+  const config = loadConfig()
+  createCommand(name, {
+    template: flags['template'],
+    tier: flags['tier'] ?? config?.tier,
+    theme: flags['theme'] ?? config?.theme,
+  })
 }
 
 function runMcpSetup() {
@@ -194,11 +205,13 @@ function runStats() {
 
 function runFigmaExport(argv: string[]) {
   const flags = parseFlags(argv)
-  if (!flags['theme'] || !flags['output']) {
+  const config = loadConfig()
+  const themeName = flags['theme'] ?? config?.theme
+  if (!themeName || !flags['output']) {
     console.error('Usage: ui-kit figma-export --theme <name|hex> --output <path> [--mode dark|light]')
     process.exit(1)
   }
-  figmaExportCommand({ theme: flags['theme'], output: flags['output'], mode: flags['mode'] })
+  figmaExportCommand({ theme: themeName, output: flags['output'], mode: flags['mode'] })
 }
 
 function list() {

@@ -36,6 +36,7 @@ export default defineConfig({
     premium: 'src/premium/index.ts',
     rsc: 'src/rsc/index.ts',
     'web-components': 'src/web-components/index.ts',
+    ai: 'src/ai/index.ts',
   },
   outDir: 'dist/esm',
   format: ['esm'],

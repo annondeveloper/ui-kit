@@ -46,24 +46,25 @@ interface BundleFile {
 
 ### Runtime Render Profiler
 
-The `useRenderTime()` hook measures component render duration:
+The `useRenderTime(componentName)` hook samples a component's render timing:
 
 ```tsx
 import { useRenderTime } from '@annondeveloper/ui-kit'
 
 function MyComponent() {
-  const renderTime = useRenderTime()
+  const timing = useRenderTime('MyComponent')
 
   return (
     <div>
-      <p>Last render: {renderTime.toFixed(1)}ms</p>
+      <p>Avg render: {timing.averageRenderMs.toFixed(1)}ms ({timing.status})</p>
       {/* ... component content ... */}
     </div>
   )
 }
 ```
 
-The dashboard uses this to display render times for key components, with color-coded indicators:
+It collects 10 samples on a short interval, then reports `status: 'complete'`. The
+dashboard uses this to display render times for key components, with color-coded indicators:
 - Green: < 5ms
 - Amber: 5-16ms (within one frame)
 - Red: > 16ms (may cause jank)
@@ -121,12 +122,20 @@ This script:
 
 ## API Reference
 
-### `useRenderTime()`
+### `useRenderTime(componentName)`
 
-Returns the render duration in milliseconds for the current component. Uses `performance.now()` to measure the time between render start and effect execution.
+Samples a component's render timing over a short window and returns a `RenderTiming` object.
 
 ```ts
-function useRenderTime(): number
+function useRenderTime(componentName: string): RenderTiming
+
+interface RenderTiming {
+  componentName: string
+  renderCount: number
+  lastRenderMs: number
+  averageRenderMs: number
+  status: 'sampling' | 'complete'
+}
 ```
 
 ### `useWebVitals()`
@@ -163,12 +172,12 @@ function useWebVitals(): WebVitals
 ```tsx
 function PerfWidget() {
   const vitals = useWebVitals()
-  const renderTime = useRenderTime()
+  const timing = useRenderTime('PerfWidget')
 
   return (
     <Card>
       <h3>Performance</h3>
-      <MetricCard label="Render Time" value={`${renderTime.toFixed(1)}ms`} />
+      <MetricCard label="Render Time" value={`${timing.averageRenderMs.toFixed(1)}ms`} />
       <MetricCard label="LCP" value={vitals.lcp ? `${vitals.lcp.toFixed(0)}ms` : '--'} />
       <MetricCard label="CLS" value={vitals.cls ? vitals.cls.toFixed(3) : '--'} />
     </Card>

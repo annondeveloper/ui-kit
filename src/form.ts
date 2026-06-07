@@ -9,8 +9,11 @@
  * import { createForm, useForm, v } from '@annondeveloper/ui-kit/form'
  *
  * const LoginForm = createForm({
- *   email: { validator: v.compose(v.required(), v.email()) },
- *   password: { validator: v.required() },
+ *   fields: {
+ *     email: { initial: '', validate: v.pipe(v.required(), v.email()) },
+ *     password: { initial: '', validate: v.required() },
+ *   },
+ *   onSubmit: async (values) => { await login(values) },
  * })
  * ```
  */

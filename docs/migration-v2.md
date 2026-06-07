@@ -341,14 +341,17 @@ Motion cascade: OS `prefers-reduced-motion` > component `motion` prop > CSS `--m
 Built-in form management with zero external dependencies:
 
 ```tsx
-import { createForm, useForm, v, Form, FormInput, Select, FieldArray } from '@annondeveloper/ui-kit/form'
+// Form engine (createForm/useForm/validators/Form/FieldArray) lives at /form;
+// form *components* (FormInput, Select, Button) come from the main entry.
+import { createForm, useForm, v, Form, FieldArray } from '@annondeveloper/ui-kit/form'
+import { FormInput, Select, Button } from '@annondeveloper/ui-kit'
 
 const profileForm = createForm({
   fields: {
     name: { initial: '', validate: v.pipe(v.required(), v.minLength(2)) },
     email: { initial: '', validate: v.pipe(v.required(), v.email()) },
     role: { initial: '', validate: v.required() },
-    tags: { initial: [] as string[], validate: v.minLength(1, 'At least one tag') },
+    tags: { initial: [{ label: '' }] },
   },
   onSubmit: async (values) => {
     await saveProfile(values)
@@ -371,12 +374,21 @@ function ProfileForm() {
         ]}
         {...form.getFieldProps('role')}
       />
-      <FieldArray name="tags" form={form}>
-        {(items) => items.map((item, i) => (
-          <FormInput key={i} label={`Tag ${i + 1}`} {...item} />
-        ))}
+      {/* FieldArray takes only `name`; its render prop yields { fields, append, remove, move, insert } */}
+      <FieldArray name="tags">
+        {({ fields, append, remove }) => (
+          <>
+            {fields.map((field, i) => (
+              <div key={field.key} style={{ display: 'flex', gap: '0.5rem' }}>
+                <FormInput label={`Tag ${i + 1}`} {...form.getFieldProps(`tags.${i}.label`)} />
+                <Button variant="ghost" onClick={() => remove(i)}>Remove</Button>
+              </div>
+            ))}
+            <Button variant="secondary" onClick={() => append({ label: '' })}>Add Tag</Button>
+          </>
+        )}
       </FieldArray>
-      <Button type="submit" loading={form.isSubmitting}>Save Profile</Button>
+      <Button type="submit" loading={form.submitting}>Save Profile</Button>
     </Form>
   )
 }

@@ -51,7 +51,7 @@ npx @annondeveloper/ui-kit add metric-card --tier premium --out-dir ./src/ui
 | Flag | Default | Description |
 |------|---------|-------------|
 | `--tier` | `standard` | Weight tier: `standard`, `lite`, or `premium` |
-| `--out-dir` | `./components` | Destination directory |
+| `--out-dir` | `./src/components` | Destination directory |
 
 **Examples:**
 
