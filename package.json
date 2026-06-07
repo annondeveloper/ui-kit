@@ -78,7 +78,7 @@
     "storybook": "storybook dev -p 6006",
     "build:storybook": "storybook build -o storybook-static",
     "test:visual": "playwright test",
-    "preversion": "node scripts/sync-versions.js",
+    "version": "node scripts/sync-versions.js && git add jsr.json",
     "postversion": "git push && git push --tags"
   },
   "peerDependencies": {

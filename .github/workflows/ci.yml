@@ -7,6 +7,12 @@ on:
   pull_request:
     branches: [main]
 
+# Supersede in-flight runs when new commits land on the same ref — avoids
+# redundant duplicate runs during rapid pushes (e.g. feature push + version bump).
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   build-test:
     runs-on: ubuntu-latest
