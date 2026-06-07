@@ -1,4 +1,18 @@
 import { forwardRef, useMemo, type HTMLAttributes } from 'react'
+import { css } from '../core/styles/css-tag'
+import { useStyles } from '../core/styles/use-styles'
+
+const switchFaceplateStyles = css`
+  @layer components {
+    @scope (.ui-lite-switch-faceplate) {
+      :scope {
+        display: inline-block;
+        color: var(--text-primary, oklch(97% 0 0));
+        font-family: inherit;
+      }
+    }
+  }
+`
 
 export interface LiteSwitchPort {
   id: number
@@ -30,6 +44,7 @@ const STATUS_BORDERS: Record<string, string> = {
 /** Lite SwitchFaceplate — simple CSS grid, no animation */
 export const SwitchFaceplate = forwardRef<HTMLDivElement, LiteSwitchFaceplateProps>(
   ({ ports, rows = 2, label, className, ...rest }, ref) => {
+    useStyles('lite-switch-faceplate', switchFaceplateStyles)
     const portRows = useMemo(() => {
       const result: LiteSwitchPort[][] = Array.from({ length: rows }, () => [])
       ports.forEach((port, idx) => result[idx % rows].push(port))

@@ -1,4 +1,6 @@
 import { forwardRef, type HTMLAttributes } from 'react'
+import { css } from '../core/styles/css-tag'
+import { useStyles } from '../core/styles/use-styles'
 
 export interface LiteNetworkInterface {
   name: string
@@ -35,9 +37,38 @@ function formatBytes(bytes: number): string {
   return `${bytes} B/s`
 }
 
+const networkInterfaceGridStyles = css`
+  @layer components {
+    @scope (.ui-lite-network-interface-grid) {
+      :scope {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 0.625rem;
+        font-family: var(--font-mono, ui-monospace, monospace);
+      }
+
+      :scope > * {
+        display: flex;
+        flex-direction: column;
+        gap: 0.25rem;
+        padding: 0.5rem 0.75rem;
+        border-radius: 0.5rem;
+        background: var(--bg-surface, oklch(20% 0.01 270));
+        border: 1px solid var(--border-subtle, oklch(100% 0 0 / 0.08));
+        border-inline-start: 3px solid var(--border-subtle, oklch(100% 0 0 / 0.08));
+      }
+      :scope > [data-status="up"] { border-inline-start-color: oklch(72% 0.19 155 / 0.5); }
+      :scope > [data-status="down"] { border-inline-start-color: oklch(62% 0.22 25 / 0.5); }
+      :scope > [data-status="dormant"] { border-inline-start-color: oklch(80% 0.18 85 / 0.4); }
+      :scope > [data-status="unknown"] { border-inline-start-color: oklch(55% 0 0 / 0.3); }
+    }
+  }
+`
+
 /** Lite NetworkInterfaceGrid — simple CSS grid, no animation */
 export const NetworkInterfaceGrid = forwardRef<HTMLDivElement, LiteNetworkInterfaceGridProps>(
   ({ interfaces, columns, compact, className, style, ...rest }, ref) => {
+    useStyles('lite-network-interface-grid', networkInterfaceGridStyles)
     return (
       <div
         ref={ref}

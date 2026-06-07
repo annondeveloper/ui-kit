@@ -1,4 +1,21 @@
 import { forwardRef, type HTMLAttributes } from 'react'
+import { css } from '../core/styles/css-tag'
+import { useStyles } from '../core/styles/use-styles'
+
+const coreChartStyles = css`
+  @layer components {
+    @scope (.ui-lite-core-chart) {
+      :scope {
+        display: inline-grid;
+        gap: 2px;
+        line-height: 0;
+      }
+      :scope > div {
+        border-radius: 3px;
+      }
+    }
+  }
+`
 
 export interface LiteCoreChartCore { id: number; usage: number }
 
@@ -16,6 +33,7 @@ function usageColor(u: number): string {
 /** Lite core chart — simple CSS grid of colored cells, no animation */
 export const CoreChart = forwardRef<HTMLDivElement, LiteCoreChartProps>(
   ({ cores, columns, cellSize = 20, className, ...rest }, ref) => {
+    useStyles('lite-core-chart', coreChartStyles)
     const cols = columns ?? Math.ceil(Math.sqrt(cores.length))
     return (
       <div

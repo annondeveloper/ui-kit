@@ -1,4 +1,21 @@
 import { forwardRef, type HTMLAttributes } from 'react'
+import { css } from '../core/styles/css-tag'
+import { useStyles } from '../core/styles/use-styles'
+
+const connectionTestPanelStyles = css`
+  @layer components {
+    @scope (.ui-lite-connection-test-panel) {
+      :scope {
+        display: block;
+        font-family: inherit;
+        color: var(--text-primary, oklch(97% 0 0));
+        background: var(--bg-surface, oklch(12% 0.015 270));
+        border-radius: var(--radius-md, 0.5rem);
+      }
+      :scope button { font-family: inherit; }
+    }
+  }
+`
 
 export interface LiteTestStep { id: string; label: string; status: 'pending' | 'running' | 'passed' | 'failed' | 'skipped'; message?: string; duration?: number }
 
@@ -14,6 +31,7 @@ const COLORS: Record<string, string> = { pending: 'oklch(55% 0 0)', running: 'ok
 /** Lite connection test panel — simple step list, no animation */
 export const ConnectionTestPanel = forwardRef<HTMLDivElement, LiteConnectionTestPanelProps>(
   ({ steps, title = 'Connection Test', onRetry, className, ...rest }, ref) => {
+    useStyles('lite-connection-test-panel', connectionTestPanelStyles)
     const passed = steps.filter(s => s.status === 'passed').length
     const failed = steps.filter(s => s.status === 'failed').length
     return (

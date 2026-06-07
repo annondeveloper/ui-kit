@@ -1,4 +1,20 @@
 import { forwardRef, type HTMLAttributes } from 'react'
+import { css } from '../core/styles/css-tag'
+import { useStyles } from '../core/styles/use-styles'
+
+const storageBarStyles = css`
+  @layer components {
+    @scope (.ui-lite-storage-bar) {
+      :scope {
+        display: flex;
+        flex-direction: column;
+        gap: 0.25rem;
+        inline-size: 100%;
+        color: var(--text-primary, oklch(97% 0 0));
+      }
+    }
+  }
+`
 
 export interface LiteStorageBarSegment { label: string; value: number; color?: string }
 
@@ -13,6 +29,7 @@ const COLORS = ['oklch(65% 0.2 270)', 'oklch(72% 0.19 155)', 'oklch(78% 0.17 85)
 /** Lite storage bar — simple HTML bar, no animation */
 export const StorageBar = forwardRef<HTMLDivElement, LiteStorageBarProps>(
   ({ segments, total, showLegend, className, ...rest }, ref) => {
+    useStyles('lite-storage-bar', storageBarStyles)
     return (
       <div ref={ref} className={`ui-lite-storage-bar${className ? ` ${className}` : ''}`} {...rest}>
         <div style={{ display: 'flex', height: 14, borderRadius: 4, overflow: 'hidden', background: 'oklch(100% 0 0 / 0.06)' }}>

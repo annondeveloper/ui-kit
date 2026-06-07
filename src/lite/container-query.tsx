@@ -1,4 +1,17 @@
 import { forwardRef, type ReactNode } from 'react'
+import { css } from '../core/styles/css-tag'
+import { useStyles } from '../core/styles/use-styles'
+
+const containerQueryStyles = css`
+  @layer components {
+    @scope (.ui-lite-container-query) {
+      :scope {
+        container-type: inline-size;
+        display: block;
+      }
+    }
+  }
+`
 
 export interface LiteContainerQueryProps {
   children: ReactNode
@@ -11,7 +24,9 @@ export interface LiteContainerQueryProps {
  * No JS measurement, no render-prop. Use CSS @container queries in children.
  */
 export const ContainerQuery = forwardRef<HTMLDivElement, LiteContainerQueryProps>(
-  ({ children, className, style }, ref) => (
+  ({ children, className, style }, ref) => {
+    useStyles('lite-container-query', containerQueryStyles)
+    return (
     <div
       ref={ref}
       className={`ui-lite-container-query${className ? ` ${className}` : ''}`}
@@ -19,7 +34,8 @@ export const ContainerQuery = forwardRef<HTMLDivElement, LiteContainerQueryProps
     >
       {children}
     </div>
-  ),
+    )
+  },
 )
 
 ContainerQuery.displayName = 'ContainerQuery'

@@ -1,4 +1,16 @@
 import { forwardRef, type HTMLAttributes, type ReactNode } from 'react'
+import { css } from '../core/styles/css-tag'
+import { useStyles } from '../core/styles/use-styles'
+
+const pluginDashboardStyles = css`
+  @layer components {
+    @scope (.ui-lite-plugin-dashboard) {
+      :scope {
+        color: var(--text-primary, oklch(90% 0 0));
+      }
+    }
+  }
+`
 
 export interface LitePluginMetricDef {
   key: string
@@ -60,6 +72,7 @@ function formatValue(value: unknown, format?: string, unit?: string): string {
 /** Lite PluginDashboard — simple grid of metrics + properties list, no charts */
 export const PluginDashboard = forwardRef<HTMLDivElement, LitePluginDashboardProps>(
   ({ config, data, loading, error, className, style, ...rest }, ref) => {
+    useStyles('lite-plugin-dashboard', pluginDashboardStyles)
     return (
       <div
         ref={ref}

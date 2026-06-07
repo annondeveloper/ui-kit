@@ -1,4 +1,24 @@
 import { forwardRef, type HTMLAttributes, type ReactNode } from 'react'
+import { css } from '../core/styles/css-tag'
+import { useStyles } from '../core/styles/use-styles'
+
+const dashboardTemplateStyles = css`
+  @layer components {
+    @scope (.ui-lite-dashboard-template) {
+      :scope {
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-md, 1rem);
+        min-inline-size: 320px;
+        color: var(--text-primary, oklch(97% 0 0));
+        font-family: inherit;
+      }
+      :scope h2 {
+        text-wrap: balance;
+      }
+    }
+  }
+`
 
 export interface LiteDashboardMetric {
   title: string
@@ -21,6 +41,7 @@ export interface LiteDashboardTemplateProps extends Omit<HTMLAttributes<HTMLDivE
 /** Lite DashboardTemplate — simple flex layout, no animation, inline styles */
 export const DashboardTemplate = forwardRef<HTMLDivElement, LiteDashboardTemplateProps>(
   ({ title, metrics, sections, sidebar, children, className, ...rest }, ref) => {
+    useStyles('lite-dashboard-template', dashboardTemplateStyles)
     return (
       <div
         ref={ref}

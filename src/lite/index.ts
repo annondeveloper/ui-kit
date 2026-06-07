@@ -1,9 +1,11 @@
 /**
  * @module @annondeveloper/ui-kit/lite
  *
- * Lightweight CSS-only component variants (~0.3-1.2 KB each). Minimal
- * JavaScript wrappers with no motion engine, ideal for performance-critical
- * or low-bandwidth scenarios. 144 components available.
+ * Lightweight component variants (~0.3-1.2 KB each). Minimal JavaScript
+ * wrappers with no motion engine, ideal for performance-critical or
+ * low-bandwidth scenarios. Each component self-injects its own scoped CSS via
+ * useStyles(), so the tier renders fully styled with no manual CSS import.
+ * 159 components available.
  */
 
 // ─── Core (existing) ─────────────────────────────────────────────────────────
@@ -188,3 +190,4 @@ export { Toolbar, type LiteToolbarProps } from './toolbar'
 export { StatsGrid, type LiteStatsGridProps } from './stats-grid'
 export { CardGrid, type LiteCardGridProps } from './card-grid'
 export { ListLayout, type LiteListLayoutProps } from './list-layout'
+export { NativeTooltip, type NativeTooltipProps } from './native-tooltip'

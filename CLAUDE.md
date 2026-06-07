@@ -5,7 +5,7 @@
 `@annondeveloper/ui-kit` — A zero-dependency React component library with 147 components across 3 weight tiers (Lite/Standard/Premium), physics-based animations, OKLCH color system, and Aurora Fluid design identity.
 
 **Repository:** https://github.com/annondeveloper/ui-kit
-**Current:** v2.7.0 on `main` branch
+**Current:** v2.8.1 on `main` branch
 **Legacy:** v0.4.1 on `v1` branch (archived)
 
 ## Development Philosophy
@@ -164,9 +164,11 @@ Per-component budgets (tree-shaken imports):
 - Medium component: < 5KB JS gzip, < 1.5KB CSS gzip
 - Complex domain: < 8KB JS gzip, < 2KB CSS gzip
 
-Full un-tree-shaken bundle budget:
-- Full library: < 400KB JS gzip (current: ~384KB, 96% of budget)
-- Full CSS: < 20KB gzip
+Full un-tree-shaken bundle budget (runtime UI library — excludes the `./ai` dev-codegen subpath):
+- Full library: < 440KB JS gzip (current: ~433KB, 98% of budget)
+  - Baselined at 440KB after the lite tier became self-styling (each lite component
+    embeds its own scoped CSS via useStyles, ~58KB moved from external CSS into JS)
+- Full CSS: < 20KB gzip (per-component standalone CSS in dist/css; lite aggregate in dist/css/lite.css)
 
 Engine modules:
 - Motion engine: ~3.5KB gzip

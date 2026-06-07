@@ -1,4 +1,21 @@
 import { forwardRef, useMemo, type HTMLAttributes } from 'react'
+import { css } from '../core/styles/css-tag'
+import { useStyles } from '../core/styles/use-styles'
+
+const sparklineStyles = css`
+  @layer components {
+    @scope (.ui-lite-sparkline) {
+      :scope {
+        display: inline-block;
+        inline-size: 100%;
+      }
+      svg {
+        display: block;
+        overflow: visible;
+      }
+    }
+  }
+`
 
 export interface LiteSparklineProps extends Omit<HTMLAttributes<HTMLDivElement>, 'children'> {
   data: number[]
@@ -10,6 +27,7 @@ export interface LiteSparklineProps extends Omit<HTMLAttributes<HTMLDivElement>,
 /** Lite sparkline — simple SVG polyline, no animation */
 export const Sparkline = forwardRef<HTMLDivElement, LiteSparklineProps>(
   ({ data, width = '100%', height = 32, color = 'var(--brand, oklch(65% 0.2 270))', className, ...rest }, ref) => {
+    useStyles('lite-sparkline', sparklineStyles)
     const points = useMemo(() => {
       if (!data.length) return ''
       const max = Math.max(...data)

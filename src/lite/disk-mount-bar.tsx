@@ -1,4 +1,20 @@
 import { forwardRef, type HTMLAttributes } from 'react'
+import { css } from '../core/styles/css-tag'
+import { useStyles } from '../core/styles/use-styles'
+
+const diskMountBarStyles = css`
+  @layer components {
+    @scope (.ui-lite-disk-mount-bar) {
+      :scope {
+        display: flex;
+        flex-direction: column;
+        inline-size: 100%;
+        color: var(--text-primary, oklch(90% 0 0));
+        font-family: inherit;
+      }
+    }
+  }
+`
 
 export interface LiteMountInfo { mount: string; totalBytes: number; usedBytes: number; freeBytes: number; utilPct: number }
 
@@ -26,6 +42,7 @@ function barColor(pct: number): string {
 /** Lite disk mount bar — simple HTML bars, no animation */
 export const DiskMountBar = forwardRef<HTMLDivElement, LiteDiskMountBarProps>(
   ({ mounts, maxVisible = 3, showFree, className, ...rest }, ref) => {
+    useStyles('lite-disk-mount-bar', diskMountBarStyles)
     const visible = mounts.slice(0, maxVisible)
     return (
       <div ref={ref} className={`ui-lite-disk-mount-bar${className ? ` ${className}` : ''}`} {...rest}>

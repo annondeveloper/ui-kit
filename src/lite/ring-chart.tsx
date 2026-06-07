@@ -1,4 +1,28 @@
 import { forwardRef, type HTMLAttributes, type ReactNode } from 'react'
+import { css } from '../core/styles/css-tag'
+import { useStyles } from '../core/styles/use-styles'
+
+const ringChartStyles = css`
+  @layer components {
+    @scope (.ui-lite-ring-chart) {
+      :scope {
+        position: relative;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--text-primary, oklch(97% 0 0));
+      }
+      :scope svg { display: block; }
+      :scope > span {
+        position: absolute;
+        font-size: 0.75rem;
+        font-weight: 700;
+        font-variant-numeric: tabular-nums;
+        color: var(--text-primary, oklch(97% 0 0));
+      }
+    }
+  }
+`
 
 export interface LiteRingChartProps extends HTMLAttributes<HTMLDivElement> {
   value: number
@@ -13,6 +37,7 @@ export interface LiteRingChartProps extends HTMLAttributes<HTMLDivElement> {
 /** Lite ring chart — simple SVG donut, no animation */
 export const RingChart = forwardRef<HTMLDivElement, LiteRingChartProps>(
   ({ value, max = 100, size = 64, thickness = 6, color = 'var(--brand, oklch(65% 0.2 270))', label, showValue, className, style, ...rest }, ref) => {
+    useStyles('lite-ring-chart', ringChartStyles)
     const pct = Math.min(100, Math.max(0, (value / max) * 100))
     const r = (size - thickness) / 2
     const circ = 2 * Math.PI * r

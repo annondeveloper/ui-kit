@@ -1,4 +1,22 @@
 import { forwardRef, type HTMLAttributes, type ReactNode } from 'react'
+import { css } from '../core/styles/css-tag'
+import { useStyles } from '../core/styles/use-styles'
+
+const pageHeaderStyles = css`
+  @layer components {
+    @scope (.ui-lite-page-header) {
+      :scope {
+        inline-size: 100%;
+        color: var(--text-primary, oklch(97% 0 0));
+        border-block-end: 1px solid var(--border-subtle, oklch(100% 0 0 / 0.04));
+        padding-block-end: var(--space-md, 1rem);
+        margin-block-end: var(--space-md, 1rem);
+      }
+      :scope h1 { color: var(--text-primary, oklch(97% 0 0)); text-wrap: balance; }
+      :scope nav { font-size: 0.8125rem; color: var(--text-secondary, oklch(70% 0 0)); }
+    }
+  }
+`
 
 export interface LitePageHeaderProps extends HTMLAttributes<HTMLElement> {
   title: string
@@ -15,7 +33,9 @@ const TITLE_SIZES: Record<string, string> = {
 }
 
 export const PageHeader = forwardRef<HTMLElement, LitePageHeaderProps>(
-  ({ title, description, actions, size = 'md', breadcrumbs, className, ...rest }, ref) => (
+  ({ title, description, actions, size = 'md', breadcrumbs, className, ...rest }, ref) => {
+    useStyles('lite-page-header', pageHeaderStyles)
+    return (
     <header
       ref={ref}
       className={`ui-lite-page-header${className ? ` ${className}` : ''}`}
@@ -46,6 +66,7 @@ export const PageHeader = forwardRef<HTMLElement, LitePageHeaderProps>(
         )}
       </div>
     </header>
-  )
+    )
+  }
 )
 PageHeader.displayName = 'PageHeader'

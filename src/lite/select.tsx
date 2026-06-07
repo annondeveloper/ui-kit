@@ -1,15 +1,55 @@
 'use client'
 import { forwardRef, useCallback, useEffect, useRef, useState } from 'react'
+import { css } from '../core/styles/css-tag'
+import { useStyles } from '../core/styles/use-styles'
 import type { SelectProps, SelectOption } from '../components/select'
 
 export type { SelectOption as LiteSelectOption }
 export type LiteSelectProps = SelectProps
+
+const selectStyles = css`
+  @layer components {
+    @scope (.ui-lite-select) {
+      .ui-lite-select__label {
+        font-size: 0.8125rem;
+        font-weight: 500;
+        color: var(--text-secondary, oklch(70% 0 0));
+      }
+      .ui-lite-select__trigger:focus-visible {
+        outline: 2px solid var(--brand, oklch(65% 0.2 270));
+        outline-offset: 2px;
+        border-radius: var(--radius-md, 0.375rem);
+      }
+      :scope[data-open] .ui-lite-select__trigger,
+      .ui-lite-select__trigger:hover:not(:disabled) {
+        border-color: var(--border-strong, oklch(100% 0 0 / 0.16)) !important;
+      }
+      :scope[data-invalid] .ui-lite-select__trigger {
+        border-color: var(--status-critical, oklch(62% 0.22 25)) !important;
+      }
+      :scope[data-size="sm"] .ui-lite-select__trigger { font-size: 0.75rem; }
+      :scope[data-size="lg"] .ui-lite-select__trigger { font-size: 1rem; }
+      .ui-lite-select__chevron {
+        color: var(--text-secondary, oklch(70% 0 0));
+        flex-shrink: 0;
+      }
+      .ui-lite-select__option:hover:not([data-disabled]) {
+        background: oklch(100% 0 0 / 0.06);
+      }
+      .ui-lite-select__option[data-selected] {
+        background: oklch(65% 0.2 270 / 0.12);
+        color: var(--text-primary, oklch(97% 0 0));
+      }
+    }
+  }
+`
 
 export const Select = forwardRef<HTMLDivElement, SelectProps>(({
   name, options, value: controlledValue, defaultValue, onChange,
   placeholder = 'Select...', label, error, disabled, size = 'md', className,
   searchable: _s, clearable: _c, multiple: _m, motion: _mo, ...rest
 }, ref) => {
+  useStyles('lite-select', selectStyles)
   const [isOpen, setIsOpen] = useState(false)
   const [internalValue, setInternalValue] = useState<string>((defaultValue as string) ?? '')
   const rootRef = useRef<HTMLDivElement>(null)

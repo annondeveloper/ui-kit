@@ -1,4 +1,6 @@
 import { forwardRef, useMemo, type HTMLAttributes } from 'react'
+import { css } from '../core/styles/css-tag'
+import { useStyles } from '../core/styles/use-styles'
 
 export interface LiteVlanEntry {
   id: number
@@ -17,9 +19,39 @@ function autoColor(index: number): string {
   return `oklch(65% 0.15 ${hue})`
 }
 
+const vlanBusBarStyles = css`
+  @layer components {
+    @scope (.ui-lite-vlan-bus-bar) {
+      :scope {
+        display: inline-block;
+        background: var(--bg-surface, oklch(20% 0.01 270));
+        border-radius: var(--radius-md, 0.5rem);
+        border: 1px solid var(--border-subtle, oklch(100% 0 0 / 0.08));
+        padding: var(--space-sm, 0.5rem);
+        font-family: var(--font-mono, ui-monospace, monospace);
+      }
+
+      svg {
+        display: block;
+        overflow: visible;
+      }
+
+      @media (forced-colors: active) {
+        :scope {
+          border: 1px solid ButtonText;
+        }
+        rect {
+          forced-color-adjust: none;
+        }
+      }
+    }
+  }
+`
+
 /** Lite VlanBusBar — simple SVG, no animation, no hover effects */
 export const VlanBusBar = forwardRef<HTMLDivElement, LiteVlanBusBarProps>(
   ({ vlans, totalPorts, showLabels = true, className, ...rest }, ref) => {
+    useStyles('lite-vlan-bus-bar', vlanBusBarStyles)
     const tickWidth = 14
     const rowHeight = 18
     const gap = 2
@@ -34,20 +66,12 @@ export const VlanBusBar = forwardRef<HTMLDivElement, LiteVlanBusBarProps>(
       <div
         ref={ref}
         className={`ui-lite-vlan-bus-bar${className ? ` ${className}` : ''}`}
-        style={{
-          display: 'inline-block',
-          background: 'oklch(20% 0.01 270)',
-          borderRadius: '0.5rem',
-          border: '1px solid oklch(100% 0 0 / 0.08)',
-          padding: '0.5rem',
-        }}
         {...rest}
       >
         <svg
           width={totalWidth}
           height={totalHeight}
           viewBox={`0 0 ${totalWidth} ${totalHeight}`}
-          style={{ display: 'block' }}
         >
           {vlans.map((vlan, vi) => {
             const y = gap + vi * (rowHeight + gap)

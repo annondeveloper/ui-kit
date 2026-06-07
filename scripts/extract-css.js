@@ -55,6 +55,33 @@ if (allCSS.length > 0) {
   writeFileSync(join(DIST_CSS, 'all.css'), allCSS.join('\n\n') + '\n')
 }
 
+// Lite tier: extract embedded CSS into a complete standalone stylesheet.
+// React consumers get auto-injection via useStyles(); this file serves
+// non-React / no-bundler consumers (exported as @annondeveloper/ui-kit/lite/styles.css).
+const SRC_LITE = 'src/lite'
+const DIST_LITE = 'dist/css/lite'
+if (existsSync(SRC_LITE)) {
+  mkdirSync(DIST_LITE, { recursive: true })
+  const liteCSS = []
+  let liteCount = 0
+  const liteFiles = readdirSync(SRC_LITE)
+    .filter(f => f.endsWith('.tsx') && !f.endsWith('.test.tsx') && !f.endsWith('.stories.tsx'))
+    .sort()
+  for (const file of liteFiles) {
+    const css = extractCSS(join(SRC_LITE, file))
+    if (css) {
+      const name = basename(file, '.tsx')
+      writeFileSync(join(DIST_LITE, `${name}.css`), css + '\n')
+      liteCSS.push(`/* lite/${name} */\n${css}`)
+      liteCount++
+    }
+  }
+  if (liteCSS.length > 0) {
+    writeFileSync(join(DIST_CSS, 'lite.css'), liteCSS.join('\n\n') + '\n')
+  }
+  console.log(`CSS extraction: ${liteCount} lite components extracted`)
+}
+
 // Copy theme CSS
 if (existsSync(THEME_SRC)) {
   copyFileSync(THEME_SRC, join(DIST_CSS, 'theme.css'))

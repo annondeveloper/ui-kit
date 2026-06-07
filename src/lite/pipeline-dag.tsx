@@ -1,6 +1,24 @@
 import { forwardRef, useMemo } from 'react'
 import type { HTMLAttributes } from 'react'
 import { computeLayout } from '../core/graph'
+import { css } from '../core/styles/css-tag'
+import { useStyles } from '../core/styles/use-styles'
+
+const pipelineDagStyles = css`
+  @layer components {
+    @scope (.ui-lite-pipeline-dag) {
+      :scope {
+        display: block;
+        inline-size: 100%;
+        border-radius: var(--radius-lg, 0.75rem);
+        background: var(--bg-surface, oklch(22% 0.01 270));
+        border: 1px solid var(--border-subtle, oklch(100% 0 0 / 0.08));
+        overflow: hidden;
+      }
+      :scope svg { display: block; }
+    }
+  }
+`
 
 export interface LitePipelineNode {
   id: string
@@ -42,6 +60,7 @@ const NODE_H = 44
 /** Lite PipelineDAG — simple SVG rendering, no animation */
 export const PipelineDAG = forwardRef<HTMLDivElement, LitePipelineDAGProps>(
   ({ nodes, edges, direction = 'LR', height = 300, className, style, ...rest }, ref) => {
+    useStyles('lite-pipeline-dag', pipelineDagStyles)
     const layout = useMemo(() => {
       if (nodes.length === 0) return null
 

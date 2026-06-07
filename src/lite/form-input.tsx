@@ -1,4 +1,104 @@
 import { forwardRef, type InputHTMLAttributes, type ReactNode } from 'react'
+import { css } from '../core/styles/css-tag'
+import { useStyles } from '../core/styles/use-styles'
+
+const formInputStyles = css`
+  @layer components {
+    @scope (.ui-lite-form-input) {
+      :scope {
+        display: flex;
+        flex-direction: column;
+        gap: 0.25rem;
+        font-family: inherit;
+      }
+      label {
+        font-size: 0.8125rem;
+        font-weight: 500;
+        color: var(--text-secondary, oklch(70% 0 0));
+      }
+      .ui-lite-form-input__required {
+        color: oklch(62% 0.22 25);
+      }
+      input {
+        inline-size: 100%;
+        padding: 0.5rem 0.75rem;
+        background: var(--bg-surface, oklch(12% 0.015 270));
+        border: 1px solid var(--border-default, oklch(100% 0 0 / 0.08));
+        border-radius: var(--radius-md, 10px);
+        color: var(--text-primary, oklch(97% 0 0));
+        font-family: inherit;
+        font-size: 0.875rem;
+        line-height: 1.5;
+      }
+      input:focus {
+        outline: none;
+        border-color: var(--brand, oklch(65% 0.2 270));
+        box-shadow: 0 0 0 3px oklch(from var(--brand, oklch(65% 0.2 270)) l c h / 0.15);
+      }
+      input::placeholder {
+        color: var(--text-tertiary, oklch(60% 0 0));
+      }
+
+      /* Sizes */
+      :scope[data-size="xs"] input { padding: 0.25rem 0.5rem; font-size: 0.6875rem; }
+      :scope[data-size="sm"] input { padding: 0.375rem 0.5rem; font-size: 0.75rem; }
+      :scope[data-size="lg"] input { padding: 0.625rem 1rem; font-size: 1rem; }
+      :scope[data-size="xl"] input { padding: 0.75rem 1.25rem; font-size: 1.125rem; }
+
+      /* Icon padding */
+      :scope[data-has-icon] input { padding-inline-start: 2.25rem; }
+      :scope[data-has-icon-end] input { padding-inline-end: 2.25rem; }
+
+      /* Filled variant */
+      :scope[data-variant="filled"] input {
+        background: oklch(100% 0 0 / 0.06);
+        border-color: transparent;
+      }
+      :scope[data-variant="filled"] input:focus {
+        background: var(--bg-surface, oklch(12% 0.015 270));
+        border-color: var(--brand, oklch(65% 0.2 270));
+      }
+
+      /* Invalid */
+      :scope[data-invalid] input,
+      input[aria-invalid="true"] {
+        border-color: oklch(62% 0.22 25);
+      }
+
+      /* Icons */
+      .ui-lite-form-input__icon,
+      .ui-lite-form-input__icon-end {
+        color: var(--text-tertiary, oklch(60% 0 0));
+      }
+      .ui-lite-form-input__clear {
+        color: var(--text-secondary, oklch(70% 0 0));
+      }
+      .ui-lite-form-input__clear:hover {
+        color: var(--text-primary, oklch(97% 0 0));
+      }
+
+      .ui-lite-form-input__description {
+        font-size: 0.75rem;
+        color: var(--text-secondary, oklch(70% 0 0));
+        line-height: 1.4;
+      }
+      .ui-lite-form-input__error {
+        font-size: 0.75rem;
+        color: oklch(62% 0.22 25);
+      }
+      .ui-lite-form-input__counter {
+        font-size: 0.75rem;
+        color: var(--text-tertiary, oklch(60% 0 0));
+        text-align: end;
+        font-variant-numeric: tabular-nums;
+      }
+
+      @media (forced-colors: active) {
+        input { border: 1px solid ButtonText; }
+      }
+    }
+  }
+`
 
 export interface LiteFormInputProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 'size'> {
   name: string
@@ -42,6 +142,7 @@ export const FormInput = forwardRef<HTMLInputElement, LiteFormInputProps>(
     },
     ref
   ) => {
+    useStyles('lite-form-input', formInputStyles)
     const inputId = id ?? `lite-input-${name}`
     const descriptionId = description ? `${inputId}-description` : undefined
     const errorId = error ? `${inputId}-error` : undefined

@@ -1,4 +1,6 @@
 import { forwardRef, useState, useCallback, type HTMLAttributes } from 'react'
+import { css } from '../core/styles/css-tag'
+import { useStyles } from '../core/styles/use-styles'
 
 export interface LiteInlineEditProps extends Omit<HTMLAttributes<HTMLDivElement>, 'onChange'> {
   value: string
@@ -16,8 +18,66 @@ export interface LiteInlineEditProps extends Omit<HTMLAttributes<HTMLDivElement>
   onCancel?: () => void
 }
 
+const inlineEditStyles = css`
+  @layer components {
+    @scope (.ui-lite-inline-edit) {
+      :scope {
+        display: inline-block;
+        font-family: inherit;
+        color: var(--text-primary, oklch(97% 0 0));
+      }
+
+      :scope[data-size="sm"] { font-size: 0.8125rem; }
+      :scope[data-size="md"] { font-size: 0.875rem; }
+      :scope[data-size="lg"] { font-size: 1rem; }
+
+      :scope[data-disabled] {
+        opacity: 0.5;
+        pointer-events: none;
+      }
+
+      .ui-lite-inline-edit span[role="button"] {
+        cursor: pointer;
+        padding: 0.25rem 0.375rem;
+        border-radius: var(--radius-sm, 6px);
+        border: 1px dashed transparent;
+      }
+      .ui-lite-inline-edit span[role="button"]:hover {
+        background: oklch(100% 0 0 / 0.04);
+        border-color: var(--border-default, oklch(100% 0 0 / 0.08));
+      }
+      .ui-lite-inline-edit span[role="button"]:focus-visible {
+        outline: 2px solid var(--brand, oklch(65% 0.2 270));
+        outline-offset: 2px;
+      }
+
+      .ui-lite-inline-edit input,
+      .ui-lite-inline-edit textarea {
+        padding: 0.25rem 0.375rem;
+        background: var(--bg-surface, oklch(12% 0.015 270));
+        border: 1px solid var(--brand, oklch(65% 0.2 270));
+        border-radius: var(--radius-sm, 6px);
+        color: var(--text-primary, oklch(97% 0 0));
+        font-family: inherit;
+        font-size: inherit;
+        inline-size: 100%;
+      }
+      .ui-lite-inline-edit textarea {
+        resize: vertical;
+        min-block-size: 4em;
+      }
+      .ui-lite-inline-edit input:focus-visible,
+      .ui-lite-inline-edit textarea:focus-visible {
+        outline: 2px solid var(--brand, oklch(65% 0.2 270));
+        outline-offset: 1px;
+      }
+    }
+  }
+`
+
 export const InlineEdit = forwardRef<HTMLDivElement, LiteInlineEditProps>(
   ({ value, onChange, placeholder = 'Click to edit', disabled, size, multiline, editTrigger = 'click', onSave, onCancel, className, ...rest }, ref) => {
+    useStyles('lite-inline-edit', inlineEditStyles)
     const [editing, setEditing] = useState(false)
     const [draft, setDraft] = useState(value)
 

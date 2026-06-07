@@ -1,4 +1,69 @@
 import { forwardRef, type HTMLAttributes } from 'react'
+import { css } from '../core/styles/css-tag'
+import { useStyles } from '../core/styles/use-styles'
+
+const skeletonStyles = css`
+  @layer components {
+    @scope (.ui-lite-skeleton) {
+      :scope {
+        display: block;
+        inline-size: 100%;
+        block-size: 1rem;
+        background: var(--bg-surface, oklch(25% 0.02 270));
+        border: 1px solid oklch(100% 0 0 / 0.03);
+        border-radius: var(--radius-md, 0.5rem);
+      }
+
+      :scope[data-variant="text"] {
+        block-size: 0.875rem;
+        border-radius: var(--radius-sm, 0.25rem);
+      }
+      :scope[data-variant="circular"] {
+        border-radius: var(--radius-full, 9999px);
+      }
+      :scope[data-variant="rectangular"] {
+        border-radius: var(--radius-md, 0.5rem);
+      }
+      :scope[data-variant="rounded"] {
+        border-radius: var(--radius-md, 0.5rem);
+      }
+
+      /* Multi-line text container holds individual lines */
+      :scope[data-lines] {
+        display: flex;
+        flex-direction: column;
+        gap: var(--skeleton-line-gap, 0.5rem);
+        background: transparent;
+        border: none;
+        block-size: auto;
+      }
+
+      .ui-lite-skeleton__line {
+        display: block;
+        block-size: var(--skeleton-line-height, 0.875rem);
+        border-radius: var(--radius-sm, 0.25rem);
+        background: var(--bg-surface, oklch(25% 0.02 270));
+        border: 1px solid oklch(100% 0 0 / 0.03);
+      }
+      .ui-lite-skeleton__line:last-child {
+        inline-size: 75%;
+      }
+    }
+
+    @scope (.ui-lite-skeleton__count-wrapper) {
+      :scope {
+        display: flex;
+        gap: 0.625rem;
+      }
+      :scope[data-direction="column"] {
+        flex-direction: column;
+      }
+      :scope[data-direction="row"] {
+        flex-direction: row;
+      }
+    }
+  }
+`
 
 export interface LiteSkeletonProps extends HTMLAttributes<HTMLDivElement> {
   variant?: 'text' | 'circular' | 'rectangular' | 'rounded'
@@ -40,6 +105,7 @@ export const Skeleton = forwardRef<HTMLDivElement, LiteSkeletonProps>(
     },
     ref
   ) => {
+    useStyles('lite-skeleton', skeletonStyles)
     const inlineStyle = {
       ...style,
       ...(width != null ? { inlineSize: toCssValue(width) } : {}),

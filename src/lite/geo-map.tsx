@@ -1,4 +1,28 @@
 import { forwardRef, type HTMLAttributes, type ReactNode } from 'react'
+import { css } from '../core/styles/css-tag'
+import { useStyles } from '../core/styles/use-styles'
+
+const geoMapStyles = css`
+  @layer components {
+    @scope (.ui-lite-geo-map) {
+      :scope {
+        display: block;
+        inline-size: 100%;
+        min-block-size: 200px;
+        background: var(--bg-surface, oklch(22% 0.02 270));
+        border: 1px solid var(--border-subtle, oklch(100% 0 0 / 0.08));
+        border-radius: var(--radius-lg, 0.75rem);
+        overflow: hidden;
+      }
+      :scope[data-interactive] {
+        cursor: pointer;
+      }
+      @media (forced-colors: active) {
+        :scope { border: 2px solid ButtonText; }
+      }
+    }
+  }
+`
 
 export interface LiteGeoPoint {
   id: string
@@ -29,7 +53,9 @@ export interface LiteGeoMapProps extends HTMLAttributes<HTMLDivElement> {
 }
 
 export const GeoMap = forwardRef<HTMLDivElement, LiteGeoMapProps>(
-  ({ points, connections, projection = 'equirectangular', showLabels, interactive, height, className, style, ...rest }, ref) => (
+  ({ points, connections, projection = 'equirectangular', showLabels, interactive, height, className, style, ...rest }, ref) => {
+    useStyles('lite-geo-map', geoMapStyles)
+    return (
     <div
       ref={ref}
       className={`ui-lite-geo-map${className ? ` ${className}` : ''}`}
@@ -40,6 +66,7 @@ export const GeoMap = forwardRef<HTMLDivElement, LiteGeoMapProps>(
       style={{ ...style, ...(height !== undefined && { height: typeof height === 'number' ? `${height}px` : height }) }}
       {...rest}
     />
-  )
+    )
+  }
 )
 GeoMap.displayName = 'GeoMap'

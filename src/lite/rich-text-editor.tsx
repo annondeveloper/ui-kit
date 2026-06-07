@@ -1,4 +1,43 @@
 import { forwardRef, useRef, useCallback, useEffect, type HTMLAttributes } from 'react'
+import { css } from '../core/styles/css-tag'
+import { useStyles } from '../core/styles/use-styles'
+
+const richTextEditorStyles = css`
+  @layer components {
+    @scope (.ui-lite-rich-text-editor) {
+      :scope {
+        display: flex;
+        flex-direction: column;
+        font-family: inherit;
+        color: var(--text-primary, oklch(97% 0 0));
+      }
+      :scope label {
+        color: var(--text-primary, oklch(97% 0 0));
+      }
+      :scope [role="textbox"] {
+        color: var(--text-primary, oklch(97% 0 0));
+      }
+      :scope [role="textbox"]:empty::before {
+        content: attr(data-placeholder);
+        color: var(--text-secondary, oklch(70% 0 0));
+        opacity: 0.6;
+        pointer-events: none;
+      }
+      :scope [role="toolbar"] button:hover:not(:disabled) {
+        background: oklch(100% 0 0 / 0.08) !important;
+        color: var(--text-primary, oklch(97% 0 0)) !important;
+      }
+      :scope [role="toolbar"] button:disabled {
+        opacity: 0.4;
+        cursor: not-allowed;
+      }
+      :scope [role="toolbar"] button:focus-visible {
+        outline: 2px solid var(--brand, oklch(65% 0.2 270));
+        outline-offset: -2px;
+      }
+    }
+  }
+`
 
 export interface LiteRichTextEditorProps extends Omit<HTMLAttributes<HTMLDivElement>, 'onChange'> {
   value?: string
@@ -14,6 +53,7 @@ export interface LiteRichTextEditorProps extends Omit<HTMLAttributes<HTMLDivElem
 /** Lite rich text editor — basic contentEditable with bold/italic/underline buttons, no animation */
 export const RichTextEditor = forwardRef<HTMLDivElement, LiteRichTextEditorProps>(
   ({ value, defaultValue, onChange, placeholder = 'Start typing...', label, disabled, readOnly, minHeight = 120, className, ...rest }, ref) => {
+    useStyles('lite-rich-text-editor', richTextEditorStyles)
     const editorRef = useRef<HTMLDivElement>(null)
     const isControlled = value !== undefined
 

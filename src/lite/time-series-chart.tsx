@@ -1,4 +1,28 @@
 import { forwardRef, useMemo, type HTMLAttributes } from 'react'
+import { css } from '../core/styles/css-tag'
+import { useStyles } from '../core/styles/use-styles'
+
+const timeSeriesChartStyles = css`
+  @layer components {
+    @scope (.ui-lite-time-series-chart) {
+      :scope {
+        display: block;
+        inline-size: 100%;
+        background: var(--bg-surface, oklch(12% 0.015 270));
+        border: 1px solid var(--border-subtle, oklch(100% 0 0 / 0.04));
+        border-radius: var(--radius-md, 10px);
+        padding: 0.5rem;
+        color: var(--text-secondary, oklch(70% 0 0));
+        font-size: 0.75rem;
+      }
+      svg {
+        display: block;
+        inline-size: 100%;
+        block-size: auto;
+      }
+    }
+  }
+`
 
 export interface LiteTimeSeriesData {
   timestamp: number
@@ -23,6 +47,7 @@ const COLORS = ['oklch(65% 0.2 270)', 'oklch(72% 0.19 155)', 'oklch(70% 0.2 30)'
 /** Lite TimeSeriesChart — simple SVG polylines, no animation or interactivity */
 export const TimeSeriesChart = forwardRef<HTMLDivElement, LiteTimeSeriesChartProps>(
   ({ series, height = 200, width = '100%', className, ...rest }, ref) => {
+    useStyles('lite-time-series-chart', timeSeriesChartStyles)
     const padding = { top: 8, right: 8, bottom: 20, left: 44 }
     const viewW = 400
     const viewH = height

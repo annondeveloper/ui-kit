@@ -1,4 +1,19 @@
 import { forwardRef, type HTMLAttributes } from 'react'
+import { css } from '../core/styles/css-tag'
+import { useStyles } from '../core/styles/use-styles'
+
+const rackDiagramStyles = css`
+  @layer components {
+    @scope (.ui-lite-rack-diagram) {
+      :scope {
+        position: relative;
+        display: inline-flex;
+        min-inline-size: 120px;
+        color: var(--text-primary, oklch(97% 0 0));
+      }
+    }
+  }
+`
 
 export interface LiteRackDevice { startU: number; heightU: number; label: string; status?: 'ok' | 'warning' | 'critical' | 'empty' }
 
@@ -18,6 +33,7 @@ const STATUS_BG: Record<string, string> = {
 /** Lite rack diagram — simple CSS grid, no animation */
 export const RackDiagram = forwardRef<HTMLDivElement, LiteRackDiagramProps>(
   ({ units, devices, showUnitNumbers = true, className, ...rest }, ref) => {
+    useStyles('lite-rack-diagram', rackDiagramStyles)
     const unitH = 14
     return (
       <div

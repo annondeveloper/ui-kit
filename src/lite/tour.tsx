@@ -1,4 +1,23 @@
 import { useState, useCallback, type ReactNode } from 'react'
+import { css } from '../core/styles/css-tag'
+import { useStyles } from '../core/styles/use-styles'
+
+const tourStyles = css`
+  @layer components {
+    @scope (.ui-lite-tour) {
+      :scope {
+        position: fixed;
+        inset: 0;
+        z-index: 9999;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: oklch(0% 0 0 / 0.5);
+        color: var(--text-primary, oklch(90% 0 0));
+      }
+    }
+  }
+`
 
 export interface LiteTourStep {
   title: string
@@ -15,6 +34,7 @@ export interface LiteTourProps {
 
 /** Lite tour — simple fixed overlay with step navigation, no spotlight or animation */
 export function Tour({ steps, open = false, onClose, onFinish, showProgress = true }: LiteTourProps) {
+  useStyles('lite-tour', tourStyles)
   const [step, setStep] = useState(0)
   const current = steps[step]
   const isLast = step === steps.length - 1

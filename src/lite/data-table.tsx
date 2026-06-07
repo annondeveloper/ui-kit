@@ -1,4 +1,40 @@
 import { forwardRef, type HTMLAttributes, type ReactNode } from 'react'
+import { css } from '../core/styles/css-tag'
+import { useStyles } from '../core/styles/use-styles'
+
+const dataTableStyles = css`
+  @layer components {
+    @scope (.ui-lite-data-table) {
+      :scope {
+        overflow-x: auto;
+        color: var(--text-primary, oklch(97% 0 0));
+      }
+      table {
+        inline-size: 100%;
+        border-collapse: collapse;
+        font-size: var(--text-sm, 0.8125rem);
+      }
+      th {
+        text-align: start;
+        padding: 0.5rem 0.75rem;
+        font-weight: 600;
+        color: var(--text-secondary, oklch(70% 0 0));
+        border-block-end: 1px solid var(--border-subtle, oklch(100% 0 0 / 0.04));
+      }
+      td {
+        padding: 0.5rem 0.75rem;
+        border-block-end: 1px solid oklch(100% 0 0 / 0.02);
+      }
+      :scope[data-striped] tbody tr:nth-child(even) {
+        background: oklch(100% 0 0 / 0.02);
+      }
+      :scope[data-compact] th,
+      :scope[data-compact] td {
+        padding: 0.25rem 0.5rem;
+      }
+    }
+  }
+`
 
 export interface LiteColumnDef<T> {
   id: string
@@ -18,6 +54,7 @@ function DataTableInner<T extends object>(
   { data, columns, striped, compact, className, ...rest }: LiteDataTableProps<T>,
   ref: React.Ref<HTMLDivElement>
 ) {
+  useStyles('lite-data-table', dataTableStyles)
   const getValue = (row: T, col: LiteColumnDef<T>) =>
     typeof col.accessor === 'function' ? col.accessor(row) : row[col.accessor]
 

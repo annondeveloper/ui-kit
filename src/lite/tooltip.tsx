@@ -11,6 +11,34 @@ import {
   type ReactNode,
   type CSSProperties,
 } from 'react'
+import { css } from '../core/styles/css-tag'
+import { useStyles } from '../core/styles/use-styles'
+
+const tooltipStyles = css`
+  @layer components {
+    @scope (.ui-lite-tooltip) {
+      :scope {
+        position: relative;
+        display: inline-block;
+      }
+      .ui-lite-tooltip__panel {
+        position: absolute;
+        z-index: 9999;
+        pointer-events: none;
+        background: var(--surface-elevated, var(--bg-elevated, oklch(25% 0 0)));
+        color: var(--text-primary, oklch(90% 0 0));
+        font-size: 0.875rem;
+        line-height: 1.4;
+        padding-block: 0.375rem;
+        padding-inline: 0.625rem;
+        border: 1px solid var(--border-subtle, oklch(100% 0 0 / 0.1));
+        border-radius: var(--radius-sm, 0.25rem);
+        box-shadow: 0 4px 16px oklch(0% 0 0 / 0.35);
+        white-space: nowrap;
+      }
+    }
+  }
+`
 
 export interface LiteTooltipProps {
   content: ReactNode
@@ -47,6 +75,7 @@ const placementStyles: Record<string, CSSProperties> = {
 
 export const Tooltip = forwardRef<HTMLSpanElement, LiteTooltipProps>(
   ({ content, children, placement = 'top', delay = 300, disabled, interactive, maxWidth }, ref) => {
+    useStyles('lite-tooltip', tooltipStyles)
     const [visible, setVisible] = useState(false)
     const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
     const tooltipId = useId()

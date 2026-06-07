@@ -1,4 +1,41 @@
 import { forwardRef, useState, useCallback, type HTMLAttributes, type ChangeEvent } from 'react'
+import { css } from '../core/styles/css-tag'
+import { useStyles } from '../core/styles/use-styles'
+
+const codeEditorStyles = css`
+  @layer components {
+    @scope (.ui-lite-code-editor) {
+      :scope {
+        display: flex;
+        border: 1px solid var(--border-default, oklch(100% 0 0 / 0.08));
+        border-radius: var(--radius-lg, 0.75rem);
+        overflow: hidden;
+        background: var(--bg-surface, oklch(12% 0.015 270));
+        color: var(--text-primary, oklch(97% 0 0));
+        font-family: 'SF Mono', 'Cascadia Code', 'Fira Code', ui-monospace, monospace;
+        font-size: var(--text-sm, 0.875rem);
+      }
+      :scope:focus-within {
+        border-color: var(--brand, oklch(65% 0.2 270));
+      }
+      :scope textarea {
+        flex: 1;
+        padding: 1rem;
+        border: none;
+        background: transparent;
+        color: inherit;
+        font: inherit;
+        line-height: 1.6;
+        resize: vertical;
+        outline: none;
+        tab-size: 2;
+      }
+      @media (forced-colors: active) {
+        :scope { border: 1px solid ButtonText; }
+      }
+    }
+  }
+`
 
 export interface LiteCodeEditorProps extends Omit<HTMLAttributes<HTMLDivElement>, 'onChange'> {
   value?: string
@@ -14,6 +51,7 @@ export interface LiteCodeEditorProps extends Omit<HTMLAttributes<HTMLDivElement>
 /** Lite code editor — plain textarea with optional line numbers, no syntax highlighting */
 export const CodeEditor = forwardRef<HTMLDivElement, LiteCodeEditorProps>(
   ({ value, defaultValue = '', onChange, language, readOnly, showLineNumbers, placeholder, minHeight, className, ...rest }, ref) => {
+    useStyles('lite-code-editor', codeEditorStyles)
     const isControlled = value !== undefined
     const [internalValue, setInternalValue] = useState(defaultValue)
     const code = isControlled ? value : internalValue

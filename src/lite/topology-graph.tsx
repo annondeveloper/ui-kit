@@ -1,5 +1,24 @@
 import { forwardRef, useMemo, type HTMLAttributes } from 'react'
 import { computeLayout } from '../core/graph'
+import { css } from '../core/styles/css-tag'
+import { useStyles } from '../core/styles/use-styles'
+
+const topologyGraphStyles = css`
+  @layer components {
+    @scope (.ui-lite-topology-graph) {
+      :scope {
+        display: block;
+        border: 1px solid var(--border-default, oklch(100% 0 0 / 0.08));
+        border-radius: var(--radius-md, 0.5rem);
+        background: var(--bg-surface, oklch(18% 0.01 270));
+        overflow: hidden;
+      }
+      svg {
+        display: block;
+      }
+    }
+  }
+`
 
 export interface LiteTopologyNode {
   id: string
@@ -32,6 +51,7 @@ const STATUS_COLORS: Record<string, string> = {
 /** Lite TopologyGraph — SVG-only, no pan/zoom, no minimap */
 export const TopologyGraph = forwardRef<HTMLDivElement, LiteTopologyGraphProps>(
   ({ nodes, edges, layout: layoutType = 'force', height = 400, className, style, ...rest }, ref) => {
+    useStyles('lite-topology-graph', topologyGraphStyles)
     const width = 600
 
     const layoutResult = useMemo(() => {

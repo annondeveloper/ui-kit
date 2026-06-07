@@ -1,4 +1,18 @@
 import { forwardRef, type HTMLAttributes, type ReactNode } from 'react'
+import { css } from '../core/styles/css-tag'
+import { useStyles } from '../core/styles/use-styles'
+
+const pageShellStyles = css`
+  @layer components {
+    @scope (.ui-lite-page-shell) {
+      :scope {
+        inline-size: 100%;
+        margin-inline: auto;
+        color: var(--text-primary, oklch(97% 0 0));
+      }
+    }
+  }
+`
 
 export interface LitePageShellProps extends HTMLAttributes<HTMLDivElement> {
   maxWidth?: 'sm' | 'md' | 'lg' | 'xl' | 'full'
@@ -22,7 +36,9 @@ const PADDINGS: Record<string, string> = {
 }
 
 export const PageShell = forwardRef<HTMLDivElement, LitePageShellProps>(
-  ({ maxWidth = 'lg', padding = 'md', children, className, style, ...rest }, ref) => (
+  ({ maxWidth = 'lg', padding = 'md', children, className, style, ...rest }, ref) => {
+    useStyles('lite-page-shell', pageShellStyles)
+    return (
     <div
       ref={ref}
       className={`ui-lite-page-shell${className ? ` ${className}` : ''}`}
@@ -42,6 +58,7 @@ export const PageShell = forwardRef<HTMLDivElement, LitePageShellProps>(
     >
       {children}
     </div>
-  )
+    )
+  }
 )
 PageShell.displayName = 'PageShell'

@@ -1,4 +1,17 @@
 import { forwardRef, type HTMLAttributes } from 'react'
+import { css } from '../core/styles/css-tag'
+import { useStyles } from '../core/styles/use-styles'
+
+const animatedCounterStyles = css`
+  @layer components {
+    @scope (.ui-lite-animated-counter) {
+      :scope {
+        font-variant-numeric: tabular-nums;
+        color: var(--text-primary, oklch(97% 0 0));
+      }
+    }
+  }
+`
 
 export interface LiteAnimatedCounterProps extends HTMLAttributes<HTMLSpanElement> {
   value: number
@@ -9,10 +22,13 @@ export interface LiteAnimatedCounterProps extends HTMLAttributes<HTMLSpanElement
 
 /** Lite animated counter — static display, no animation */
 export const AnimatedCounter = forwardRef<HTMLSpanElement, LiteAnimatedCounterProps>(
-  ({ value, format, duration: _duration, className, ...rest }, ref) => (
-    <span ref={ref} className={`ui-lite-animated-counter${className ? ` ${className}` : ''}`} {...rest}>
-      {format ? format(value) : value}
-    </span>
-  )
+  ({ value, format, duration: _duration, className, ...rest }, ref) => {
+    useStyles('lite-animated-counter', animatedCounterStyles)
+    return (
+      <span ref={ref} className={`ui-lite-animated-counter${className ? ` ${className}` : ''}`} {...rest}>
+        {format ? format(value) : value}
+      </span>
+    )
+  }
 )
 AnimatedCounter.displayName = 'AnimatedCounter'

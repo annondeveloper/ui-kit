@@ -1,8 +1,7 @@
 /* Import Aurora Fluid theme tokens */
 @import '../../src/core/tokens/theme.css';
 
-/* Import lite tier CSS for weight tier demos */
-@import '../../src/lite/lite.css';
+/* Lite tier components self-inject their scoped CSS via useStyles() — no import needed. */
 
 /* Demo site base styles — using Aurora Fluid tokens */
 *, *::before, *::after {
